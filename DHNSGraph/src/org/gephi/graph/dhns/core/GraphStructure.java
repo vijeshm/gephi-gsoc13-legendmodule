@@ -164,6 +164,7 @@ public class GraphStructure {
     }
 
     public void removeFromDictionnary(AbstractNode node) {
+        node.getAttributes().removeFromDictionary();
         dictionnary.removeNode(node);
     }
 
@@ -172,6 +173,7 @@ public class GraphStructure {
     }
 
     public void removeFromDictionnary(AbstractEdge edge) {
+        edge.getAttributes().removeFromDictionary();
         dictionnary.removeEdge(edge);
     }
 

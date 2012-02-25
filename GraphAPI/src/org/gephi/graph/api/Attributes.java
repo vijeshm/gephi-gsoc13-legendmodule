@@ -95,4 +95,6 @@ public interface Attributes {
      * Resets the content of the row.
      */
     public void reset();
+    
+    public void removeFromDictionary();
 }

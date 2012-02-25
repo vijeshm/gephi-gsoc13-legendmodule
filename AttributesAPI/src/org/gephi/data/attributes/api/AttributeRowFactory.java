@@ -41,8 +41,8 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.gephi.data.attributes.api;
 
+import org.gephi.graph.api.Attributable;
 import org.gephi.graph.api.EdgeData;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.NodeData;
 
@@ -86,5 +86,5 @@ public interface AttributeRowFactory {
      *          otherwise
      * @see AttributeModel#getTable(java.lang.String) 
      */
-    public AttributeRow newRowForTable(String tableName, Object object);
+    public AttributeRow newRowForTable(String tableName, Attributable source);
 }

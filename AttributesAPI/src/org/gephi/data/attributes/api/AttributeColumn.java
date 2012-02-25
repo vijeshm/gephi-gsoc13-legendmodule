@@ -41,7 +41,9 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.gephi.data.attributes.api;
 
+import java.util.Set;
 import org.gephi.data.attributes.spi.AttributeValueDelegateProvider;
+import org.gephi.graph.api.Attributable;
 
 /**
  * Column is the header of a data column. It belongs to an <code>AttributeTable</code>
@@ -127,4 +129,18 @@ public interface AttributeColumn {
      * @return attribute value delegate provider
      */
     public AttributeValueDelegateProvider getProvider();
+    
+    public AttributeTable getTable();
+    
+    public Set<Object> getValues();
+
+    public int getValueFrequency(Object value);
+    
+    public Set<Attributable> getValueRows(Object value);
+
+    public Object getMinValue();
+
+    public Object getMaxValue();
+    
+    public boolean isSortableColumn();
 }

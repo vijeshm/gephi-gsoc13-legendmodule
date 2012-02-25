@@ -76,7 +76,7 @@ package org.gephi.graph.api;
  *
  * @author Mathieu Bastian
  */
-public interface GraphView {
+public interface GraphView extends Attributable{
 
     /**
      * Returns this view unique identifier. The id is a positive integer. The

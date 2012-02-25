@@ -52,7 +52,6 @@ import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import org.gephi.data.attributes.type.*;
-import org.openide.util.Exceptions;
 
 /**
  * The different type an {@link AttributeColumn} can have.

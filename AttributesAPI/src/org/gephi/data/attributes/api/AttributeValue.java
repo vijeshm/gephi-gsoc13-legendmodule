@@ -41,6 +41,8 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.gephi.data.attributes.api;
 
+import org.gephi.graph.api.Attributable;
+
 /**
  * Cell that contains the value for a particular {@link AttributeColumn} and
  * {@link AttributeRow}.
@@ -58,6 +60,10 @@ public interface AttributeValue {
      * @return  the column this value belongs
      */
     public AttributeColumn getColumn();
+    
+    public AttributeRow getRow();
+    
+    public Attributable getSource();
 
     /**
      * Returns the value. May be <code>null</code> or equal to the column's

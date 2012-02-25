@@ -56,8 +56,9 @@ public interface AttributeValueFactory {
      * The <code>value</code> type should be compatible with the column type.
      *
      * @param column    the column where the cell belongs
+     * @param row       the row where the cell belongs
      * @param value     a compatible value, or <code>null</code>
      * @return          the new value for the given column
      */
-    public AttributeValue newValue(AttributeColumn column, Object value);
+    public AttributeValue newValue(AttributeColumn column, AttributeRow row, Object value);
 }

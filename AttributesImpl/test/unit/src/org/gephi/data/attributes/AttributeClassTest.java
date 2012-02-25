@@ -111,7 +111,7 @@ public class AttributeClassTest {
             r.setValue("col2", i);
             r.setValue("Column 3", null);
             r.setValue(5, "col4value " + i);
-            r.setValue(factory.newValue(co5, false));
+            r.setValue(factory.newValue(co5, r,false));
             rows.add(r);
         }
 

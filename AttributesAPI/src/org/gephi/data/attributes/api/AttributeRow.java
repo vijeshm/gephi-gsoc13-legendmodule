@@ -41,6 +41,7 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.gephi.data.attributes.api;
 
+import org.gephi.graph.api.Attributable;
 import org.gephi.graph.api.Attributes;
 import org.gephi.graph.api.EdgeData;
 import org.gephi.graph.api.NodeData;
@@ -189,4 +190,8 @@ public interface AttributeRow extends Attributes {
      * @return AttributeColumn at given index or null if the index is not valid
      */
     public AttributeColumn getColumnAt(int index);
+    
+    public Attributable getSource();
+    
+    public AttributeTable getTable();
 }

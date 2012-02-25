@@ -43,13 +43,10 @@ package org.gephi.data.attributes;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.gephi.data.attributes.api.AttributeColumn;
-import org.gephi.data.attributes.api.AttributeEvent;
-import org.gephi.data.attributes.api.AttributeListener;
-import org.gephi.data.attributes.api.AttributeType;
-import org.gephi.data.attributes.api.AttributeValue;
-import org.gephi.data.attributes.event.AttributeEventManager;
+import org.gephi.data.attributes.api.*;
 import org.gephi.data.attributes.model.IndexedAttributeModel;
+import org.gephi.graph.api.Attributable;
+import org.gephi.graph.api.Attributes;
 import org.junit.Test;
 import org.openide.util.Exceptions;
 
@@ -61,6 +58,28 @@ public class EventsTest {
 
     private int countEvents = 0;
     private int countElements = 0;
+    
+    class SimpleAttributable implements Attributable{
+        private Attributes attributes;
+        private String name;
+
+        public SimpleAttributable(String name) {
+            this.name = name;
+        }
+
+        public void setAttributes(Attributes attributes) {
+            this.attributes = attributes;
+        }
+        
+        public Attributes getAttributes() {
+            return attributes;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Test
     public void testEventsPerformance() {
@@ -82,8 +101,12 @@ public class EventsTest {
         //Add Column
         AttributeColumnImpl col = table.addColumn("test", AttributeType.DOUBLE);
 
-        AttributeRowImpl r1 = attModel.getFactory().newRowForTable("table", 1.0);
-        AttributeRowImpl r2 = attModel.getFactory().newRowForTable("table", 1.0);
+        SimpleAttributable a1=new SimpleAttributable("1.0");
+        AttributeRowImpl r1 = attModel.getFactory().newRowForTable("table", a1);
+        a1.setAttributes(r1);
+        SimpleAttributable a2=new SimpleAttributable("1.0");
+        AttributeRowImpl r2 = attModel.getFactory().newRowForTable("table", a2);
+        a2.setAttributes(r2);
 
         for(int i=0;i<1000000;i++) {
             r1.setValue(col.getIndex(), Math.random());
@@ -111,24 +134,13 @@ public class EventsTest {
 
         //Add Column
         AttributeColumnImpl col = table.addColumn("test", AttributeType.STRING);
-
-        //Create objects
-        Object o1 = new Object() {
-
-            @Override
-            public String toString() {
-                return "o1";
-            }
-        };
-        Object o2 = new Object() {
-
-            @Override
-            public String toString() {
-                return "o2";
-            }
-        };
+        
+        SimpleAttributable o1=new SimpleAttributable("o1");
         AttributeRowImpl r1 = attModel.getFactory().newRowForTable("table", o1);
+        o1.setAttributes(r1);
+        SimpleAttributable o2=new SimpleAttributable("o2");
         AttributeRowImpl r2 = attModel.getFactory().newRowForTable("table", o2);
+        o2.setAttributes(r2);
 
         //Set values
         r1.setValue(col, "value 1");
