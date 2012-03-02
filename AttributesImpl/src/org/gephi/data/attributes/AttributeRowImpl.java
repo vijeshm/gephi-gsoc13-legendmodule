@@ -270,4 +270,12 @@ public class AttributeRowImpl implements AttributeRow {
             }
         }
     }
+    
+    public void addToDictionary() {
+        if (values != null) {
+            for (AttributeValue value : values) {
+                ((AttributeColumnImpl) value.getColumn()).putValue(value);
+            }
+        }
+    }
 }

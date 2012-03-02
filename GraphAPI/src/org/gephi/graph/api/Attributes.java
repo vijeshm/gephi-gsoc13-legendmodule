@@ -97,4 +97,6 @@ public interface Attributes {
     public void reset();
     
     public void removeFromDictionary();
+    
+    public void addToDictionary();
 }

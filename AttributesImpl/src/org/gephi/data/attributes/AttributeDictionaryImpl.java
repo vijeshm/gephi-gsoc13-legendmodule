@@ -4,7 +4,13 @@
  */
 package org.gephi.data.attributes;
 
-import java.util.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeDictionary;
 import org.gephi.data.attributes.api.AttributeUtils;
@@ -17,26 +23,38 @@ import org.gephi.graph.api.Attributable;
  */
 public final class AttributeDictionaryImpl implements AttributeDictionary {
 
+    private static final boolean DEFAULT_TRIMMING_ENABLED = false;
+    private static final int DEFAULT_TRIMMING_FREQUENCY = 30;
     private AttributeColumn column;
     private Map<Object, Set<Attributable>> map;
     private Set<Attributable> nullSet;
     private boolean sortableColumn;
+    private boolean trimmingEnabled;
+    private int trimmingFrequency;
+    private int countDownToTrim;
 
-    public AttributeDictionaryImpl(AttributeColumn column) {
+    public AttributeDictionaryImpl(AttributeColumn column, boolean trimmingEnabled, int trimmingFrequency) {
         this.column = column;
-        this.nullSet = new HashSet<Attributable>();
+        this.trimmingEnabled = trimmingEnabled;
+        this.trimmingFrequency = trimmingFrequency;
+        this.nullSet = new ObjectOpenHashSet<Attributable>();
         buildMap();
     }
 
+    public AttributeDictionaryImpl(AttributeColumn column) {
+        this(column, DEFAULT_TRIMMING_ENABLED, DEFAULT_TRIMMING_FREQUENCY);
+    }
+
     private void buildMap() {
-        if (AttributeUtils.getDefault().isNumberColumn(column)) {
+        sortableColumn = AttributeUtils.getDefault().isNumberColumn(column);
+        if (sortableColumn) {
             //Column type is sortable:
-            map = new TreeMap<Object, Set<Attributable>>();
-            sortableColumn = true;
+            map = new Object2ObjectAVLTreeMap<Object, Set<Attributable>>();
+            trimmingEnabled = false;//No need to trim TreeMap
         } else {
             //Column type is not sortable:
-            map = new HashMap<Object, Set<Attributable>>();
-            sortableColumn = false;
+            map = new Object2ObjectOpenHashMap<Object, Set<Attributable>>();
+            countDownToTrim = trimmingFrequency;
         }
     }
 
@@ -47,7 +65,7 @@ public final class AttributeDictionaryImpl implements AttributeDictionary {
         if (map.containsKey(value)) {
             return map.get(value);
         } else {
-            Set<Attributable> set = new HashSet<Attributable>();
+            Set<Attributable> set = new ObjectOpenHashSet<Attributable>();
             map.put(value, set);
             return set;
         }
@@ -56,9 +74,7 @@ public final class AttributeDictionaryImpl implements AttributeDictionary {
     public synchronized void putValue(AttributeValue value) {
         Object objVal = value.getValue();
         Set<Attributable> set = getValueSet(objVal);
-        if(!set.add(value.getSource())){
-            //System.out.println("false");
-        }
+        set.add(value.getSource());
     }
 
     public synchronized void removeValue(AttributeValue value) {
@@ -67,6 +83,13 @@ public final class AttributeDictionaryImpl implements AttributeDictionary {
         set.remove(value.getSource());
         if (set.isEmpty() && objVal != null) {
             map.remove(objVal);
+            if (trimmingEnabled) {
+                countDownToTrim--;
+                if (countDownToTrim == 0) {
+                    ((Object2ObjectOpenHashMap) map).trim();
+                    countDownToTrim = trimmingFrequency;
+                }
+            }
         }
     }
 
@@ -105,7 +128,7 @@ public final class AttributeDictionaryImpl implements AttributeDictionary {
             if (map.isEmpty()) {
                 return null;
             } else {
-                return ((TreeMap) map).firstKey();
+                return ((SortedMap) map).firstKey();
             }
         } else {
             throw new UnsupportedOperationException(column.getTitle() + " is not a sortable column.");
@@ -117,7 +140,7 @@ public final class AttributeDictionaryImpl implements AttributeDictionary {
             if (map.isEmpty()) {
                 return null;
             } else {
-                return ((TreeMap) map).lastKey();
+                return ((SortedMap) map).lastKey();
             }
         } else {
             throw new UnsupportedOperationException(column.getTitle() + " is not a sortable column.");
@@ -130,5 +153,17 @@ public final class AttributeDictionaryImpl implements AttributeDictionary {
 
     public AttributeColumn getColumn() {
         return column;
+    }
+
+    public int getCountDownToTrim() {
+        return countDownToTrim;
+    }
+
+    public boolean isTrimmingEnabled() {
+        return trimmingEnabled;
+    }
+
+    public int getTrimmingFrequency() {
+        return trimmingFrequency;
     }
 }

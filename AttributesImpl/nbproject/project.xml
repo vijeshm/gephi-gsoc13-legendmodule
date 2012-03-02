@@ -60,9 +60,11 @@
                     <name>unit</name>
                 </test-type>
             </test-dependencies>
-            <public-packages>
-                <package>org.gephi.data.attributes.spi</package>
-            </public-packages>
+            <public-packages/>
+            <class-path-extension>
+                <runtime-relative-path>ext/fastutil-6.4.3-reduced.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/fastutil-6.4.3-reduced.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>
