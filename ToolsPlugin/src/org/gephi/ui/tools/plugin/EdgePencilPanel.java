@@ -43,6 +43,8 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.gephi.ui.tools.plugin;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import org.gephi.ui.components.JColorButton;
 
 /**
@@ -53,7 +55,26 @@ public class EdgePencilPanel extends javax.swing.JPanel {
 
     /** Creates new form EdgePencilPanel */
     public EdgePencilPanel() {
+        isDirected = true;
         initComponents();
+        
+                //Init events
+        modeComboBox.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (modeComboBox.getSelectedIndex() == 0) {
+                    isDirected = true;
+                } else {
+                    isDirected = false;
+                }
+                System.out.printf("Changed edge type:%s\n",((isDirected==true)?"directed":"undirected"));
+            }
+            
+        });
+    }
+    
+    public boolean isDirected(){
+        return isDirected;
     }
 
     public void setStatus(String status) {
@@ -84,60 +105,92 @@ public class EdgePencilPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         statusLabel = new javax.swing.JLabel();
         weightSpinner = new javax.swing.JSpinner();
         labelWeight = new javax.swing.JLabel();
         colorButton = new JColorButton(Color.BLACK);
         labelColor = new javax.swing.JLabel();
+        modeComboBox = new javax.swing.JComboBox();
+        labelMode = new javax.swing.JLabel();
+
+        setLayout(new java.awt.GridBagLayout());
 
         statusLabel.setFont(statusLabel.getFont().deriveFont((float)10));
         statusLabel.setText(org.openide.util.NbBundle.getMessage(EdgePencilPanel.class, "EdgePencilPanel.statusLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipady = 28;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(statusLabel, gridBagConstraints);
 
         weightSpinner.setFont(weightSpinner.getFont().deriveFont((float)10));
         weightSpinner.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(1.0f), Float.valueOf(0.0f), null, Float.valueOf(0.1f)));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        add(weightSpinner, gridBagConstraints);
 
         labelWeight.setFont(labelWeight.getFont().deriveFont((float)10));
         labelWeight.setText(org.openide.util.NbBundle.getMessage(EdgePencilPanel.class, "EdgePencilPanel.labelWeight.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipady = 15;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
+        add(labelWeight, gridBagConstraints);
 
         colorButton.setText(org.openide.util.NbBundle.getMessage(EdgePencilPanel.class, "EdgePencilPanel.colorButton.text")); // NOI18N
         colorButton.setContentAreaFilled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = -55;
+        gridBagConstraints.ipady = -1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        add(colorButton, gridBagConstraints);
 
         labelColor.setFont(labelColor.getFont().deriveFont((float)10));
         labelColor.setText(org.openide.util.NbBundle.getMessage(EdgePencilPanel.class, "EdgePencilPanel.labelColor.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipady = 15;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(labelColor, gridBagConstraints);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(statusLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
-                .addComponent(labelColor)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelWeight)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(weightSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(weightSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        modeComboBox.setFont(modeComboBox.getFont().deriveFont((float)10));
+        modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Directed", "Undirected" }));
+        modeComboBox.setMinimumSize(new java.awt.Dimension(109, 20));
+        modeComboBox.setPreferredSize(new java.awt.Dimension(109, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        add(modeComboBox, gridBagConstraints);
+
+        labelMode.setFont(labelMode.getFont().deriveFont((float)10));
+        labelMode.setText(org.openide.util.NbBundle.getMessage(EdgePencilPanel.class, "EdgePencilPanel.labelMode.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 100, 0, 0);
+        add(labelMode, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    public boolean isDirected;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton colorButton;
     private javax.swing.JLabel labelColor;
+    private javax.swing.JLabel labelMode;
     private javax.swing.JLabel labelWeight;
+    private javax.swing.JComboBox modeComboBox;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JSpinner weightSpinner;
     // End of variables declaration//GEN-END:variables

@@ -1,44 +1,44 @@
 /*
-Copyright 2008-2010 Gephi
-Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
-Website : http://www.gephi.org
+ Copyright 2008-2010 Gephi
+ Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
+ Website : http://www.gephi.org
 
-This file is part of Gephi.
+ This file is part of Gephi.
 
-DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-Copyright 2011 Gephi Consortium. All rights reserved.
+ Copyright 2011 Gephi Consortium. All rights reserved.
 
-The contents of this file are subject to the terms of either the GNU
-General Public License Version 3 only ("GPL") or the Common
-Development and Distribution License("CDDL") (collectively, the
-"License"). You may not use this file except in compliance with the
-License. You can obtain a copy of the License at
-http://gephi.org/about/legal/license-notice/
-or /cddl-1.0.txt and /gpl-3.0.txt. See the License for the
-specific language governing permissions and limitations under the
-License.  When distributing the software, include this License Header
-Notice in each file and include the License files at
-/cddl-1.0.txt and /gpl-3.0.txt. If applicable, add the following below the
-License Header, with the fields enclosed by brackets [] replaced by
-your own identifying information:
-"Portions Copyrighted [year] [name of copyright owner]"
+ The contents of this file are subject to the terms of either the GNU
+ General Public License Version 3 only ("GPL") or the Common
+ Development and Distribution License("CDDL") (collectively, the
+ "License"). You may not use this file except in compliance with the
+ License. You can obtain a copy of the License at
+ http://gephi.org/about/legal/license-notice/
+ or /cddl-1.0.txt and /gpl-3.0.txt. See the License for the
+ specific language governing permissions and limitations under the
+ License.  When distributing the software, include this License Header
+ Notice in each file and include the License files at
+ /cddl-1.0.txt and /gpl-3.0.txt. If applicable, add the following below the
+ License Header, with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
 
-If you wish your version of this file to be governed by only the CDDL
-or only the GPL Version 3, indicate your decision by adding
-"[Contributor] elects to include this software in this distribution
-under the [CDDL or GPL Version 3] license." If you do not indicate a
-single choice of license, a recipient has the option to distribute
-your version of this file under either the CDDL, the GPL Version 3 or
-to extend the choice of license to its licensees as provided above.
-However, if you add GPL Version 3 code and therefore, elected the GPL
-Version 3 license, then the option applies only if the new code is
-made subject to such option by the copyright holder.
+ If you wish your version of this file to be governed by only the CDDL
+ or only the GPL Version 3, indicate your decision by adding
+ "[Contributor] elects to include this software in this distribution
+ under the [CDDL or GPL Version 3] license." If you do not indicate a
+ single choice of license, a recipient has the option to distribute
+ your version of this file under either the CDDL, the GPL Version 3 or
+ to extend the choice of license to its licensees as provided above.
+ However, if you add GPL Version 3 code and therefore, elected the GPL
+ Version 3 license, then the option applies only if the new code is
+ made subject to such option by the copyright holder.
 
-Contributor(s):
+ Contributor(s):
 
-Portions Copyrighted 2011 Gephi Consortium.
-*/
+ Portions Copyrighted 2011 Gephi Consortium.
+ */
 package org.gephi.tools.plugin;
 
 import java.awt.Color;
@@ -101,17 +101,49 @@ public class EdgePencil implements Tool {
                 if (sourceNode == null) {
                     sourceNode = n;
                     edgePencilPanel.setStatus(NbBundle.getMessage(EdgePencil.class, "EdgePencil.status2"));
-                } else {
+                }
+                else {
                     color = edgePencilPanel.getColor();
                     weight = edgePencilPanel.getWeight();
                     GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-                    Graph graph = gc.getModel().getGraph();
-                    boolean directed = graph instanceof DirectedGraph;
+                    boolean isDirected = edgePencilPanel.isDirected();
+                    
+                    //OTHER VERSION
+                    /*Graph graph = gc.getModel().getMixedGraph();
+
                     Edge edge = gc.getModel().factory().newEdge(sourceNode, n, weight, directed);
                     edge.getEdgeData().setR(color.getRed() / 255f);
                     edge.getEdgeData().setG(color.getGreen() / 255f);
                     edge.getEdgeData().setB(color.getBlue() / 255f);
                     graph.addEdge(edge);
+
+                    */
+
+                    Graph graph = gc.getModel().getGraph();
+                    if (isDirected) {
+                        Edge edge = gc.getModel().factory().newEdge(sourceNode, n, weight, isDirected);
+
+                        edge.getEdgeData().setR(color.getRed() / 255f);
+                        edge.getEdgeData().setG(color.getGreen() / 255f);
+                        edge.getEdgeData().setB(color.getBlue() / 255f);
+                        graph.addEdge(edge);
+                    }
+                    else
+                    {
+                        Edge edge1 = gc.getModel().factory().newEdge(sourceNode, n, weight, true);
+                        Edge edge2 = gc.getModel().factory().newEdge(n, sourceNode, weight, true);
+
+                        edge1.getEdgeData().setR(color.getRed() / 255f);
+                        edge1.getEdgeData().setG(color.getGreen() / 255f);
+                        edge1.getEdgeData().setB(color.getBlue() / 255f);
+                        graph.addEdge(edge1);
+                        
+                        edge2.getEdgeData().setR(color.getRed() / 255f);
+                        edge2.getEdgeData().setG(color.getGreen() / 255f);
+                        edge2.getEdgeData().setB(color.getBlue() / 255f);
+                        graph.addEdge(edge2);
+                    }
+
                     sourceNode = null;
                     edgePencilPanel.setStatus(NbBundle.getMessage(EdgePencil.class, "EdgePencil.status1"));
                 }
@@ -126,6 +158,7 @@ public class EdgePencil implements Tool {
                     sourceNode = null;
                 }
             }
+
         };
         return listeners;
     }
@@ -156,10 +189,12 @@ public class EdgePencil implements Tool {
             public int getPosition() {
                 return 130;
             }
+
         };
     }
 
     public ToolSelectionType getSelectionType() {
         return ToolSelectionType.SELECTION;
     }
+
 }
