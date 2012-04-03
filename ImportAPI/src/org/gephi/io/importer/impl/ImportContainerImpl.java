@@ -147,9 +147,9 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
         }
 
         if (parameters.isDuplicateWithLabels()
-                && nodeDraftImpl.getLabel() != null
-                && !nodeDraftImpl.getLabel().equals(nodeDraftImpl.getId())
-                && nodeLabelMap.containsKey(nodeDraftImpl.getLabel())) {
+            && nodeDraftImpl.getLabel() != null
+            && !nodeDraftImpl.getLabel().equals(nodeDraftImpl.getId())
+            && nodeLabelMap.containsKey(nodeDraftImpl.getLabel())) {
             String message = NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_nodeExist", nodeDraftImpl.getId());
             report.logIssue(new Issue(message, Level.WARNING));
             return;
@@ -174,7 +174,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                 addNode(node);
                 node.setCreatedAuto(true);
                 report.logIssue(new Issue("Unknown node id, creates node from id='" + id + "'", Level.INFO));
-            } else {
+            }
+            else {
                 String message = NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_UnknowNodeId", id);
                 report.logIssue(new Issue(message, Level.SEVERE));
             }
@@ -211,6 +212,17 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             report.logIssue(new Issue(message, Level.SEVERE));
             return;
         }
+
+        //setting default type
+        if (edgeDraftImpl.getType() == null) {
+            edgeDraftImpl.setType((parameters.getEdgeDefault() == EdgeDefault.DIRECTED)
+                                  ? EdgeDraftImpl.EdgeType.DIRECTED
+                                  : EdgeDraftImpl.EdgeType.UNDIRECTED);
+        }
+
+        System.out.printf("Edge:%s type:%s\n",
+                          edgeDraftImpl.getId(),
+                          edgeDraftImpl.getType().toString());
 
         if (edgeDraftImpl.getType() != null) {
             //Counting
@@ -252,7 +264,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             if (!parameters.isParallelEdges()) {
                 report.logIssue(new Issue(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_edgeExist"), Level.WARNING));
                 return;
-            } else {
+            }
+            else {
                 EdgeDraftImpl existingEdge = edgeMap.get(id);
                 if (existingEdge == null) {
                     existingEdge = edgeSourceTargetMap.get(sourceTargetId);
@@ -274,6 +287,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
         edgeSourceTargetMap.put(sourceTargetId, edgeDraftImpl);
         edgeMap.put(id, edgeDraftImpl);
 
+
+
         //Mutual
         if (edgeDraftImpl.getType() != null && edgeDraftImpl.getType().equals(EdgeDraft.EdgeType.MUTUAL)) {
             id = edgeDraftImpl.getId() + "-mutual";
@@ -282,7 +297,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                 if (!parameters.isParallelEdges()) {
                     report.logIssue(new Issue(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_edgeExist"), Level.WARNING));
                     return;
-                } else {
+                }
+                else {
                     EdgeDraftImpl existingEdge = edgeSourceTargetMap.get(sourceTargetId);
                     //Manage parallel edges
                     if (parameters.isMergeParallelEdgesWeight()) {
@@ -421,7 +437,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             } catch (Exception ex) {
                 report.logIssue(new Issue(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_TimeInterval_ParseError", timeIntervalMax), Level.SEVERE));
             }
-        } else {
+        }
+        else {
             try {
                 this.timeIntervalMax = Double.parseDouble(timeIntervalMax);
             } catch (Exception ex) {
@@ -437,7 +454,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             } catch (Exception ex) {
                 report.logIssue(new Issue(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_TimeInterval_ParseError", timeIntervalMin), Level.SEVERE));
             }
-        } else {
+        }
+        else {
             try {
                 this.timeIntervalMin = Double.parseDouble(timeIntervalMin);
             } catch (Exception ex) {
@@ -467,9 +485,11 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
         //Graph EdgeDefault
         if (directedEdgesCount > 0 && undirectedEdgesCount == 0) {
             parameters.setEdgeDefault(EdgeDefault.DIRECTED);
-        } else if (directedEdgesCount == 0 && undirectedEdgesCount > 0) {
+        }
+        else if (directedEdgesCount == 0 && undirectedEdgesCount > 0) {
             parameters.setEdgeDefault(EdgeDefault.UNDIRECTED);
-        } else if (directedEdgesCount > 0 && undirectedEdgesCount > 0) {
+        }
+        else if (directedEdgesCount > 0 && undirectedEdgesCount > 0) {
             parameters.setEdgeDefault(EdgeDefault.MIXED);
         }
 
@@ -512,7 +532,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                     report.log(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerLog.TimeInterval", message));
                 } catch (Exception e) {
                 }
-            } else {
+            }
+            else {
                 String message = "[" + (timeIntervalMin != null ? timeIntervalMin.toString() : "-inf") + ",";
                 message += (timeIntervalMax != null ? timeIntervalMax.toString() : "+inf") + "]";
                 report.log(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerLog.TimeInterval", message));
@@ -645,14 +666,16 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                 if (opposite != null) {
                     if (parameters.isUndirectedSumDirectedEdgesWeight()) {
                         opposite.setWeight(edge.getWeight() + opposite.getWeight());
-                    } else {
+                    }
+                    else {
                         opposite.setWeight(Math.max(edge.getWeight(), opposite.getWeight()));
                     }
                     itr.remove();
                     edgeSourceTargetMap.remove(edge.getSource().getId() + "-" + edge.getTarget().getId());
                 }
             }
-        } else if (parameters.getEdgeDefault().equals(EdgeDefault.MIXED)) {
+        }
+        else if (parameters.getEdgeDefault().equals(EdgeDefault.MIXED)) {
             //Clean undirected edges when graph is mixed
             for (EdgeDraftImpl edge : edgeMap.values().toArray(new EdgeDraftImpl[0])) {
                 if (edge.getType() == null) {
@@ -665,7 +688,8 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                     if (opposite != null) {
                         if (parameters.isUndirectedSumDirectedEdgesWeight()) {
                             edge.setWeight(edge.getWeight() + opposite.getWeight());
-                        } else {
+                        }
+                        else {
                             edge.setWeight(Math.max(edge.getWeight(), opposite.getWeight()));
                         }
                         edgeMap.remove(edge.getId());
@@ -698,6 +722,7 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             public int compare(NodeDraftImpl o1, NodeDraftImpl o2) {
                 return new Integer(o2.getHeight()).compareTo(o1.getHeight());
             }
+
         });
         for (NodeDraftImpl n : sortedMapValues) {
             sortedNodeMap.put(n.getId(), n);
@@ -734,6 +759,7 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             }
         }
     }
+
     private static int nodeIDgen = 0;
     private static int edgeIDgen = 0;
 
@@ -753,6 +779,7 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
             edgeIDgen++;
             return edge;
         }
+
     }
 
     //MANAGEMENT
@@ -826,4 +853,5 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
     public void setAutoScale(boolean autoscale) {
         parameters.setAutoScale(autoscale);
     }
+
 }

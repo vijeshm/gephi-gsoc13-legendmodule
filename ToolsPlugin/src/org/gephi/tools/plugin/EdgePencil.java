@@ -120,6 +120,7 @@ public class EdgePencil implements Tool {
                     */
 
                     Graph graph = gc.getModel().getGraph();
+                    
                     if (isDirected) {
                         Edge edge = gc.getModel().factory().newEdge(sourceNode, n, weight, isDirected);
 
