@@ -80,6 +80,7 @@ public class ImporterDOT implements FileImporter, LongTask {
         this.report = new Report();
         LineNumberReader lineReader = ImportUtils.getTextReader(reader);
         try {
+            System.out.printf("+----Importing\n");
             importData(lineReader);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -93,7 +94,7 @@ public class ImporterDOT implements FileImporter, LongTask {
         initColorTable();
         StreamTokenizer streamTokenizer = new StreamTokenizer(reader);
         setSyntax(streamTokenizer);
-
+        System.out.printf("+----Creating graph\n");
         graph(streamTokenizer);
     }
 
@@ -123,6 +124,7 @@ public class ImporterDOT implements FileImporter, LongTask {
         while (streamTokenizer.nextToken() != StreamTokenizer.TT_EOF) {
             if (streamTokenizer.ttype == StreamTokenizer.TT_WORD) {
                 if (streamTokenizer.sval.equalsIgnoreCase("digraph") || streamTokenizer.sval.equalsIgnoreCase("graph")) {
+                    System.out.printf("Importing graph: %s\n",streamTokenizer.sval);
                     found = true;
                     container.setEdgeDefault(streamTokenizer.sval.equalsIgnoreCase("digraph") ? EdgeDefault.DIRECTED : EdgeDefault.UNDIRECTED);
                     streamTokenizer.nextToken();
@@ -149,6 +151,7 @@ public class ImporterDOT implements FileImporter, LongTask {
     protected void stmtList(StreamTokenizer streamTokenizer) throws Exception {
         do {
             streamTokenizer.nextToken();
+            System.out.printf("*** Analyzing:%s,\t%f,\t%d\n",streamTokenizer.sval,streamTokenizer.nval,streamTokenizer.ttype);
             stmt(streamTokenizer);
         } while (streamTokenizer.ttype != StreamTokenizer.TT_EOF);
     }
@@ -160,12 +163,15 @@ public class ImporterDOT implements FileImporter, LongTask {
                 || streamTokenizer.sval.equalsIgnoreCase("edge")) {
         } else {
             String nodeId = nodeID(streamTokenizer);
+            System.out.printf("Node Created:%s\n",nodeId);
             streamTokenizer.nextToken();
-
+            System.out.printf("Node Created analyzed :%s,\t%f,\t%d, %c\n",streamTokenizer.sval,streamTokenizer.nval,streamTokenizer.ttype,(char)streamTokenizer.ttype);
             if (streamTokenizer.ttype == '-') {
+                System.out.printf("With edge:\n");  
                 NodeDraft nodeDraft = getOrCreateNode(nodeId);
                 edgeStructure(streamTokenizer, nodeDraft);
             } else if (streamTokenizer.ttype == '[') {
+                System.out.printf("Creating new attribute:\n");
                 NodeDraft nodeDraft = getOrCreateNode(nodeId);
                 nodeAttributes(streamTokenizer, nodeDraft);
             }
@@ -183,11 +189,13 @@ public class ImporterDOT implements FileImporter, LongTask {
 
     protected NodeDraft getOrCreateNode(String id) {
         if (!container.nodeExists(id)) {
+            System.out.printf("Creating new node:%s\n", id);
             NodeDraft nodeDraft = container.factory().newNodeDraft();
             nodeDraft.setId(id);
             container.addNode(nodeDraft);
             return nodeDraft;
         }
+        System.out.printf("Node Exists:%s\n", id);
         return container.getNode(id);
     }
 
@@ -298,6 +306,8 @@ public class ImporterDOT implements FileImporter, LongTask {
 
     protected void edgeStructure(StreamTokenizer streamTokenizer, final NodeDraft nodeDraft) throws Exception {
         streamTokenizer.nextToken();
+        
+       System.out.printf("Creating new edge:\n");
 
         EdgeDraft edge = null;
         if (streamTokenizer.ttype == '>' || streamTokenizer.ttype == '-') {
