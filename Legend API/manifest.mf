@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.gephi.legend.api
+OpenIDE-Module-Localizing-Bundle: org/gephi/legend/api/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: com.itextpdf.text.pdf
+OpenIDE-Module-Localizing-Bundle: com/itextpdf/text/pdf/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
