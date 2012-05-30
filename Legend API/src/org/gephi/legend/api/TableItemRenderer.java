@@ -14,18 +14,18 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
+import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-import org.w3c.dom.Element;
 import processing.core.PGraphics;
 import processing.core.PGraphicsJava2D;
 
-@ServiceProvider(service = TableItemRenderer.class, position = 10)
-public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
+@ServiceProvider(service = Renderer.class, position = 10)
+public class TableItemRenderer implements Renderer {
 
     @Override
     public String getDisplayName() {
-        return NbBundle.getMessage(TableItemRenderer.class, "localized.name.key");
+        return NbBundle.getMessage(TableItemRenderer.class, "TableItemRenderer.name");
     }
 
     @Override
@@ -36,63 +36,13 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
         TableItem tableItem = (TableItem) item;
 
-        //font
-        //font
-        Integer fontSize = tableItem.getData(TableItem.FONT_SIZE);
-        String fontType = tableItem.getData(TableItem.FONT_TYPE);
-        Integer fontStyle = tableItem.getData(TableItem.FONT_STYLE);
-        Font font = new Font(fontType, fontStyle, fontSize);
-
-        //labels
-        ArrayList<String> labels = tableItem.getData(TableItem.LABELS);
-
-        Integer cellSizeWidth = tableItem.getData(TableItem.CELL_SIZE_WIDTH);
-        Integer cellSizeHeight = tableItem.getData(TableItem.CELL_SIZE_HEIGHT);
-
-
-        TableItem.VerticalTextDirection verticalTextDirection = tableItem.getData(TableItem.VERTICAL_TEXT_DIRECTION);
-
-
-        Integer MINIMUM_MARGIN = tableItem.getData(TableItem.MINIMUM_MARGIN);
-
-
-        Graphics2D graphics = null;
-
-
-
         if (target instanceof ProcessingTarget) {
-            graphics = getGraphicsFromRendeting((ProcessingTarget) target);
-        }
-        else if (target instanceof SVGTarget) {
+            renderProcessing(tableItem, (ProcessingTarget) target, properties);
+        } else if (target instanceof SVGTarget) {
             renderSVG(tableItem, (SVGTarget) target, properties);
-        }
-        else if (target instanceof PDFTarget) {
+        } else if (target instanceof PDFTarget) {
             renderPDF(tableItem, (PDFTarget) target, properties);
         }
-
-        graphics.setFont(font);
-        FontMetrics fontMetrics = graphics.getFontMetrics();
-        int maxLength = fontMetrics.stringWidth(longestLabel(labels));
-
-
-
-
-
-        Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
-
-
-
-        Integer horizontalTextWidth = maxLength + 2 * MINIMUM_MARGIN;
-        Integer horizontalTextHeight = cellSizeHeight * labels.size();
-        Integer verticalTextHeight = maxLength + 2 * MINIMUM_MARGIN;
-        Integer verticalTextWidth = cellSizeWidth * labels.size();
-
-        AffineTransform origin = new AffineTransform();
-        origin.setToTranslation(100, 100);
-
-        createImage(tableItem, graphics, origin, horizontalTextWidth, horizontalTextHeight, verticalTextWidth, verticalTextHeight);
-
-
     }
 
     @Override
@@ -109,14 +59,42 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof TableItemBuilder;
     }
+    
+    private void renderProcessing(TableItem tableItem, ProcessingTarget target, PreviewProperties properties) {
+        PGraphics pGraphics = target.getGraphics();
+        
+        Integer fontSize = tableItem.getData(TableItem.FONT_SIZE);
+        String fontType = tableItem.getData(TableItem.FONT_TYPE);
+        Integer fontStyle = tableItem.getData(TableItem.FONT_STYLE);
+        Font font = new Font(fontType, fontStyle, fontSize);
 
-    private Graphics2D getGraphicsFromRendeting(ProcessingTarget target) {
-        return (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
-    }
+        //labels
+        ArrayList<String> labels = tableItem.getData(TableItem.LABELS);
 
-    private void renderProcessing(TableItem item, ProcessingTarget target, PreviewProperties properties) {
-        PGraphics graphics = target.getGraphics();
-        //Render here with processing graphics
+        Integer cellSizeWidth = tableItem.getData(TableItem.CELL_SIZE_WIDTH);
+        Integer cellSizeHeight = tableItem.getData(TableItem.CELL_SIZE_HEIGHT);
+
+        TableItem.VerticalTextDirection verticalTextDirection = tableItem.getData(TableItem.VERTICAL_TEXT_DIRECTION);
+
+        Integer MINIMUM_MARGIN = tableItem.getData(TableItem.MINIMUM_MARGIN);
+
+        Graphics2D graphics = (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
+        
+        graphics.setFont(font);
+        FontMetrics fontMetrics = graphics.getFontMetrics();
+        int maxLength = fontMetrics.stringWidth(longestLabel(labels));
+
+        Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
+
+        Integer horizontalTextWidth = maxLength + 2 * MINIMUM_MARGIN;
+        Integer horizontalTextHeight = cellSizeHeight * labels.size();
+        Integer verticalTextHeight = maxLength + 2 * MINIMUM_MARGIN;
+        Integer verticalTextWidth = cellSizeWidth * labels.size();
+
+        AffineTransform origin = new AffineTransform();
+        origin.setToTranslation(100, 100);
+
+        createImage(tableItem, graphics, origin, horizontalTextWidth, horizontalTextHeight, verticalTextWidth, verticalTextHeight);
     }
 
     private void renderSVG(TableItem tableItem, SVGTarget target, PreviewProperties properties) {
@@ -149,8 +127,7 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
     }
 
     public void createVerticalText(TableItem tableItem, Graphics2D graphics, AffineTransform affineTransform, int width, int height) {
-
-    int fontSize = tableItem.getData(TableItem.FONT_SIZE);
+        Integer fontSize = tableItem.getData(TableItem.FONT_SIZE);
         String fontType = tableItem.getData(TableItem.FONT_TYPE);
         Integer fontStyle = tableItem.getData(TableItem.FONT_STYLE);
 
@@ -165,8 +142,8 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
         TableItem.Direction verticalAlignment = tableItem.getData(TableItem.VERTICAL_ALIGNMENT);
         TableItem.Direction cellColoring = tableItem.getData(TableItem.CELL_COLORING);
         TableItem.VerticalTextDirection verticalTextDirection = tableItem.getData(TableItem.VERTICAL_TEXT_DIRECTION);
-        
-        
+
+
         Integer cellSizeWidth = tableItem.getData(TableItem.CELL_SIZE_WIDTH);
         Integer cellSizeHeight = tableItem.getData(TableItem.CELL_SIZE_HEIGHT);
 
@@ -183,7 +160,7 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
 
         //font
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                                  RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setFont(font);
         graphics.setColor(Color.MAGENTA);
 
@@ -204,8 +181,8 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
                 for (int i = 0; i < labels.size(); i++) {
                     String label = labels.get(i);
                     graphics.drawString(label,
-                                        minimumMargin,
-                                        i * cellSizeWidth + fontSize + centerDistance);
+                            minimumMargin,
+                            i * cellSizeWidth + fontSize + centerDistance);
 
                 }
 
@@ -222,8 +199,8 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
                 for (int i = 0; i < labels.size(); i++) {
                     String label = labels.get(i);
                     graphics.drawString(label,
-                                        height - metrics.stringWidth(label) - minimumMargin,
-                                        i * cellSizeWidth + fontSize + centerDistance);
+                            height - metrics.stringWidth(label) - minimumMargin,
+                            i * cellSizeWidth + fontSize + centerDistance);
 
                 }
 
@@ -245,8 +222,8 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
                 for (int i = 0; i < labels.size(); i++) {
                     String label = labels.get(i);
                     graphics.drawString(label,
-                                        minimumMargin + ((i) * diagonalShift) + centerDistance + horizontalExtraAlignment,
-                                        (int) (i * diagonalShift) + fontSize - centerDistance + horizontalExtraAlignment);
+                            minimumMargin + ((i) * diagonalShift) + centerDistance + horizontalExtraAlignment,
+                            (int) (i * diagonalShift) + fontSize - centerDistance + horizontalExtraAlignment);
                 }
 
                 break;
@@ -269,5 +246,4 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
         }
         return maxLabel;
     }
-
 }

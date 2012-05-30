@@ -120,26 +120,6 @@
                 </dependency>
             </module-dependencies>
             <public-packages/>
-            <class-path-extension>
-                <runtime-relative-path>ext/itextpdf-5.2.1-javadoc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/itextpdf-5.2.1-javadoc.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/itextpdf-5.2.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/itextpdf-5.2.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/batik.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/batik.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/itext-xtra-5.2.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/itext-xtra-5.2.1.jar</binary-origin>
-            </class-path-extension>
         </data>
     </configuration>
 </project>
