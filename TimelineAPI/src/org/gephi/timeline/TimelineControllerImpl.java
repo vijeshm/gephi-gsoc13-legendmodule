@@ -55,7 +55,6 @@ import org.gephi.data.attributes.type.DynamicType;
 import org.gephi.data.attributes.type.Interval;
 import org.gephi.data.attributes.type.TimeInterval;
 import org.gephi.dynamic.api.DynamicController;
-import org.gephi.dynamic.api.DynamicModel;
 import org.gephi.dynamic.api.DynamicModelEvent;
 import org.gephi.dynamic.api.DynamicModelListener;
 import org.gephi.graph.api.Graph;
@@ -63,12 +62,8 @@ import org.gephi.graph.api.GraphController;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.gephi.project.api.WorkspaceListener;
-import org.gephi.timeline.api.TimelineChart;
-import org.gephi.timeline.api.TimelineController;
-import org.gephi.timeline.api.TimelineModel;
 import org.gephi.timeline.api.TimelineModel.PlayMode;
-import org.gephi.timeline.api.TimelineModelEvent;
-import org.gephi.timeline.api.TimelineModelListener;
+import org.gephi.timeline.api.*;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -170,6 +165,7 @@ public class TimelineControllerImpl implements TimelineController, DynamicModelL
             double max = timeInterval.getHigh();
             fireTimelineModelEvent(new TimelineModelEvent(TimelineModelEvent.EventType.INTERVAL, model, new double[]{min, max}));
         } else if (event.getEventType().equals(DynamicModelEvent.EventType.TIME_FORMAT)) {
+            fireTimelineModelEvent(new TimelineModelEvent(TimelineModelEvent.EventType.MODEL, model, null)); //refresh display
         }
     }
 
@@ -177,7 +173,7 @@ public class TimelineControllerImpl implements TimelineController, DynamicModelL
         if (model != null) {
             if (min > max) {
                 throw new IllegalArgumentException("min should be less than max");
-            } else if(min == max) {
+            } else if (min == max) {
                 //Avoid setting values at this point
                 return false;
             }
@@ -309,13 +305,19 @@ public class TimelineControllerImpl implements TimelineController, DynamicModelL
                                 Number[] xs = new Number[intervals.size() * 2];
                                 Number[] ys = new Number[intervals.size() * 2];
                                 int i = 0;
-                                for (Interval interval : intervals) {
+                                Interval interval;
+                                for (int j = 0; j < intervals.size(); j++) {
+                                    interval = intervals.get(j);
                                     Number x = (Double) interval.getLow();
                                     Number y = (Number) interval.getValue();
                                     xs[i] = x;
                                     ys[i] = y;
                                     i++;
-                                    xs[i] = (Double) interval.getHigh();
+                                    if (j != intervals.size() - 1 && intervals.get(j + 1).getLow() < interval.getHigh()) {
+                                        xs[i] = (Double) intervals.get(j + 1).getLow();
+                                    } else {
+                                        xs[i] = (Double) interval.getHigh();
+                                    }
                                     ys[i] = y;
                                     i++;
                                 }
