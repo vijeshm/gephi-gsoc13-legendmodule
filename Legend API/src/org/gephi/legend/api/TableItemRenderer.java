@@ -14,13 +14,13 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
+import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-import org.w3c.dom.Element;
 import processing.core.PGraphics;
 import processing.core.PGraphicsJava2D;
 
-@ServiceProvider(service = TableItemRenderer.class, position = 10)
+@ServiceProvider(service = Renderer.class, position = 10)
 public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
 
     @Override
@@ -120,6 +120,7 @@ public class TableItemRenderer implements org.gephi.preview.spi.Renderer {
     }
 
     private void renderSVG(TableItem tableItem, SVGTarget target, PreviewProperties properties) {
+        //not working yet
     }
 
     private void renderPDF(TableItem tableItem, PDFTarget target, PreviewProperties properties) {

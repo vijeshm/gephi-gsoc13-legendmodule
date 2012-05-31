@@ -37,6 +37,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 // import com.itextpdf.text.Document;
 //import com.itextpdf.text.pdf.FontMapper;
 import com.itextpdf.awt.DefaultFontMapper;
+//import org.gephi.lib.itext;
 import org.gephi.preview.plugin.items.AbstractItem;
 
 /**

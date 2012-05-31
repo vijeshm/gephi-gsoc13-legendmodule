@@ -4,8 +4,6 @@
  */
 package org.gephi.legend.api;
 
-import java.awt.Color;
-import java.util.ArrayList;
 import org.gephi.preview.plugin.items.AbstractItem;
 
 /**
