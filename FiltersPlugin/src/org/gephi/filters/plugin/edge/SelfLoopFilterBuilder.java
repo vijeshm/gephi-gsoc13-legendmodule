@@ -1,6 +1,6 @@
 /*
-Copyright 2008-2010 Gephi
-Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
+Copyright 2008-2012 Gephi
+Authors : Luiz Ribeiro <luizribeiro@gmail.com>
 Website : http://www.gephi.org
 
 This file is part of Gephi.
@@ -38,37 +38,71 @@ made subject to such option by the copyright holder.
 Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
-*/
-package org.gephi.tools.api;
+ */
+package org.gephi.filters.plugin.edge;
 
-import javax.swing.JComponent;
-import org.gephi.tools.spi.Tool;
+import javax.swing.Icon;
+import javax.swing.JPanel;
+import org.gephi.filters.api.FilterLibrary;
+import org.gephi.filters.spi.*;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
- * Controller for visualization toolbar.
- * <p>
- * This controller is a service and can therefore be found in Lookup:
- * <pre>ToolController tc = Lookup.getDefault().lookup(ToolController.class);</pre>
- * @author Mathieu Bastian
+ *
+ * @author Luiz Ribeiro
  */
-public interface ToolController {
+@ServiceProvider(service = FilterBuilder.class)
+public class SelfLoopFilterBuilder implements FilterBuilder {
 
-    /**
-     * Selects <code>tool</code> as the active tool and therefore unselect the
-     * current tool, if exists.
-     * @param tool  the tool that is to be selected or null to only unselect the current tool
-     */
-    public void select(Tool tool);
+    public Category getCategory() {
+        return FilterLibrary.EDGE;
+    }
 
-    /**
-     * Returns the toolbar component, build from tools implementations.
-     * @return      the toolbar component
-     */
-    public JComponent getToolbar();
+    public String getName() {
+        return NbBundle.getMessage(SelfLoopFilterBuilder.class, "SelfLoopFilterBuilder.name");
+    }
 
-    /**
-     * Returns the properties bar component, that display tools settings.
-     * @return      the properties bar component
-     */
-    public JComponent getPropertiesBar();
+    public Icon getIcon() {
+        return null;
+    }
+
+    public String getDescription() {
+        return NbBundle.getMessage(SelfLoopFilterBuilder.class, "SelfLoopFilterBuilder.description");
+    }
+
+    public Filter getFilter() {
+        return new SelfLoopFilter();
+    }
+
+    public JPanel getPanel(Filter filter) {
+        return null;
+    }
+
+    public void destroy(Filter filter) {
+    }
+
+    public static class SelfLoopFilter implements EdgeFilter {
+
+        public boolean init(Graph graph) {
+            return true;
+        }
+
+        public String getName() {
+            return NbBundle.getMessage(SelfLoopFilterBuilder.class, "SelfLoopFilterBuilder.name");
+        }
+
+        public boolean evaluate(Graph graph, Edge edge) {
+            return !edge.isSelfLoop();
+        }
+
+        public void finish() {
+        }
+
+        public FilterProperty[] getProperties() {
+            return null;
+        }
+    }
 }

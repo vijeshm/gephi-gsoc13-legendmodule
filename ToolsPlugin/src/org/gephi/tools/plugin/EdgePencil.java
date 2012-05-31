@@ -45,11 +45,13 @@ import java.awt.Color;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import org.gephi.graph.api.DirectedGraph;
+import org.gephi.datalab.api.GraphElementsController;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
+import org.gephi.project.api.WorkspaceListener;
 import org.gephi.tools.spi.MouseClickEventListener;
 import org.gephi.tools.spi.NodeClickEventListener;
 import org.gephi.tools.spi.Tool;
@@ -81,6 +83,38 @@ public class EdgePencil implements Tool {
         //Default settings
         color = Color.BLACK;
         weight = 1f;
+
+        //Add workspace listener for updating edge pencil panel options and status
+        Lookup.getDefault().lookup(ProjectController.class).addWorkspaceListener(new WorkspaceListener() {
+
+            public void initialize(Workspace workspace) {
+                updatePanel();
+            }
+
+            public void select(Workspace workspace) {
+                updatePanel();
+            }
+
+            public void unselect(Workspace workspace) {
+            }
+
+            public void close(Workspace workspace) {
+            }
+
+            public void disable() {
+            }
+        });
+    }
+
+    private void updatePanel() {
+        if (edgePencilPanel != null) {
+            GraphController gc = Lookup.getDefault().lookup(GraphController.class);
+            if (gc.getModel() != null) {
+                edgePencilPanel.setType(gc.getModel().isDirected() || gc.getModel().isMixed());
+            }
+            sourceNode = null;
+            edgePencilPanel.setStatus(NbBundle.getMessage(EdgePencil.class, "EdgePencil.status1"));
+        }
     }
 
     public void select() {
@@ -89,7 +123,8 @@ public class EdgePencil implements Tool {
     public void unselect() {
         listeners = null;
         sourceNode = null;
-        edgePencilPanel = null;
+        color = edgePencilPanel.getColor();
+        weight = edgePencilPanel.getWeight();
     }
 
     public ToolEventListener[] getListeners() {
@@ -98,53 +133,18 @@ public class EdgePencil implements Tool {
 
             public void clickNodes(Node[] nodes) {
                 Node n = nodes[0];
+
                 if (sourceNode == null) {
                     sourceNode = n;
                     edgePencilPanel.setStatus(NbBundle.getMessage(EdgePencil.class, "EdgePencil.status2"));
-                }
-                else {
+                } else {
                     color = edgePencilPanel.getColor();
                     weight = edgePencilPanel.getWeight();
-                    GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-                    boolean isDirected = edgePencilPanel.isDirected();
-                    
-                    //OTHER VERSION
-                    /*Graph graph = gc.getModel().getMixedGraph();
-
-                    Edge edge = gc.getModel().factory().newEdge(sourceNode, n, weight, directed);
+                    boolean directed = edgePencilPanel.isDirected;
+                    Edge edge = Lookup.getDefault().lookup(GraphElementsController.class).createEdge(sourceNode, n, directed);
                     edge.getEdgeData().setR(color.getRed() / 255f);
                     edge.getEdgeData().setG(color.getGreen() / 255f);
                     edge.getEdgeData().setB(color.getBlue() / 255f);
-                    graph.addEdge(edge);
-
-                    */
-
-                    Graph graph = gc.getModel().getGraph();
-                    
-                    if (isDirected) {
-                        Edge edge = gc.getModel().factory().newEdge(sourceNode, n, weight, isDirected);
-
-                        edge.getEdgeData().setR(color.getRed() / 255f);
-                        edge.getEdgeData().setG(color.getGreen() / 255f);
-                        edge.getEdgeData().setB(color.getBlue() / 255f);
-                        graph.addEdge(edge);
-                    }
-                    else
-                    {
-                        Edge edge1 = gc.getModel().factory().newEdge(sourceNode, n, weight, true);
-                        Edge edge2 = gc.getModel().factory().newEdge(n, sourceNode, weight, true);
-
-                        edge1.getEdgeData().setR(color.getRed() / 255f);
-                        edge1.getEdgeData().setG(color.getGreen() / 255f);
-                        edge1.getEdgeData().setB(color.getBlue() / 255f);
-                        graph.addEdge(edge1);
-                        
-                        edge2.getEdgeData().setR(color.getRed() / 255f);
-                        edge2.getEdgeData().setG(color.getGreen() / 255f);
-                        edge2.getEdgeData().setB(color.getBlue() / 255f);
-                        graph.addEdge(edge2);
-                    }
-
                     sourceNode = null;
                     edgePencilPanel.setStatus(NbBundle.getMessage(EdgePencil.class, "EdgePencil.status1"));
                 }
@@ -159,7 +159,6 @@ public class EdgePencil implements Tool {
                     sourceNode = null;
                 }
             }
-
         };
         return listeners;
     }
@@ -171,7 +170,7 @@ public class EdgePencil implements Tool {
                 edgePencilPanel = new EdgePencilPanel();
                 edgePencilPanel.setColor(color);
                 edgePencilPanel.setWeight(weight);
-                edgePencilPanel.setStatus(NbBundle.getMessage(EdgePencil.class, "EdgePencil.status1"));
+                updatePanel();
                 return edgePencilPanel;
             }
 
@@ -190,12 +189,10 @@ public class EdgePencil implements Tool {
             public int getPosition() {
                 return 130;
             }
-
         };
     }
 
     public ToolSelectionType getSelectionType() {
         return ToolSelectionType.SELECTION;
     }
-
 }

@@ -43,23 +43,14 @@ package org.gephi.io.importer.plugin.file;
 
 import java.awt.Color;
 import java.io.Reader;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLReporter;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import javax.xml.stream.events.XMLEvent;
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeOrigin;
 import org.gephi.data.attributes.api.AttributeType;
 import org.gephi.data.properties.PropertiesColumn;
 import org.gephi.dynamic.api.DynamicModel.TimeFormat;
-import org.gephi.io.importer.api.ContainerLoader;
-import org.gephi.io.importer.api.EdgeDefault;
-import org.gephi.io.importer.api.EdgeDraft;
-import org.gephi.io.importer.api.Issue;
-import org.gephi.io.importer.api.NodeDraft;
-import org.gephi.io.importer.api.Report;
+import org.gephi.io.importer.api.*;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.utils.longtask.spi.LongTask;
 import org.gephi.utils.progress.Progress;
@@ -115,8 +106,6 @@ public class ImporterGEXF implements FileImporter, LongTask {
     private static final String ATTVALUE_FOR = "for";
     private static final String ATTVALUE_FOR2 = "id"; // GEXF 1.0
     private static final String ATTVALUE_VALUE = "value";
-    private static final String ATTVALUE_START = "start";
-    private static final String ATTVALUE_END = "end";
     //Architecture
     private Reader reader;
     private ContainerLoader container;
@@ -193,8 +182,12 @@ public class ImporterGEXF implements FileImporter, LongTask {
             report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_log_version10"), Issue.Level.INFO));
         } else if (!version.isEmpty() && version.equals("1.1")) {
             report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_log_version11"), Issue.Level.INFO));
-        } else {
+        } else if (!version.isEmpty() && version.equals("1.2")) {
             report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_log_version12"), Issue.Level.INFO));
+        } else if (!version.isEmpty() && version.equals("1.3")) {
+            report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_log_version13"), Issue.Level.INFO));
+        } else {
+            report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_log_version_undef"), Issue.Level.WARNING));
         }
     }
 
@@ -241,6 +234,8 @@ public class ImporterGEXF implements FileImporter, LongTask {
                 container.setTimeFormat(TimeFormat.DATE);
             } else if ("datetime".equalsIgnoreCase(timeFormat)) {
                 container.setTimeFormat(TimeFormat.DATETIME);
+            } else if ("timestamp".equalsIgnoreCase(timeFormat)) {
+                container.setTimeFormat(TimeFormat.TIMESTAMP);
             }
         } else if (mode.equalsIgnoreCase("dynamic")) {
             container.setTimeFormat(TimeFormat.DOUBLE);
@@ -364,6 +359,8 @@ public class ImporterGEXF implements FileImporter, LongTask {
         String value = "";
         String startDate = "";
         String endDate = "";
+        boolean startOpen = false;
+        boolean endOpen = false;
 
         for (int i = 0; i < reader.getAttributeCount(); i++) {
             String attName = reader.getAttributeName(i).getLocalPart();
@@ -371,10 +368,16 @@ public class ImporterGEXF implements FileImporter, LongTask {
                 fore = reader.getAttributeValue(i);
             } else if (ATTVALUE_VALUE.equalsIgnoreCase(attName)) {
                 value = reader.getAttributeValue(i);
-            } else if (ATTVALUE_START.equalsIgnoreCase(attName)) {
+            } else if (START.equalsIgnoreCase(attName)) {
                 startDate = reader.getAttributeValue(i);
-            } else if (ATTVALUE_END.equalsIgnoreCase(attName)) {
+            } else if (START_OPEN.equalsIgnoreCase(attName)) {
+                startDate = reader.getAttributeValue(i);
+                startOpen = true;
+            } else if (END.equalsIgnoreCase(attName)) {
                 endDate = reader.getAttributeValue(i);
+            } else if (END_OPEN.equalsIgnoreCase(attName)) {
+                endDate = reader.getAttributeValue(i);
+                endOpen = true;
             }
         }
 
@@ -390,7 +393,7 @@ public class ImporterGEXF implements FileImporter, LongTask {
                 if (!startDate.isEmpty() || !endDate.isEmpty()) {
                     //Dynamic
                     try {
-                        node.addAttributeValue(column, value, startDate, endDate);
+                        node.addAttributeValue(column, value, startDate, endDate, startOpen, endOpen);
                     } catch (IllegalArgumentException e) {
                         report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_error_nodeattribute_timeinterval_parseerror", node), Issue.Level.SEVERE));
                     } catch (Exception e) {
@@ -672,6 +675,8 @@ public class ImporterGEXF implements FileImporter, LongTask {
         String value = "";
         String startDate = "";
         String endDate = "";
+        boolean startOpen = false;
+        boolean endOpen = false;
 
         for (int i = 0; i < reader.getAttributeCount(); i++) {
             String attName = reader.getAttributeName(i).getLocalPart();
@@ -679,10 +684,16 @@ public class ImporterGEXF implements FileImporter, LongTask {
                 fore = reader.getAttributeValue(i);
             } else if (ATTVALUE_VALUE.equalsIgnoreCase(attName)) {
                 value = reader.getAttributeValue(i);
-            } else if (ATTVALUE_START.equalsIgnoreCase(attName)) {
+            } else if (START.equalsIgnoreCase(attName)) {
                 startDate = reader.getAttributeValue(i);
-            } else if (ATTVALUE_END.equalsIgnoreCase(attName)) {
+            } else if (END.equalsIgnoreCase(attName)) {
                 endDate = reader.getAttributeValue(i);
+            } else if (START_OPEN.equalsIgnoreCase(attName)) {
+                startDate = reader.getAttributeValue(i);
+                startOpen = true;
+            } else if (END_OPEN.equalsIgnoreCase(attName)) {
+                endDate = reader.getAttributeValue(i);
+                endOpen = true;
             }
         }
 
@@ -698,7 +709,7 @@ public class ImporterGEXF implements FileImporter, LongTask {
                 if (!startDate.isEmpty() || !endDate.isEmpty()) {
                     //Dynamic
                     try {
-                        edge.addAttributeValue(column, value, startDate, endDate);
+                        edge.addAttributeValue(column, value, startDate, endDate, startOpen, endOpen);
                     } catch (IllegalArgumentException e) {
                         report.logIssue(new Issue(NbBundle.getMessage(ImporterGEXF.class, "importerGEXF_error_edgeattribute_timeinterval_parseerror", edge), Issue.Level.SEVERE));
                     } catch (Exception e) {

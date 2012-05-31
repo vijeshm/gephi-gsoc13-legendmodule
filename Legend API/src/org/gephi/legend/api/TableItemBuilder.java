@@ -9,6 +9,7 @@ package org.gephi.legend.api;
  * @author edubecks
  */
 import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
@@ -71,7 +72,7 @@ public class TableItemBuilder implements ItemBuilder {
         Integer cellSizeHeight = 20;
         TableItem.VerticalTextDirection verticalTextDirection = TableItem.VerticalTextDirection.DIAGONAL;
         Integer verticalExtraMargin = 0;
-        Table.Direction horizontalTextAlignment = Table.Direction.RIGHT;
+        TableItem.Direction horizontalTextAlignment = TableItem.Direction.RIGHT;
         Boolean isCellColoring = true;
         
         
@@ -81,17 +82,16 @@ public class TableItemBuilder implements ItemBuilder {
         tableItem.setData(TableItem.TABLE_VALUES, tableValues1);
         tableItem.setData(TableItem.LIST_OF_COLORS, listOfColors);
         tableItem.setData(TableItem.FONT_SIZE, fontSize);
+        tableItem.setData(TableItem.FONT_TYPE, "Serif");
+        tableItem.setData(TableItem.FONT_STYLE, Font.PLAIN);
         tableItem.setData(TableItem.CELL_SIZE_WIDTH, cellSizeWidth);
         tableItem.setData(TableItem.CELL_SIZE_HEIGHT, cellSizeHeight);
         tableItem.setData(TableItem.VERTICAL_TEXT_DIRECTION, verticalTextDirection);
         tableItem.setData(TableItem.VERTICAL_EXTRA_MARGIN, verticalExtraMargin);
         tableItem.setData(TableItem.HORIZONTAL_TEXT_ALIGNMENT, horizontalTextAlignment);
         tableItem.setData(TableItem.IS_CELL_COLORING, isCellColoring);
+        tableItem.setData(TableItem.MINIMUM_MARGIN, 3);
         
-        
-        
-        //item.setData("some-property", someValue);
-
         return new Item[]{tableItem};
     }
 

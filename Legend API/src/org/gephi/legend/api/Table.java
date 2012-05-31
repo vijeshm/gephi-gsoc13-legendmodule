@@ -9,36 +9,20 @@ package org.gephi.legend.api;
 
 
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.DefaultFontMapper;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.gephi.preview.api.*;
-import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.preview.spi.Renderer;
-import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
-import org.w3c.dom.DOMImplementation;
-// same name
-// import org.w3c.dom.Document;
+import java.util.ArrayList;
+import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewProperties;
+import org.gephi.preview.api.ProcessingTarget;
 import processing.core.PGraphicsJava2D;
-import org.apache.batik.svggen.SVGGraphics2D;
-// same name
-// import com.itextpdf.text.Document;
-//import com.itextpdf.text.pdf.FontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-//import org.gephi.lib.itext;
-import org.gephi.preview.plugin.items.AbstractItem;
+
 
 /**
  *
@@ -517,8 +501,6 @@ public class Table{
                 }
             }
         }
-
-
     }
 
     public BufferedImage createProcessingHorizontalText() {
@@ -748,74 +730,74 @@ public class Table{
         g2d.fill(new Rectangle(0, 0, 10, 10));
     }
 
-    public String createSVGImage() {
-        String image = "";
-
-        // Get a DOMImplementation.
-        DOMImplementation domImpl =
-                GenericDOMImplementation.getDOMImplementation();
-
-        // Create an instance of org.w3c.dom.Document.
-        String svgNS = "http://www.w3.org/2000/svg";
-        org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
-
-        // Create an instance of the SVG Generator.
-        SVGGraphics2D graphics = new SVGGraphics2D(document);
-
-        // Ask the test to render into the SVG Graphics2D implementation.
-//        paint(svgGenerator);
-
-
-
-        int maxLength = 92;
-        System.out.println("@Var: maxLength: " + maxLength);
-
-
-
-        int diagonalShift = (int) (maxLength * Math.cos(verticalTextDirection.rotationAngle()));
-
-
-        int horizontalTextWidth = maxLength + 2 * MINIMUM_MARGIN;
-        int horizontalTextHeight = cellSizeHeight * labels.size();
-        int verticalTextHeight = maxLength + 2 * MINIMUM_MARGIN;
-        int verticalTextWidth = cellSizeWidth * labels.size();
-
-        int height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
-        int width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
-
-
-        if (verticalTextDirection == Table.VerticalTextDirection.DIAGONAL) {
-
-            System.out.println("diagonalShift" + diagonalShift);
-            width += diagonalShift;
-
-
-
-        }
-
-
-
-        AffineTransform origin = new AffineTransform();
-        origin.setToTranslation(0, 0);
-
-        createImage(graphics, origin, horizontalTextWidth, horizontalTextHeight, verticalTextWidth, verticalTextHeight);
-
-
-        // Finally, stream out SVG to the standard output using
-        // UTF-8 encoding.
-        boolean useCSS = true; // we want to use CSS style attributes
-        try {
-            File file = new File("test.svg");
-            OutputStream fos = new FileOutputStream(file);
-            Writer out = new OutputStreamWriter(fos, "UTF-8");
-            graphics.stream(out, useCSS);
-
-        } catch (Exception e) {
-        }
-
-
-        return image;
-    }
+//    public String createSVGImage() {
+//        String image = "";
+//
+//        // Get a DOMImplementation.
+//        DOMImplementation domImpl =
+//                GenericDOMImplementation.getDOMImplementation();
+//
+//        // Create an instance of org.w3c.dom.Document.
+//        String svgNS = "http://www.w3.org/2000/svg";
+//        org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
+//
+//        // Create an instance of the SVG Generator.
+//        SVGGraphics2D graphics = new SVGGraphics2D(document);
+//
+//        // Ask the test to render into the SVG Graphics2D implementation.
+////        paint(svgGenerator);
+//
+//
+//
+//        int maxLength = 92;
+//        System.out.println("@Var: maxLength: " + maxLength);
+//
+//
+//
+//        int diagonalShift = (int) (maxLength * Math.cos(verticalTextDirection.rotationAngle()));
+//
+//
+//        int horizontalTextWidth = maxLength + 2 * MINIMUM_MARGIN;
+//        int horizontalTextHeight = cellSizeHeight * labels.size();
+//        int verticalTextHeight = maxLength + 2 * MINIMUM_MARGIN;
+//        int verticalTextWidth = cellSizeWidth * labels.size();
+//
+//        int height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
+//        int width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
+//
+//
+//        if (verticalTextDirection == Table.VerticalTextDirection.DIAGONAL) {
+//
+//            System.out.println("diagonalShift" + diagonalShift);
+//            width += diagonalShift;
+//
+//
+//
+//        }
+//
+//
+//
+//        AffineTransform origin = new AffineTransform();
+//        origin.setToTranslation(0, 0);
+//
+//        createImage(graphics, origin, horizontalTextWidth, horizontalTextHeight, verticalTextWidth, verticalTextHeight);
+//
+//
+//        // Finally, stream out SVG to the standard output using
+//        // UTF-8 encoding.
+//        boolean useCSS = true; // we want to use CSS style attributes
+//        try {
+//            File file = new File("test.svg");
+//            OutputStream fos = new FileOutputStream(file);
+//            Writer out = new OutputStreamWriter(fos, "UTF-8");
+//            graphics.stream(out, useCSS);
+//
+//        } catch (Exception e) {
+//        }
+//
+//
+//        return image;
+//    }
 
     public void createPDFImage() {
 

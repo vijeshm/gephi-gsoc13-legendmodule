@@ -516,7 +516,7 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                 }
             }
             for (AttributeColumn col : attributeModel.getEdgeTable().getColumns()) {
-                dynamicGraph = col.getType().isDynamicType();
+                dynamicGraph = dynamicGraph || col.getType().isDynamicType();
                 if (dynamicGraph) {
                     break;
                 }
@@ -608,9 +608,6 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                         }
                     }
                 }
-                if (issue) {
-                    report.logIssue(new Issue(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_TimeIntervalVerify_Node_OutOfBound", node.getId()), Level.WARNING));
-                }
             }
             for (EdgeDraftImpl edge : edgeMap.values()) {
                 boolean issue = false;
@@ -646,9 +643,6 @@ public class ImportContainerImpl implements Container, ContainerLoader, Containe
                             edge.getAttributeRow().setValue(val.getColumn(), DynamicUtilities.fitToInterval(type, type.getLow(), timeIntervalMax));
                         }
                     }
-                }
-                if (issue) {
-                    report.logIssue(new Issue(NbBundle.getMessage(ImportContainerImpl.class, "ImportContainerException_TimeIntervalVerify_Edge_OutOfBound", edge.getId()), Level.WARNING));
                 }
             }
         }
