@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.api;
+package org.gephi.legend.renderers;
 
 /**
  *
@@ -12,6 +12,8 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import org.gephi.legend.items.TableItem;
+import org.gephi.legend.api.TableItemBuilder;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;

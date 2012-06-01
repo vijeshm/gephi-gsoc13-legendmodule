@@ -14,19 +14,24 @@ public abstract class LegendItem extends AbstractItem {
 
     public static final String TYPE = "Legend Item";
     
-    public static final String WIDTH =  "width";
-    public static final String HEIGHT =  "height";
-    //font
-    public static final String FONT_SIZE = "font size";
-    public static final String FONT_TYPE = "font type";
-    public static final String FONT_STYLE = "font style";
+    //DIMENSIONS
+    public static final String WIDTH = "width";
+    public static final String HEIGHT = "height";
     
-    //description
+    //LOCATION
+    public static final String ORIGIN = "origin";
+    
+    
+    //TITLE
+    public static final String TITLE = "title";
+
+    
+    //DESCRIPTION
     public static final String DESCRIPTION = "description";
-    public static final String DESCRIPTION = "description";
+
     
 
-    public LegendItem(LegendItem source) {
+    public LegendItem(Object source) {
         super(source, TYPE);
     }
 

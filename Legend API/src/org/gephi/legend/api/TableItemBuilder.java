@@ -8,6 +8,7 @@ package org.gephi.legend.api;
  *
  * @author edubecks
  */
+import org.gephi.legend.items.TableItem;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
@@ -70,27 +71,52 @@ public class TableItemBuilder implements ItemBuilder {
         Integer fontSize = 13;
         Integer cellSizeWidth = 40;
         Integer cellSizeHeight = 20;
-        TableItem.VerticalTextDirection verticalTextDirection = TableItem.VerticalTextDirection.DIAGONAL;
-        Integer verticalExtraMargin = 0;
-        TableItem.Direction horizontalTextAlignment = TableItem.Direction.RIGHT;
         Boolean isCellColoring = true;
+        TableItem.Direction cellColoring = TableItem.Direction.UP;
+        Color background = Color.WHITE;
         
+        TableItem.Direction horizontalAlignment = TableItem.Direction.LEFT;
+        TableItem.Direction horizontalTextAlignment = TableItem.Direction.RIGHT;
+        TableItem.Direction verticalAlignment = TableItem.Direction.UP;
+        
+        TableItem.VerticalTextDirection verticalTextDirection = TableItem.VerticalTextDirection.DIAGONAL;
+        
+        String fontType = Font.SANS_SERIF;
+        Integer fontStyle = Font.PLAIN;
+        // bug, dont know why
+        Integer verticalExtraMargin = 0;
+        Integer horizontalExtraAlignment = 0;
         
         //Put some data based on current graph, attributes, anything...
         //Here is where ideas to build different legend items and setting them up with the graph happens
         tableItem.setData(TableItem.LABELS, labels1);
         tableItem.setData(TableItem.TABLE_VALUES, tableValues1);
         tableItem.setData(TableItem.LIST_OF_COLORS, listOfColors);
+        
+        tableItem.setData(TableItem.IS_CELL_COLORING, isCellColoring);
+        tableItem.setData(TableItem.CELL_COLORING, cellColoring);
+        tableItem.setData(TableItem.BACKGROUND, background);
+        
+        
         tableItem.setData(TableItem.FONT_SIZE, fontSize);
-        tableItem.setData(TableItem.FONT_TYPE, "Serif");
-        tableItem.setData(TableItem.FONT_STYLE, Font.PLAIN);
+        tableItem.setData(TableItem.FONT_TYPE, fontType);
+        tableItem.setData(TableItem.FONT_STYLE, fontStyle);
+        
         tableItem.setData(TableItem.CELL_SIZE_WIDTH, cellSizeWidth);
         tableItem.setData(TableItem.CELL_SIZE_HEIGHT, cellSizeHeight);
-        tableItem.setData(TableItem.VERTICAL_TEXT_DIRECTION, verticalTextDirection);
-        tableItem.setData(TableItem.VERTICAL_EXTRA_MARGIN, verticalExtraMargin);
+        
+        
+        tableItem.setData(TableItem.HORIZONTAL_ALIGNMENT, horizontalAlignment);
         tableItem.setData(TableItem.HORIZONTAL_TEXT_ALIGNMENT, horizontalTextAlignment);
-        tableItem.setData(TableItem.IS_CELL_COLORING, isCellColoring);
+        tableItem.setData(TableItem.VERTICAL_ALIGNMENT, verticalAlignment);
+        
+        tableItem.setData(TableItem.VERTICAL_TEXT_DIRECTION, verticalTextDirection);
+        
+        
         tableItem.setData(TableItem.MINIMUM_MARGIN, 3);
+        
+        tableItem.setData(TableItem.VERTICAL_EXTRA_MARGIN, verticalExtraMargin);
+        tableItem.setData(TableItem.HORIZONTAL_EXTRA_ALIGNMENT, horizontalExtraAlignment);
         
         return new Item[]{tableItem};
     }
