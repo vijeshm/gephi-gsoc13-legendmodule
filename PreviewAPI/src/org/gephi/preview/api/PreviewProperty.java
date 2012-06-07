@@ -65,6 +65,34 @@ import org.openide.util.NbBundle;
  * @see Renderer#getProperties() 
  */
 public class PreviewProperty {
+    
+        //LEGEND
+        public static final String CATEGORY_LEGENDS = NbBundle.getMessage(PreviewProperty.class, "PreviewProperty.Category.Legends");
+    
+        //LOCATION
+        public static final String LEGEND_ORIGIN_X = "legend.originX";
+        public static final String LEGEND_ORIGIN_Y = "legend.originY";
+
+        //DIMENSIONS
+        public static final String LEGEND_WIDTH = "legend.width";
+        public static final String LEGEND_HEIGHT = "legend.height";
+
+        //TITLE
+        public static final String LEGEND_TITLE_IS_DISPLAYING = "legend.title.isDisplaying";
+        public static final String LEGEND_TITLE_FONT = "legend.title.font";
+        public static final String LEGEND_TITLE_FONT_COLOR = "legend.title.font.color";
+        
+
+        //DESCRIPTION
+        public static final String LEGEND_DESCRIPTION_IS_DISPLAYING = "legend.description.isDisplaying";
+        public static final String LEGEND_DESCRIPTION_FONT = "legend.description.font";
+        public static final String LEGEND_DESCRIPTION_FONT_COLOR = "legend.description.font.color";
+        
+    //LEGEND TEXT ITEM
+        
+        public static final String LEGEND_TEXT_BODY_IS_DISPLAYING = "legend.text.body.isDisplaying";
+        public static final String LEGEND_TEXT_BODY_FONT = "legend.text.body.font";
+        public static final String LEGEND_TEXT_BODY_FONT_COLOR = "legend.text.body.font.color";
 
     //Constants global
     /**

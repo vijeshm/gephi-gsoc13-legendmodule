@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.legend.items.TableItem;
-import org.gephi.legend.api.TableItemBuilder;
+import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;

@@ -120,6 +120,10 @@
                 </dependency>
             </module-dependencies>
             <public-packages/>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>

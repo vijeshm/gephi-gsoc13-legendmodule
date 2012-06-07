@@ -484,7 +484,7 @@ public final class PreviewSettingsTopComponent extends TopComponent implements P
         southToolbar.setRollover(true);
         southToolbar.setOpaque(false);
 
-        labelExport.setFont(new java.awt.Font("Tahoma", 0, 10));
+        labelExport.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(labelExport, org.openide.util.NbBundle.getMessage(PreviewSettingsTopComponent.class, "PreviewSettingsTopComponent.labelExport.text")); // NOI18N
         labelExport.setEnabled(false);
         southToolbar.add(labelExport);
@@ -555,6 +555,7 @@ public final class PreviewSettingsTopComponent extends TopComponent implements P
             presetComboBox.setModel(comboBoxModel);
         }
     }//GEN-LAST:event_saveButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel box;
     private javax.swing.JLabel labelExport;
