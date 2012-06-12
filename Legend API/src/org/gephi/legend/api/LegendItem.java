@@ -4,8 +4,6 @@
  */
 package org.gephi.legend.api;
 
-import org.gephi.preview.plugin.items.AbstractItem;
-
 /**
  *
  * @author edubecks
@@ -13,17 +11,20 @@ import org.gephi.preview.plugin.items.AbstractItem;
 public interface LegendItem {
 
     
+    //INDEX
+    public static final String WORK_INDEX = "work index";
+    public static final String ITEM_INDEX = "item index";
+    
     //LOCATION
     public static final String ORIGIN = "origin";
     
-    
     //TITLE
     public static final String TITLE = "title";
-
     
     //DESCRIPTION
     public static final String DESCRIPTION = "description";
-
     
+    //INDEX
+    public static final String INDEX = "index";
 
 }

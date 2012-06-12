@@ -4,11 +4,16 @@
  */
 package org.gephi.legend.renderers;
 
-import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
-import java.io.*;
-import org.apache.batik.svggen.SVGGraphics2D;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
+import java.util.ArrayList;
+import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.properties.TextProperty;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.items.TextItem;
 import org.gephi.preview.api.*;
@@ -16,14 +21,12 @@ import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-import org.w3c.dom.Node;
-import processing.core.PGraphicsJava2D;
 
 /**
  *
  * @author edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 400)
+//@ServiceProvider(service = Renderer.class, position = 400)
 public class TextItemRenderer extends LegendItemRenderer {
 
     @Override
@@ -35,69 +38,52 @@ public class TextItemRenderer extends LegendItemRenderer {
     public void preProcess(PreviewModel previewModel) {
     }
 
-    //body
-    private String body;
-    private Font bodyFont;
-    private Color bodyFontColor;
+    
     
     @Override
-    protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
+    public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         
         body = item.getData(TextItem.BODY);
-        bodyFont = properties.getFontValue(PreviewProperty.LEGEND_TEXT_BODY_FONT);
-        bodyFontColor = properties.getColorValue(PreviewProperty.LEGEND_TEXT_BODY_FONT_COLOR);
+        bodyFont = properties.getFontValue(LegendManager.getProperty(TextProperty.OWN_PROPERTIES,legendIndex, TextProperty.TEXT_BODY_FONT));
+        bodyFontColor = properties.getColorValue(LegendManager.getProperty(TextProperty.OWN_PROPERTIES,legendIndex, TextProperty.TEXT_BODY_FONT_COLOR));
     }
     
 
-    @Override
-    public void render(Item item, RenderTarget target, PreviewProperties properties) {
-
-//        readPropertiesAndValues(item, properties);
-        readLegendPropertiesAndValues(item, properties);
-        readOwnPropertiesAndValues(item, properties);
-
-        if (target instanceof ProcessingTarget) {
-            renderProcessing((ProcessingTarget) target);
-        }
-        else if (target instanceof SVGTarget) {
-            renderSVG((SVGTarget) target);
-        }
-        else if (target instanceof PDFTarget) {
-            renderPDF((PDFTarget) target);
-
-        }
-
-    }
 
     
-    // default values
-    
-    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 20);
-    protected final Color defaultBodyFontColor = Color.BLACK;
+
 
     @Override
     public PreviewProperty[] getProperties() {
         
+        this.legendIndex = LegendManager.useItemIndex();
         PreviewProperty[] legendProperties = createLegendProperties();
-        PreviewProperty[] properties = {PreviewProperty.createProperty(this,
-                                                   PreviewProperty.LEGEND_TEXT_BODY_FONT,
-                                                   Font.class,
-                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.displayName"),
-                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFont),
-                    PreviewProperty.createProperty(this,
-                                                   PreviewProperty.LEGEND_TEXT_BODY_FONT_COLOR,
-                                                   Color.class,
-                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.color.displayName"),
-                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.color.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontColor)};
+        System.out.printf("Creating Text Item:%d\n",legendIndex);
         
+        return new PreviewProperty[0];
         
-        PreviewProperty[] previewProperties = new PreviewProperty[legendProperties.length+properties.length];
-        System.arraycopy(legendProperties, 0, previewProperties, 0, legendProperties.length);
-        System.arraycopy(properties, 0, previewProperties, legendProperties.length, properties.length);
-        
-        return previewProperties;
+//        // TEXT
+//        ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES);
+//        
+//        PreviewProperty[] properties = {PreviewProperty.createProperty(this,
+//                                                   textProperties.get(TextProperty.TEXT_BODY_FONT),
+//                                                   Font.class,
+//                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.displayName"),
+//                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.description"),
+//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFont),
+//                    PreviewProperty.createProperty(this,
+//                                                   textProperties.get(TextProperty.TEXT_BODY_FONT_COLOR),
+//                                                   Color.class,
+//                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.color.displayName"),
+//                                                   NbBundle.getMessage(TextItemRenderer.class, "TextItemRenderer.property.body.font.color.description"),
+//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontColor)};
+//        
+//        
+//        PreviewProperty[] previewProperties = new PreviewProperty[legendProperties.length+properties.length];
+//        System.arraycopy(legendProperties, 0, previewProperties, 0, legendProperties.length);
+//        System.arraycopy(properties, 0, previewProperties, legendProperties.length, properties.length);
+//        
+//        return previewProperties;
     }
 
     @Override
@@ -135,12 +121,39 @@ public class TextItemRenderer extends LegendItemRenderer {
             graphics2D.setFont(titleFont);
             graphics2D.drawString(title, 0, actualLine);
         }
-
-        actualLine+= bodyFontHeight;
+        
+        //drawing body
         graphics2D.setColor(bodyFontColor);
         graphics2D.setFont(bodyFont);
-        graphics2D.drawString(body, 0, actualLine);
-        System.out.println("@Var: body: " + body);
+        
+        AttributedString styledText = new AttributedString(body);
+        AttributedCharacterIterator m_iterator = styledText.getIterator();
+        int start = m_iterator.getBeginIndex();
+        int end = m_iterator.getEndIndex();
+        
+        
+        FontRenderContext frc = graphics2D.getFontRenderContext();
+
+        LineBreakMeasurer measurer = new LineBreakMeasurer(m_iterator, frc);
+        measurer.setPosition(start);
+
+        float x = 0;
+        while (measurer.getPosition() < end)
+        {
+            TextLayout layout = measurer.nextLayout(width);
+
+            actualLine += layout.getAscent();
+            float dx = layout.isLeftToRight() ?
+                    0 : width - layout.getAdvance();
+
+            layout.draw(graphics2D, x + dx, actualLine);
+            actualLine += layout.getDescent() + layout.getLeading();
+        }
+
+//        actualLine+= actualLine;
+        
+//        graphics2D.drawString(body, 0, actualLine);
+//        System.out.println("@Var: body: " + body);
         
         
         // description
@@ -153,5 +166,14 @@ public class TextItemRenderer extends LegendItemRenderer {
 
 
     }
+    
+    // DEFAULT VALUES
+    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 20);
+    protected final Color defaultBodyFontColor = Color.BLACK;
+    
+    // OWN PROPERTIES
+    private String body;
+    private Font bodyFont;
+    private Color bodyFontColor;
 
 }

@@ -88,11 +88,30 @@ public class PreviewProperty {
         public static final String LEGEND_DESCRIPTION_FONT = "legend.description.font";
         public static final String LEGEND_DESCRIPTION_FONT_COLOR = "legend.description.font.color";
         
-    //LEGEND TEXT ITEM
+        // LEGEND ITEMS
         
+        //TEXT 
         public static final String LEGEND_TEXT_BODY_IS_DISPLAYING = "legend.text.body.isDisplaying";
         public static final String LEGEND_TEXT_BODY_FONT = "legend.text.body.font";
         public static final String LEGEND_TEXT_BODY_FONT_COLOR = "legend.text.body.font.color";
+        
+        //TABLE
+        
+        public static final String LEGEND_TABLE_FONT = "legend.table.font";
+        public static final String LEGEND_TABLE_FONT_COLOR = "legend.table.font.color";
+        public static final String LEGEND_TABLE_IS_CELL_COLORING = "legend.table.isCellColoring";
+        public static final String LEGEND_TABLE_HORIZONTAL_ALIGNMENT = "legend.table.horizontalAlignment";
+        public static final String LEGEND_TABLE_HORIZONTAL_TEXT_ALIGNMENT = "legend.table.horizontalTextAlignment";
+        public static final String LEGEND_TABLE_HORIZONTAL_EXTRA_MARGIN = "legend.table.horizontal.extraMargin";
+        public static final String LEGEND_TABLE_VERTICAL_ALIGNMENT = "legend.table.verticalAlignment";
+        public static final String LEGEND_TABLE_VERTICAL_TEXT_DIRECTION = "legend.table.verticalTextDirection";
+        public static final String LEGEND_TABLE_VERTICAL_EXTRA_MARGIN = "legend.table.vertical.extraMargin";
+        
+       // 
+       
+        
+        
+        
 
     //Constants global
     /**

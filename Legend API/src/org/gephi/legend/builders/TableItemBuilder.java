@@ -14,16 +14,35 @@ import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.partition.api.NodePartition;
+import org.gephi.partition.api.PartitionController;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
-@ServiceProvider(service = ItemBuilder.class, position = 90)
+@ServiceProvider(service = ItemBuilder.class, position = 100)
 public class TableItemBuilder implements ItemBuilder {
 
     @Override
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
 
+        PartitionController pc = Lookup.getDefault().lookup(PartitionController.class);
+        if (pc.getModel() != null) {
+            pc.refreshPartitions();
+            NodePartition[] nodePartitions = pc.getModel().getNodePartitions();
+            Float[][] tableValues = new Float[nodePartitions.length][nodePartitions.length];
+            for (int i = 0; i < nodePartitions.length; i++) {
+                for (int j = 0; j < nodePartitions.length; j++) {
+                    tableValues[i][j] = 0f;
+                    
+                }
+            }
+            
+        }
+        
+//        graph.get
+        
         //colors
         ArrayList<Color> listOfColors;
         listOfColors = new ArrayList<Color>();
@@ -93,30 +112,28 @@ public class TableItemBuilder implements ItemBuilder {
         tableItem.setData(TableItem.TABLE_VALUES, tableValues1);
         tableItem.setData(TableItem.LIST_OF_COLORS, listOfColors);
         
-        tableItem.setData(TableItem.IS_CELL_COLORING, isCellColoring);
-        tableItem.setData(TableItem.CELL_COLORING, cellColoring);
-        tableItem.setData(TableItem.BACKGROUND, background);
-        
-        
-        tableItem.setData(TableItem.FONT_SIZE, fontSize);
-        tableItem.setData(TableItem.FONT_TYPE, fontType);
-        tableItem.setData(TableItem.FONT_STYLE, fontStyle);
-        
-        tableItem.setData(TableItem.CELL_SIZE_WIDTH, cellSizeWidth);
-        tableItem.setData(TableItem.CELL_SIZE_HEIGHT, cellSizeHeight);
-        
-        
-        tableItem.setData(TableItem.HORIZONTAL_ALIGNMENT, horizontalAlignment);
-        tableItem.setData(TableItem.HORIZONTAL_TEXT_ALIGNMENT, horizontalTextAlignment);
-        tableItem.setData(TableItem.VERTICAL_ALIGNMENT, verticalAlignment);
-        
-        tableItem.setData(TableItem.VERTICAL_TEXT_DIRECTION, verticalTextDirection);
-        
-        
-        tableItem.setData(TableItem.MINIMUM_MARGIN, 3);
-        
-        tableItem.setData(TableItem.VERTICAL_EXTRA_MARGIN, verticalExtraMargin);
-        tableItem.setData(TableItem.HORIZONTAL_EXTRA_ALIGNMENT, horizontalExtraAlignment);
+//        tableItem.setData(TableItem.IS_CELL_COLORING, isCellColoring);
+//        tableItem.setData(TableItem.CELL_COLORING, cellColoring);
+//        tableItem.setData(TableItem.BACKGROUND, background);
+//        
+//        
+//        tableItem.setData(TableItem.FONT, new Font(fontType, fontStyle, fontSize));
+//        
+//        tableItem.setData(TableItem.CELL_SIZE_WIDTH, cellSizeWidth);
+//        tableItem.setData(TableItem.CELL_SIZE_HEIGHT, cellSizeHeight);
+//        
+//        
+//        tableItem.setData(TableItem.HORIZONTAL_ALIGNMENT, horizontalAlignment);
+//        tableItem.setData(TableItem.HORIZONTAL_TEXT_ALIGNMENT, horizontalTextAlignment);
+//        tableItem.setData(TableItem.VERTICAL_ALIGNMENT, verticalAlignment);
+//        
+//        tableItem.setData(TableItem.VERTICAL_TEXT_DIRECTION, verticalTextDirection);
+//        
+//        
+//        tableItem.setData(TableItem.MINIMUM_MARGIN, 3);
+//        
+//        tableItem.setData(TableItem.VERTICAL_EXTRA_MARGIN, verticalExtraMargin);
+//        tableItem.setData(TableItem.HORIZONTAL_EXTRA_ALIGNMENT, horizontalExtraAlignment);
         
         return new Item[]{tableItem};
     }

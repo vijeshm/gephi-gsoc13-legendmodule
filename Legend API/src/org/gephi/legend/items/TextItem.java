@@ -15,10 +15,17 @@ public class TextItem extends AbstractItem implements LegendItem {
 
     //BODY
     public static final String BODY = "body";
-    public static final String TYPE= "Legend Text Item";
+    public static final String TYPE= "Text Item";
 
     public TextItem(Object source) {
         super(source, TYPE);
     }
+
+    @Override
+    public String toString() {
+        return TYPE;
+    }
+    
+    
 
 }
