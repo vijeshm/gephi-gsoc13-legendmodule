@@ -39,8 +39,8 @@ public class TextItemRenderer extends LegendItemRenderer {
     @Override
     public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         
         
         body = item.getData(TextItem.BODY);

@@ -40,8 +40,8 @@ public abstract class LegendItemBuilder implements ItemBuilder{
     
     public PreviewProperty[] createLegendProperties(Item item) {
         
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
 
         ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex);

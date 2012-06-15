@@ -48,8 +48,8 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         ArrayList<String> textProperties = LegendManager.getProperties(DescriptionProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
 

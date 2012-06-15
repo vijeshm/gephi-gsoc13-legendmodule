@@ -45,8 +45,8 @@ public class TextItemBuilder extends LegendItemBuilder {
 
 
 
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
 

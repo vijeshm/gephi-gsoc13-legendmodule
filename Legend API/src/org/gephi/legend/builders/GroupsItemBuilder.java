@@ -64,8 +64,8 @@ public class GroupsItemBuilder extends LegendItemBuilder{
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
         
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         
         ArrayList<String> groupsProperties = LegendManager.getProperties(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
 

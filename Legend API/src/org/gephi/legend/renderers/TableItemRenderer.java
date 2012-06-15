@@ -309,8 +309,8 @@ public class TableItemRenderer extends LegendItemRenderer {
     @Override
     public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         //values
         labels = item.getData(TableItem.LABELS);

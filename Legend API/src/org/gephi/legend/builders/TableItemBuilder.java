@@ -104,8 +104,8 @@ public class TableItemBuilder extends LegendItemBuilder {
 
 
 
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
 

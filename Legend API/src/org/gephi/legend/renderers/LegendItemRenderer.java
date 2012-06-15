@@ -42,8 +42,8 @@ public abstract class LegendItemRenderer implements Renderer {
 
     public void readLegendPropertiesAndValues(Item item, PreviewProperties properties) {
 
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         // DIMENSIONS
         width = properties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.WIDTH));

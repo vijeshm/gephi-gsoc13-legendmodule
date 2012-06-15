@@ -67,8 +67,8 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
 
     @Override
     public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         keys = item.getData(DescriptionItem.KEYS);
         values = item.getData(DescriptionItem.VALUES);

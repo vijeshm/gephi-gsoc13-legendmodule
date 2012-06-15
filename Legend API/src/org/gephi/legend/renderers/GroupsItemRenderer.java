@@ -155,8 +155,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
     @Override
     public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         
-        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         // properties
         numColumns = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS));
