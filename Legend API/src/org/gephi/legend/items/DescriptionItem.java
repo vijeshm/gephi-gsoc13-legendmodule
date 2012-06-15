@@ -15,10 +15,10 @@ import org.gephi.preview.plugin.items.AbstractItem;
 public class DescriptionItem extends AbstractItem implements LegendItem {
 
     public static final String TYPE= "Legend Description Item";
+    public static final String KEYS= "keys";
+    public static final String VALUES= "values";
     
-    //BODY
-    public static final String ITEMS = "items";
-
+    
     public DescriptionItem(Object source) {
         super(source,TYPE);
     }

@@ -5,13 +5,12 @@
 package org.gephi.legend.renderers;
 
 import com.itextpdf.text.pdf.PdfContentByte;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.legend.api.LegendItem;
+import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.preview.api.*;
@@ -24,94 +23,8 @@ import processing.core.PGraphicsJava2D;
  * @author edubecks
  */
 public abstract class LegendItemRenderer implements Renderer {
-    
-    
 
-    
-    //DEFAULT VALUES 
-    protected float defaultOriginX = 100f;
-    protected float defaultOriginY = 100f;
-    protected float defaultWidth = 200f;
-    protected float defaultHeight = 200f;
-    protected Boolean defaultIsDisplayingTitle = true;
-    protected final Font defaultTitleFont = new Font("Arial", Font.BOLD, 24);
-    protected final Color defaultTitleFontColor = Color.BLACK;
-    protected Boolean defaultIsDisplayingDescription = true;
-    protected final Color defaultDescriptionFontColor = Color.BLACK;
-    protected final Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
-
-    public PreviewProperty[] createLegendProperties() {
-        
-        
-        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES);
-        
-        return new PreviewProperty[0];
-
-//        return new PreviewProperty[]{
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.ORIGIN_X),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.originX.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.originX.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultOriginX),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.ORIGIN_Y),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.originY.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.originY.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultOriginY),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_IS_DISPLAYING),
-//                                                   Boolean.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.title.isDisplaying.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.title.isDisplaying.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplayingTitle),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_FONT),
-//                                                   Font.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.title.font.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.title.font.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultTitleFont),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_FONT_COLOR),
-//                                                   Color.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.title.font.color.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.title.font.color.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultTitleFontColor),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_IS_DISPLAYING),
-//                                                   Boolean.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.description.isDisplaying.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.description.isDisplaying.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplayingTitle),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_FONT),
-//                                                   Font.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.description.font.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.description.font.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionFont),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_FONT_COLOR),
-//                                                   Color.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.description.font.color.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.description.font.color.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionFontColor),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.WIDTH),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.width.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.width.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultWidth),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.HEIGHT),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.height.displayName"),
-//                                                   NbBundle.getMessage(TextItemRenderer.class, "LegendItemRenderer.property.height.description"),
-//                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHeight)
-//                };
-    }
     //INDEX
-    protected int legendIndex;
     // VARIABLES
     protected Integer width;
     protected Integer height;
@@ -128,51 +41,44 @@ public abstract class LegendItemRenderer implements Renderer {
     protected Color titleFontColor;
 
     public void readLegendPropertiesAndValues(Item item, PreviewProperties properties) {
-        
-        
+
+        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         // DIMENSIONS
-        width = properties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.WIDTH));
-//        width = properties.getIntValue(PreviewProperty.WIDTH);
-//        height = properties.getIntValue(PreviewProperty.HEIGHT);
-        height = properties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.HEIGHT));
+        width = properties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.WIDTH));
+        height = properties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.HEIGHT));
 
         //TITLE
-        isDisplayingTitle = properties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.TITLE_IS_DISPLAYING));
-//        isDisplayingTitle = properties.getBooleanValue(PreviewProperty.TITLE_IS_DISPLAYING);
-        titleFont = properties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.TITLE_FONT));
-//        titleFont = properties.getFontValue(PreviewProperty.TITLE_FONT);
-        titleFontColor = properties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.TITLE_FONT_COLOR));
-//        titleFontColor = properties.getColorValue(PreviewProperty.TITLE_FONT_COLOR);
+        isDisplayingTitle = properties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.TITLE_IS_DISPLAYING));
+        titleFont = properties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.TITLE_FONT));
+        titleFontColor = properties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.TITLE_FONT_COLOR));
         title = item.getData(LegendItem.TITLE);
 
         //DESCRIPTION
-        isDisplayingDescription = properties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.DESCRIPTION_IS_DISPLAYING));
-//        isDisplayingDescription = properties.getBooleanValue(PreviewProperty.DESCRIPTION_IS_DISPLAYING);
-        descriptionFont = properties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.DESCRIPTION_FONT));
-//        descriptionFont = properties.getFontValue(PreviewProperty.DESCRIPTION_FONT);
-        descriptionFontColor = properties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.DESCRIPTION_FONT_COLOR));
-//        descriptionFontColor = properties.getColorValue(PreviewProperty.DESCRIPTION_FONT_COLOR);
+        isDisplayingDescription = properties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.DESCRIPTION_IS_DISPLAYING));
+        descriptionFont = properties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.DESCRIPTION_FONT));
+        descriptionFontColor = properties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.DESCRIPTION_FONT_COLOR));
         description = item.getData(LegendItem.DESCRIPTION);
 
 
         // ORIGIN
-        float originX = properties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.ORIGIN_X));
-//        float originX = properties.getFloatValue(PreviewProperty.ORIGIN_X);
-        float originY = properties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES,legendIndex, LegendProperty.ORIGIN_Y));
-//        float originY = properties.getFloatValue(PreviewProperty.ORIGIN_Y);
+        float originX = properties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.ORIGIN_X));
+        float originY = properties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex, LegendProperty.ORIGIN_Y));
         originTranslation = new AffineTransform();
         originTranslation.setToTranslation(originX, originY);
     }
 
     protected void renderSVG(SVGTarget target) {
         org.w3c.dom.Document document = target.getDocument();
-        SVGGraphics2D graphics = new SVGGraphics2D(document);
-        renderToGraphics(graphics, originTranslation, width, height);
+        SVGGraphics2D graphics2D = new SVGGraphics2D(document);
+        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        renderToGraphics(graphics2D, originTranslation, width, height);
 
         //appending
         org.w3c.dom.Element svgRoot = document.getDocumentElement();
-        svgRoot.appendChild(graphics.getRoot());
+        svgRoot.appendChild(graphics2D.getRoot());
     }
 
     protected void renderPDF(PDFTarget target) {
@@ -180,17 +86,56 @@ public abstract class LegendItemRenderer implements Renderer {
         com.itextpdf.text.Document pdfDocument = contentByte.getPdfDocument();
         contentByte.saveState();
         Graphics2D graphics2D = contentByte.createGraphics(pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
+        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         renderToGraphics(graphics2D, originTranslation, width, height);
         graphics2D.dispose();
         contentByte.restoreState();
     }
 
     protected void renderProcessing(ProcessingTarget target) {
-        Graphics2D graphics = (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
-        renderToGraphics(graphics, originTranslation, width, height);
+        Graphics2D graphics2D = (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
+        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+        renderToGraphics(graphics2D, originTranslation, width, height);
+    }
+
+    public void render(Graphics2D graphics2D, AffineTransform origin, int width, int height) {
+        int titleSpaceUsed = renderTitle(graphics2D, origin);
+        renderToGraphics(graphics2D, origin, width, height - titleSpaceUsed);
+
     }
 
     public abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, int width, int height);
+
+    public int renderTitle(Graphics2D graphics2D, AffineTransform origin) {
+        if (isDisplayingTitle) {
+            graphics2D.setColor(titleFontColor);
+            graphics2D.setFont(titleFont);
+            int titleFontHeight = graphics2D.getFontMetrics().getHeight();
+            graphics2D.drawString(title, 0, titleFontHeight);
+            origin.translate(0, titleFontHeight);
+            return titleFontHeight;
+        }
+        return 0;
+    }
+
+    public void renderDescription(Graphics2D graphics2D, AffineTransform origin) {
+        if (isDisplayingDescription) {
+            graphics2D.setColor(descriptionFontColor);
+            graphics2D.setFont(descriptionFont);
+            int descriptionFontHeight = graphics2D.getFontMetrics().getHeight();
+            graphics2D.drawString(description, 0, descriptionFontHeight);
+            origin.translate(0, descriptionFontHeight);
+        }
+    }
+
+    @Override
+    public void preProcess(PreviewModel previewModel) {
+    }
 
     public abstract void readOwnPropertiesAndValues(Item item, PreviewProperties properties);
 
@@ -209,7 +154,28 @@ public abstract class LegendItemRenderer implements Renderer {
             renderPDF((PDFTarget) target);
         }
     }
-    
-    
+
+    @Override
+    public PreviewProperty[] getProperties() {
+        return new PreviewProperty[0];
+    }
+
+    protected void legendDrawString(Graphics2D graphics2D, String label, Font font, Color color, int x, int y, int width, int height, Alignment alignment) {
+        graphics2D.setColor(color);
+        graphics2D.setFont(font);
+        int labelWidth = graphics2D.getFontMetrics().stringWidth(label);
+        y += height;
+        switch (alignment) {
+            case RIGHT: {
+                x+= width - labelWidth;
+                break;
+            }
+            case CENTER:{
+                x+= ((width - labelWidth)/2);
+                break;
+            }
+        }
+        graphics2D.drawString(label, x, y);
+    }
 
 }

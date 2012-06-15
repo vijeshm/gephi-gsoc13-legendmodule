@@ -58,25 +58,6 @@ public class TableItem extends AbstractItem implements LegendItem{
 
     }
     
-    public enum Direction {
-
-        UP("Up"),
-        BOTTOM("Bottom"),
-        RIGHT("Right"),
-        LEFT("Left");
-        private final String direction;
-
-        private Direction(String direction) {
-            this.direction = direction;
-        }
-
-        @Override
-        public String toString() {
-            return this.direction;
-        }
-
-    }
-    
     public TableItem(Object source) {
         super(source, TYPE);
     }

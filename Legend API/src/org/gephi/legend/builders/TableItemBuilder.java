@@ -14,35 +14,31 @@ import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.LegendItem;
+import org.gephi.legend.api.LegendItem.Direction;
+import org.gephi.legend.api.LegendItem.Alignment;
+import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.properties.TableProperty;
+import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.partition.api.NodePartition;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service = ItemBuilder.class, position = 100)
-public class TableItemBuilder implements ItemBuilder {
+public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
-    public Item[] getItems(Graph graph, AttributeModel attributeModel) {
+    public String getType() {
+        return TableItem.TYPE;
+    }
 
-        PartitionController pc = Lookup.getDefault().lookup(PartitionController.class);
-        if (pc.getModel() != null) {
-            pc.refreshPartitions();
-            NodePartition[] nodePartitions = pc.getModel().getNodePartitions();
-            Float[][] tableValues = new Float[nodePartitions.length][nodePartitions.length];
-            for (int i = 0; i < nodePartitions.length; i++) {
-                for (int j = 0; j < nodePartitions.length; j++) {
-                    tableValues[i][j] = 0f;
-                    
-                }
-            }
-            
-        }
-        
-//        graph.get
-        
+    @Override
+    public Item buildItem(Graph graph, AttributeModel attributeModel) {
         //colors
         ArrayList<Color> listOfColors;
         listOfColors = new ArrayList<Color>();
@@ -65,10 +61,10 @@ public class TableItemBuilder implements ItemBuilder {
             {5.44276841441f, 5.68705442654f, 5.45203949569f, 6.3702550653f, 6.25203315678f, 6.40009442175f, 8.28908129072f, 7.81318233426f},
             {5.35181089016f, 5.07697000134f, 5.76683083336f, 5.04885627802f, 6.51540268438f, 5.05027735868f, 7.21679046513f, 5.58756039989f},
             {5.24203982658f, 5.67995857207f, 7.75338861595f, 7.95242620409f, 5.45866613248f, 5.34302649296f, 5.26438348233f, 5.70365120776f}};
-        
-            
+
+
         //label
-            ArrayList<String> labels1;
+        ArrayList<String> labels1;
         labels1 = new ArrayList<String>();
         labels1.add("Juan");
         labels1.add("QWERTYYY");
@@ -80,67 +76,125 @@ public class TableItemBuilder implements ItemBuilder {
         labels1.add("Holaaaaaaaaaa");
 
 
-        //Build a number of SomeLegendItem instances, so they are later rendered with SomeLegendItemRenderer
-        //In this case we return just one:
-        TableItem tableItem = new TableItem(graph/*
-                 * Actually, anything can be passed here to identify as the
-                 * source for this item
-                 */);
+        PartitionController pc = Lookup.getDefault().lookup(PartitionController.class);
+        if (pc.getModel() != null) {
+            pc.refreshPartitions();
+            NodePartition[] nodePartitions = pc.getModel().getNodePartitions();
+            Float[][] tableValues = new Float[nodePartitions.length][nodePartitions.length];
+            for (int i = 0; i < nodePartitions.length; i++) {
+                for (int j = 0; j < nodePartitions.length; j++) {
+                    tableValues[i][j] = 0f;
 
-        Integer fontSize = 13;
-        Integer cellSizeWidth = 40;
-        Integer cellSizeHeight = 20;
-        Boolean isCellColoring = true;
-        TableItem.Direction cellColoring = TableItem.Direction.UP;
-        Color background = Color.WHITE;
-        
-        TableItem.Direction horizontalAlignment = TableItem.Direction.LEFT;
-        TableItem.Direction horizontalTextAlignment = TableItem.Direction.RIGHT;
-        TableItem.Direction verticalAlignment = TableItem.Direction.UP;
-        
-        TableItem.VerticalTextDirection verticalTextDirection = TableItem.VerticalTextDirection.DIAGONAL;
-        
-        String fontType = Font.SANS_SERIF;
-        Integer fontStyle = Font.PLAIN;
-        // bug, dont know why
-        Integer verticalExtraMargin = 0;
-        Integer horizontalExtraAlignment = 0;
-        
-        //Put some data based on current graph, attributes, anything...
-        //Here is where ideas to build different legend items and setting them up with the graph happens
-        tableItem.setData(TableItem.LABELS, labels1);
-        tableItem.setData(TableItem.TABLE_VALUES, tableValues1);
-        tableItem.setData(TableItem.LIST_OF_COLORS, listOfColors);
-        
-//        tableItem.setData(TableItem.IS_CELL_COLORING, isCellColoring);
-//        tableItem.setData(TableItem.CELL_COLORING, cellColoring);
-//        tableItem.setData(TableItem.BACKGROUND, background);
-//        
-//        
-//        tableItem.setData(TableItem.FONT, new Font(fontType, fontStyle, fontSize));
-//        
-//        tableItem.setData(TableItem.CELL_SIZE_WIDTH, cellSizeWidth);
-//        tableItem.setData(TableItem.CELL_SIZE_HEIGHT, cellSizeHeight);
-//        
-//        
-//        tableItem.setData(TableItem.HORIZONTAL_ALIGNMENT, horizontalAlignment);
-//        tableItem.setData(TableItem.HORIZONTAL_TEXT_ALIGNMENT, horizontalTextAlignment);
-//        tableItem.setData(TableItem.VERTICAL_ALIGNMENT, verticalAlignment);
-//        
-//        tableItem.setData(TableItem.VERTICAL_TEXT_DIRECTION, verticalTextDirection);
-//        
-//        
-//        tableItem.setData(TableItem.MINIMUM_MARGIN, 3);
-//        
-//        tableItem.setData(TableItem.VERTICAL_EXTRA_MARGIN, verticalExtraMargin);
-//        tableItem.setData(TableItem.HORIZONTAL_EXTRA_ALIGNMENT, horizontalExtraAlignment);
-        
-        return new Item[]{tableItem};
+                }
+            }
+
+        }
+
+        TableItem item = new TableItem(graph);
+        item.setData(TableItem.LABELS, labels1);
+        item.setData(TableItem.TABLE_VALUES, tableValues1);
+        item.setData(TableItem.LIST_OF_COLORS, listOfColors);
+        return item;
+
+
     }
 
     @Override
-    public String getType() {
-        return TableItem.TYPE;
+    protected PreviewProperty[] createLegendItemProperties(Item item) {
+
+
+
+        int workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+        ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
+
+
+
+        PreviewProperty[] properties = {
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_VERTICAL_EXTRA_MARGIN),
+                                           Integer.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalExtraMargin),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_HORIZONTAL_EXTRA_MARGIN),
+                                           Integer.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalExtraMargin),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_FONT),
+                                           Font.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultFont),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_FONT_COLOR),
+                                           Color.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.color.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.color.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultFontColor),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_IS_CELL_COLORING),
+                                           Boolean.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.isCellColoring.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.isCellColoring.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsCellColoring),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_CELL_COLORING_DIRECTION),
+                                           Direction.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.cellColoringDirection.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.cellColoringDirection.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultCellColoringDirection),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_HORIZONTAL_TEXT_ALIGNMENT),
+                                           Alignment.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.alignment.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.alignment.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalTextAlignment),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_HORIZONTAL_TEXT_POSITION),
+                                           Direction.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalTextPosition),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ALIGNMENT),
+                                           Alignment.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.alignment.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.alignment.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextAlignment),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_POSITION),
+                                           Direction.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextPosition),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_POSITION),
+                                           Float.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),
+        };
+
+
+        return properties;
     }
 
+    //default values
+    protected final Integer defaultVerticalExtraMargin = 3;
+    protected final Integer defaultHorizontalExtraMargin = 3;
+    protected final Integer defaultMinimumMargin = 3;
+    protected final Font defaultFont = new Font("Arial", Font.PLAIN, 13);
+    protected final Color defaultFontColor = Color.BLACK;
+    protected final Boolean defaultIsCellColoring = true;
+    protected final Direction defaultCellColoringDirection = Direction.UP;
+    protected final Direction defaultHorizontalTextPosition = Direction.LEFT;
+    protected final Alignment defaultHorizontalTextAlignment = Alignment.LEFT;
+    protected final Alignment defaultVerticalTextAlignment = Alignment.LEFT;
+    protected final Direction defaultVerticalTextPosition = Direction.LEFT;
+    protected final Float defaultVerticalTextRotation = 90f;
 }

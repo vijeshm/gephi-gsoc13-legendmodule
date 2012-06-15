@@ -16,7 +16,7 @@ import org.gephi.preview.plugin.items.AbstractItem;
 public class ImageItem extends AbstractItem implements LegendItem {
 
         //BODY
-    public static final String IMAGE = "image";
+    public static final String IMAGE_URL = "image";
     public static final String TYPE= "Image Item";
 
     public ImageItem(Object source) {

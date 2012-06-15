@@ -11,6 +11,7 @@ import org.gephi.legend.api.LegendManager;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.legend.items.ImageItem;
+import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -18,23 +19,23 @@ import org.openide.util.lookup.ServiceProvider;
  * @author edubecks
  */
 @ServiceProvider(service = ItemBuilder.class, position = 102)
-public class ImageItemBuilder implements ItemBuilder{
-
-    @Override
-    public Item[] getItems(Graph graph, AttributeModel attributeModel) {
-        Item[] items = new ImageItem[1];
-        ImageItem imageItem = new ImageItem(graph);
-        imageItem.setData(LegendItem.WORK_INDEX, LegendManager.useWorkIndex());
-        imageItem.setData(LegendItem.ITEM_INDEX, LegendManager.useItemIndex());
-        imageItem.setData(ImageItem.IMAGE, "/Users/edubecks/Dropbox/gsoc2012/gephi/gephi.communication/test2.png");
-        items[0]=imageItem;
-        
-        return items;
-    }
+public class ImageItemBuilder extends LegendItemBuilder{
 
     @Override
     public String getType() {
         return ImageItem.TYPE;
+    }
+
+    @Override
+    public Item buildItem(Graph graph, AttributeModel attributeModel) {
+        ImageItem item = new ImageItem(graph);
+        item.setData(ImageItem.IMAGE_URL, "/Users/edubecks/Dropbox/gsoc2012/gephi/gephi.communication/test2.png");
+        return item;
+    }
+
+    @Override
+    protected PreviewProperty[] createLegendItemProperties(Item item) {
+        return new PreviewProperty[0];
     }
     
     

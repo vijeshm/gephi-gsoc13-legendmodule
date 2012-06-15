@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import javax.imageio.ImageIO;
+import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
@@ -47,7 +48,7 @@ public class ImageItemRenderer extends LegendItemRenderer{
 
     @Override
     public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
-        imageURL = item.getData(ImageItem.IMAGE);
+        imageURL = item.getData(ImageItem.IMAGE_URL);
     }
 
     @Override
@@ -55,15 +56,7 @@ public class ImageItemRenderer extends LegendItemRenderer{
         return NbBundle.getMessage(ImageItemRenderer.class, "ImageItemRenderer.name");
     }
 
-    @Override
-    public void preProcess(PreviewModel previewModel) {
-    }
-
-    @Override
-    public PreviewProperty[] getProperties() {
-        return new PreviewProperty[0];
-    }
-
+    
     @Override
     public boolean isRendererForitem(Item item, PreviewProperties properties) {
         return item instanceof ImageItem;
@@ -76,5 +69,6 @@ public class ImageItemRenderer extends LegendItemRenderer{
     
     // OWN PROPERTIES
     private String imageURL;
+
     
 }

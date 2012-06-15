@@ -14,22 +14,33 @@ public class TableProperty{
     public static final int TABLE_FONT = 0;
     public static final int TABLE_FONT_COLOR = 1;
     public static final int TABLE_IS_CELL_COLORING = 2;
-    public static final int TABLE_HORIZONTAL_ALIGNMENT = 3;
+    public static final int TABLE_HORIZONTAL_TEXT_POSITION = 3;
     public static final int TABLE_HORIZONTAL_TEXT_ALIGNMENT = 4;
     public static final int TABLE_HORIZONTAL_EXTRA_MARGIN = 5;
-    public static final int TABLE_VERTICAL_ALIGNMENT = 6;
-    public static final int TABLE_VERTICAL_TEXT_DIRECTION = 7;
-    public static final int TABLE_VERTICAL_EXTRA_MARGIN = 8;
+    public static final int TABLE_VERTICAL_TEXT_POSITION = 6;
+    public static final int TABLE_VERTICAL_TEXT_ALIGNMENT = 7;
+    public static final int TABLE_VERTICAL_TEXT_ROTATION = 8;
+    public static final int TABLE_VERTICAL_EXTRA_MARGIN = 9;
+    public static final int TABLE_CELL_COLORING_DIRECTION = 10;
     
     public static String[] OWN_PROPERTIES = {
         ".table.font",
         ".table.font.color",
         ".table.isCellColoring",
-        ".table.horizontalAlignment",
-        ".table.horizontalTextAlignment",
+        ".table.horizontalText.position",
+        ".table.horizontalText.alignment",
         ".table.horizontal.extraMargin",
-        ".table.verticalAlignment",
-        ".table.verticalTextDirection",
-        ".table.vertical.extraMargin"
+        ".table.verticalText.position",
+        ".table.verticalText.alignment",
+        ".table.verticalText.rotation",
+        ".table.vertical.extraMargin",
+        ".table.cellColoringDirection"
     };
+    /*
+     *     protected final Direction defaultCellColoringDirection = Direction.UP;
+    protected final Direction defaultHorizontalAlignment = Direction.LEFT;
+    protected final Direction defaultHorizontalTextAlignment = Direction.RIGHT;
+    protected final Direction defaultVerticalAlignment = Direction.UP;
+    protected final Float defaultVerticalTextRotation = 90f;
+     */
 }

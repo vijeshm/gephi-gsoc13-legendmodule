@@ -30,25 +30,25 @@ public class LegendManager {
         return currentWorkIndex;
     }
 
-    public static ArrayList<String> getProperties(String[] PROPERTIES) {
+    public static ArrayList<String> getProperties(String[] PROPERTIES, int workspaceIndex, int itemIndex) {
         ArrayList<String> properties = new ArrayList<String>();
         for (String property : PROPERTIES) {
             String newProperty = (legendDescription
-                                  + workDescription + currentWorkIndex
-                                  + itemDescription + currentItemIndex
+                                  + workDescription + workspaceIndex
+                                  + itemDescription + itemIndex
                                   + property);
             properties.add(newProperty);
-            System.out.println("Creating >>> " + newProperty);
+//            System.out.println("Creating >>> " + newProperty);
         }
         return properties;
     }
 
-    public static String getProperty(String[] PROPERTIES, int legendIndex, int legendProperty) {
+    public static String getProperty(String[] PROPERTIES, int workspaceIndex, int itemIndex, int legendProperty) {
         String property = (legendDescription
                            + workDescription + currentWorkIndex
-                           + itemDescription + legendIndex
+                           + itemDescription + itemIndex
                            + PROPERTIES[legendProperty]);
-        System.out.println("@Var: property: " + property);
+//        System.out.println("@Var: property: " + property);
         return property;
     }
 
