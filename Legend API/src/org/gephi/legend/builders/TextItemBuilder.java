@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendItem;
+import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.items.TextItem;
 import org.gephi.legend.properties.TextProperty;
@@ -28,29 +29,31 @@ public class TextItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return TextItem.TYPE;
+        return TextItem.LEGEND_TYPE;
     }
 
     @Override
     public Item buildItem(Graph graph, AttributeModel attributeModel) {
-        TextItem textItem = new TextItem(graph);
-        textItem.setData(TextItem.BODY, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In venenatis nibh eget dolor accumsan rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec felis leo, eget placerat eros. Curabitur eros erat, vulputate nec laoreet sed, aliquam ac sem. Nullam sollicitudin, dui eu placerat pulvinar, odio lacus molestie neque, sagittis commodo dui enim luctus est. Etiam quis orci felis, a tristique enim. Phasellus placerat est suscipit nisi dapibus non sollicitudin massa lobortis. Vestibulum ac malesuada diam.");
-        textItem.setData(TextItem.TITLE, "Title");
-        textItem.setData(TextItem.DESCRIPTION, "Description");
-        return textItem;
+        TextItem item = new TextItem(graph);
+        item.setData(TextItem.BODY, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In venenatis nibh eget dolor accumsan rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec felis leo, eget placerat eros. Curabitur eros erat, vulputate nec laoreet sed, aliquam ac sem. Nullam sollicitudin, dui eu placerat pulvinar, odio lacus molestie neque, sagittis commodo dui enim luctus est. Etiam quis orci felis, a tristique enim. Phasellus placerat est suscipit nisi dapibus non sollicitudin massa lobortis. Vestibulum ac malesuada diam.");
+        item.setData(LegendItem.SUB_TYPE, getType());
+        return item;
     }
 
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
-
-
-        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
+        ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES, itemIndex);
 
         PreviewProperty[] properties = {
+            PreviewProperty.createProperty(this,
+                                           textProperties.get(TextProperty.TEXT_BODY),
+                                           String.class,
+                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBody),
             PreviewProperty.createProperty(this,
                                            textProperties.get(TextProperty.TEXT_BODY_FONT),
                                            Font.class,
@@ -62,13 +65,22 @@ public class TextItemBuilder extends LegendItemBuilder {
                                            Color.class,
                                            NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontColor)};
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontColor),
+            PreviewProperty.createProperty(this,
+                                           textProperties.get(TextProperty.TEXT_BODY_FONT_ALIGNMENT),
+                                           Alignment.class,
+                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontAlignment)
+        };
 
 
         return properties;
     }
 
     // DEFAULT VALUES
-    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 20);
-    protected final Color defaultBodyFontColor = Color.BLACK;
+    protected final String defaultBody = "";
+    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
+    protected final Color defaultBodyFontColor = Color.BLUE;
+    protected final Alignment defaultBodyFontAlignment = Alignment.LEFT;
 }

@@ -20,16 +20,18 @@ import org.gephi.legend.items.GroupsItem;
 import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.api.LegendItem.Shape;
 import org.gephi.legend.api.LegendItem.Direction;
+import org.gephi.preview.spi.Renderer;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author edubecks
  */
-//@ServiceProvider(service = Renderer.class, position = 401)
+@ServiceProvider(service = Renderer.class, position = 504)
 public class GroupsItemRenderer extends LegendItemRenderer {
 
     @Override
-    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, int width, int height) {
+    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
         System.out.println("@Var: height: " + height);
         System.out.println("@Var: width: " + width);
         int numGroups = labelsGroup.size();
@@ -115,7 +117,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         }
     }
 
-    public void drawString(Graphics2D graphics2D, String label, Color color, int x, int y, int width, int height, Direction labelPosition) {
+    public void drawString(Graphics2D graphics2D, String label, Color color, int x, int y, Integer width, Integer height, Direction labelPosition) {
 
         FontMetrics fontMetrics = graphics2D.getFontMetrics();
         int fontHeight = fontMetrics.getHeight();
@@ -131,7 +133,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         graphics2D.drawString(label, xCenter, yCenter);
     }
 
-    public void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, int width, int height) {
+    public void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height) {
                 graphics2D.setColor(color);
         switch (shape) {
             case RECTANGLE: {
@@ -155,18 +157,17 @@ public class GroupsItemRenderer extends LegendItemRenderer {
     @Override
     public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         
-        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         // properties
-        numColumns = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS));
+        numColumns = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS));
         System.out.println("@Var: numColumns: " + numColumns);
-        labelPosition = (LegendItem.Direction) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_LABEL_POSITION));
+        labelPosition = (LegendItem.Direction) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_POSITION));
         System.out.println("@Var: labelPosition: " + labelPosition);
-        shape = (LegendItem.Shape) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_SHAPE));
+        shape = (LegendItem.Shape) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
         System.out.println("@Var: shape: " + shape);
-        labelFont = properties.getFontValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
-        labelFontColor = properties.getColorValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_COLOR));
+        labelFont = properties.getFontValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
+        labelFontColor = properties.getColorValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_COLOR));
 
         //values
         labelsGroup = item.getData(GroupsItem.LABELS_GROUP);
@@ -174,8 +175,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         colorsGroup = item.getData(GroupsItem.COLORS_GROUP);
         System.out.println("@Var: colorsGroup: " + colorsGroup);
 
-        paddingBetweenTextAndShape = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
-        paddingBetweenElements = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
+        paddingBetweenTextAndShape = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
+        paddingBetweenElements = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
 
     }
 

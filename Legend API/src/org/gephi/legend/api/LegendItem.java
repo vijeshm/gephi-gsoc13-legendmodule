@@ -11,16 +11,18 @@ package org.gephi.legend.api;
 public interface LegendItem {
 
     //INDEX
-    public static final String WORKSPACE_INDEX = "work index";
     public static final String ITEM_INDEX = "item index";
     //LOCATION
     public static final String ORIGIN = "origin";
-    //TITLE
-    public static final String TITLE = "title";
-    //DESCRIPTION
-    public static final String DESCRIPTION = "description";
     //INDEX
     public static final String PROPERTIES = "properties";
+    // TYPE 
+    public static final String TYPE="Legend Item";
+    public static final String SUB_TYPE="Legend Item";
+    
+    
+    
+    public static final String INDEX = "index";
 
     public enum Direction {
 
@@ -43,7 +45,7 @@ public interface LegendItem {
 
     public enum Shape {
 
-        RECTANGLE("rectangle"),
+        RECTANGLE("Rectangle"),
         CIRCLE("Circle"),
         TRIANGLE("Triangle");
 
@@ -62,9 +64,10 @@ public interface LegendItem {
 
     public enum Alignment {
 
-        LEFT("left"),
-        RIGHT("right"),
-        CENTER("center");
+        LEFT("Left"),
+        RIGHT("Right"),
+        CENTER("Center"),
+        JUSTIFIED("Justified");
 
         private final String alignment;
 

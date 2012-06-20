@@ -22,6 +22,7 @@ import org.gephi.legend.properties.TableProperty;
 import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.partition.api.NodePartition;
 import org.gephi.partition.api.PartitionController;
+import org.gephi.partition.api.PartitionModel;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
@@ -34,11 +35,11 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return TableItem.TYPE;
+        return TableItem.LEGEND_TYPE;
     }
 
     @Override
-    public Item buildItem(Graph graph, AttributeModel attributeModel) {
+    protected Item buildItem(Graph graph, AttributeModel attributeModel) {
         //colors
         ArrayList<Color> listOfColors;
         listOfColors = new ArrayList<Color>();
@@ -76,12 +77,18 @@ public class TableItemBuilder extends LegendItemBuilder {
         labels1.add("Holaaaaaaaaaa");
 
 
-        PartitionController pc = Lookup.getDefault().lookup(PartitionController.class);
-        if (pc.getModel() != null) {
-            pc.refreshPartitions();
-            NodePartition[] nodePartitions = pc.getModel().getNodePartitions();
+        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+        PartitionModel model = partitionController.getModel();
+        
+        if (model != null) {
+            NodePartition[] nodePartitions = model.getNodePartitions();
+            System.out.println("@Var: num Partitions: "+nodePartitions.length);
+            
+            
             Float[][] tableValues = new Float[nodePartitions.length][nodePartitions.length];
             for (int i = 0; i < nodePartitions.length; i++) {
+                System.out.println("@Var: nodePartitions: (elements):"+nodePartitions[i].getElementsCount());
+                
                 for (int j = 0; j < nodePartitions.length; j++) {
                     tableValues[i][j] = 0f;
 
@@ -94,6 +101,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         item.setData(TableItem.LABELS, labels1);
         item.setData(TableItem.TABLE_VALUES, tableValues1);
         item.setData(TableItem.LIST_OF_COLORS, listOfColors);
+        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
 
 
@@ -104,10 +112,9 @@ public class TableItemBuilder extends LegendItemBuilder {
 
 
 
-        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
+        ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, itemIndex);
 
 
 
@@ -173,7 +180,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextPosition),
             PreviewProperty.createProperty(this,
-                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_POSITION),
+                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ROTATION),
                                            Float.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),

@@ -17,7 +17,7 @@ public class ImageItem extends AbstractItem implements LegendItem {
 
         //BODY
     public static final String IMAGE_URL = "image";
-    public static final String TYPE= "Image Item";
+    public static final String LEGEND_TYPE= "Image Item";
 
     public ImageItem(Object source) {
         super(source, TYPE);

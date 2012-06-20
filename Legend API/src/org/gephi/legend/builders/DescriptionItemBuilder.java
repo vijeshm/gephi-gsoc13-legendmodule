@@ -41,6 +41,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         DescriptionItem item = new DescriptionItem(graph);
         item.setData(DescriptionItem.KEYS, descriptions);
         item.setData(DescriptionItem.VALUES, values);
+        item.setData(LegendItem.SUB_TYPE, getType());
         
         return item;
     }
@@ -48,10 +49,9 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
-        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        ArrayList<String> textProperties = LegendManager.getProperties(DescriptionProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
+        ArrayList<String> textProperties = LegendManager.getProperties(DescriptionProperty.OWN_PROPERTIES, itemIndex);
 
         PreviewProperty[] properties = {
             PreviewProperty.createProperty(this,
@@ -104,7 +104,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return DescriptionItem.TYPE;
+        return DescriptionItem.LEGEND_TYPE;
     }
 
     private Font defaultKeyFont = new Font("Arial", Font.PLAIN, 13);

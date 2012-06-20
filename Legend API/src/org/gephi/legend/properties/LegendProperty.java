@@ -10,6 +10,8 @@ package org.gephi.legend.properties;
  */
 public class LegendProperty {
     
+
+    
     
     //LOCATION
     public static final int ORIGIN_X = 0;
@@ -25,6 +27,14 @@ public class LegendProperty {
     public static final int DESCRIPTION_IS_DISPLAYING = 7;
     public static final int DESCRIPTION_FONT = 8;
     public static final int DESCRIPTION_FONT_COLOR = 9;
+    // ALIGNMENT
+    public static final int TITLE_ALIGNMENT = 10;
+    public static final int DESCRIPTION_ALIGNMENT = 11;
+    // VALUES
+    public static final int TITLE = 12;
+    public static final int DESCRIPTION = 13;
+    //REMOVE
+    public static final int REMOVE = 14;
     
     public static final String[] LEGEND_PROPERTIES = {
         //LOCATION
@@ -39,6 +49,13 @@ public class LegendProperty {
         //DESCRIPTION
         ".description.isDisplaying",
         ".description.font",
-        ".description.font.color"
+        ".description.font.color",
+        // ALIGNMENT
+        ".title.alignment",
+        ".description.alignment",
+        ".title",
+        ".description",
+        ".remove"
+        
     };
 }

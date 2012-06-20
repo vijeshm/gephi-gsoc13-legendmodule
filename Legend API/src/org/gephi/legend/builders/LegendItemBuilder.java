@@ -10,43 +10,70 @@ import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendItem;
+import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.api.LegendManager;
-import org.gephi.preview.api.Item;
-import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author edubecks
  */
-public abstract class LegendItemBuilder implements ItemBuilder{
+public abstract class LegendItemBuilder implements ItemBuilder {
 
-    public abstract Item buildItem(Graph graph, AttributeModel attributeModel);
-    
+    protected abstract Item buildItem(Graph graph, AttributeModel attributeModel);
+
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
-    
+
+    public Item createItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
+        Item item = buildItem(graph, attributeModel);
+        item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+        item.setData(LegendItem.PROPERTIES, getLegendProperties(item));
+        return item;
+
+    }
+
     @Override
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
-        Item[] items = new Item[1];
-        Item item = buildItem(graph,attributeModel);
-        item.setData(LegendItem.WORKSPACE_INDEX, LegendManager.useWorkIndex());
-        item.setData(LegendItem.ITEM_INDEX, LegendManager.useItemIndex());
-        item.setData(LegendItem.PROPERTIES, getLegendProperties(item));
-        items[0] = item;
-        return items;
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+        Workspace workspace = projectController.getCurrentWorkspace();
+        PreviewModel previewModel = previewController.getModel(workspace);
+        PreviewProperties previewProperties = previewModel.getProperties();
+        if (previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
+
+            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+            ArrayList<Item> legendItems = legendManager.getLegendItems();
+            if (!legendItems.isEmpty()) {
+                Item[] items = new Item[legendItems.size()];
+                for (int i = 0; i < legendItems.size(); i++) {
+                    items[i] = legendItems.get(i);
+                }
+                return items;
+            }
+        }
+        return new Item[0];
     }
-    
+
     public PreviewProperty[] createLegendProperties(Item item) {
-        
-        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
 
-        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, workspaceIndex, itemIndex);
+        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, itemIndex);
 
         return new PreviewProperty[]{
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.REMOVE),
+                                                   Boolean.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.remove.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.remove.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultRemove),
                     PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.ORIGIN_X),
                                                    Float.class,
@@ -60,11 +87,29 @@ public abstract class LegendItemBuilder implements ItemBuilder{
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultOriginY),
                     PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.WIDTH),
+                                                   Float.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.width.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.width.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultWidth),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.HEIGHT),
+                                                   Float.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHeight),
+                    PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.TITLE_IS_DISPLAYING),
                                                    Boolean.class,
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.isDisplaying.displayName"),
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.isDisplaying.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplayingTitle),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.TITLE),
+                                                   String.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultTitle),
                     PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.TITLE_FONT),
                                                    Font.class,
@@ -78,11 +123,23 @@ public abstract class LegendItemBuilder implements ItemBuilder{
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.font.color.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultTitleFontColor),
                     PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.TITLE_ALIGNMENT),
+                                                   Alignment.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.alignment.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.alignment.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultTitleAlignment),
+                    PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.DESCRIPTION_IS_DISPLAYING),
                                                    Boolean.class,
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.isDisplaying.displayName"),
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.isDisplaying.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplayingTitle),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.DESCRIPTION),
+                                                   String.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescription),
                     PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.DESCRIPTION_FONT),
                                                    Font.class,
@@ -96,21 +153,14 @@ public abstract class LegendItemBuilder implements ItemBuilder{
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.font.color.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionFontColor),
                     PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.WIDTH),
-                                                   Float.class,
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.width.displayName"),
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.width.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultWidth),
-                    PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.HEIGHT),
-                                                   Float.class,
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.displayName"),
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHeight)
+                                                   legendProperties.get(LegendProperty.DESCRIPTION_ALIGNMENT),
+                                                   Alignment.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.alignment.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.alignment.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionAlignment)
                 };
     }
-    
-    
+
     public PreviewProperty[] getLegendProperties(Item item) {
 
         PreviewProperty[] legendProperties = createLegendProperties(item);
@@ -122,20 +172,26 @@ public abstract class LegendItemBuilder implements ItemBuilder{
         return previewProperties;
 
     }
-    
-    
-    
+
     //DEFAULT VALUES 
+    // REMOVE
+    protected boolean defaultRemove = false;
+    //ORIGIN
     protected float defaultOriginX = 100f;
     protected float defaultOriginY = 100f;
+    //WIDTH
     protected float defaultWidth = 200f;
     protected float defaultHeight = 200f;
+    // TITLE
     protected Boolean defaultIsDisplayingTitle = true;
-    protected final Font defaultTitleFont = new Font("Arial", Font.BOLD, 24);
+    protected final String defaultTitle = "";
+    protected final Font defaultTitleFont = new Font("Arial", Font.BOLD, 30);
+    protected final Alignment defaultTitleAlignment = Alignment.CENTER;
     protected final Color defaultTitleFontColor = Color.BLACK;
+    // DESCRIPTION
+    protected final String defaultDescription = "";
     protected Boolean defaultIsDisplayingDescription = true;
     protected final Color defaultDescriptionFontColor = Color.BLACK;
+    protected final Alignment defaultDescriptionAlignment = Alignment.LEFT;
     protected final Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
-
-    
 }

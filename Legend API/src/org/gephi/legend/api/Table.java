@@ -297,7 +297,7 @@ public class Table{
 //    public BufferedImage createProcessingVerticalText(){
 //        
 //    }
-    public void createVerticalText(Graphics2D graphics, AffineTransform affineTransform, int width, int height) {
+    public void createVerticalText(Graphics2D graphics, AffineTransform affineTransform, Integer width, Integer height) {
 
         int diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
 
@@ -445,9 +445,9 @@ public class Table{
 
         //compute the width and height for the new image
         int maxLength = metrics.stringWidth(longestLabel());
-//        int height = (metrics.charWidth('w') + 3) * maxLength + margin;
-        int height = maxLength + 2 * MINIMUM_MARGIN;
-        int width = cellSizeWidth * labels.size() + height;
+//        Integer height = (metrics.charWidth('w') + 3) * maxLength + margin;
+        Integer height = maxLength + 2 * MINIMUM_MARGIN;
+        Integer width = cellSizeWidth * labels.size() + height;
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         imageGraphics = (Graphics2D) image.getGraphics();
 
@@ -458,7 +458,7 @@ public class Table{
 
 
 
-        int heightSub = 0, widthSub = 0;
+        Integer heightSub = 0, widthSub = 0;
 
 
 
@@ -467,7 +467,7 @@ public class Table{
         return image;
     }
 
-    public void createHorizontalText(Graphics2D graphics, AffineTransform arrangeTranslation, int width, int height) {
+    public void createHorizontalText(Graphics2D graphics, AffineTransform arrangeTranslation, Integer width, Integer height) {
 
 
         //arrange
@@ -510,8 +510,8 @@ public class Table{
 
         BufferedImage image = new BufferedImage(1, 1,
                                                 BufferedImage.TYPE_INT_RGB);
-        int width = image.getGraphics().getFontMetrics().stringWidth(longestLabel()) + 2 * MINIMUM_MARGIN;
-        int height = cellSizeHeight * labels.size();
+        Integer width = image.getGraphics().getFontMetrics().stringWidth(longestLabel()) + 2 * MINIMUM_MARGIN;
+        Integer height = cellSizeHeight * labels.size();
         image = new BufferedImage(width, height,
                                   BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = (Graphics2D) image.getGraphics();
@@ -559,8 +559,8 @@ public class Table{
     }
 
     public BufferedImage createProcessingTableImage(float[][] tableValues) {
-        int width = (tableValues[0].length * cellSizeWidth);
-        int height = (tableValues.length * cellSizeHeight);
+        Integer width = (tableValues[0].length * cellSizeWidth);
+        Integer height = (tableValues.length * cellSizeHeight);
         BufferedImage image = new BufferedImage(width, height,
                                                 BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = (Graphics2D) image.getGraphics();
@@ -596,11 +596,11 @@ public class Table{
 
 
 
-//            int width = verticalText.getWidth() + horizontalText.getWidth();
-//            int height = verticalText.getHeight() + horizontalText.getHeight();
+//            Integer width = verticalText.getWidth() + horizontalText.getWidth();
+//            Integer height = verticalText.getHeight() + horizontalText.getHeight();
 
 
-//        int height = (metrics.charWidth('w') + 3) * maxLength + margin;
+//        Integer height = (metrics.charWidth('w') + 3) * maxLength + margin;
 
             image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
             //font
@@ -621,8 +621,8 @@ public class Table{
 
 
 
-            int height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
-            int width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
+            Integer height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
+            Integer width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
 
 
             int horizontalTextWidth = maxLength + 2 * MINIMUM_MARGIN;
@@ -678,7 +678,7 @@ public class Table{
 
     }
 
-    public String SVGFillRect(String color, int x, int y, int width, int height) {
+    public String SVGFillRect(String color, int x, int y, Integer width, Integer height) {
         String colorToRGB = color;
         String image = "<rect "
                        + "x=\"" + x + "\" "
@@ -692,8 +692,8 @@ public class Table{
 
     public String createSVGTableImage(float[][] tableValues, int begin, int end) {
         StringBuilder image = new StringBuilder();
-        int width = (tableValues[0].length * cellSizeWidth);
-        int height = (tableValues.length * cellSizeHeight);
+        Integer width = (tableValues[0].length * cellSizeWidth);
+        Integer height = (tableValues.length * cellSizeHeight);
 
         String color = "";
 
@@ -762,8 +762,8 @@ public class Table{
 //        int verticalTextHeight = maxLength + 2 * MINIMUM_MARGIN;
 //        int verticalTextWidth = cellSizeWidth * labels.size();
 //
-//        int height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
-//        int width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
+//        Integer height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
+//        Integer width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
 //
 //
 //        if (verticalTextDirection == Table.VerticalTextDirection.DIAGONAL) {
@@ -830,8 +830,8 @@ public class Table{
             int verticalTextHeight = maxLength + 2 * MINIMUM_MARGIN;
             int verticalTextWidth = cellSizeWidth * labels.size();
             
-            int height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
-            int width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
+            Integer height = maxLength + cellSizeHeight * labels.size() + 2 * MINIMUM_MARGIN;
+            Integer width = maxLength + cellSizeWidth * labels.size() + 2 * MINIMUM_MARGIN;
 
             if (verticalTextDirection == Table.VerticalTextDirection.DIAGONAL) {
                 width += horizontalTextWidth;

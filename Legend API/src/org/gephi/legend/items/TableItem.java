@@ -13,7 +13,7 @@ import org.gephi.preview.plugin.items.AbstractItem;
  */
 public class TableItem extends AbstractItem implements LegendItem{
 
-    public static final String TYPE = "Table Legend";
+    public static final String LEGEND_TYPE = "Table Legend";
     
     //data
     public static final String TABLE_VALUES = "table values";

@@ -28,26 +28,31 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-
 @ServiceProvider(service = ItemBuilder.class, position = 103)
-public class GroupsItemBuilder extends LegendItemBuilder{
-
+public class GroupsItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return GroupsItem.TYPE;
+        return GroupsItem.LEGEND_TYPE;
+    }
+
+    protected ArrayList<String> createLabels(Graph graph, AttributeModel attributeModel) {
+        ArrayList<String> labels = new ArrayList<String>();
+        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+        PartitionModel model = partitionController.getModel();
+        for (NodePartition partition : model.getNodePartitions()) {
+            // get groups
+        }
+
+        return labels;
     }
 
     @Override
     public Item buildItem(Graph graph, AttributeModel attributeModel) {
-        //        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
-//        PartitionModel model = partitionController.getModel();
-//        for (NodePartition partition : model.getNodePartitions()) {
-//            // get groups
-//        }
-        
+
+
         GroupsItem item = new GroupsItem(graph);
-        
+
         ArrayList<String> labelsGroup = new ArrayList<String>();
         labelsGroup.add("Test 1");
         labelsGroup.add("Test 2");
@@ -58,16 +63,16 @@ public class GroupsItemBuilder extends LegendItemBuilder{
         colorsGroup.add(Color.RED);
         item.setData(GroupsItem.COLORS_GROUP, colorsGroup);
         item.setData(GroupsItem.LABELS_GROUP, labelsGroup);
+        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
 
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
-        
-        Integer workspaceIndex = item.getData(LegendItem.WORKSPACE_INDEX);
+
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        
-        ArrayList<String> groupsProperties = LegendManager.getProperties(GroupsProperty.OWN_PROPERTIES, workspaceIndex, itemIndex);
+
+        ArrayList<String> groupsProperties = LegendManager.getProperties(GroupsProperty.OWN_PROPERTIES, itemIndex);
 
         PreviewProperty[] properties = {
             PreviewProperty.createProperty(this,
@@ -112,20 +117,17 @@ public class GroupsItemBuilder extends LegendItemBuilder{
                                            NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenElements.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenElements.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultPaddingBetweenElements)
-
         };
 
         return properties;
     }
-    
-    
-            // DEFAULT PROPERTIES
-    private Integer defaultNumColumns = 2;
+
+    // DEFAULT PROPERTIES
+    private Integer defaultNumColumns = 1;
     private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.BOTTOM;
     private Color defaultLabelFontColor = Color.BLACK;
     private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 36);
     private Integer defaultPaddingBetweenTextAndShape = 5;
     private Integer defaultPaddingBetweenElements = 5;
     private LegendItem.Shape defaultShape = LegendItem.Shape.TRIANGLE;
-    
 }

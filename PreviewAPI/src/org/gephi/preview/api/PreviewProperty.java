@@ -68,50 +68,7 @@ public class PreviewProperty {
     
         //LEGEND
         public static final String CATEGORY_LEGENDS = NbBundle.getMessage(PreviewProperty.class, "PreviewProperty.Category.Legends");
-    
-        //LOCATION
-        public static final String LEGEND_ORIGIN_X = "legend.originX";
-        public static final String LEGEND_ORIGIN_Y = "legend.originY";
-
-        //DIMENSIONS
-        public static final String LEGEND_WIDTH = "legend.width";
-        public static final String LEGEND_HEIGHT = "legend.height";
-
-        //TITLE
-        public static final String LEGEND_TITLE_IS_DISPLAYING = "legend.title.isDisplaying";
-        public static final String LEGEND_TITLE_FONT = "legend.title.font";
-        public static final String LEGEND_TITLE_FONT_COLOR = "legend.title.font.color";
-        
-
-        //DESCRIPTION
-        public static final String LEGEND_DESCRIPTION_IS_DISPLAYING = "legend.description.isDisplaying";
-        public static final String LEGEND_DESCRIPTION_FONT = "legend.description.font";
-        public static final String LEGEND_DESCRIPTION_FONT_COLOR = "legend.description.font.color";
-        
-        // LEGEND ITEMS
-        
-        //TEXT 
-        public static final String LEGEND_TEXT_BODY_IS_DISPLAYING = "legend.text.body.isDisplaying";
-        public static final String LEGEND_TEXT_BODY_FONT = "legend.text.body.font";
-        public static final String LEGEND_TEXT_BODY_FONT_COLOR = "legend.text.body.font.color";
-        
-        //TABLE
-        
-        public static final String LEGEND_TABLE_FONT = "legend.table.font";
-        public static final String LEGEND_TABLE_FONT_COLOR = "legend.table.font.color";
-        public static final String LEGEND_TABLE_IS_CELL_COLORING = "legend.table.isCellColoring";
-        public static final String LEGEND_TABLE_HORIZONTAL_ALIGNMENT = "legend.table.horizontalAlignment";
-        public static final String LEGEND_TABLE_HORIZONTAL_TEXT_ALIGNMENT = "legend.table.horizontalTextAlignment";
-        public static final String LEGEND_TABLE_HORIZONTAL_EXTRA_MARGIN = "legend.table.horizontal.extraMargin";
-        public static final String LEGEND_TABLE_VERTICAL_ALIGNMENT = "legend.table.verticalAlignment";
-        public static final String LEGEND_TABLE_VERTICAL_TEXT_DIRECTION = "legend.table.verticalTextDirection";
-        public static final String LEGEND_TABLE_VERTICAL_EXTRA_MARGIN = "legend.table.vertical.extraMargin";
-        
-       // 
        
-        
-        
-        
 
     //Constants global
     /**
