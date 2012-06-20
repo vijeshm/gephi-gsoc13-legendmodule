@@ -7,6 +7,7 @@ package org.gephi.legend.api;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -23,12 +24,12 @@ import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
-import org.gephi.legend.builders.TableItemBuilder;
+import org.gephi.legend.builders.*;
+import org.gephi.legend.items.*;
+import org.gephi.legend.renderers.*;
 import org.gephi.preview.PreviewModelImpl;
-import org.gephi.preview.api.Item;
-import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.ProcessingTarget;
-import org.gephi.preview.api.RenderTarget;
+import org.gephi.preview.api.*;
+import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -43,8 +44,6 @@ import processing.core.PApplet;
  */
 public class LegendItemsTest {
 
-    private int width = 300;
-    private int height = 300;
     BufferedImage processingImage;
 
     public Graphics2D getGraphicsProcessing() {
@@ -57,7 +56,7 @@ public class LegendItemsTest {
 
     public void saveProcessing() {
         try {
-            ImageIO.write(processingImage, "PNG", new File("processing.png"));
+            ImageIO.write(processingImage, "PNG", new File("/Users/edubecks/Dropbox/Developer/Gephi/gephi.edubecks/Legend API/processing.png"));
         } catch (Exception e) {
         }
     }
@@ -92,17 +91,82 @@ public class LegendItemsTest {
 
         AttributeController attributeController = Lookup.getDefault().lookup(AttributeController.class);
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-//        PreviewModelImpl model = pc.getCurrentWorkspace().getLookup().lookup(PreviewModelImpl.class);
-//        AttributeModel attributeModel = attributeController.getModel(model.getWorkspace());
 
         AttributeModel attributeModel = null;
 
-        TableItemBuilder builder = new TableItemBuilder();
-        Item item = builder.createItem(graph, attributeModel);
-        System.out.println("@Var: item: "+item.getData(LegendItem.SUB_TYPE));
-        
+        PreviewModel previewModel = previewController.getModel(workspace);
+        PreviewProperties previewProperties = previewModel.getProperties();
 
+        // LEGEND MANAGER
+        previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
+        LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+        Integer newItemIndex = legendManager.getCurrentIndex();
+
+
+        Item item = null;
+        LegendItemBuilder builder = null;
+        LegendItemRenderer renderer = null;
+
+
+
+        if (selectedType.equals(DescriptionItem.LEGEND_TYPE)) {
+            builder = new DescriptionItemBuilder();
+            renderer = new DescriptionItemRenderer();
+        }
+        else if (selectedType.equals(TextItem.LEGEND_TYPE)) {
+            builder = new TextItemBuilder();
+            renderer = new TextItemRenderer();
+        }
+        else if (selectedType.equals(GroupsItem.LEGEND_TYPE)) {
+            builder = new GroupsItemBuilder();
+            renderer = new GroupsItemRenderer();
+        }
+        else if (selectedType.equals(ImageItem.LEGEND_TYPE)) {
+            builder = new ImageItemBuilder();
+            renderer = new ImageItemRenderer();
+        }
+        else if (selectedType.equals(TableItem.LEGEND_TYPE)) {
+            builder = new TableItemBuilder();
+            renderer = new TableItemRenderer();
+        }
+
+
+
+
+
+
+
+        // CREATE ITEM AND ADD IT TO LEGEND MANAGER
+        item = builder.createItem(newItemIndex, graph, attributeModel);
+
+
+        legendManager.addItem(item);
+        System.out.println("@Var: item: " + item.getData(LegendItem.SUB_TYPE));
+
+        // ADDING ITS PROPERTIES TO PREVIEW PROPERTIES
+        PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
+        for (PreviewProperty property : properties) {
+            previewController.getModel().getProperties().addProperty(property);
+        }
+
+
+        Graphics2D graphics2D = getGraphicsProcessing();
+        AffineTransform origin = new AffineTransform();
+        origin.setToTranslation(originX, originY);
+        renderer.readLegendPropertiesAndValues(item, previewProperties);
+        renderer.readOwnPropertiesAndValues(item, previewProperties);
+        renderer.render(graphics2D, origin, width, height);
+        saveProcessing();
 
     }
 
+    private int width = 200;
+    private int height = 200;
+    private int originX = 0;
+    private int originY = 0;
+//    private String selectedType = ImageItem.LEGEND_TYPE;
+//    private String selectedType = TableItem.LEGEND_TYPE;
+//    private String selectedType = DescriptionItem.LEGEND_TYPE;
+    private String selectedType = TextItem.LEGEND_TYPE;
+//    private String selectedType = GroupsItem.LEGEND_TYPE;
 }

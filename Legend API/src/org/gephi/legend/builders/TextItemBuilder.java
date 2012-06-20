@@ -26,6 +26,11 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = ItemBuilder.class, position = 101)
 public class TextItemBuilder extends LegendItemBuilder {
+    
+    @Override
+    protected boolean isBuilderForItem(Item item) {
+        return item instanceof TextItem;
+    }
 
     @Override
     public String getType() {
@@ -79,8 +84,8 @@ public class TextItemBuilder extends LegendItemBuilder {
     }
 
     // DEFAULT VALUES
-    protected final String defaultBody = "";
+    protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
     protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
     protected final Color defaultBodyFontColor = Color.BLUE;
-    protected final Alignment defaultBodyFontAlignment = Alignment.LEFT;
+    protected final Alignment defaultBodyFontAlignment = Alignment.JUSTIFIED;
 }

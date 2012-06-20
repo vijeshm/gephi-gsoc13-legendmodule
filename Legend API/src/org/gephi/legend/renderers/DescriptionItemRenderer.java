@@ -34,6 +34,8 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
 
     @Override
     public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+        
+        graphics2D.setTransform(origin);
 
         int numElements = keys.size();
         int elementHeight = height / numElements;

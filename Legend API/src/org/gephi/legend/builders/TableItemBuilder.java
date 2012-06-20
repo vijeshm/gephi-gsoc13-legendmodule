@@ -32,6 +32,11 @@ import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service = ItemBuilder.class, position = 100)
 public class TableItemBuilder extends LegendItemBuilder {
+    
+    @Override
+    protected boolean isBuilderForItem(Item item) {
+        return item instanceof TableItem;
+    }
 
     @Override
     public String getType() {
@@ -47,7 +52,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         listOfColors.add(Color.BLUE);
         listOfColors.add(Color.LIGHT_GRAY);
         listOfColors.add(Color.YELLOW);
-        listOfColors.add(Color.WHITE);
+        listOfColors.add(Color.ORANGE);
         listOfColors.add(Color.GREEN);
         listOfColors.add(Color.PINK);
         listOfColors.add(Color.MAGENTA);
@@ -181,7 +186,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextPosition),
             PreviewProperty.createProperty(this,
                                            tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ROTATION),
-                                           Float.class,
+                                           TableItem.VerticalTextDirection.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),
@@ -203,5 +208,5 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected final Alignment defaultHorizontalTextAlignment = Alignment.LEFT;
     protected final Alignment defaultVerticalTextAlignment = Alignment.LEFT;
     protected final Direction defaultVerticalTextPosition = Direction.LEFT;
-    protected final Float defaultVerticalTextRotation = 90f;
+    protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
 }

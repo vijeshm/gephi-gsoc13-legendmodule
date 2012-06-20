@@ -114,4 +114,9 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     private Alignment defaultKeyAlignment = Alignment.LEFT;
     private Alignment defaultValueAlignment = Alignment.LEFT;
     private Boolean defaultIsFlowLayout = true;
+
+    @Override
+    protected boolean isBuilderForItem(Item item) {
+        return item instanceof DescriptionItem;
+    }
 }

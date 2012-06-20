@@ -27,6 +27,11 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = ItemBuilder.class, position = 102)
 public class ImageItemBuilder extends LegendItemBuilder{
+    
+    @Override
+    protected boolean isBuilderForItem(Item item) {
+        return item instanceof ImageItem;
+    }
 
     @Override
     public String getType() {

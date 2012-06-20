@@ -188,14 +188,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         propertySheet.setNodes(new Node[]{new LegendNode(propertySheet)});
         propertySheet.setDescriptionAreaVisible(true);
-
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-
-
         // @bug: check
         currentUsedLegends.removeAll();
         currentUsedLegends.add(propertySheet, BorderLayout.CENTER);

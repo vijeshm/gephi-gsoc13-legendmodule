@@ -103,7 +103,7 @@ public class LegendManager {
         String property = (LEGEND_DESCRIPTION
                            + ITEM_DESCRIPTION + itemIndex
                            + PROPERTIES[legendProperty]);
-//        System.out.println("@Var: property: " + property);
+        System.out.println("@Var: property: " + property);
         return property;
     }
 

@@ -30,6 +30,11 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = ItemBuilder.class, position = 103)
 public class GroupsItemBuilder extends LegendItemBuilder {
+    
+    @Override
+    protected boolean isBuilderForItem(Item item) {
+        return item instanceof GroupsItem;
+    }
 
     @Override
     public String getType() {
@@ -126,7 +131,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     private Integer defaultNumColumns = 1;
     private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.BOTTOM;
     private Color defaultLabelFontColor = Color.BLACK;
-    private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 36);
+    private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 10);
     private Integer defaultPaddingBetweenTextAndShape = 5;
     private Integer defaultPaddingBetweenElements = 5;
     private LegendItem.Shape defaultShape = LegendItem.Shape.TRIANGLE;

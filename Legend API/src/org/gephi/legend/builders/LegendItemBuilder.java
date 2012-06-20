@@ -25,6 +25,8 @@ import org.openide.util.NbBundle;
  * @author edubecks
  */
 public abstract class LegendItemBuilder implements ItemBuilder {
+    
+    protected abstract boolean isBuilderForItem(Item item);
 
     protected abstract Item buildItem(Graph graph, AttributeModel attributeModel);
 
@@ -48,14 +50,24 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         if (previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
 
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+            System.out.println("@Var: legendManager items: "+legendManager.getLegendItems());
+            System.out.println("@Var: legendManager num items: "+legendManager.getLegendItems().size());
             ArrayList<Item> legendItems = legendManager.getLegendItems();
-            if (!legendItems.isEmpty()) {
-                Item[] items = new Item[legendItems.size()];
-                for (int i = 0; i < legendItems.size(); i++) {
-                    items[i] = legendItems.get(i);
+            ArrayList<Item> items = new ArrayList<Item>();
+            for (Item item : legendItems) {
+                if(isBuilderForItem(item)){
+                    items.add(item);
                 }
-                return items;
+                
             }
+            return items.toArray(new Item[items.size()]);
+//            if (!legendItems.isEmpty()) {
+//                Item[] items = new Item[legendItems.size()];
+//                for (int i = 0; i < legendItems.size(); i++) {
+//                    items[i] = legendItems.get(i);
+//                }
+//                return items;
+//            }
         }
         return new Item[0];
     }
@@ -184,12 +196,12 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     protected float defaultHeight = 200f;
     // TITLE
     protected Boolean defaultIsDisplayingTitle = true;
-    protected final String defaultTitle = "";
+    protected final String defaultTitle = "TITLE";
     protected final Font defaultTitleFont = new Font("Arial", Font.BOLD, 30);
     protected final Alignment defaultTitleAlignment = Alignment.CENTER;
     protected final Color defaultTitleFontColor = Color.BLACK;
     // DESCRIPTION
-    protected final String defaultDescription = "";
+    protected final String defaultDescription = "description ... ";
     protected Boolean defaultIsDisplayingDescription = true;
     protected final Color defaultDescriptionFontColor = Color.BLACK;
     protected final Alignment defaultDescriptionAlignment = Alignment.LEFT;

@@ -50,7 +50,6 @@ public class ImageItemRenderer extends LegendItemRenderer {
                     AffineTransform scaleTransform = new AffineTransform();
                     scaleTransform.scale(scaleWidth, scaleHeight);
                     AffineTransformOp scaleOperation = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
-                    System.out.println("@Var: image: " + before);
                     after = scaleOperation.filter(before, after);
 
                     graphics2D.drawImage(after, 0, 0, null);
