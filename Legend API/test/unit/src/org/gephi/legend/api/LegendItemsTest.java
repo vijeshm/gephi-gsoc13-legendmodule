@@ -4,12 +4,15 @@
  */
 package org.gephi.legend.api;
 
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -20,6 +23,7 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
+import org.gephi.io.exporter.preview.PDFExporter;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
@@ -56,9 +60,12 @@ public class LegendItemsTest {
 
     public void saveProcessing() {
         try {
-            ImageIO.write(processingImage, "PNG", new File("/Users/edubecks/Dropbox/Developer/Gephi/gephi.edubecks/Legend API/processing.png"));
+            ImageIO.write(processingImage, "PNG", new File("/Users/edubecks/Desktop/Untitled.png"));
         } catch (Exception e) {
         }
+    }
+
+    public void savePDF() {
     }
 
     @Test
@@ -159,6 +166,8 @@ public class LegendItemsTest {
         saveProcessing();
 
     }
+
+    
 
     private int width = 200;
     private int height = 200;

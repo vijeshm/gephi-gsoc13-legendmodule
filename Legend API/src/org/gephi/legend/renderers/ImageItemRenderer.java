@@ -6,13 +6,18 @@ package org.gephi.legend.renderers;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.net.URL;
 import javax.imageio.ImageIO;
+import org.apache.batik.svggen.ImageHandler;
+import org.apache.batik.svggen.ImageHandlerBase64Encoder;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.builders.ImageItemBuilder;
@@ -38,6 +43,10 @@ public class ImageItemRenderer extends LegendItemRenderer {
             if (imageFile.exists()) {
                 BufferedImage before = ImageIO.read(imageFile);
 
+
+
+
+
                 graphics2D.setTransform(origin);
                 if (before.getWidth() == width && before.getHeight() == height) {
                     graphics2D.drawImage(before, 0, 0, null);
@@ -52,7 +61,12 @@ public class ImageItemRenderer extends LegendItemRenderer {
                     AffineTransformOp scaleOperation = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
                     after = scaleOperation.filter(before, after);
 
+                    SVGGraphics2D svgGraphics2D = (SVGGraphics2D) graphics2D;
+                    ImageHandler imageHandler = svgGraphics2D.getImageHandler();
+                    imageHandler.handleImage((Image) after, svgGraphics2D.getRoot(), svgGraphics2D.getGeneratorContext());
                     graphics2D.drawImage(after, 0, 0, null);
+                    
+                    
                 }
             }
         } catch (Exception e) {

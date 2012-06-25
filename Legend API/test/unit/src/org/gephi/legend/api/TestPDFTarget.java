@@ -1,0 +1,157 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.gephi.legend.api;
+
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import org.gephi.data.attributes.api.AttributeController;
+import org.gephi.data.attributes.api.AttributeModel;
+import org.gephi.desktop.welcome.WelcomeTopComponent;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph; 
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.Node;
+import org.gephi.io.exporter.preview.PDFExporter;
+import org.gephi.io.importer.api.Container;
+import org.gephi.io.importer.api.ImportController;
+import org.gephi.io.importer.spi.FileImporter;
+import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.legend.builders.TextItemBuilder;
+import org.gephi.preview.api.*;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
+import org.junit.*;
+import static org.junit.Assert.*;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
+
+/**
+ *
+ * @author edubecks
+ */
+public class TestPDFTarget {
+
+    public TestPDFTarget() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+    @Before
+    public void setUp() {
+    }
+
+    @After
+    public void tearDown() {
+    }
+
+    @Test
+    public void testPDF() {
+        try {
+
+            //Init a project - and therefore a workspace
+            ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+            pc.newProject();
+            Workspace workspace = pc.getCurrentWorkspace();
+
+            //Append container to graph structure
+            String sample = "/org/gephi/desktop/welcome/samples/Les Miserables.gexf";
+            final InputStream stream = WelcomeTopComponent.class.getResourceAsStream(sample);
+            ImportController importController = Lookup.getDefault().lookup(ImportController.class);
+            FileImporter fileImporter = importController.getFileImporter(".gexf");
+            Container container = importController.importFile(stream, fileImporter);
+
+            importController.process(container, new DefaultProcessor(), workspace);
+
+            //Add self loop
+            GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
+            Graph graph = graphController.getModel().getGraph();
+            Node node = graph.getNode(12);
+            System.out.println("Self loop " + node.getNodeData().getLabel());
+            graph.addEdge(graphController.getModel().factory().newEdge(node, node, 31, true));
+
+            //Set label edges       
+            for (Edge edge : graphController.getModel().getGraph().getEdges()) {
+                edge.getEdgeData().setLabel("Label test");
+            }
+
+
+            // pdf document
+            Rectangle pdfPageSize = PageSize.EXECUTIVE.rotate();
+            com.itextpdf.text.Document pdfDocument = new com.itextpdf.text.Document(pdfPageSize);
+            FileOutputStream pdfFile = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled-A4.pdf"));
+            PdfWriter writer = PdfWriter.getInstance(pdfDocument, pdfFile);
+            pdfDocument.open();
+            PdfContentByte pdfContentByte = writer.getDirectContent();
+
+
+            // attribute ???
+            AttributeController attributeController = Lookup.getDefault().lookup(AttributeController.class);
+            AttributeModel attributeModel = null;
+
+            // preview
+            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+            PreviewModel previewModel = previewController.getModel(workspace);
+            PreviewProperty pdfPageSizePreviewProperty = PreviewProperty.createProperty(null, PDFTarget.PAGESIZE).setValue(pdfPageSize);
+            PreviewProperty pdfCBPreviewProperty = PreviewProperty.createProperty(null, PDFTarget.PDF_CONTENT_BYTE).setValue(pdfContentByte);
+            PreviewProperties previewProperties = previewModel.getProperties();
+            previewProperties.addProperty(pdfPageSizePreviewProperty);
+            previewProperties.addProperty(pdfCBPreviewProperty);
+            previewController.refreshPreview(workspace);
+
+
+            PDFTarget target = (PDFTarget) previewController.getRenderTarget(RenderTarget.PDF_TARGET, workspace);
+
+
+
+
+            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
+            
+            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+            Integer newItemIndex = legendManager.getCurrentIndex();
+
+            
+            // creating item
+            Item item = addTextItem(newItemIndex, graph, attributeModel);
+            
+            
+            // add item
+            legendManager.addItem(item);
+            PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
+            for (PreviewProperty property : properties) {
+                previewController.getModel().getProperties().addProperty(property);
+            }
+
+            // render
+            previewController.refreshPreview(workspace);
+            previewController.render(target);
+
+
+            pdfDocument.close();
+            pdfFile.close();
+
+        } catch (Exception e) {
+            Exceptions.printStackTrace(e);
+
+        }
+    }
+
+    public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
+        TextItemBuilder builder = new TextItemBuilder();
+        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        return item;
+    }
+
+}

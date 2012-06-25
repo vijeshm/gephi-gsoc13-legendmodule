@@ -28,6 +28,10 @@ import org.openide.util.lookup.ServiceProvider;
 public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
+    protected void setDefaultValues() {
+    }
+
+    @Override
     public Item buildItem(Graph graph, AttributeModel attributeModel) {
         ArrayList<String> descriptions = new ArrayList<String>();
         descriptions.add("Test 1");
@@ -42,7 +46,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         item.setData(DescriptionItem.KEYS, descriptions);
         item.setData(DescriptionItem.VALUES, values);
         item.setData(LegendItem.SUB_TYPE, getType());
-        
+
         return item;
     }
 
@@ -119,4 +123,5 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     protected boolean isBuilderForItem(Item item) {
         return item instanceof DescriptionItem;
     }
+
 }

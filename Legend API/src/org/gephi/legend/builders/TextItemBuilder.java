@@ -26,7 +26,11 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = ItemBuilder.class, position = 101)
 public class TextItemBuilder extends LegendItemBuilder {
-    
+
+    @Override
+    protected void setDefaultValues() {
+    }
+
     @Override
     protected boolean isBuilderForItem(Item item) {
         return item instanceof TextItem;

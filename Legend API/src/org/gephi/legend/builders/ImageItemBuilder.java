@@ -26,8 +26,12 @@ import org.openide.util.lookup.ServiceProvider;
  * @author edubecks
  */
 @ServiceProvider(service = ItemBuilder.class, position = 102)
-public class ImageItemBuilder extends LegendItemBuilder{
-    
+public class ImageItemBuilder extends LegendItemBuilder {
+
+    @Override
+    protected void setDefaultValues() {
+    }
+
     @Override
     protected boolean isBuilderForItem(Item item) {
         return item instanceof ImageItem;
@@ -63,9 +67,6 @@ public class ImageItemBuilder extends LegendItemBuilder{
 
         return properties;
     }
-    
-    
+
     private File defaultImageFile = new File("/Users/edubecks/Dropbox/gsoc2012/gephi/gephi.communication/test2.png");
-    
-    
 }

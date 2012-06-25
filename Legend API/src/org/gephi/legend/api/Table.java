@@ -678,17 +678,7 @@ public class Table{
 
     }
 
-    public String SVGFillRect(String color, int x, int y, Integer width, Integer height) {
-        String colorToRGB = color;
-        String image = "<rect "
-                       + "x=\"" + x + "\" "
-                       + "y=\"" + y + "\" "
-                       + "width=\"" + width + "\" "
-                       + "height=\"" + height + "\" "
-                       + "fill=\"" + colorToRGB + "\" "
-                       + "/>";
-        return image;
-    }
+
 
     public String createSVGTableImage(float[][] tableValues, int begin, int end) {
         StringBuilder image = new StringBuilder();

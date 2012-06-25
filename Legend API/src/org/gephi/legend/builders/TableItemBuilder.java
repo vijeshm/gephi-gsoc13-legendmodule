@@ -32,7 +32,13 @@ import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service = ItemBuilder.class, position = 100)
 public class TableItemBuilder extends LegendItemBuilder {
-    
+
+    @Override
+    protected void setDefaultValues() {
+        defaultWidth = 600;
+        defaultHeight = 500;
+    }
+
     @Override
     protected boolean isBuilderForItem(Item item) {
         return item instanceof TableItem;
@@ -84,16 +90,16 @@ public class TableItemBuilder extends LegendItemBuilder {
 
         PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
         PartitionModel model = partitionController.getModel();
-        
+
         if (model != null) {
             NodePartition[] nodePartitions = model.getNodePartitions();
-            System.out.println("@Var: num Partitions: "+nodePartitions.length);
-            
-            
+            System.out.println("@Var: num Partitions: " + nodePartitions.length);
+
+
             Float[][] tableValues = new Float[nodePartitions.length][nodePartitions.length];
             for (int i = 0; i < nodePartitions.length; i++) {
-                System.out.println("@Var: nodePartitions: (elements):"+nodePartitions[i].getElementsCount());
-                
+                System.out.println("@Var: nodePartitions: (elements):" + nodePartitions[i].getElementsCount());
+
                 for (int j = 0; j < nodePartitions.length; j++) {
                     tableValues[i][j] = 0f;
 
@@ -189,8 +195,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            TableItem.VerticalTextDirection.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),
-        };
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),};
 
 
         return properties;

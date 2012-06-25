@@ -17,13 +17,25 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import org.apache.batik.svggen.SVGGraphics2D;
 import com.itextpdf.awt.PdfGraphics2D;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderableImage;
+import org.apache.batik.svggen.*;
+import org.gephi.data.attributes.api.AttributeModel;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.Node;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.preview.api.*;
+import org.gephi.preview.plugin.items.NodeItem;
 import org.gephi.preview.spi.Renderer;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.w3c.dom.Element;
 import processing.core.PGraphicsJava2D;
 
 /**
@@ -32,6 +44,13 @@ import processing.core.PGraphicsJava2D;
  */
 public abstract class LegendItemRenderer implements Renderer {
 
+    public abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
+
+    private float defaultMargin = 100f;
+    private float graphOriginX = Float.MAX_VALUE;
+    private float graphOriginY = Float.MAX_VALUE;
+    private float graphWidth = 0;
+    private float graphHeight = 0;
     // VARIABLES
     protected Integer width;
     protected Integer height;
@@ -80,24 +99,46 @@ public abstract class LegendItemRenderer implements Renderer {
 
             // ORIGIN
             originX = properties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.ORIGIN_X));
-            System.out.println("@Var: originX: " + originX);
             originY = properties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.ORIGIN_Y));
-            System.out.println("@Var: originY: " + originY);
+//            originTranslation = new AffineTransform();
+            
 
         }
     }
 
     private void renderSVG(SVGTarget target) {
         org.w3c.dom.Document document = target.getDocument();
-        SVGGraphics2D graphics2D = new SVGGraphics2D(document);
-        AffineTransform graphTransform = graphics2D.getTransform();
-        originTranslation = new AffineTransform(graphTransform);
+        ImageHandler imageHandler = new ImageHandlerBase64Encoder();
+        
+        DefaultExtensionHandler defaultExtensionHandler = new DefaultExtensionHandler();
+        
+        SVGGraphics2D graphics2D = new SVGGraphics2D(document, imageHandler, defaultExtensionHandler, true);
+        float targetOriginX = (int) graphOriginX;
+        System.out.println("@Var: tempX: " + targetOriginX);
+        float targetOriginY = (int) graphOriginY;
+        System.out.println("@Var: tempY: " + targetOriginY);
+//        graphics2D = (SVGGraphics2D) graphics2D.create((int)targetOriginX, (int)targetOriginY, (int)graphWidth, (int)graphHeight);
+//        graphics2D.setClip((int)targetOriginX, (int)targetOriginY, (int)graphWidth, (int)graphHeight);
+        originTranslation = new AffineTransform();
         originTranslation.translate(originX, originY);
+        originTranslation.translate(targetOriginX, targetOriginY);
+//        graphics2D.setTransform(originTranslation);
+////      
+//        
+////        AffineTransform graphTransform = graphics2D.getTransform();
+////        System.out.printf("SVG:   graphTransform T[%f,%f] S[%f,%f]\n", graphTransform.getTranslateX(), graphTransform.getTranslateY(), graphTransform.getScaleX(), graphTransform.getScaleY());
+////        originTranslation = new AffineTransform(graphTransform);
+////        originTranslation.translate(graphOriginX, graphOriginY);
+//
+//        graphics2D.setColor(Color.BLACK);
+//        graphics2D.fillRect(10,10, 600,600);
+//        graphics2D.setTransform(new AffineTransform());
+
         render(graphics2D, originTranslation, width, height);
 
         //appending
         org.w3c.dom.Element svgRoot = document.getDocumentElement();
-        svgRoot.appendChild(graphics2D.getRoot());
+        svgRoot.appendChild(graphics2D.getRoot().getLastChild());
         graphics2D.dispose();
     }
 
@@ -105,11 +146,50 @@ public abstract class LegendItemRenderer implements Renderer {
         PdfContentByte pdfContentByte = target.getContentByte();
         com.itextpdf.text.Document pdfDocument = pdfContentByte.getPdfDocument();
         pdfContentByte.saveState();
-        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
-//        Graphics2D graphics2D = contentByte.createGraphics(pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
+        
+        float pdfWidth = target.getPageSize().getWidth()- target.getMarginLeft() - target.getMarginRight();
+        System.out.println("@Var: pdfWidth: " + pdfWidth);
+        float pdfHeight = target.getPageSize().getHeight() - target.getMarginBottom() - target.getMarginTop();
+        float scaleWidth = pdfWidth / graphWidth;
+        System.out.println("@Var: scaleWidth: " + scaleWidth);
+        float scaleHeight = pdfWidth / graphHeight;
+        System.out.println("@Var: scaleHeight: " + scaleHeight);
+        float scaleValue = Math.min(scaleWidth, scaleHeight);
+        System.out.println("@Var: scaleValue: " + scaleValue);
+        
+//        float pdfOriginX = pdfWidth * graphOriginX / graphWidth;
+//        float pdfOriginY = pdfHeight * graphOriginY / graphHeight;
+        
+        float targetOriginX = (int) graphOriginX;
+        System.out.println("@Var: tempX: " + targetOriginX);
+        float targetOriginY = (int) graphOriginY - 12;
+//        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, graphWidth, graphHeight);
+        System.out.println("@Var: tempY: " + targetOriginY);
+        originTranslation = new AffineTransform();
+        originTranslation.translate(targetOriginX, targetOriginY);
+        originTranslation.translate(originX, - originY);
+        
+        
+        
+//        originTranslation.translate(pdfOriginX, pdfOriginY);
+//                originTranslation.scale(scaleValue, scaleValue);
+//        originTranslation.translate(30, 30);
+        pdfContentByte.transform(originTranslation);
+//        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
+        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, graphWidth, graphHeight);
+//        Graphics2D graphics2D = pdfContentByte.createGraphics(pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
         AffineTransform graphTransform = graphics2D.getTransform();
-        originTranslation = new AffineTransform(graphTransform);
-        originTranslation.translate(originX, originY);
+
+
+
+        
+        
+
+
+//        graphics2D.setColor(Color.PINK);
+//        graphics2D.fillRect(tempX, tempY, (int) graphWidth, (int) graphHeight);
+
+        originTranslation = new AffineTransform();
         render(graphics2D, originTranslation, width, height);
         graphics2D.dispose();
         pdfContentByte.restoreState();
@@ -117,12 +197,25 @@ public abstract class LegendItemRenderer implements Renderer {
 
     private void renderProcessing(ProcessingTarget target) {
         Graphics2D graphics2D = (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
-        System.out.println("@Var: Processing>>>>> graphics2D: " + graphics2D.getTransform());
+        AffineTransform graphTransform = graphics2D.getTransform();
+        System.out.printf("PROCESSING:   graphTransform T[%f,%f] S[%f,%f]\n", graphTransform.getTranslateX(), graphTransform.getTranslateY(), graphTransform.getScaleX(), graphTransform.getScaleY());
         AffineTransform saveState = graphics2D.getTransform();
-        originTranslation = new AffineTransform(saveState);
+        originTranslation = new AffineTransform(graphTransform);
+        originTranslation.translate(graphOriginX, graphOriginY);
         originTranslation.translate(originX, originY);
-        System.out.println("@Var: originTranslation: " + originTranslation);
+//        originTranslation.translate(graphTransform.getTranslateX(), graphTransform.getTranslateY());
+//        originTranslation.translate(graphOriginX * graphTransform.getScaleX() , graphOriginY * graphTransform.getScaleY());
+//        originTranslation.scale(graphTransform.getScaleX(), graphTransform.getScaleY());
+//        originTranslation.translate(originX, originY);
 //        originTranslation.translate(graphTransform.getTranslateX(),graphTransform.getTranslateY());
+
+        graphics2D.setTransform(originTranslation);
+
+//        originTranslation.scale(graphTransform.getScaleX(), graphTransform.getScaleY());
+
+        // temp
+
+
         render(graphics2D, originTranslation, width, height);
         graphics2D.setTransform(saveState);
     }
@@ -153,8 +246,6 @@ public abstract class LegendItemRenderer implements Renderer {
 
     }
 
-    public abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
-
     public float renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
         if (isDisplayingDescription && !description.isEmpty()) {
             graphics2D.setTransform(origin);
@@ -181,6 +272,31 @@ public abstract class LegendItemRenderer implements Renderer {
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
 
         if (item != null) {
+
+            ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+            Workspace workspace = pc.getCurrentWorkspace();
+            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+            PreviewModel previewModel = previewController.getModel(workspace);
+            Dimension dimensions = previewModel.getDimensions();
+            graphHeight = dimensions.height;
+            graphWidth = dimensions.width;
+            System.out.println("@Var: dimensions: " + dimensions);
+            Point topLeftPosition = previewModel.getTopLeftPosition();
+            graphOriginX = topLeftPosition.x;
+            graphOriginY = topLeftPosition.y;
+
+//            System.out.println("@Var: topLeftPosition: "+topLeftPosition);
+//            graphOriginX = Float.MAX_VALUE;
+//            graphOriginY = Float.MAX_VALUE;
+//            for (Item node : previewModel.getItems(Item.NODE)) {
+//                graphOriginX = Math.min(graphOriginX, (Float) node.getData(NodeItem.X) - (Float) node.getData(NodeItem.SIZE));
+//                graphOriginY = Math.min(graphOriginY, (Float) node.getData(NodeItem.Y) - (Float) node.getData(NodeItem.SIZE));
+//            }
+
+            System.out.printf("graphOrigin [%f.%f]\n", graphOriginX, graphOriginY);
+
+//            graphOriginX -= defaultMargin;
+//            graphOriginY -= defaultMargin;
 
             System.out.println("@Var: rendering item: " + item);
 
