@@ -262,7 +262,11 @@
                     </test-dependency>
                 </test-type>
             </test-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>org.apache.batik.svggen</package>
+                <package>org.apache.batik.svggen.font</package>
+                <package>org.apache.batik.svggen.font.table</package>
+            </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/itextpdf-5.3.0.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/itextpdf-5.3.0.jar</binary-origin>
@@ -270,6 +274,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/commons-codec-1.6.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-codec-1.6.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

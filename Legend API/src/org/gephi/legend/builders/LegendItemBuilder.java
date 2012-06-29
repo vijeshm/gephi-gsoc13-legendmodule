@@ -189,10 +189,10 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     // REMOVE
     protected boolean defaultRemove = false;
     //ORIGIN
-    protected float defaultOriginX = 100f;
-    protected float defaultOriginY = 100f;
+    protected float defaultOriginX = 0;
+    protected float defaultOriginY = 0;
     //WIDTH
-    protected float defaultWidth = 200f;
+    protected float defaultWidth = 300;
     protected float defaultHeight = 200f;
     // TITLE
     protected Boolean defaultIsDisplayingTitle = true;

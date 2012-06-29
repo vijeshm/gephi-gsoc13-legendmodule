@@ -100,6 +100,10 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
         props.removeSimpleValue("width");
         props.removeSimpleValue("height");
         
+        // BUG WHEN EXPORTING MARGIN
+        System.out.println("__HERE __ removing margin\n");
+        props.removeSimpleValue(PreviewProperty.MARGIN);
+        
         try {
             target.refresh();
             

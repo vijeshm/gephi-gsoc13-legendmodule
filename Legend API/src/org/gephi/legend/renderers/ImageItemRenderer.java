@@ -4,6 +4,8 @@
  */
 package org.gephi.legend.renderers;
 
+import com.sun.media.jai.codec.ImageEncoder;
+import com.sun.media.jai.codecimpl.PNGImageEncoder;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -12,12 +14,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import org.apache.batik.svggen.ImageHandler;
-import org.apache.batik.svggen.ImageHandlerBase64Encoder;
-import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.*;
+import org.apache.batik.util.Base64EncoderStream;
+import org.apache.commons.codec.binary.*;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.builders.ImageItemBuilder;
@@ -28,6 +31,9 @@ import org.gephi.legend.items.ImageItem;
 import org.gephi.legend.properties.ImageProperty;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -38,13 +44,12 @@ public class ImageItemRenderer extends LegendItemRenderer {
 
     @Override
     public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+        System.out.println("@Var: origin: "+origin);
 //        graphics2D.setTransform(origin);
         try {
             if (imageFile.exists()) {
                 BufferedImage before = ImageIO.read(imageFile);
-
-
-
+                System.out.println("@Var: imageFile: " + imageFile.getAbsolutePath());
 
 
                 graphics2D.setTransform(origin);
@@ -61,15 +66,55 @@ public class ImageItemRenderer extends LegendItemRenderer {
                     AffineTransformOp scaleOperation = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
                     after = scaleOperation.filter(before, after);
 
-                    SVGGraphics2D svgGraphics2D = (SVGGraphics2D) graphics2D;
-                    ImageHandler imageHandler = svgGraphics2D.getImageHandler();
-                    imageHandler.handleImage((Image) after, svgGraphics2D.getRoot(), svgGraphics2D.getGeneratorContext());
-                    graphics2D.drawImage(after, 0, 0, null);
-                    
-                    
+
+                    System.out.println("@Var: graphics2D: " + graphics2D);
+                    if (graphics2D instanceof SVGGraphics2D) {
+                        SVGGraphics2D svgGraphics2D = (SVGGraphics2D) graphics2D;
+                        SVGGeneratorContext svgGeneratorContext = svgGraphics2D.getGeneratorContext();
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ImageIO.write(after, "png", baos);
+                        baos.flush();
+                        String encodedImage = Base64.encodeBase64String(baos.toByteArray());
+                        System.out.println("@Var: encodedImage: " + encodedImage);
+                        baos.close(); // should be inside a finally block
+                        Document svgDocument = svgGeneratorContext.getDOMFactory();
+                        System.out.println("@Var: domFactory: "+svgDocument);
+
+                        Element imageBase64 = svgDocument.createElementNS("http://www.w3.org/2000/svg","image");
+                        imageBase64.setAttribute("width", ""+after.getWidth());
+                        imageBase64.setAttribute("height", ""+after.getHeight());
+//                        imageBase64.setAttribute("transform", "scale("+scaleWidth+","+scaleHeight+") translate("+origin.getTranslateX()+","+origin.getTranslateY()+")");
+                        imageBase64.setAttribute("transform", "scale(1,1) translate("+origin.getTranslateX()+","+origin.getTranslateY()+")");
+                        imageBase64.setAttribute("xlink:href", DATA_PROTOCOL_PNG_PREFIX+encodedImage);
+                        
+                        svgDocument.getLastChild().appendChild(imageBase64);
+
+                        
+                        
+
+
+                    }
+                    else {
+                        graphics2D.drawImage(after, 0, 0, null);
+                    }
+
+//                    ImageHandlerBase64Encoder imageHandler = (ImageHandlerBase64Encoder) svgGeneratorContext.getImageHandler();
+//                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+//                    Base64EncoderStream b64Encoder = new Base64EncoderStream(os);
+//
+//                    imageHandler.encodeImage(after, b64Encoder);
+//                    b64Encoder.close();
+//                    imageHandler.((Image) after, svgGraphics2D.getRoot(), svgGeneratorContext);
+
+
+
                 }
             }
         } catch (Exception e) {
+            System.out.println("@Var: e: " + e);
+
+
         }
     }
 
@@ -98,4 +143,6 @@ public class ImageItemRenderer extends LegendItemRenderer {
 
     // OWN PROPERTIES
     private File imageFile;
+    // encoding
+    public static final String DATA_PROTOCOL_PNG_PREFIX = "data:image/png;base64,";
 }

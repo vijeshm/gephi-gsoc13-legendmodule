@@ -22,6 +22,8 @@ import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
+import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -124,11 +126,19 @@ public class TestSVGTarget {
 
             // creating item
             Item item = addImageItem(newItemIndex, graph, attributeModel);
+            
+            
 
 
             // add item
             legendManager.addItem(item);
             PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
+            
+            
+            //override some properties
+//            origin X
+//            properties[3].setValue(600);
+            
             for (PreviewProperty property : properties) {
                 previewController.getModel().getProperties().addProperty(property);
             }
@@ -140,7 +150,7 @@ public class TestSVGTarget {
             previewController.render(target);
             
             
-            OutputStream fos = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled-A4.svg"));
+            OutputStream fos = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled.svg"));
             Writer writer = new OutputStreamWriter(fos, "UTF-8");
             
             

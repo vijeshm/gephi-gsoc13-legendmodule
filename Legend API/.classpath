@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry combineaccessrules="false" kind="src" path="/Gephi"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test/unit/src"/>
+	<classpathentry kind="lib" path="lib/batik-1.7/lib/batik-svggen.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.6/commons-codec-1.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.6/commons-codec-1.6-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.6/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/batik-1.7/lib/batik-util.jar"/>
+	<classpathentry kind="lib" path="/Gephi/WorkspaceUI/build/classes/platform/platform/lib/org-openide-modules.jar"/>
+	<classpathentry kind="lib" path="/Gephi/WorkspaceUI/build/classes/platform/platform/lib/org-openide-util-lookup.jar"/>
+	<classpathentry kind="lib" path="/Gephi/WorkspaceUI/build/classes/platform/platform/lib/org-openide-util.jar"/>
+	<classpathentry kind="lib" path="lib/itext-5.3/itextpdf-5.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/batik-1.7/batik.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/Gephi/platform/platform/modules/org-openide-nodes.jar"/>
+	<classpathentry kind="lib" path="/Gephi/ProcessingWrapper/release/modules/ext/core.jar"/>
+	<classpathentry kind="lib" path="/Gephi/platform/platform/modules/org-openide-explorer.jar"/>
+	<classpathentry kind="lib" path="/Gephi/platform/platform/modules/org-openide-io.jar"/>
+	<classpathentry kind="lib" path="/Gephi/iTextWrapper/release/modules/ext/iText-5.0.1.jar"/>
+	<classpathentry kind="output" path="lib/batik-1.7/samples/tests/resources/java/classes"/>
+</classpath>
