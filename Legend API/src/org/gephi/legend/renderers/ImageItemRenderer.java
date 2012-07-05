@@ -4,22 +4,14 @@
  */
 package org.gephi.legend.renderers;
 
-import com.sun.media.jai.codec.ImageEncoder;
-import com.sun.media.jai.codecimpl.PNGImageEncoder;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.net.URL;
 import javax.imageio.ImageIO;
 import org.apache.batik.svggen.*;
-import org.apache.batik.util.Base64EncoderStream;
 import org.apache.commons.codec.binary.*;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
@@ -33,7 +25,6 @@ import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  *
