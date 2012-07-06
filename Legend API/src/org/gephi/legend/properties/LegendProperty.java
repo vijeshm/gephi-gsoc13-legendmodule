@@ -9,10 +9,7 @@ package org.gephi.legend.properties;
  * @author eduBecKs
  */
 public class LegendProperty {
-    
 
-    
-    
     //LOCATION
     public static final int ORIGIN_X = 0;
     public static final int ORIGIN_Y = 1;
@@ -34,11 +31,12 @@ public class LegendProperty {
     public static final int TITLE = 12;
     public static final int DESCRIPTION = 13;
     //REMOVE
-    public static final int REMOVE = 14;
-    
+    public static final int IS_DISPLAYING = 14;
+    //REMOVE
+    public static final int LABEL = 15;
     public static final String[] LEGEND_PROPERTIES = {
         //LOCATION
-         ".originX",
+        ".originX",
         ".originY",
         ".width",
         ".height",
@@ -55,7 +53,7 @@ public class LegendProperty {
         ".description.alignment",
         ".title",
         ".description",
-        ".remove"
-        
+        ".isDisplaying",
+        ".label"
     };
 }

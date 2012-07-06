@@ -74,14 +74,10 @@ public class GroupsItemRenderer extends LegendItemRenderer {
             labelWidth = shapeWidth;
             labelHeight = maxLabelHeight;
         }
-        System.out.println("@Var: shapeWidth: " + shapeWidth);
-        System.out.println("@Var: shapeHeight: " + shapeHeight);
 
         for (int i = 0; i < labelsGroup.size(); i++) {
             int x = (i % numColumns) * elementWidth + paddingBetweenElements;
-            System.out.println("@Var: x: " + x);
             int y = (i / numColumns) * elementHeight + paddingBetweenElements;
-            System.out.println("@Var: y: " + y);
             int xShape = 0, yShape = 0, xLabel = 0, yLabel = 0;
             switch (labelPosition) {
                 case RIGHT: {
@@ -117,27 +113,9 @@ public class GroupsItemRenderer extends LegendItemRenderer {
             System.out.println("@Var: xShape: " + xShape);
             System.out.println("@Var: yShape: " + yShape);
             legendDrawText(graphics2D, labelsGroup.get(i), labelFont, colorsGroup.get(i), xLabel, yLabel, labelWidth, labelHeight, LegendItem.Alignment.CENTER);
-//            drawString(graphics2D, labelsGroup.get(i), colorsGroup.get(i), xLabel, yLabel, labelWidth, labelHeight, labelPosition);
-            System.out.println("@Var: xLabel: " + xLabel);
-            System.out.println("@Var: yLabel: " + yLabel);
         }
     }
 
-    public void drawString(Graphics2D graphics2D, String label, Color color, int x, int y, Integer width, Integer height, Direction labelPosition) {
-
-        FontMetrics fontMetrics = graphics2D.getFontMetrics();
-        int fontHeight = fontMetrics.getHeight();
-        int yCenter = y + fontHeight;
-        int xCenter = x;
-//        if (labelPosition == Direction.LEFT || labelPosition == Direction.RIGHT){
-        yCenter += ((height - fontHeight) / 2);
-//        }
-        if (labelPosition == Direction.UP || labelPosition == Direction.BOTTOM) {
-            xCenter += ((width - fontMetrics.stringWidth(label)) / 2);
-        }
-        graphics2D.setColor(color);
-        graphics2D.drawString(label, xCenter, yCenter);
-    }
 
     public void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height) {
         graphics2D.setColor(color);

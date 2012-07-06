@@ -19,6 +19,7 @@ import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.preview.api.*;
@@ -88,9 +89,6 @@ public class TestProcessingTarget {
 
 
             // svg document
-//            Get a DOMImplementation
-            DOMImplementation domImpl =
-                    GenericDOMImplementation.getDOMImplementation();
 
 
             
@@ -123,7 +121,8 @@ public class TestProcessingTarget {
 
 
             // creating item
-            Item item = addImageItem(newItemIndex, graph, attributeModel);
+            Item item = addGroupsItem(newItemIndex, graph, attributeModel);
+//            Item item = addTextItem(newItemIndex, graph, attributeModel);
 
 
             // add item
@@ -140,14 +139,13 @@ public class TestProcessingTarget {
             previewController.render(target);
             
             
-            OutputStream fos = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled-A4.png"));
+            OutputStream fos = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled.png"));
             Writer writer = new OutputStreamWriter(fos, "UTF-8");
             
             
             PNGExporter pngExporter = new PNGExporter();
-            pngExporter.setMargin(20);
-            pngExporter.setHeight(2000);
-            pngExporter.setWidth(2000);
+//            pngExporter.setHeight(2000);
+//            pngExporter.setWidth(2000);
             pngExporter.setWorkspace(workspace);
             pngExporter.setOutputStream(fos);
             pngExporter.execute();
@@ -171,5 +169,12 @@ public class TestProcessingTarget {
         Item item = builder.createItem(newItemIndex, graph, attributeModel);
         return item;
     }
+    
+    public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
+        GroupsItemBuilder builder = new GroupsItemBuilder();
+        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        return item;
+    }
+    
     
 }

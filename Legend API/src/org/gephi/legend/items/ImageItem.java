@@ -6,6 +6,7 @@
 package org.gephi.legend.items;
 
 import org.gephi.legend.api.LegendItem;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
 
 
@@ -25,7 +26,7 @@ public class ImageItem extends AbstractItem implements LegendItem {
 
     @Override
     public String toString() {
-        return TYPE;
+        return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
     }
 
 }

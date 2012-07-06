@@ -16,6 +16,7 @@ public class DescriptionProperty {
     public static final int DESCRIPTION_KEY_FONT_ALIGNMENT = 4;
     public static final int DESCRIPTION_VALUE_FONT_ALIGNMENT = 5;
     public static final int DESCRIPTION_IS_FLOW_LAYOUT = 6;
+    public static final int DESCRIPTION_DATA = 7;
     public static final String[] OWN_PROPERTIES = {
         ".key.font",
         ".key.font.color",
@@ -24,5 +25,6 @@ public class DescriptionProperty {
         ".key.font.alignment",
         ".value.font.alignment",
         ".isFlowLayout",
+        "data"
     };
 }

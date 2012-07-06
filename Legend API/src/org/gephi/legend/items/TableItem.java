@@ -5,16 +5,16 @@
 package org.gephi.legend.items;
 
 import org.gephi.legend.api.LegendItem;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
 
 /**
  *
  * @author edubecks
  */
-public class TableItem extends AbstractItem implements LegendItem{
+public class TableItem extends AbstractItem implements LegendItem {
 
     public static final String LEGEND_TYPE = "Table Legend";
-    
     //data
     public static final String TABLE_VALUES = "table values";
     public static final String LABELS = "labels";
@@ -39,7 +39,6 @@ public class TableItem extends AbstractItem implements LegendItem{
 //    public static final String HORIZONTAL_EXTRA_ALIGNMENT = "horizontal extra alignment";
 //    public static final String MINIMUM_MARGIN = "minimum margin";
 
-
     public enum VerticalTextDirection {
 
         // anti clockwise
@@ -57,14 +56,14 @@ public class TableItem extends AbstractItem implements LegendItem{
         }
 
     }
-    
+
     public TableItem(Object source) {
         super(source, TYPE);
     }
-    
+
     @Override
     public String toString() {
-        return TYPE;
+        return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
     }
 
 }

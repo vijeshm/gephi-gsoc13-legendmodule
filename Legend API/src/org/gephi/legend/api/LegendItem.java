@@ -4,6 +4,9 @@
  */
 package org.gephi.legend.api;
 
+import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.plugin.items.AbstractItem;
+
 /**
  *
  * @author edubecks
@@ -19,11 +22,11 @@ public interface LegendItem {
     // TYPE 
     public static final String TYPE="Legend Item";
     public static final String SUB_TYPE="Legend Item";
+    // DESCRIPTION
+    public static final String LABEL = "label";
     
     
     
-    public static final String INDEX = "index";
-
     public enum Direction {
 
         UP("Up"),

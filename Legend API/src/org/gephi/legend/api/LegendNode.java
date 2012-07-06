@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import javax.swing.SwingUtilities;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -33,9 +34,10 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public LegendNode(PropertySheet propertySheet) {
+    public LegendNode(PropertySheet propertySheet, Integer activeLegend) {
         super(Children.LEAF);
         this.propertySheet = propertySheet;
+        this.activeLegend = activeLegend;
         setDisplayName(NbBundle.getMessage(LegendNode.class, "LegendNode.displayName"));
     }
 
@@ -54,23 +56,37 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
             PreviewProperties previewProperties = previewModel.getProperties();
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
 
-            ArrayList<String> items = legendManager.getItems();
-            ArrayList<String> legendTypes = legendManager.getLegendTypes();
+            if (legendManager.hasActiveLegends()) {
 
-            for (int i = 0; i < items.size(); i++) {
+                ArrayList<String> items = legendManager.getItems();
+
                 Sheet.Set itemSet = Sheet.createPropertiesSet();
-                String name = "Item " + i + " [" + legendTypes.get(i) + "]";
-                itemSet.setDisplayName(name);
-                itemSet.setName(name);
+                String label = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, activeLegend, LegendProperty.LABEL));
+                itemSet.setDisplayName(label);
+                itemSet.setName(label);
                 for (PreviewProperty property : previewProperties.getProperties()) {
-                    if (LegendManager.isLegendPropertyForItem(property, items.get(i))) {
+                    if (LegendManager.isLegendPropertyForItem(property, items.get(activeLegend))) {
                         Node.Property nodeProperty = new PreviewPropertyWrapper(property);
                         itemSet.put(nodeProperty);
                     }
                 }
                 sheet.put(itemSet);
-
             }
+
+//            for (int i = 0; i < items.size(); i++) {
+//                Sheet.Set itemSet = Sheet.createPropertiesSet();
+//                String name = "Item " + i + " [" + legendTypes.get(i) + "]";
+//                itemSet.setDisplayName(name);
+//                itemSet.setName(name);
+//                for (PreviewProperty property : previewProperties.getProperties()) {
+//                    if (LegendManager.isLegendPropertyForItem(property, items.get(i))) {
+//                        Node.Property nodeProperty = new PreviewPropertyWrapper(property);
+//                        itemSet.put(nodeProperty);
+//                    }
+//                }
+//                sheet.put(itemSet);
+//
+//            }
 
         }
         return sheet;
@@ -97,4 +113,5 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
 
     }
     private PropertySheet propertySheet;
+    private Integer activeLegend;
 }

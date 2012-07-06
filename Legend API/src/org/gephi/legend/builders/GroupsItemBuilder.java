@@ -11,6 +11,7 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.api.PartitionData;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.legend.items.GroupsItem;
@@ -60,7 +61,8 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     public Item buildItem(Graph graph, AttributeModel attributeModel) {
 
 
-        GroupsItem item = new GroupsItem(graph);
+        PartitionData partitionData = new PartitionData();
+        partitionData.retrieveData();
 
         ArrayList<String> labelsGroup = new ArrayList<String>();
         labelsGroup.add("Test 1");
@@ -70,6 +72,11 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         colorsGroup.add(Color.GREEN);
         colorsGroup.add(Color.BLUE);
         colorsGroup.add(Color.RED);
+        
+        
+        
+        
+        GroupsItem item = new GroupsItem(graph);
         item.setData(GroupsItem.COLORS_GROUP, colorsGroup);
         item.setData(GroupsItem.LABELS_GROUP, labelsGroup);
         item.setData(LegendItem.SUB_TYPE, getType());

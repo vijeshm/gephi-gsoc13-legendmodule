@@ -13,12 +13,15 @@ import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.items.DescriptionItem;
+//import org.gephi.legend.items.DescriptionItem.DescriptionData;
+import org.gephi.legend.items.DescriptionData;
 import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+
 
 /**
  *
@@ -99,7 +102,13 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
                                            Boolean.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout)
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
+            PreviewProperty.createProperty(this,
+                                           textProperties.get(DescriptionProperty.DESCRIPTION_DATA),
+                                           DescriptionData.class,
+                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionData)
         };
 
 
@@ -123,5 +132,8 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     protected boolean isBuilderForItem(Item item) {
         return item instanceof DescriptionItem;
     }
+    
+    // temp
+    private DescriptionData defaultDescriptionData=new DescriptionData();
 
 }

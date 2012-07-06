@@ -12,6 +12,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
+//import org.gephi.legend.properties.LegendProperties.LegendProperty;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
@@ -75,17 +76,24 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         setDefaultValues();
+        
 
 
         ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, itemIndex);
 
         return new PreviewProperty[]{
                     PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.REMOVE),
+                                                   legendProperties.get(LegendProperty.LABEL),
+                                                   String.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultLabel+itemIndex),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.IS_DISPLAYING),
                                                    Boolean.class,
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.remove.displayName"),
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.remove.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultRemove),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.isDisplaying.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.isDisplaying.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplaying),
                     PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.ORIGIN_X),
                                                    Float.class,
@@ -186,14 +194,17 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     //DEFAULT VALUES 
-    // REMOVE
-    protected boolean defaultRemove = false;
+    // LABEL
+    protected String defaultLabel = "";
+    
+    // IS_DISPLAYING
+    protected boolean defaultIsDisplaying = true;
     //ORIGIN
     protected float defaultOriginX = 0;
     protected float defaultOriginY = 0;
     //WIDTH
-    protected float defaultWidth = 300;
-    protected float defaultHeight = 200f;
+    protected float defaultWidth = 500;
+    protected float defaultHeight = 300f;
     // TITLE
     protected Boolean defaultIsDisplayingTitle = true;
     protected final String defaultTitle = "TITLE";

@@ -49,8 +49,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
      */
     public LegendManagerUI() {
         initComponents();
-
-
+        
+        
         String[] legendTypes = {
             TextItem.LEGEND_TYPE,
             DescriptionItem.LEGEND_TYPE,
@@ -58,11 +58,11 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             GroupsItem.LEGEND_TYPE,
             TableItem.LEGEND_TYPE
         };
-
+        
         for (String legendType : legendTypes) {
             legendItemsComboBox.addItem(legendType);
         }
-
+        
     }
 
     /**
@@ -78,6 +78,9 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         addLegendButton = new javax.swing.JButton();
         legendItemsComboBox = new javax.swing.JComboBox();
         currentUsedLegends = new javax.swing.JPanel();
+        activeLegendsComboBox = new javax.swing.JComboBox();
+        activeLegendLabel = new javax.swing.JLabel();
+        legendPropertiesPanel = new javax.swing.JPanel();
         removeLegendButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
@@ -100,16 +103,37 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         add(legendItemsComboBox, gridBagConstraints);
 
         currentUsedLegends.setBorder(javax.swing.BorderFactory.createTitledBorder(null, org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.currentUsedLegends.border.title"), javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP)); // NOI18N
-        currentUsedLegends.setLayout(new java.awt.BorderLayout());
+        currentUsedLegends.setLayout(new java.awt.GridBagLayout());
+
+        activeLegendsComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeLegendsComboBoxActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        currentUsedLegends.add(activeLegendsComboBox, gridBagConstraints);
+
+        activeLegendLabel.setText(org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.activeLegendLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = 0;
+        currentUsedLegends.add(activeLegendLabel, gridBagConstraints);
+
+        legendPropertiesPanel.setMinimumSize(new java.awt.Dimension(152, 57));
+        legendPropertiesPanel.setPreferredSize(new java.awt.Dimension(152, 57));
+        legendPropertiesPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(currentUsedLegends, gridBagConstraints);
+        currentUsedLegends.add(legendPropertiesPanel, gridBagConstraints);
 
         removeLegendButton.setText(org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.removeLegendButton.text")); // NOI18N
         removeLegendButton.addActionListener(new java.awt.event.ActionListener() {
@@ -119,130 +143,179 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        add(removeLegendButton, gridBagConstraints);
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        currentUsedLegends.add(removeLegendButton, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(currentUsedLegends, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void addLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLegendButtonActionPerformed
         Graph graph = null;
         AttributeModel attributeModel = null;
-
+        
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
-
-
+        
+        
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
         PreviewProperties previewProperties = previewModel.getProperties();
-
+        
         String selectedType = legendItemsComboBox.getSelectedItem().toString();
         System.out.println("@Var: selectedType: " + selectedType);
-
-
+        
+        
         if (!previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
-            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
+            LegendManager legendManager = new LegendManager();
+            legendManager.setActiveLegendsComboBox(activeLegendsComboBox);
+            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, legendManager);
+            
         }
-
+        
         LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
         Integer newItemIndex = legendManager.getCurrentIndex();
-
-        Item item = null;
+        
+        LegendItemBuilder builder = null;
         if (selectedType.equals(DescriptionItem.LEGEND_TYPE)) {
-            DescriptionItemBuilder builder = new DescriptionItemBuilder();
-            item = builder.createItem(newItemIndex, graph, attributeModel);
+            builder = new DescriptionItemBuilder();
+            
         }
         else if (selectedType.equals(TextItem.LEGEND_TYPE)) {
-            TextItemBuilder builder = new TextItemBuilder();
-            item = builder.createItem(newItemIndex, graph, attributeModel);
+            builder = new TextItemBuilder();
         }
         else if (selectedType.equals(GroupsItem.LEGEND_TYPE)) {
-            GroupsItemBuilder builder = new GroupsItemBuilder();
-            item = builder.createItem(newItemIndex, graph, attributeModel);
+            builder = new GroupsItemBuilder();
         }
         else if (selectedType.equals(ImageItem.LEGEND_TYPE)) {
-            ImageItemBuilder builder = new ImageItemBuilder();
-            item = builder.createItem(newItemIndex, graph, attributeModel);
+            builder = new ImageItemBuilder();
         }
         else if (selectedType.equals(TableItem.LEGEND_TYPE)) {
-            TableItemBuilder builder = new TableItemBuilder();
-            item = builder.createItem(newItemIndex, graph, attributeModel);
+            builder = new TableItemBuilder();
         }
-
-        if (item != null) {
-            legendManager.addItem(item);
-            PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
-            for (PreviewProperty property : properties) {
-                previewController.getModel().getProperties().addProperty(property);
-            }
+        
+        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        
+        
+        legendManager.addItem(item);
+        PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
+        for (PreviewProperty property : properties) {
+            previewController.getModel().getProperties().addProperty(property);
         }
+        // update property sheet
+        refreshPropertySheet(newItemIndex);
 
-
-        refreshPropertySheet();
 
 //        currentUsedLegends.revalidate();
     }//GEN-LAST:event_addLegendButtonActionPerformed
-
-    private void refreshPropertySheet() {
-        PropertySheet propertySheet = new PropertySheet();
-
-        propertySheet.setNodes(new Node[]{new LegendNode(propertySheet)});
-        propertySheet.setDescriptionAreaVisible(true);
-        // @bug: check
-        currentUsedLegends.removeAll();
-        currentUsedLegends.add(propertySheet, BorderLayout.CENTER);
+    
+    private void refreshPropertySheet(Integer activeLegend) {
+        legendPropertiesPanel.removeAll();
+        
+        
+        System.out.println("@Var:CREATING PROPERTIES FOR activeLegend: " + activeLegend);
+        if (activeLegend != -1) {
+            PropertySheet propertySheet = new PropertySheet();
+            
+            propertySheet.setNodes(new Node[]{new LegendNode(propertySheet, activeLegend)});
+            propertySheet.setDescriptionAreaVisible(true);
+            // @bug: check
+            legendPropertiesPanel.add(propertySheet, BorderLayout.CENTER);
+        }
+        legendPropertiesPanel.repaint();
     }
-
+    
     private void removeLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeLegendButtonActionPerformed
-
+        
+        // check wheter an element is active
+        if(activeLegendsComboBox.getSelectedIndex()==-1){
+            return;
+        }
+        
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
-
-
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
         PreviewProperties previewProperties = previewModel.getProperties();
+        
+        if (previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
 
-        if (!previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
+//            Integer activeLegend = activeLegendsComboBox.getSelectedIndex();
+            Integer activeLegend = ((Item) activeLegendsComboBox.getSelectedItem()).getData(LegendItem.ITEM_INDEX);
+            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+            legendManager.removeItem(activeLegend);
+            System.out.println("@Var: legendManager.getActiveLegend(): " + legendManager.getActiveLegend());
+            refreshPropertySheet(legendManager.getActiveLegend());
 
-            Integer index = null;
-            // clean previewProperties
-            for (PreviewProperty property : previewProperties.getProperties()) {
-
-                if (LegendManager.getItemIndexFromProperty(property, index)) {
-                }
-            }
-
+//            if (activeLegend != -1) {
+//                System.out.println("Removing ..... @Var: activeLegend: " + activeLegend);
+//                // clean previewProperties
+//                for (PreviewProperty property : previewProperties.getProperties()) {
+//
+//                    if (LegendManager.getItemIndexFromProperty(property, activeLegend)) {
+//                        previewProperties.removeProperty(property);
+//                    }
+////                activeLegendsComboBox.removeItemAt(activeLegend);
+//                }
+//                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+//                legendManager.removeItem(activeLegend);
+//            }
         }
     }//GEN-LAST:event_removeLegendButtonActionPerformed
+    
+    private void activeLegendsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_activeLegendsComboBoxActionPerformed
+        Item item = (Item) activeLegendsComboBox.getSelectedItem();
+        System.out.println("@Var: item: "+item);
+        
+        if (item != null) {
+            Integer activeLegend = (Integer) item.getData(LegendItem.ITEM_INDEX);
+            System.out.println("+----------------------------------->>>>>>   @Var: activeLegend: " + activeLegend);
+            refreshPropertySheet(activeLegend);
+        }
+        else {
+            refreshPropertySheet(-1);
+        }
+    }//GEN-LAST:event_activeLegendsComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel activeLegendLabel;
+    private javax.swing.JComboBox activeLegendsComboBox;
     private javax.swing.JButton addLegendButton;
     private javax.swing.JPanel currentUsedLegends;
     private javax.swing.JComboBox legendItemsComboBox;
+    private javax.swing.JPanel legendPropertiesPanel;
     private javax.swing.JButton removeLegendButton;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void setup(PreviewModel previewModel) {
     }
-
+    
     @Override
     public JPanel getPanel() {
         return this;
     }
-
+    
     @Override
     public void unsetup() {
     }
-
+    
     @Override
     public Icon getIcon() {
         return new ImageIcon();
     }
-
+    
     @Override
     public String getPanelTitle() {
         return NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.title");
     }
-
+    
 }

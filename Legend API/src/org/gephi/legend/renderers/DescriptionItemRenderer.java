@@ -16,14 +16,13 @@ import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.builders.DescriptionItemBuilder;
 import org.gephi.legend.items.DescriptionItem;
 import org.gephi.legend.properties.DescriptionProperty;
-import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
-import org.openide.util.lookup.ServiceProvider;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
