@@ -24,7 +24,10 @@ public interface LegendItem {
     public static final String SUB_TYPE="Legend Item";
     // DESCRIPTION
     public static final String LABEL = "label";
+    public static final String DYNAMIC_PROPERTIES = "dynamic properties";
     
+    
+    public PreviewProperty[] getDynamicPreviewProperties();
     
     
     public enum Direction {

@@ -9,10 +9,16 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JComboBox;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
 import org.openide.nodes.PropertySupport;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -31,6 +37,7 @@ public class LegendManager {
     public static final String LEGEND_PROPERTIES = "legend properties";
     public static final String INDEX = "index";
     private static final String LEGEND_DESCRIPTION = "legend";
+    private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
 
     public LegendManager() {
@@ -56,6 +63,33 @@ public class LegendManager {
         return false;
     }
 
+    public void refreshDynamicPreviewProperties() {
+
+        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+        Workspace workspace = projectController.getCurrentWorkspace();
+
+
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel(workspace);
+        PreviewProperties previewProperties = previewModel.getProperties();
+
+        // clear old properties
+        for (PreviewProperty property : previewProperties.getProperties(LegendProperty.DYNAMIC)) {
+            System.out.println("@Var: removing property: " + property.getName());
+            previewProperties.removeProperty(property);
+        }
+
+        for (int i = 0; i < isActive.size(); i++) {
+            if (isActive.get(i)) {
+                PreviewProperty[] properties = (PreviewProperty[]) legendItems.get(i).getData(LegendItem.DYNAMIC_PROPERTIES);
+                for (PreviewProperty property : properties) {
+                    System.out.println("@Var: adding property: " + property.getName());
+                    previewProperties.addProperty(property);
+                }
+            }
+        }
+    }
+
     public void refreshActiveLegendsComboBox() {
         System.out.println("@Var: refreshActiveLegendsComboBox activeLegend: " + activeLegend);
         activeLegendsComboBox.removeAllItems();
@@ -74,7 +108,7 @@ public class LegendManager {
 //        activeLegendsComboBox.setSelectedIndex(activeLegend);
             activeLegendsComboBox.setSelectedItem(legendItems.get(activeLegend));
         }
-        else{
+        else {
             activeLegendsComboBox.setSelectedIndex(-1);
         }
 
@@ -85,11 +119,11 @@ public class LegendManager {
     }
 
     public void addItem(Item item) {
-        
+
         activeLegend = currentIndex;
-        System.out.println("@Var: creating item activeLegend: "+activeLegend);
-        System.out.println("@Var: item: "+item);
-        
+        System.out.println("@Var: creating item activeLegend: " + activeLegend);
+        System.out.println("@Var: item: " + item);
+
         items.add(LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex);
         isActive.add(Boolean.TRUE);
         legendItems.add(item);
@@ -123,12 +157,10 @@ public class LegendManager {
         return items;
     }
 
-
-
     public ArrayList<Item> getLegendItems() {
-        ArrayList<Item> activeItems= new ArrayList<Item>();
+        ArrayList<Item> activeItems = new ArrayList<Item>();
         for (int i = 0; i < isActive.size(); i++) {
-            if(isActive.get(i)){
+            if (isActive.get(i)) {
                 activeItems.add(legendItems.get(i));
             }
         }
@@ -158,6 +190,13 @@ public class LegendManager {
         return false;
     }
 
+    public static boolean isLegendDynamicProperty(PreviewProperty property) {
+        if (property.getName().endsWith(DYNAMIC)) {
+            return true;
+        }
+        return false;
+    }
+
     public static ArrayList<String> getProperties(String[] PROPERTIES, int itemIndex) {
         ArrayList<String> properties = new ArrayList<String>();
         for (String property : PROPERTIES) {
@@ -168,6 +207,10 @@ public class LegendManager {
 //            System.out.println("Creating >>> " + newProperty);
         }
         return properties;
+    }
+
+    public static String getDynamicProperty(String property, int itemIndex, int itemIndexNested) {
+        return (LEGEND_DESCRIPTION + ITEM_DESCRIPTION + itemIndex + property + itemIndexNested + DYNAMIC);
     }
 
     public static ArrayList<String> getProperties(ArrayList<String> legendProperties, int itemIndex) {

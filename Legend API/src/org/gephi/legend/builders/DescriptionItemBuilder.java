@@ -16,12 +16,12 @@ import org.gephi.legend.items.DescriptionItem;
 //import org.gephi.legend.items.DescriptionItem.DescriptionData;
 import org.gephi.legend.items.DescriptionData;
 import org.gephi.legend.properties.DescriptionProperty;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-
 
 /**
  *
@@ -46,8 +46,9 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         values.add("Value 33333333");
 
         DescriptionItem item = new DescriptionItem(graph);
-        item.setData(DescriptionItem.KEYS, descriptions);
-        item.setData(DescriptionItem.VALUES, values);
+        item.setData(DescriptionItem.KEY, descriptions);
+        item.setData(DescriptionItem.VALUE, values);
+        item.setData(DescriptionItem.NUMBER_OF_ITEMS, 0);
         item.setData(LegendItem.SUB_TYPE, getType());
 
         return item;
@@ -58,61 +59,141 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        ArrayList<String> textProperties = LegendManager.getProperties(DescriptionProperty.OWN_PROPERTIES, itemIndex);
+        ArrayList<String> legendProperties = LegendManager.getProperties(DescriptionProperty.OWN_PROPERTIES, itemIndex);
 
         PreviewProperty[] properties = {
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT),
                                            Font.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyFont),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_COLOR),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_COLOR),
                                            Color.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyFontColor),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_ALIGNMENT),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_ALIGNMENT),
                                            Alignment.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyAlignment),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT),
                                            Font.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueFont),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_COLOR),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_COLOR),
                                            Color.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueFontColor),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_ALIGNMENT),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_ALIGNMENT),
                                            Alignment.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueAlignment),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_IS_FLOW_LAYOUT),
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_IS_FLOW_LAYOUT),
                                            Boolean.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
             PreviewProperty.createProperty(this,
-                                           textProperties.get(DescriptionProperty.DESCRIPTION_DATA),
-                                           DescriptionData.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionData)
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_NUMBER_OF_ITEMS),
+                                           Integer.class,
+                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultNumberOfItems)
         };
 
 
         return properties;
+    }
+
+    public static boolean updatePreviewProperty(Item item, Integer numOfProperties) {
+        // item index
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Integer currentNumOfPropertiews = item.getData(DescriptionItem.NUMBER_OF_ITEMS);
+        System.out.println("@Var: currentNumOfPropertiews: " + currentNumOfPropertiews);
+        System.out.println("@Var: numOfProperties: " + numOfProperties);
+        // number of items didn't change
+        if (numOfProperties.intValue() == currentNumOfPropertiews.intValue()) {
+            return false;
+        }
+        // adding properties
+        else if (numOfProperties.intValue() > currentNumOfPropertiews.intValue()) {
+            int newProperties = numOfProperties.intValue() - currentNumOfPropertiews.intValue();
+            DescriptionItemBuilder.addPreviewProperty(item, currentNumOfPropertiews.intValue(), newProperties);
+        }
+        // removing properties
+        else{
+            int removeProperties = currentNumOfPropertiews.intValue() - numOfProperties.intValue();
+            removePreviewProperty(item, removeProperties);
+        }
+        item.setData(DescriptionItem.NUMBER_OF_ITEMS, numOfProperties);
+        return true;
+
+    }
+    
+    private static void removePreviewProperty(Item item,int numOfProperties){
+        // item index
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        PreviewProperty[] itemProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+        PreviewProperty[] newDescriptionProperties = new PreviewProperty[itemProperties.length - numOfProperties * 2];
+        System.arraycopy(itemProperties, 0, newDescriptionProperties, 0, newDescriptionProperties.length);
+        //
+        item.setData(LegendItem.DYNAMIC_PROPERTIES, newDescriptionProperties);
+    }
+
+    private static void addPreviewProperty(Item item, int begin, int numOfProperties) {
+        System.out.println("@Var: appendPreviewProperty: " + numOfProperties);
+        // item index
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        PreviewProperty[] itemProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+
+        // creating new PreviewProperty[]
+        PreviewProperty[] newDescriptionProperties = new PreviewProperty[numOfProperties * 2];
+        for (int i = 0; i < numOfProperties; i++) {
+            int dataIndex = begin + i;
+            String key = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
+            System.out.println("@Var: appendPreviewProperty key: " + key);
+            String value = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
+            System.out.println("@Var: appendPreviewProperty value: " + value);
+            newDescriptionProperties[2 * i] = PreviewProperty.createProperty(
+                    DescriptionItemBuilder.class,
+                    key,
+                    String.class,
+                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
+                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
+                    LegendProperty.DYNAMIC).setValue("");
+            newDescriptionProperties[2 * i + 1] = PreviewProperty.createProperty(
+                    DescriptionItemBuilder.class,
+                    value,
+                    String.class,
+                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
+                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
+                    LegendProperty.DYNAMIC).setValue("");
+        }
+
+        // appending
+        PreviewProperty[] previewProperties = new PreviewProperty[itemProperties.length + newDescriptionProperties.length];
+        System.arraycopy(itemProperties, 0, previewProperties, 0, itemProperties.length);
+        System.arraycopy(newDescriptionProperties, 0, previewProperties, itemProperties.length, newDescriptionProperties.length);
+        
+        for (PreviewProperty previewProperty : previewProperties) {
+            System.out.println("@Var: adding previewProperty: "+previewProperty);
+            System.out.println("@Var: adding previewProperty: "+previewProperty.getName());
+            
+        }
+
+        item.setData(LegendItem.DYNAMIC_PROPERTIES, previewProperties);
+
     }
 
     @Override
@@ -132,8 +213,8 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     protected boolean isBuilderForItem(Item item) {
         return item instanceof DescriptionItem;
     }
-    
-    // temp
-    private DescriptionData defaultDescriptionData=new DescriptionData();
 
+    // temp
+    private DescriptionData defaultDescriptionData = new DescriptionData();
+    private Integer defaultNumberOfItems = 0;
 }

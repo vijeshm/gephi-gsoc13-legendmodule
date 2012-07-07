@@ -9,6 +9,7 @@ package org.gephi.legend.properties;
  * @author edubecks
  */
 public class DescriptionProperty {
+
     public static final int DESCRIPTION_KEY_FONT = 0;
     public static final int DESCRIPTION_KEY_FONT_COLOR = 1;
     public static final int DESCRIPTION_VALUE_FONT = 2;
@@ -17,6 +18,9 @@ public class DescriptionProperty {
     public static final int DESCRIPTION_VALUE_FONT_ALIGNMENT = 5;
     public static final int DESCRIPTION_IS_FLOW_LAYOUT = 6;
     public static final int DESCRIPTION_DATA = 7;
+    public static final int DESCRIPTION_NUMBER_OF_ITEMS = 8;
+    public static final int DESCRIPTION_KEY = 9;
+    public static final int DESCRIPTION_VALUE = 10;
     public static final String[] OWN_PROPERTIES = {
         ".key.font",
         ".key.font.color",
@@ -25,6 +29,9 @@ public class DescriptionProperty {
         ".key.font.alignment",
         ".value.font.alignment",
         ".isFlowLayout",
-        "data"
+        ".data",
+        ".numberOfItems",
+        ".key",
+        ".value"
     };
 }

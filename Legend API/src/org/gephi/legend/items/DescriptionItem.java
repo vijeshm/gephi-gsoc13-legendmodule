@@ -16,8 +16,9 @@ import org.gephi.preview.plugin.items.AbstractItem;
 public class DescriptionItem extends AbstractItem implements LegendItem {
 
     public static final String LEGEND_TYPE = "Description Item";
-    public static final String KEYS = "keys";
-    public static final String VALUES = "values";
+    public static final String KEY = "keys";
+    public static final String VALUE = "values";
+    public static final String NUMBER_OF_ITEMS = "number of items";
 
     public DescriptionItem(Object source) {
         super(source, TYPE);
@@ -26,6 +27,11 @@ public class DescriptionItem extends AbstractItem implements LegendItem {
     @Override
     public String toString() {
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
+    }
+    
+    @Override
+    public PreviewProperty[] getDynamicPreviewProperties() {
+        return (PreviewProperty[]) this.getData(DYNAMIC_PROPERTIES);
     }
 
 }

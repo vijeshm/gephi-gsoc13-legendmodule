@@ -28,5 +28,10 @@ public class ImageItem extends AbstractItem implements LegendItem {
     public String toString() {
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
     }
+    
+    @Override
+    public PreviewProperty[] getDynamicPreviewProperties() {
+        return new PreviewProperty[0];
+    }
 
 }

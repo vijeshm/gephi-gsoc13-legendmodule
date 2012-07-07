@@ -56,4 +56,7 @@ public class LegendProperty {
         ".isDisplaying",
         ".label"
     };
+    
+    
+    public static final String DYNAMIC = "dynamic";
 }

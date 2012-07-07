@@ -28,4 +28,9 @@ public class GroupsItem extends AbstractItem implements LegendItem {
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
     }
 
+    @Override
+    public PreviewProperty[] getDynamicPreviewProperties() {
+        return new PreviewProperty[0];
+    }
+
 }

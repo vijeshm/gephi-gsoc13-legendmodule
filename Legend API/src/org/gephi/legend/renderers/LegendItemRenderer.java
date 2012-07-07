@@ -376,6 +376,10 @@ public abstract class LegendItemRenderer implements Renderer {
 //        System.out.println("@Var: x: "+x);
 //        System.out.println("@Var: y: "+y);
 
+        if (text.isEmpty()) {
+            return 0f;
+        }
+
         AttributedString styledText = new AttributedString(text);
         styledText.addAttribute(TextAttribute.FONT, font);
         graphics2D.setFont(font);
