@@ -92,4 +92,9 @@ public class TextItemBuilder extends LegendItemBuilder {
     protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
     protected final Color defaultBodyFontColor = Color.BLUE;
     protected final Alignment defaultBodyFontAlignment = Alignment.JUSTIFIED;
+
+    @Override
+    protected Boolean hasDynamicProperties() {
+        return Boolean.FALSE;
+    }
 }

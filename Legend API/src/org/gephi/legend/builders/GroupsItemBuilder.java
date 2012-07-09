@@ -146,4 +146,9 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     private Integer defaultPaddingBetweenTextAndShape = 5;
     private Integer defaultPaddingBetweenElements = 5;
     private LegendItem.Shape defaultShape = LegendItem.Shape.TRIANGLE;
+
+    @Override
+    protected Boolean hasDynamicProperties() {
+        return Boolean.FALSE;
+    }
 }

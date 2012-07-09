@@ -214,4 +214,9 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected final Alignment defaultVerticalTextAlignment = Alignment.LEFT;
     protected final Direction defaultVerticalTextPosition = Direction.LEFT;
     protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
+
+    @Override
+    protected Boolean hasDynamicProperties() {
+        return Boolean.FALSE;
+    }
 }

@@ -69,4 +69,9 @@ public class ImageItemBuilder extends LegendItemBuilder {
     }
 
     private File defaultImageFile = new File("/Users/edubecks/Dropbox/gsoc2012/gephi/gephi.communication/test2.png");
+
+    @Override
+    protected Boolean hasDynamicProperties() {
+        return Boolean.FALSE;
+    }
 }

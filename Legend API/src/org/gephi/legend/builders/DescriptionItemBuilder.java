@@ -103,47 +103,46 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
                                            Boolean.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_NUMBER_OF_ITEMS),
-                                           Integer.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultNumberOfItems)
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout)
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_NUMBER_OF_ITEMS),
+//                                           Integer.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultNumberOfItems)
         };
 
 
         return properties;
     }
-
-    public static boolean updatePreviewProperty(Item item, Integer numOfProperties) {
-        // item index
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        Integer currentNumOfPropertiews = item.getData(DescriptionItem.NUMBER_OF_ITEMS);
-        System.out.println("@Var: currentNumOfPropertiews: " + currentNumOfPropertiews);
-        System.out.println("@Var: numOfProperties: " + numOfProperties);
-        // number of items didn't change
-        if (numOfProperties.intValue() == currentNumOfPropertiews.intValue()) {
-            return false;
-        }
-        // adding properties
-        else if (numOfProperties.intValue() > currentNumOfPropertiews.intValue()) {
-            int newProperties = numOfProperties.intValue() - currentNumOfPropertiews.intValue();
-            DescriptionItemBuilder.addPreviewProperty(item, currentNumOfPropertiews.intValue(), newProperties);
-        }
-        // removing properties
-        else{
-            int removeProperties = currentNumOfPropertiews.intValue() - numOfProperties.intValue();
-            removePreviewProperty(item, removeProperties);
-        }
-        item.setData(DescriptionItem.NUMBER_OF_ITEMS, numOfProperties);
-        return true;
-
-    }
+//
+//    public static boolean updatePreviewProperty(Item item, Integer numOfProperties) {
+//        // item index
+//        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+//        Integer currentNumOfPropertiews = item.getData(DescriptionItem.NUMBER_OF_ITEMS);
+//        System.out.println("@Var: currentNumOfPropertiews: " + currentNumOfPropertiews);
+//        System.out.println("@Var: numOfProperties: " + numOfProperties);
+//        // number of items didn't change
+//        if (numOfProperties.intValue() == currentNumOfPropertiews.intValue()) {
+//            return false;
+//        }
+//        // adding properties
+//        else if (numOfProperties.intValue() > currentNumOfPropertiews.intValue()) {
+//            int newProperties = numOfProperties.intValue() - currentNumOfPropertiews.intValue();
+//            DescriptionItemBuilder.addPreviewProperty(item, currentNumOfPropertiews.intValue(), newProperties);
+//        }
+//        // removing properties
+//        else{
+//            int removeProperties = currentNumOfPropertiews.intValue() - numOfProperties.intValue();
+//            removePreviewProperty(item, removeProperties);
+//        }
+//        item.setData(DescriptionItem.NUMBER_OF_ITEMS, numOfProperties);
+//        return true;
+//    }
     
-    private static void removePreviewProperty(Item item,int numOfProperties){
+    
+    protected static void removePreviewProperty(Item item,int numOfProperties){
         // item index
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] itemProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
         PreviewProperty[] newDescriptionProperties = new PreviewProperty[itemProperties.length - numOfProperties * 2];
         System.arraycopy(itemProperties, 0, newDescriptionProperties, 0, newDescriptionProperties.length);
@@ -151,7 +150,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         item.setData(LegendItem.DYNAMIC_PROPERTIES, newDescriptionProperties);
     }
 
-    private static void addPreviewProperty(Item item, int begin, int numOfProperties) {
+    protected static void addPreviewProperty(Item item, int begin, int numOfProperties) {
         System.out.println("@Var: appendPreviewProperty: " + numOfProperties);
         // item index
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -217,4 +216,9 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     // temp
     private DescriptionData defaultDescriptionData = new DescriptionData();
     private Integer defaultNumberOfItems = 0;
+
+    @Override
+    protected Boolean hasDynamicProperties() {
+        return Boolean.TRUE;
+    }
 }

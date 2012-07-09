@@ -34,10 +34,11 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public LegendNode(PropertySheet propertySheet, Integer activeLegend) {
+
+    public LegendNode(PropertySheet propertySheet, Item activeLegendItem) {
         super(Children.LEAF);
         this.propertySheet = propertySheet;
-        this.activeLegend = activeLegend;
+        this.activeLegendItem = activeLegendItem;
         setDisplayName(NbBundle.getMessage(LegendNode.class, "LegendNode.displayName"));
     }
 
@@ -45,50 +46,81 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
     protected Sheet createSheet() {
 
         Sheet sheet = Sheet.createDefault();
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+        
+        System.out.println("@Var: activeLegendItem: "+activeLegendItem);
+        
+        // regular properties
+        
+        
+        PreviewProperty[] properties = activeLegendItem.getData(LegendItem.PROPERTIES);
+        String label = properties[0].getValue();
+        System.out.println("@Var: label: "+label);
+        Sheet.Set itemSet = Sheet.createPropertiesSet();
+        itemSet.setDisplayName(label);
+        itemSet.setName(label);
+        for (PreviewProperty property : properties) {
+            System.out.println("@Var: createSheet property: "+property.getName());
+            Node.Property nodeProperty = new PreviewPropertyWrapper(property);
+            itemSet.put(nodeProperty);
+        }
+        
+        
+        // dynamic properties
+        PreviewProperty[] dynamicProperties = activeLegendItem.getData(LegendItem.DYNAMIC_PROPERTIES);
+        for (PreviewProperty property : dynamicProperties) {
+            System.out.println("@Var: createSheet dynamic property: "+property.getName());
+            Node.Property nodeProperty = new PreviewPropertyWrapper(property);
+            itemSet.put(nodeProperty);
+        }
+        
+        
+        sheet.put(itemSet);
 
-        Workspace workspace = projectController.getCurrentWorkspace();
-        PreviewModel previewModel = previewController.getModel(workspace);
+//        Sheet sheet = Sheet.createDefault();
+//        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+//        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+//
+//        Workspace workspace = projectController.getCurrentWorkspace();
+//        PreviewModel previewModel = previewController.getModel(workspace);
 
 
-        if (previewModel != null) {
-            PreviewProperties previewProperties = previewModel.getProperties();
-            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-
-            if (legendManager.hasActiveLegends()) {
-
-                ArrayList<String> items = legendManager.getItems();
-
-                Sheet.Set itemSet = Sheet.createPropertiesSet();
-                String label = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, activeLegend, LegendProperty.LABEL));
-                itemSet.setDisplayName(label);
-                itemSet.setName(label);
-                for (PreviewProperty property : previewProperties.getProperties()) {
-                    if (LegendManager.isLegendPropertyForItem(property, items.get(activeLegend))) {
-                        Node.Property nodeProperty = new PreviewPropertyWrapper(property);
-                        itemSet.put(nodeProperty);
-                    }
-                }
-                sheet.put(itemSet);
-            }
-
-//            for (int i = 0; i < items.size(); i++) {
+//        if (previewModel != null) {
+//            PreviewProperties previewProperties = previewModel.getProperties();
+//            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+//
+//            if (legendManager.hasActiveLegends()) {
+//
+//                ArrayList<String> items = legendManager.getItems();
+//
 //                Sheet.Set itemSet = Sheet.createPropertiesSet();
-//                String name = "Item " + i + " [" + legendTypes.get(i) + "]";
-//                itemSet.setDisplayName(name);
-//                itemSet.setName(name);
+//                String label = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, activeLegend, LegendProperty.LABEL));
+//                itemSet.setDisplayName(label);
+//                itemSet.setName(label);
 //                for (PreviewProperty property : previewProperties.getProperties()) {
-//                    if (LegendManager.isLegendPropertyForItem(property, items.get(i))) {
+//                    if (LegendManager.isLegendPropertyForItem(property, items.get(activeLegend))) {
 //                        Node.Property nodeProperty = new PreviewPropertyWrapper(property);
 //                        itemSet.put(nodeProperty);
 //                    }
 //                }
 //                sheet.put(itemSet);
-//
 //            }
-
-        }
+//
+////            for (int i = 0; i < items.size(); i++) {
+////                Sheet.Set itemSet = Sheet.createPropertiesSet();
+////                String name = "Item " + i + " [" + legendTypes.get(i) + "]";
+////                itemSet.setDisplayName(name);
+////                itemSet.setName(name);
+////                for (PreviewProperty property : previewProperties.getProperties()) {
+////                    if (LegendManager.isLegendPropertyForItem(property, items.get(i))) {
+////                        Node.Property nodeProperty = new PreviewPropertyWrapper(property);
+////                        itemSet.put(nodeProperty);
+////                    }
+////                }
+////                sheet.put(itemSet);
+////
+////            }
+//
+//        }
         return sheet;
     }
 
@@ -114,4 +146,5 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
     }
     private PropertySheet propertySheet;
     private Integer activeLegend;
+    private Item activeLegendItem;
 }

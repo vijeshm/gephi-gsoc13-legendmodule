@@ -14,6 +14,7 @@ import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
 //import org.gephi.legend.properties.LegendProperties.LegendProperty;
 import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.DescriptionItem;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.project.api.ProjectController;
@@ -33,12 +34,17 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     protected abstract Item buildItem(Graph graph, AttributeModel attributeModel);
 
+    protected abstract Boolean hasDynamicProperties();
+
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
 
     public Item createItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
         Item item = buildItem(graph, attributeModel);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, getLegendProperties(item));
+        Integer numDynamicProperties = 0;
+        item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, numDynamicProperties);
+        item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, new PreviewProperty[0]);
         return item;
 
@@ -61,7 +67,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             ArrayList<Item> items = new ArrayList<Item>();
             for (Item item : legendItems) {
                 if (isBuilderForItem(item)) {
-
                     items.add(item);
                     System.out.println("@Var: Build item: " + item.getType());
                 }
@@ -77,7 +82,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         setDefaultValues();
-        
+
 
 
         ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, itemIndex);
@@ -88,7 +93,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
                                                    String.class,
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.displayName"),
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultLabel+itemIndex),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultLabel + itemIndex),
                     PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.IS_DISPLAYING),
                                                    Boolean.class,
@@ -194,10 +199,49 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     }
 
+    public static boolean updatePreviewProperty(Item item, int numOfProperties) {
+        // item index
+//        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+//        Integer currentNumOfPropertiews = item.getData(DescriptionItem.NUMBER_OF_ITEMS);
+//        int currentNumOfProperties = ((PreviewProperty[]) (item.getData(LegendItem.DYNAMIC_PROPERTIES))).length;
+         System.out.println("@Var: currentNumOfProperties: "+item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES));
+         int currentNumOfProperties = ((Integer)(item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES))).intValue();
+        System.out.println("@Var: currentNumOfPropertiews: " + currentNumOfProperties);
+        System.out.println("@Var: numOfProperties: " + numOfProperties);
+        // number of items didn't change
+        if (numOfProperties == currentNumOfProperties) {
+            return false;
+        }
+        // adding properties
+        else if (numOfProperties > currentNumOfProperties) {
+            int newProperties = numOfProperties - currentNumOfProperties;
+
+            //bug
+            if (item instanceof DescriptionItem) {
+                DescriptionItemBuilder.addPreviewProperty(item, currentNumOfProperties, newProperties);
+            }
+        }
+        // removing properties
+        else {
+            int removeProperties = currentNumOfProperties - numOfProperties;
+            //bug
+            if (item instanceof DescriptionItem) {
+                DescriptionItemBuilder.removePreviewProperty(item, removeProperties);
+            }
+        }
+        item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, numOfProperties);
+        return true;
+    }
+
+//    protected static void addPreviewProperty(Item item, int currentNumOfProperties, int numNewProperties) {
+//    }
+//
+//    protected static void removePreviewProperty(Item item, int numRemoveProperties) {
+//    }
+
     //DEFAULT VALUES 
     // LABEL
     protected String defaultLabel = "";
-    
     // IS_DISPLAYING
     protected boolean defaultIsDisplaying = true;
     //ORIGIN

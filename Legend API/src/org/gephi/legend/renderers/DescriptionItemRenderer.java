@@ -89,13 +89,15 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
             isFlowLayout = previewProperties.getBooleanValue(LegendManager.getProperty(DescriptionProperty.OWN_PROPERTIES, itemIndex, DescriptionProperty.DESCRIPTION_IS_FLOW_LAYOUT));
 
             // reading keys
-            Integer numberOfItems = previewProperties.getIntValue(LegendManager.getProperty(DescriptionProperty.OWN_PROPERTIES, itemIndex, DescriptionProperty.DESCRIPTION_NUMBER_OF_ITEMS));
+            Integer numberOfItems = item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES);
+            
+            
             System.out.println("@Var: numberOfItems: " + numberOfItems);
-            if (DescriptionItemBuilder.updatePreviewProperty(item, numberOfItems)) {
-                System.out.printf("Refresh property sheet\n");
-                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-                legendManager.refreshActiveLegendsComboBox();
-            }
+//            if (DescriptionItemBuilder.updatePreviewProperty(item, numberOfItems)) {
+//                System.out.printf("Refresh property sheet\n");
+//                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+////                legendManager.refreshActiveLegendsComboBox();
+//            }
             keys = new ArrayList<String>();
             values = new ArrayList<String>();
             for (int i = 0; i < numberOfItems; i++) {

@@ -78,7 +78,6 @@ public abstract class LegendItemRenderer implements Renderer {
             // UPDATING LABEL
             String label = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.LABEL));
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-            legendManager.refreshActiveLegendsComboBox();
 
             // IS DISPLAYING
             isDisplayingLegend = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.IS_DISPLAYING));

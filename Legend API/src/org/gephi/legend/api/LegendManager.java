@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
@@ -26,7 +27,7 @@ import org.openide.util.Lookup;
  */
 public class LegendManager {
 
-    private Integer activeLegend;
+    private Integer activeLegendIndex;
     private Integer currentIndex;
     private Integer firstActiveLegend;
     private ArrayList<Boolean> isActive;
@@ -34,18 +35,21 @@ public class LegendManager {
     private ArrayList<Item> legendItems;
     // reference to combobox
     private JComboBox activeLegendsComboBox;
+    private JPanel legendManagerPanel;
     public static final String LEGEND_PROPERTIES = "legend properties";
     public static final String INDEX = "index";
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
 
-    public LegendManager() {
-        currentIndex = 0;
-        firstActiveLegend = 0;
-        items = new ArrayList<String>();
-        legendItems = new ArrayList<Item>();
-        isActive = new ArrayList<Boolean>();
+    
+    public LegendManager(){
+        this.currentIndex = 0;
+        this.firstActiveLegend = 0;
+        this.items = new ArrayList<String>();
+        this.legendItems = new ArrayList<Item>();
+        this.isActive = new ArrayList<Boolean>();
+        this.activeLegendIndex=-1;
     }
 
     public Integer getCurrentIndex() {
@@ -90,29 +94,7 @@ public class LegendManager {
         }
     }
 
-    public void refreshActiveLegendsComboBox() {
-        System.out.println("@Var: refreshActiveLegendsComboBox activeLegend: " + activeLegend);
-        activeLegendsComboBox.removeAllItems();
-        if (activeLegend != -1) {
-            for (int i = 0; i < isActive.size(); i++) {
-                if (isActive.get(i)) {
-                    Item item = legendItems.get(i);
-//                PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
-//                String label = properties[0].getValue();
-//                String legendType = " [" + item.getData(LegendItem.SUB_TYPE) + "]";
-//                System.out.println("@Var: add item to combobox: " + label);
-                    activeLegendsComboBox.addItem(item);
-                }
-            }
-            System.out.println("@Var: refreshActiveLegendsComboBox activeLegend: " + activeLegend);
-//        activeLegendsComboBox.setSelectedIndex(activeLegend);
-            activeLegendsComboBox.setSelectedItem(legendItems.get(activeLegend));
-        }
-        else {
-            activeLegendsComboBox.setSelectedIndex(-1);
-        }
-
-    }
+    
 
     public void setActiveLegendsComboBox(JComboBox activeLegendsComboBox) {
         this.activeLegendsComboBox = activeLegendsComboBox;
@@ -120,37 +102,40 @@ public class LegendManager {
 
     public void addItem(Item item) {
 
-        activeLegend = currentIndex;
-        System.out.println("@Var: creating item activeLegend: " + activeLegend);
+        activeLegendIndex = currentIndex;
+        System.out.println("@Var: creating item activeLegend: " + activeLegendIndex);
         System.out.println("@Var: item: " + item);
 
         items.add(LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex);
         isActive.add(Boolean.TRUE);
         legendItems.add(item);
         currentIndex++;
-        // refresh list
-        refreshActiveLegendsComboBox();
     }
 
     public void removeItem(int index) {
 
         isActive.set(index, Boolean.FALSE);
         if (hasActiveLegends()) {
-            activeLegend = firstActiveLegend;
+            activeLegendIndex = firstActiveLegend;
         }
         else {
-            activeLegend = -1;
+            activeLegendIndex = -1;
         }
-        // refresh list
-        refreshActiveLegendsComboBox();
     }
 
     public void setActiveLegend(Integer activeLegend) {
-        this.activeLegend = activeLegend;
+        this.activeLegendIndex = activeLegend;
     }
 
     public Integer getActiveLegend() {
-        return activeLegend;
+        return activeLegendIndex;
+    }
+    
+    public Item getActiveLegendItem(){
+        if(activeLegendIndex>=0){
+            return legendItems.get(activeLegendIndex);
+        }
+        return null;
     }
 
     public ArrayList<String> getItems() {
