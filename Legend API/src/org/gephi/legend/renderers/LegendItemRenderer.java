@@ -433,5 +433,11 @@ public abstract class LegendItemRenderer implements Renderer {
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment) {
         return legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, false);
     }
+    
+    protected float computeVerticalTextSpaceUsed(Graphics2D graphics2D, String text, Font font,  double x, double y, Integer width){
+        return legendDrawText(graphics2D, text, font, Color.BLACK, x, y, width, height, Alignment.LEFT, true);
+    }
+    
+   
 
 }

@@ -22,6 +22,8 @@ import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
+import org.gephi.legend.properties.GroupsProperty;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -117,20 +119,27 @@ public class TestProcessingTarget {
             previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
 
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-            Integer newItemIndex = legendManager.getCurrentIndex();
+            Integer itemIndex = legendManager.getCurrentIndex();
 
 
             // creating item
-            Item item = addGroupsItem(newItemIndex, graph, attributeModel);
+            Item item = addGroupsItem(itemIndex, graph, attributeModel);
 //            Item item = addTextItem(newItemIndex, graph, attributeModel);
 
 
             // add item
             legendManager.addItem(item);
             PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
+            
             for (PreviewProperty property : properties) {
-                previewController.getModel().getProperties().addProperty(property);
+                previewProperties.addProperty(property);
             }
+            
+            //test
+//            previewProperties.getProperty(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS)).setValue(2);
+            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.ORIGIN_X)).setValue(-100);
+            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.ORIGIN_Y)).setValue(-100);
+            
 
 
 

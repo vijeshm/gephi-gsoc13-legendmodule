@@ -54,10 +54,10 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
 
         String[] legendTypes = {
+            GroupsItem.LEGEND_TYPE,
             DescriptionItem.LEGEND_TYPE,
             TextItem.LEGEND_TYPE,
             ImageItem.LEGEND_TYPE,
-            GroupsItem.LEGEND_TYPE,
             TableItem.LEGEND_TYPE
         };
 

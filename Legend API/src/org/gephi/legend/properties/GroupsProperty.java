@@ -17,6 +17,7 @@ public class GroupsProperty {
     public static final int GROUPS_LABEL_FONT_COLOR = 4;
     public static final int GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE = 5;
     public static final int GROUPS_PADDING_BETWEEN_ELEMENTS = 6;
+    public static final int GROUPS_SCALE_SHAPE = 7;
     public static final String[] OWN_PROPERTIES = {
         ".numberColumns",
         ".shape",
@@ -24,6 +25,7 @@ public class GroupsProperty {
         ".label.font",
         ".label.font.color",
         ".paddingBetweenTextAndShape",
-        ".paddingBetweenElements"
+        ".paddingBetweenElements",
+        ".scaleShape"
     };
 }

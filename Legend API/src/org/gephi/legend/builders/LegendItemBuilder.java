@@ -42,8 +42,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Item item = buildItem(graph, attributeModel);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, getLegendProperties(item));
-        Integer numDynamicProperties = 0;
-        item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, numDynamicProperties);
+        item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);
         item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, new PreviewProperty[0]);
         return item;

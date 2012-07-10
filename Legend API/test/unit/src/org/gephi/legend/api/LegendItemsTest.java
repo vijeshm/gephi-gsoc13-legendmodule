@@ -176,6 +176,6 @@ public class LegendItemsTest {
 //    private String selectedType = ImageItem.LEGEND_TYPE;
 //    private String selectedType = TableItem.LEGEND_TYPE;
 //    private String selectedType = DescriptionItem.LEGEND_TYPE;
-    private String selectedType = TextItem.LEGEND_TYPE;
-//    private String selectedType = GroupsItem.LEGEND_TYPE;
+//    private String selectedType = TextItem.LEGEND_TYPE;
+    private String selectedType = GroupsItem.LEGEND_TYPE;
 }
