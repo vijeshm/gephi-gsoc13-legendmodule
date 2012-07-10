@@ -99,6 +99,7 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
         //When a .gephi file is loaded later with these properties PGraphics will be created instead of a PApplet
         props.removeSimpleValue("width");
         props.removeSimpleValue("height");
+        props.removeSimpleValue(PreviewProperty.MARGIN);
         
         // BUG WHEN EXPORTING MARGIN
         System.out.println("__HERE __ removing margin\n");
