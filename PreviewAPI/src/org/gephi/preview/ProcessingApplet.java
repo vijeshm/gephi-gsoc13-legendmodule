@@ -45,15 +45,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.PreviewModel;
-import org.gephi.preview.api.PreviewProperty;
-import org.gephi.preview.api.RenderTarget;
+import org.gephi.preview.api.*;
 import org.openide.util.Lookup;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -143,27 +139,77 @@ public class ProcessingApplet extends PApplet implements MouseWheelListener {
             super.resizeRenderer(i, i1);
         }
     }
+    
+    private PVector screenPositionToModelPosition(PVector screenPos) {
+        PVector center = new PVector(width / 2f, height / 2f);
+        PVector scaledCenter = PVector.mult(center, scaling);
+        PVector scaledTrans = PVector.sub(center, scaledCenter);
+
+        PVector modelPos = new PVector(screenPos.x, screenPos.y);
+        modelPos.sub(scaledTrans);
+        modelPos.div(scaling);
+        modelPos.sub(trans);
+        return modelPos;
+    }
+    
+    private PVector getMouseModelPosition(){
+        return screenPositionToModelPosition(new PVector(mouseX, mouseY));
+    }
+
+    @Override
+    public void mouseClicked() {
+        PVector pos = getMouseModelPosition();
+        if (previewController.sendMouseEvent(new PreviewMouseEvent((int)pos.x, (int)pos.y, PreviewMouseEvent.Type.CLICKED))) {
+            previewController.refreshPreview();
+            redraw();
+        }
+    }
 
     @Override
     public void mousePressed() {
-        ref.set(mouseX, mouseY, 0);
+        if (mouseButton == RIGHT) {
+            ref.set(mouseX, mouseY, 0);
+            redraw();
+        } else {
+            PVector pos = getMouseModelPosition();
+            if (previewController.sendMouseEvent(new PreviewMouseEvent((int)pos.x, (int)pos.y, PreviewMouseEvent.Type.PRESSED))) {
+                previewController.refreshPreview();
+                redraw();
+            }
+        }
     }
 
     @Override
     public void mouseDragged() {
-        setMoving(true);
-        trans.set(mouseX, mouseY, 0);
-        trans.sub(ref);
-        trans.div(scaling); // ensure const. moving speed whatever the zoom is
-        trans.add(lastMove);
-        redraw();
+        if (mouseButton == RIGHT) {
+            setMoving(true);
+            trans.set(mouseX, mouseY, 0);
+            trans.sub(ref);
+            trans.div(scaling); // ensure const. moving speed whatever the zoom is
+            trans.add(lastMove);
+            redraw();
+        } else {
+            PVector pos = getMouseModelPosition();
+            if (previewController.sendMouseEvent(new PreviewMouseEvent((int)pos.x, (int)pos.y, PreviewMouseEvent.Type.DRAGGED))) {
+                previewController.refreshPreview();
+                redraw();
+            }
+        }
     }
 
     @Override
     public void mouseReleased() {
-        lastMove.set(trans);
-        setMoving(false);
-        redraw();
+        if (mouseButton == RIGHT) {
+            lastMove.set(trans);
+            setMoving(false);
+            redraw();
+        } else {
+            PVector pos = getMouseModelPosition();
+            if (previewController.sendMouseEvent(new PreviewMouseEvent((int)pos.x, (int)pos.y, PreviewMouseEvent.Type.RELEASED))) {
+                previewController.refreshPreview();
+                redraw();
+            }
+        }
     }
 
     @Override
