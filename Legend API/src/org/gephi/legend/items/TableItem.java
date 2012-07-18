@@ -58,7 +58,7 @@ public class TableItem extends AbstractItem implements LegendItem {
     }
 
     public TableItem(Object source) {
-        super(source, TYPE);
+        super(source, LEGEND_TYPE);
     }
 
     @Override

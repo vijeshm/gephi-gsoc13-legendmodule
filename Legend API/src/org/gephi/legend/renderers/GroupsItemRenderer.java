@@ -93,7 +93,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 
         // 
         ArrayList<Float> valuesNormalized = new ArrayList<Float>();
-        if (isScaling) {
+        if (isScalingShapes) {
             float maxValue = Collections.max(valuesGroup);
             for (Float value : valuesGroup) {
                 valuesNormalized.add(value / maxValue);
@@ -188,7 +188,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         shape = (LegendItem.Shape) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
         labelFont = properties.getFontValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
         labelFontColor = properties.getColorValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_COLOR));
-        isScaling = properties.getBooleanValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SCALE_SHAPE));
+        isScalingShapes = properties.getBooleanValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SCALE_SHAPE));
 
         //values
         labelsGroup = item.getData(GroupsItem.LABELS_GROUP);
@@ -224,7 +224,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
     private Direction labelPosition;
     private Shape shape;
     // TO ADD
-    private Boolean isScaling;
+    private Boolean isScalingShapes;
     //VALUES
     private ArrayList<String> labelsGroup;
     private ArrayList<Color> colorsGroup;

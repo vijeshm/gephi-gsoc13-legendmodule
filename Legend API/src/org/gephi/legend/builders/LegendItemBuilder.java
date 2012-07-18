@@ -6,6 +6,7 @@ package org.gephi.legend.builders;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Point;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
@@ -45,8 +46,37 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);
         item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, new PreviewProperty[0]);
+        item.setData(LegendItem.IS_SCALING, Boolean.FALSE);
+        item.setData(LegendItem.REAL_POSITION, buildRealLocationProperties(newItemIndex));
         return item;
 
+    }
+
+    private PreviewProperty[] buildRealLocationProperties(Integer newItemIndex) {
+
+
+        // real position
+        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+        Workspace workspace = pc.getCurrentWorkspace();
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel(workspace);
+
+        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, newItemIndex);
+
+
+        return new PreviewProperty[]{
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.REAL_ORIGIN_X),
+                                                   Float.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(previewModel.getTopLeftPosition().x),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.REAL_ORIGIN_Y),
+                                                   Float.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(previewModel.getTopLeftPosition().y),};
     }
 
     @Override
@@ -67,7 +97,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             for (Item item : legendItems) {
                 if (isBuilderForItem(item)) {
                     items.add(item);
-                    System.out.println("@Var: Build item: " + item.getType());
+                    System.out.println("@Var: get item: " + item.getType());
                 }
 
             }
@@ -100,13 +130,13 @@ public abstract class LegendItemBuilder implements ItemBuilder {
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.isDisplaying.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplaying),
                     PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.ORIGIN_X),
+                                                   legendProperties.get(LegendProperty.USER_ORIGIN_X),
                                                    Float.class,
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.displayName"),
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultOriginX),
                     PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.ORIGIN_Y),
+                                                   legendProperties.get(LegendProperty.USER_ORIGIN_Y),
                                                    Float.class,
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.displayName"),
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.description"),
@@ -203,8 +233,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 //        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 //        Integer currentNumOfPropertiews = item.getData(DescriptionItem.NUMBER_OF_ITEMS);
 //        int currentNumOfProperties = ((PreviewProperty[]) (item.getData(LegendItem.DYNAMIC_PROPERTIES))).length;
-         System.out.println("@Var: currentNumOfProperties: "+item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES));
-         int currentNumOfProperties = ((Integer)(item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES))).intValue();
+        System.out.println("@Var: currentNumOfProperties: " + item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES));
+        int currentNumOfProperties = ((Integer) (item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES))).intValue();
         System.out.println("@Var: currentNumOfPropertiews: " + currentNumOfProperties);
         System.out.println("@Var: numOfProperties: " + numOfProperties);
         // number of items didn't change
@@ -237,7 +267,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 //
 //    protected static void removePreviewProperty(Item item, int numRemoveProperties) {
 //    }
-
     //DEFAULT VALUES 
     // LABEL
     protected String defaultLabel = "";

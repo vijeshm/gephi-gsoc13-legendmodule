@@ -17,7 +17,7 @@ import processing.core.PGraphics;
  *
  * @author Eduardo Ramos<eduramiba@gmail.com>
  */
-@ServiceProvider(service=Renderer.class)
+//@ServiceProvider(service=Renderer.class)
 public class RendererTest implements Renderer, MouseResponsiveRenderer {
 
     public String getDisplayName() {

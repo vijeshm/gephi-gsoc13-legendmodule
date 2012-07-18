@@ -21,7 +21,7 @@ public class GroupsItem extends AbstractItem implements LegendItem {
 
     //BODY
     public GroupsItem(Object source) {
-        super(source, TYPE);
+        super(source, LEGEND_TYPE);
     }
 
     @Override

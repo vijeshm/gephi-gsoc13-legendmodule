@@ -21,7 +21,7 @@ public class DescriptionItem extends AbstractItem implements LegendItem {
     public static final String NUMBER_OF_ITEMS = "number of items";
 
     public DescriptionItem(Object source) {
-        super(source, TYPE);
+        super(source, LEGEND_TYPE);
     }
 
     @Override

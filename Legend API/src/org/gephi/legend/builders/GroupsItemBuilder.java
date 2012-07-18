@@ -167,7 +167,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                                            Boolean.class,
                                            NbBundle.getMessage(LegendManager.class, "GroupsItem.property.scaleShape.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "GroupsItem.property.scaleShape.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultScaleShape)
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsScalingShapes)
         };
 
         return properties;
@@ -181,7 +181,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     private Integer defaultPaddingBetweenTextAndShape = 5;
     private Integer defaultPaddingBetweenElements = 5;
     private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
-    private Boolean defaultScaleShape = Boolean.FALSE;
+    private Boolean defaultIsScalingShapes = Boolean.FALSE;
 
     @Override
     protected Boolean hasDynamicProperties() {

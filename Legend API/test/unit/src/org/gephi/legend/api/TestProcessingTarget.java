@@ -123,7 +123,7 @@ public class TestProcessingTarget {
 
 
             // creating item
-            Item item = addGroupsItem(itemIndex, graph, attributeModel);
+            Item item = addImageItem(itemIndex, graph, attributeModel);
 //            Item item = addTextItem(newItemIndex, graph, attributeModel);
 
 
@@ -137,8 +137,9 @@ public class TestProcessingTarget {
             
             //test
 //            previewProperties.getProperty(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS)).setValue(2);
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.ORIGIN_X)).setValue(-100);
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.ORIGIN_Y)).setValue(-100);
+            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(-100);
+            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(-100);
+            item.setData(LegendItem.IS_SCALING, Boolean.TRUE);
             
 
 

@@ -54,9 +54,9 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
 
         String[] legendTypes = {
+            TextItem.LEGEND_TYPE,
             GroupsItem.LEGEND_TYPE,
             DescriptionItem.LEGEND_TYPE,
-            TextItem.LEGEND_TYPE,
             ImageItem.LEGEND_TYPE,
             TableItem.LEGEND_TYPE
         };
@@ -198,7 +198,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         // creating if it doesnt exist
         if (!previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
             LegendManager legendManager = new LegendManager();
-            legendManager.setActiveLegendsComboBox(activeLegendsComboBox);
             previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, legendManager);
         }
         LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
@@ -230,6 +229,12 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
+        
+        // check if previewModel exists
+        if(previewModel==null){
+            return;
+        }
+        
         PreviewProperties previewProperties = previewModel.getProperties();
 
         String selectedType = legendItemsComboBox.getSelectedItem().toString();
@@ -238,7 +243,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         if (!previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
             LegendManager legendManager = new LegendManager();
-            legendManager.setActiveLegendsComboBox(activeLegendsComboBox);
             previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, legendManager);
         }
 
@@ -269,10 +273,19 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         legendManager.addItem(item);
         Item activeLegendItem = legendManager.getActiveLegendItem();
         refreshActiveLegendsComboBox();
-        PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
-        for (PreviewProperty property : properties) {
+        PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
+        for (PreviewProperty property : legendProperties) {
             previewController.getModel().getProperties().addProperty(property);
         }
+        PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+        for (PreviewProperty property : dynamicProperties) {
+            previewController.getModel().getProperties().addProperty(property);
+        }
+        PreviewProperty[] realPositionProperties = item.getData(LegendItem.REAL_POSITION);
+        for (PreviewProperty property : realPositionProperties) {
+            previewController.getModel().getProperties().addProperty(property);
+        }
+        
         // update property sheet
         refreshPropertySheet(activeLegendItem);
 

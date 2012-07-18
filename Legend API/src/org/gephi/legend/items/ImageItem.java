@@ -21,7 +21,7 @@ public class ImageItem extends AbstractItem implements LegendItem {
     public static final String LEGEND_TYPE= "Image Item";
 
     public ImageItem(Object source) {
-        super(source, TYPE);
+        super(source, LEGEND_TYPE);
     }
 
     @Override

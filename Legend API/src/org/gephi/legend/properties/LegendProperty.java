@@ -11,8 +11,9 @@ package org.gephi.legend.properties;
 public class LegendProperty {
 
     //LOCATION
-    public static final int ORIGIN_X = 0;
-    public static final int ORIGIN_Y = 1;
+    public static final int USER_ORIGIN_X = 0;
+    public static final int USER_ORIGIN_Y = 1;
+    
     //DIMENSIONS
     public static final int WIDTH = 2;
     public static final int HEIGHT = 3;
@@ -32,8 +33,12 @@ public class LegendProperty {
     public static final int DESCRIPTION = 13;
     //REMOVE
     public static final int IS_DISPLAYING = 14;
-    //REMOVE
+    // LABEL
     public static final int LABEL = 15;
+    //LOCATION
+    public static final int REAL_ORIGIN_X = 16;
+    public static final int REAL_ORIGIN_Y = 17;
+    
     public static final String[] LEGEND_PROPERTIES = {
         //LOCATION
         ".originX",
@@ -54,7 +59,9 @@ public class LegendProperty {
         ".title",
         ".description",
         ".isDisplaying",
-        ".label"
+        ".label",
+        ".realOriginX",
+        ".realOriginY"
     };
     
     

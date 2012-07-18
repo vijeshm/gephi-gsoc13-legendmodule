@@ -7,6 +7,8 @@ package org.gephi.legend.items;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
+import org.gephi.preview.spi.MouseResponsiveRenderer;
+import org.gephi.preview.spi.PreviewMouseListener;
 
 /**
  *
@@ -19,7 +21,7 @@ public class TextItem extends AbstractItem implements LegendItem {
     public static final String LEGEND_TYPE= "Text Item";
 
     public TextItem(Object source) {
-        super(source, TYPE);
+        super(source, LEGEND_TYPE);
     }
 
     @Override

@@ -96,9 +96,7 @@ public class LegendManager {
 
     
 
-    public void setActiveLegendsComboBox(JComboBox activeLegendsComboBox) {
-        this.activeLegendsComboBox = activeLegendsComboBox;
-    }
+
 
     public void addItem(Item item) {
 
