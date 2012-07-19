@@ -139,7 +139,7 @@ public class TestProcessingTarget {
 //            previewProperties.getProperty(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS)).setValue(2);
             previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(-100);
             previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(-100);
-            item.setData(LegendItem.IS_SCALING, Boolean.TRUE);
+            item.setData(LegendItem.IS_SELECTED, Boolean.TRUE);
             
 
 

@@ -35,6 +35,8 @@ import processing.core.PGraphicsJava2D;
  */
 public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRenderer {
 
+    private static final int ANCHOR_SIZE = 20;
+
     public abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
     public void readLocationProperties(Item item, PreviewProperties previewProperties) {
@@ -46,13 +48,12 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
     public void readLocationProperties(Item item, PreviewProperties previewProperties, Workspace workspace) {
         if (item != null) {
-            itemIndex = item.getData(LegendItem.ITEM_INDEX);
-            isScaling = item.getData(LegendItem.IS_SCALING);
+            currentItemIndex = item.getData(LegendItem.ITEM_INDEX);
 
             // DIMENSIONS
-            width = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+            currentWidth = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.WIDTH));
 //            System.out.println("@Var: Reading PROPERTY width: " + width);
-            height = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+            currentHeight = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.HEIGHT));
 //            System.out.println("@Var: Reading PROPERTY height: " + height);
 
 
@@ -62,29 +63,29 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
             PreviewModel previewModel = previewController.getModel(workspace);
             Dimension dimensions = previewModel.getDimensions();
-            System.out.println("@Var: previewModel: " + previewModel);
-            System.out.println("@Var: previewModel getTopLeftPosition: " + previewModel.getTopLeftPosition());
-            System.out.println("@Var: previewModel getDimensions: " + previewModel.getDimensions());
+//            System.out.println("@Var: previewModel: " + previewModel);
+//            System.out.println("@Var: previewModel getTopLeftPosition: " + previewModel.getTopLeftPosition());
+//            System.out.println("@Var: previewModel getDimensions: " + previewModel.getDimensions());
             graphHeight = dimensions.height;
             graphWidth = dimensions.width;
 //            System.out.println("@Var: dimensions: " + dimensions);
             Point topLeftPosition = previewModel.getTopLeftPosition();
             graphOriginX = topLeftPosition.x;
-            System.out.println("@Var: Reading graphOriginX: " + graphOriginX);
+//            System.out.println("@Var: Reading graphOriginX: " + graphOriginX);
 //            System.out.println("@Var: graphOriginX: "+graphOriginX);
             graphOriginY = topLeftPosition.y;
-            System.out.println("@Var: Reading graphOriginY: " + graphOriginY);
+//            System.out.println("@Var: Reading graphOriginY: " + graphOriginY);
 
 
             // REAL POSITION
-            realOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
-            realOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
+            currentRealOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_X));
+            currentRealOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_Y));
 //            realOriginX = userOriginX + graphOriginX;
 //            realOriginY = userOriginY + graphOriginY;
 //            realOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.REAL_ORIGIN_Y));
 //            realOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.REAL_ORIGIN_X));
-            System.out.println("@Var: realOriginX: " + realOriginX);
-            System.out.println("@Var: realOriginY: " + realOriginY);
+//            System.out.println("@Var: realOriginX: " + realOriginX);
+//            System.out.println("@Var: realOriginY: " + realOriginY);
 
 
 //            // USER ORIGIN
@@ -98,29 +99,19 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //            userOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
 //            System.out.println("@Var: Reading PROPERTY originY: " + realOriginY);
 
-            int anchorSize = 20;
 //            float[][] anchorLocations = {
 //                {-anchorSize / 2 + realOriginX, -anchorSize / 2 + realOriginY, anchorSize, anchorSize},
 //                {width - anchorSize / 2 + realOriginX, -anchorSize / 2 + realOriginY, anchorSize, anchorSize},
 //                {-anchorSize / 2 + realOriginX, height - anchorSize / 2 + realOriginY, anchorSize, anchorSize},
 //                {width - anchorSize / 2 + realOriginX, height - anchorSize / 2 + realOriginY, anchorSize, anchorSize}
 //            };
-            float[][] anchorLocations = {
-                {-anchorSize / 2, -anchorSize / 2, anchorSize, anchorSize},
-                {width - anchorSize / 2, -anchorSize / 2, anchorSize, anchorSize},
-                {-anchorSize / 2, height - anchorSize / 2, anchorSize, anchorSize},
-                {width - anchorSize / 2, height - anchorSize / 2, anchorSize, anchorSize}
-            };
-            this.anchorLocations = anchorLocations;
-
-
         }
     }
 
     public void readLegendPropertiesAndValues(Item item, PreviewProperties previewProperties) {
 
         if (item != null) {
-
+            currentIsSelected = item.getData(LegendItem.IS_SELECTED);
 //            PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
 //            String label = properties[0].getValue();
 
@@ -134,7 +125,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
 
             // IS DISPLAYING
-            isDisplayingLegend = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.IS_DISPLAYING));
+            isDisplayingLegend = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.IS_DISPLAYING));
 
 
 //            // DIMENSIONS
@@ -144,18 +135,18 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //            System.out.println("@Var: Reading PROPERTY height: "+height);
 
             //TITLE
-            isDisplayingTitle = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.TITLE_IS_DISPLAYING));
-            titleFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.TITLE_FONT));
-            titleFontColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.TITLE_FONT_COLOR));
-            titleAlignment = (Alignment) previewProperties.getValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.TITLE_ALIGNMENT));
-            title = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.TITLE));
+            isDisplayingTitle = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_IS_DISPLAYING));
+            titleFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT));
+            titleFontColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT_COLOR));
+            titleAlignment = (Alignment) previewProperties.getValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_ALIGNMENT));
+            title = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE));
 
             //DESCRIPTION
-            isDisplayingDescription = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.DESCRIPTION_IS_DISPLAYING));
-            descriptionFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.DESCRIPTION_FONT));
-            descriptionFontColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.DESCRIPTION_FONT_COLOR));
-            descriptionAlignment = (Alignment) previewProperties.getValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.DESCRIPTION_ALIGNMENT));
-            description = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.DESCRIPTION));
+            isDisplayingDescription = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.DESCRIPTION_IS_DISPLAYING));
+            descriptionFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.DESCRIPTION_FONT));
+            descriptionFontColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.DESCRIPTION_FONT_COLOR));
+            descriptionAlignment = (Alignment) previewProperties.getValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.DESCRIPTION_ALIGNMENT));
+            description = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.DESCRIPTION));
 
 
 
@@ -199,7 +190,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //        graphics2D = (SVGGraphics2D) graphics2D.create((int)targetOriginX, (int)targetOriginY, (int)graphWidth, (int)graphHeight);
 //        graphics2D.setClip((int)targetOriginX, (int)targetOriginY, (int)graphWidth, (int)graphHeight);
         originTranslation = new AffineTransform();
-        originTranslation.translate(realOriginX, realOriginY);
+        originTranslation.translate(currentRealOriginX, currentRealOriginY);
 //        System.out.println("@Var: originTranslation: "+originTranslation);
         originTranslation.translate(targetOriginX, targetOriginY);
 //        System.out.println("@Var: originTranslation: "+originTranslation);
@@ -215,7 +206,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //        graphics2D.fillRect(10,10, 600,600);
 //        graphics2D.setTransform(new AffineTransform());
 
-        render(graphics2D, originTranslation, width, height);
+        render(graphics2D, originTranslation, currentWidth, currentHeight);
 
 
         //appending
@@ -243,13 +234,13 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //        float pdfOriginY = pdfHeight * graphOriginY / graphHeight;
 
         float targetOriginX = (int) graphOriginX;
-        System.out.println("@Var: tempX: " + targetOriginX);
+//        System.out.println("@Var: tempX: " + targetOriginX);
         float targetOriginY = (int) graphOriginY - 12;
 //        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, graphWidth, graphHeight);
-        System.out.println("@Var: tempY: " + targetOriginY);
+//        System.out.println("@Var: tempY: " + targetOriginY);
         originTranslation = new AffineTransform();
         originTranslation.translate(targetOriginX, targetOriginY);
-        originTranslation.translate(realOriginX, -realOriginY);
+        originTranslation.translate(currentRealOriginX, -currentRealOriginY);
 
 
 
@@ -272,7 +263,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //        graphics2D.fillRect(tempX, tempY, (int) graphWidth, (int) graphHeight);
 
         originTranslation = new AffineTransform();
-        render(graphics2D, originTranslation, width, height);
+        render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.dispose();
         pdfContentByte.restoreState();
     }
@@ -287,7 +278,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         AffineTransform saveState = graphics2D.getTransform();
         originTranslation = new AffineTransform(saveState);
 //        originTranslation.translate(graphOriginX, graphOriginY);
-        originTranslation.translate(realOriginX, realOriginY);
+        originTranslation.translate(currentRealOriginX, currentRealOriginY);
 //        originTranslation.translate(graphTransform.getTranslateX(), graphTransform.getTranslateY());
 
 //        originTranslation.translate(graphWidth*(processingMargin)/100, graphWidth*(processingMargin)/100);
@@ -309,7 +300,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         // temp
 
 
-        render(graphics2D, originTranslation, width, height);
+        render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.setTransform(saveState);
     }
 
@@ -344,14 +335,18 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
 
         // is scaling
-        if (isScaling) {
+        if (currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
-
-
     }
 
     private void drawScaleAnchors(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+        float[][] anchorLocations = {
+            {-ANCHOR_SIZE / 2, -ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE},
+            {width - ANCHOR_SIZE / 2, -ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE},
+            {-ANCHOR_SIZE / 2, height - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE},
+            {width - ANCHOR_SIZE / 2, height - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE}
+        };
 
         Color anchorColor = Color.LIGHT_GRAY;
 
@@ -368,42 +363,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //        graphics2D.drawRect(width - anchorSize / 2, -anchorSize / 2, anchorSize, anchorSize);
 //        graphics2D.drawRect(width - anchorSize / 2, height - anchorSize / 2, anchorSize, anchorSize);
 //
-    }
-
-    private int isClickingInAnchor(int pointX, int pointY) {
-//        System.out.println("@Var: isClickingInAnchor: ");
-//        System.out.println("@Var: pointX: " + pointX);
-//        System.out.println("@Var: pointY: " + pointY);
-
-        pointX -= realOriginX;
-        pointY -= realOriginY;
-//        System.out.println("@Var: pointX: " + pointX);
-//        System.out.println("@Var: pointY: " + pointY);
-
-
-        for (int i = 0; i < anchorLocations.length; i++) {
-//            System.out.println("@Var: Anchor i: " + i);
-//            System.out.println("@Var: pointX: " + pointX + " in [" + anchorLocations[i][0] + "," + (anchorLocations[i][0] + anchorLocations[i][2]) + "]");
-//            System.out.println("@Var: pointY: " + pointY + " in [" + anchorLocations[i][1] + "," + (anchorLocations[i][1] + anchorLocations[i][3]) + "]");
-            if ((pointX >= anchorLocations[i][0] && pointX < (anchorLocations[i][0] + anchorLocations[i][2]))
-                && (pointY >= anchorLocations[i][1] && pointY < (anchorLocations[i][1] + anchorLocations[i][3]))) {
-                System.out.println("@Var: Anchor SELECTED i: " + i);
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private boolean isClickingInLegend(int pointX, int pointY) {
-        System.out.println("@Var: pointX: " + pointX + " in [" + realOriginX + "," + (realOriginX + width) + "]");
-        System.out.println("@Var: pointY: " + pointY + " in [" + realOriginY + "," + (realOriginY + height) + "]");
-        if ((pointX >= realOriginX && pointX < (realOriginX + width))
-            && (pointY >= realOriginY && pointY < (realOriginY + height))) {
-            System.out.println("@Var: isClickingInLegend: ");
-
-            return true;
-        }
-        return false;
     }
 
     public float renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -448,7 +407,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 //            graphOriginX -= defaultMargin;
 //            graphOriginY -= defaultMargin;
 
-            System.out.println("@Var: rendering item: " + item.getType());
+//            System.out.println("@Var: rendering item: " + item.getType());
 
             readLegendPropertiesAndValues(item, properties);
             readOwnPropertiesAndValues(item, properties);
@@ -457,11 +416,9 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
                 if (target instanceof ProcessingTarget) {
                     renderProcessing((ProcessingTarget) target);
-                }
-                else if (target instanceof SVGTarget) {
+                } else if (target instanceof SVGTarget) {
                     renderSVG((SVGTarget) target);
-                }
-                else if (target instanceof PDFTarget) {
+                } else if (target instanceof PDFTarget) {
                     renderPDF((PDFTarget) target);
                 }
             }
@@ -539,213 +496,203 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     }
 
     protected float computeVerticalTextSpaceUsed(Graphics2D graphics2D, String text, Font font, double x, double y, Integer width) {
-        return legendDrawText(graphics2D, text, font, Color.BLACK, x, y, width, height, Alignment.LEFT, true);
+        return legendDrawText(graphics2D, text, font, Color.BLACK, x, y, width, currentHeight, Alignment.LEFT, true);
+    }
+
+    private int isClickingInAnchor(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        float realOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
+        float realOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
+        int width = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+        int height = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+        float[][] anchorLocations = {
+            {-ANCHOR_SIZE / 2, -ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE},
+            {width - ANCHOR_SIZE / 2, -ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE},
+            {-ANCHOR_SIZE / 2, height - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE},
+            {width - ANCHOR_SIZE / 2, height - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE}
+        };
+
+        pointX -= realOriginX;
+        pointY -= realOriginY;
+
+        for (int i = 0; i < anchorLocations.length; i++) {
+            if ((pointX >= anchorLocations[i][0] && pointX < (anchorLocations[i][0] + anchorLocations[i][2]))
+                    && (pointY >= anchorLocations[i][1] && pointY < (anchorLocations[i][1] + anchorLocations[i][3]))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isClickingInLegend(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        float realOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
+        float realOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
+        int width = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+        int height = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+        if ((pointX >= realOriginX && pointX < (realOriginX + width))
+                && (pointY >= realOriginY && pointY < (realOriginY + height))) {
+            return true;
+        }
+        return false;
     }
 
     public void mousePressedEvent(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        System.out.printf("\n\n\n");
-        System.out.println("@Var: mousePressed: ");
         LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-        Item activeLegendItem = legendManager.getActiveLegendItem();
-        readLocationProperties(activeLegendItem, previewProperties);
-
-        // is selected
-
-        Boolean isSelected = activeLegendItem.getData(LegendItem.IS_SCALING);
-        int clickedAnchor = isClickingInAnchor(event.x, event.y);
-        Boolean isClickingInAnchor = (clickedAnchor >= 0) ? true : false;
-        if (isSelected && isClickingInAnchor) {
-
-            relativeX = event.x - realOriginX;
-            relativeY = event.y - realOriginY;
-
-
-            switch (clickedAnchor) {
-                // Top Left Anchor
-                case 0: {
-                    relativeAnchorX = relativeX;
-                    relativeAnchorY = relativeY;
-
-                    break;
+        for (Item item : legendManager.getLegendItems()) {
+            if (isRendererForitem(item, previewProperties)) {
+                Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
+                if (!isSelected) {
+                    continue;
                 }
-                // Top Right
-                case 1: {
-                    relativeAnchorX = relativeX - width;
-                    relativeAnchorY = relativeY;
-                    break;
-                }
-                // Bottom Left
-                case 2: {
-                    relativeAnchorX = relativeX;
-                    relativeAnchorY = relativeY - height;
-                    break;
-                }
-                // Bottom Right
-                case 3: {
-                    relativeAnchorX = relativeX - width;
-                    relativeAnchorY = relativeY - height;
-                    break;
+                Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+                float realOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
+                float realOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
+                int width = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+                int height = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+
+                clickedAnchor = isClickingInAnchor(event.x, event.y, item, previewProperties);
+                boolean isClickingInAnchor = clickedAnchor >= 0;
+                if (isClickingInAnchor) {
+                    relativeX = event.x - realOriginX;
+                    relativeY = event.y - realOriginY;
+                    switch (clickedAnchor) {
+                        // Top Left Anchor
+                        case 0: {
+                            relativeAnchorX = relativeX;
+                            relativeAnchorY = relativeY;
+                            break;
+                        }
+                        // Top Right
+                        case 1: {
+                            relativeAnchorX = relativeX - width;
+                            relativeAnchorY = relativeY;
+                            break;
+                        }
+                        // Bottom Left
+                        case 2: {
+                            relativeAnchorX = relativeX;
+                            relativeAnchorY = relativeY - height;
+                            break;
+                        }
+                        // Bottom Right
+                        case 3: {
+                            relativeAnchorX = relativeX - width;
+                            relativeAnchorY = relativeY - height;
+                            break;
+                        }
+                    }
+
+                    event.setConsumed(true);
+                    return;
+                } else if (isClickingInLegend(event.x, event.y, item, previewProperties)) {
+                    relativeX = event.x - realOriginX;
+                    relativeY = event.y - realOriginY;
+                    event.setConsumed(true);
+                    return;
                 }
             }
-
-
-            // Top Left anchor
-            System.out.println("@Var: clickedAnchor: " + clickedAnchor);
-            System.out.println("@Var: relativeX: " + relativeX);
-            System.out.println("@Var: relativeY: " + relativeY);
-                    System.out.println("@Var: relativeAnchorX: "+relativeAnchorX);
-            System.out.println("@Var: relativeAnchorY: " + relativeAnchorY);
-
         }
-        else if (isSelected && isClickingInLegend(event.x, event.y)) {
-            relativeX = event.x - realOriginX;
-            relativeY = event.y - realOriginY;
-            System.out.println("@Var: relativeX: " + relativeX);
-            System.out.println("@Var: relativeY: " + relativeY);
-        }
-        else {
-            activeLegendItem.setData(LegendItem.IS_SCALING, Boolean.FALSE);
-            relativeX = 0;
-            relativeY = 0;
-        }
-        event.setConsumed(true);
     }
 
     public void mouseClickedEvent(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        System.out.printf("\n\n\n");
-        System.out.println("@Var: mouseClicked: ");
-
         LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-        Item activeLegendItem = legendManager.getActiveLegendItem();
-        readLocationProperties(activeLegendItem, previewProperties);
-        Boolean isSelected = activeLegendItem.getData(LegendItem.IS_SCALING);
-        int clickedAnchor = isClickingInAnchor(event.x, event.y);
-        Boolean isClickingInAnchor = (clickedAnchor >= 0) ? true : false;
-        if (isSelected && isClickingInAnchor) {
-
-            // Top Left anchor
-            System.out.println("@Var: clickedAnchor: " + clickedAnchor);
-
+        boolean someItemStateChanged = false;
+        for (Item item : legendManager.getLegendItems()) {
+            Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
+            if (isClickingInLegend(event.x, event.y, item, previewProperties)) {
+                //Unselect all other items:
+                for (Item otherItem : legendManager.getLegendItems()) {
+                    otherItem.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
+                }
+                item.setData(LegendItem.IS_SELECTED, Boolean.TRUE);
+                event.setConsumed(true);
+                return;
+            } else if (isSelected) {
+                someItemStateChanged = someItemStateChanged || isSelected;
+                item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
+            }
         }
-        else if (isClickingInLegend(event.x, event.y)) {
-            activeLegendItem.setData(LegendItem.IS_SCALING, Boolean.TRUE);
-
+        if (someItemStateChanged) {
+            event.setConsumed(true);
         }
-        else {
-            activeLegendItem.setData(LegendItem.IS_SCALING, Boolean.FALSE);
-        }
-        event.setConsumed(true);
     }
 
     public void mouseDraggedEvent(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        System.out.printf("\n\n\n");
-        System.out.println("@Var: +---------------------> mouseDragged: ");
-
-
         LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-        Item activeLegendItem = legendManager.getActiveLegendItem();
-        readLocationProperties(activeLegendItem, previewProperties);
-
-
-        // is selected
-        Boolean isSelected = activeLegendItem.getData(LegendItem.IS_SCALING);
-        int clickedAnchor = isClickingInAnchor(event.x, event.y);
-        Boolean isClickingInAnchor = (clickedAnchor >= 0) ? true : false;
-        if (isSelected && isClickingInAnchor) {
-
-
-
-
-            float newOriginX = realOriginX;
-            float newOriginY = realOriginY;
-            float newWidth = width;
-            float newHeight = height;
-
-
-            switch (clickedAnchor) {
-                // Top Left Anchor
-                case 0: {
-                    newOriginX = event.x - relativeAnchorX;
-                    newOriginY = event.y - relativeAnchorY;
-                    newWidth = realOriginX + width - newOriginX;
-                    newHeight = realOriginY + height - newOriginY;
-                    break;
+        for (Item item : legendManager.getLegendItems()) {
+            if (isRendererForitem(item, previewProperties)) {
+                Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
+                if (!isSelected) {
+                    continue;
                 }
-                // Top Right
-                case 1: {
-                    newOriginX = realOriginX;
-                    newOriginY = event.y - relativeAnchorY;
-                    newWidth = event.x - relativeAnchorX - newOriginX;
-                    newHeight = realOriginY + height - newOriginY;
-                    break;
+                Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+                float realOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
+                float realOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
+                int width = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+                int height = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+
+                boolean isClickingInAnchor = clickedAnchor >= 0;
+                if (isClickingInAnchor) {
+                    float newOriginX = realOriginX;
+                    float newOriginY = realOriginY;
+                    float newWidth = width;
+                    float newHeight = height;
+
+                    switch (clickedAnchor) {
+                        // Top Left Anchor
+                        case 0: {
+                            newOriginX = event.x - relativeAnchorX;
+                            newOriginY = event.y - relativeAnchorY;
+                            newWidth = realOriginX + width - newOriginX;
+                            newHeight = realOriginY + height - newOriginY;
+                            break;
+                        }
+                        // Top Right
+                        case 1: {
+                            newOriginX = realOriginX;
+                            newOriginY = event.y - relativeAnchorY;
+                            newWidth = event.x - relativeAnchorX - newOriginX;
+                            newHeight = realOriginY + height - newOriginY;
+                            break;
+                        }
+                        // Bottom Left
+                        case 2: {
+                            newOriginX = event.x - relativeAnchorX;
+                            newOriginY = realOriginY;
+                            newWidth = realOriginX + width - newOriginX;
+                            newHeight = event.y - realOriginY - relativeAnchorY;
+                            break;
+                        }
+                        // Bottom Right
+                        case 3: {
+                            newOriginX = realOriginX;
+                            newOriginY = realOriginY;
+                            newWidth = event.x - relativeAnchorX - newOriginX;
+                            newHeight = event.y - relativeAnchorY - newOriginY;
+                            break;
+                        }
+                    }
+
+                    previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(newOriginX);
+                    previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(newOriginY);
+                    previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH)).setValue(newWidth);
+                    previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT)).setValue(newHeight);
+                } else { // translate
+                    float newRealOriginX = event.x - relativeX;
+                    float newRealOriginY = event.y - relativeY;
+
+                    previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(newRealOriginX);
+                    previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(newRealOriginY);
                 }
-                // Bottom Left
-                case 2: {
-                    newOriginX = event.x - relativeAnchorX;
-                    newOriginY = realOriginY;
-                    newWidth = realOriginX + width - newOriginX;
-                    newHeight = event.y - realOriginY - relativeAnchorY;
-                    break;
-                }
-                // Bottom Right
-                case 3: {
-                    newOriginX = realOriginX;
-                    newOriginY = realOriginY;
-                    newWidth = event.x - relativeAnchorX - newOriginX;
-                    newHeight = event.y - relativeAnchorY - newOriginY;
-                    break;
-                }
+
+                event.setConsumed(true);
+                return;
             }
-
-            System.out.println("@Var: newOriginX: " + newOriginX);
-            System.out.println("@Var: newOriginY: " + newOriginY);
-            System.out.println("@Var: newWidth: " + newWidth);
-            System.out.println("@Var: newHeight: " + newHeight);
-
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(newOriginX);
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(newOriginY);
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH)).setValue(newWidth);
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT)).setValue(newHeight);
-
         }
-        // translate
-        else if (isSelected && isClickingInLegend(event.x, event.y)) {
-
-            System.out.println("@Var: graphOriginX: " + graphOriginX);
-            System.out.println("@Var: graphOriginY: " + graphOriginY);
-
-
-            System.out.println("@Var: dragging relativeX: " + relativeX);
-            System.out.println("@Var: dragging relativeY: " + relativeY);
-
-
-            float newRealOriginX = event.x - relativeX;
-            System.out.println("@Var: newRealOriginX: " + newRealOriginX);
-            float newRealOriginY = event.y - relativeY;
-            System.out.println("@Var: newRealOriginY: " + newRealOriginY);
-            float newUserOriginX = event.x - graphOriginX - relativeX;
-            System.out.println("@Var: newUserOriginX: " + newUserOriginX);
-            float newUserOriginY = event.y - graphOriginY - relativeY;
-            System.out.println("@Var: newUserOriginY: " + newUserOriginY);
-
-
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(newRealOriginX);
-            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(newRealOriginY);
-
-
-//            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(event.x);
-//            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(event.y);
-        }
-
-        event.setConsumed(true);
-        System.out.println("@Var: +---------------------> END mouseDragged: ");
     }
 
     public void mouseReleasedEvent(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        System.out.printf("\n\n\n");
-        System.out.println("@Var: mouseReleased: ");
-//                            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(event.x);
-//                            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(event.y);
         event.setConsumed(true);
     }
 
@@ -755,28 +702,30 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         return new PreviewMouseListener[]{
                     new PreviewMouseListener() {
+
+                        @Override
                         public void mouseClicked(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
                             mouseClickedEvent(event, previewProperties, workspace);
                         }
 
+                        @Override
                         public void mousePressed(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
                             mousePressedEvent(event, previewProperties, workspace);
                         }
 
+                        @Override
                         public void mouseDragged(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
                             mouseDraggedEvent(event, previewProperties, workspace);
                         }
 
+                        @Override
                         public void mouseReleased(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
                             mouseReleasedEvent(event, previewProperties, workspace);
                         }
-
                     }
                 };
     }
-
-    private Integer itemIndex;
-    private float defaultMargin = 100f;
+    private Integer currentItemIndex;
     private float graphOriginX = Float.MAX_VALUE;
     private float graphOriginY = Float.MAX_VALUE;
     private float graphWidth = 0;
@@ -785,13 +734,11 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     // IS DISPLAYING
     private Boolean isDisplayingLegend;
     // DIMENSIONS
-    protected Integer width;
-    protected Integer height;
+    protected Integer currentWidth;
+    protected Integer currentHeight;
     protected AffineTransform originTranslation;
-    private float realOriginX;
-    private float realOriginY;
-    private float userOriginX;
-    private float userOriginY;
+    private float currentRealOriginX;
+    private float currentRealOriginY;
     //description
     private Boolean isDisplayingDescription;
     private String description;
@@ -806,12 +753,11 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     private Color titleFontColor;
     // processing margin
     private Float processingMargin;
-    // is scaling legend
-    private Boolean isScaling;
-    private float[][] anchorLocations = null;
     // click
+    private Boolean currentIsSelected;
     private float relativeX;
     private float relativeY;
+    private int clickedAnchor;
     private float relativeAnchorX;
     private float relativeAnchorY;
 }
