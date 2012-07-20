@@ -27,7 +27,9 @@ public interface LegendItem {
     public static final String HAS_DYNAMIC_PROPERTIES = "has dynamic properties";
     public static final String DYNAMIC_PROPERTIES = "dynamic properties";
     public static final String NUMBER_OF_DYNAMIC_PROPERTIES = "number dynamic properties";
-    public static final String IS_SCALING = "is scaling";
+    public static final String IS_SELECTED = "is scaling";
+    public static final String IS_BEING_TRANSFORMED = "is being transformed";
+    public static final String CURRENT_TRANSFORMATION = "transformation";
     public static final String REAL_POSITION = "real position";
     
     
