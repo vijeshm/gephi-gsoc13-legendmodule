@@ -99,7 +99,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             for (Item item : legendItems) {
                 if (isBuilderForItem(item)) {
                     items.add(item);
-                    System.out.println("@Var: get item: " + item.getType());
                 }
 
             }
