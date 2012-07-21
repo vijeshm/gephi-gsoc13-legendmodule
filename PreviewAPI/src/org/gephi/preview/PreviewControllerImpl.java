@@ -49,10 +49,7 @@ import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.*;
 import org.gephi.preview.api.*;
-import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.preview.spi.MouseResponsiveRenderer;
-import org.gephi.preview.spi.RenderTargetBuilder;
-import org.gephi.preview.spi.Renderer;
+import org.gephi.preview.spi.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.gephi.project.api.WorkspaceListener;
@@ -156,11 +153,11 @@ public class PreviewControllerImpl implements PreviewController {
         if (!mousePressed) {
             renderers = model.getManagedEnabledRenderers();
         } else {
-            ManagedPreviewMouseListener[] enabledMouseListeners = model.getEnabledMouseListeners();
             ArrayList<Renderer> renderersList = new ArrayList<Renderer>();
-            for (ManagedPreviewMouseListener managedPreviewMouseListener : enabledMouseListeners) {
-                if (!renderersList.contains(managedPreviewMouseListener.renderer)) {
-                    renderersList.add(managedPreviewMouseListener.renderer);
+            for(Renderer renderer: model.getManagedEnabledRenderers()){
+                //Only mouse responsive renderers will be called while mouse is pressed
+                if(renderer instanceof MouseResponsiveRenderer){
+                    renderersList.add(renderer);
                 }
             }
 
@@ -407,21 +404,21 @@ public class PreviewControllerImpl implements PreviewController {
         
         //Avoid drag events arriving to listeners if they did not consume previous press event.
         if ((event.type != PreviewMouseEvent.Type.DRAGGED && event.type != PreviewMouseEvent.Type.RELEASED) || mousePressed) {
-            for (ManagedPreviewMouseListener listener : previewModel.getEnabledMouseListeners()) {
+            for (PreviewMouseListener listener : previewModel.getEnabledMouseListeners()) {
                 switch (event.type) {
                     case CLICKED:
-                        listener.listener.mouseClicked(event, previewModel.getProperties(), workspace);
+                        listener.mouseClicked(event, previewModel.getProperties(), workspace);
                         break;
                     case PRESSED:
                         mousePressed = true;
-                        listener.listener.mousePressed(event, previewModel.getProperties(), workspace);
+                        listener.mousePressed(event, previewModel.getProperties(), workspace);
                         break;
                     case DRAGGED:
-                        listener.listener.mouseDragged(event, previewModel.getProperties(), workspace);
+                        listener.mouseDragged(event, previewModel.getProperties(), workspace);
                         break;
                     case RELEASED:
                         mousePressed = false;
-                        listener.listener.mouseReleased(event, previewModel.getProperties(), workspace);
+                        listener.mouseReleased(event, previewModel.getProperties(), workspace);
                 }
                 if (event.isConsumed()) {
                     return true;

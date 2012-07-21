@@ -77,7 +77,7 @@ public class PreviewModelImpl implements PreviewModel {
     //Renderers
     private ManagedRenderer[] managedRenderers;
     //Mouse listeners (of enabled renderers)
-    private ManagedPreviewMouseListener[] enabledMouseListeners;
+    private PreviewMouseListener[] enabledMouseListeners;
     //Properties
     private PreviewProperties properties;
     //Dimensions
@@ -138,20 +138,22 @@ public class PreviewModelImpl implements PreviewModel {
             }
         }
     }
-    
-    private void prepareManagedListeners(){
-        ArrayList<ManagedPreviewMouseListener> listeners = new ArrayList<ManagedPreviewMouseListener>();
+
+    private void prepareManagedListeners() {
+        ArrayList<PreviewMouseListener> listeners = new ArrayList<PreviewMouseListener>();
         
-        for(Renderer renderer : getManagedEnabledRenderers()){
-            if(renderer instanceof MouseResponsiveRenderer){
-                for(PreviewMouseListener listener : ((MouseResponsiveRenderer) renderer).getListeners()){
-                    listeners.add(new ManagedPreviewMouseListener(listener, renderer));
+        for (PreviewMouseListener listener : Lookup.getDefault().lookupAll(PreviewMouseListener.class)) {
+            for (Renderer renderer : getManagedEnabledRenderers()) {
+                if (renderer instanceof MouseResponsiveRenderer) {
+                    if(((MouseResponsiveRenderer) renderer).needsPreviewMouseListener(listener) && !listeners.contains(listener)){
+                        listeners.add(listener);
+                    }
                 }
             }
         }
-        
-        Collections.reverse(listeners);//First listeners to receive events will be the ones coming from last called listeners.
-        enabledMouseListeners = listeners.toArray(new ManagedPreviewMouseListener[0]);
+
+        Collections.reverse(listeners);//First listeners to receive events will be the ones coming from last called renderers.
+        enabledMouseListeners = listeners.toArray(new PreviewMouseListener[0]);
     }
 
     private synchronized void initProperties() {
@@ -345,8 +347,8 @@ public class PreviewModelImpl implements PreviewModel {
                 properties.putValue(property.getName(), property.getValue());
             }
         }
-        
-        for(Entry<String, Object> property: oldProperties.getSimpleValues()){
+
+        for (Entry<String, Object> property : oldProperties.getSimpleValues()) {
             properties.putValue(property.getKey(), property.getValue());
         }
     }
@@ -527,7 +529,7 @@ public class PreviewModelImpl implements PreviewModel {
     }
 
     @Override
-    public ManagedPreviewMouseListener[] getEnabledMouseListeners() {
+    public PreviewMouseListener[] getEnabledMouseListeners() {
         return enabledMouseListeners;
     }
 }

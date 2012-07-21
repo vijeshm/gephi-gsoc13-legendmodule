@@ -48,8 +48,9 @@ import org.gephi.project.api.Workspace;
 /**
  * <p>Listener for mouse events in Preview.</p>
  * <p>Listeners will <b>always</b> receive left mouse button events. Right button is reserved for zooming and moving the canvas</p>
- * <p>In order to enable a <code>PreviewMouseListener</code>, implement <code>MouseResponsiveRenderer</code> 
- * in a <code>Renderer</code> and return the listener in <code>getListeners</code> method.</p>
+ * 
+ * <p>In order to enable a <code>PreviewMouseListener</code>, annotate it with <code>ServiceProvider</code> annotation and implement <code>MouseResponsiveRenderer</code> 
+ * in a <code>Renderer</code> and return true for the listener in the <code>needsPreviewMouseListener</code> method.</p>
  * @author Eduardo Ramos<eduramiba@gmail.com>
  */
 public interface PreviewMouseListener {

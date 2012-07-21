@@ -46,7 +46,6 @@ import java.awt.Point;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
-import org.gephi.preview.ManagedPreviewMouseListener;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.preview.spi.Renderer;
@@ -135,7 +134,7 @@ public interface PreviewModel {
     /*
      * Returns <code>managedPreviewMouseListeners</code> containing the <code>PreviewMouseListeners</code> that are declared by the current enabled managed renderers.
      */
-    public ManagedPreviewMouseListener[] getEnabledMouseListeners();
+    public PreviewMouseListener[] getEnabledMouseListeners();
 
     /**
      * Returns the width and height of the graph in the graph coordinates.
