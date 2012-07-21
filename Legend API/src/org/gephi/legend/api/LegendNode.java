@@ -138,6 +138,7 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         @Override
         public void setValue(Object t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
             previewProperties.putValue(property.getName(), t);
+            property.setValue(t);
         }
 
     }
