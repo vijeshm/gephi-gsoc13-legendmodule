@@ -47,7 +47,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, new PreviewProperty[0]);
         item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
-        item.setData(LegendItem.REAL_POSITION, buildRealLocationProperties(newItemIndex));
+        item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
+        item.setData(LegendItem.CURRENT_TRANSFORMATION, "");
+//        item.setData(LegendItem.REAL_POSITION, buildRealLocationProperties(newItemIndex));
         return item;
 
     }
@@ -97,7 +99,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             for (Item item : legendItems) {
                 if (isBuilderForItem(item)) {
                     items.add(item);
-                    System.out.println("@Var: get item: " + item.getType());
                 }
 
             }

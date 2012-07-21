@@ -281,10 +281,10 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         for (PreviewProperty property : dynamicProperties) {
             previewController.getModel().getProperties().addProperty(property);
         }
-        PreviewProperty[] realPositionProperties = item.getData(LegendItem.REAL_POSITION);
-        for (PreviewProperty property : realPositionProperties) {
-            previewController.getModel().getProperties().addProperty(property);
-        }
+//        PreviewProperty[] realPositionProperties = item.getData(LegendItem.REAL_POSITION);
+//        for (PreviewProperty property : realPositionProperties) {
+//            previewController.getModel().getProperties().addProperty(property);
+//        }
         
         // update property sheet
         refreshPropertySheet(activeLegendItem);

@@ -30,6 +30,8 @@ public interface LegendItem {
     
     // MOUSE RESPONSIVE
     public static final String IS_SELECTED = "is selected";
+    public static final String IS_BEING_TRANSFORMED = "is being transformed";
+    public static final String CURRENT_TRANSFORMATION = "current transformation";
     public static final String REAL_POSITION = "real position";
     
     
