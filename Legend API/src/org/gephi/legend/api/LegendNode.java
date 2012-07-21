@@ -7,27 +7,21 @@ package org.gephi.legend.api;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import javax.swing.SwingUtilities;
-import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.util.Lookup;
 import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.SystemAction;
 
 /**
  *
  * @author eduBecKs
  */
 public class LegendNode extends AbstractNode implements PropertyChangeListener {
+    private final PreviewProperties previewProperties;
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -35,10 +29,11 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
     }
 
 
-    public LegendNode(PropertySheet propertySheet, Item activeLegendItem) {
+    public LegendNode(PropertySheet propertySheet, Item activeLegendItem, PreviewProperties previewProperties) {
         super(Children.LEAF);
         this.propertySheet = propertySheet;
         this.activeLegendItem = activeLegendItem;
+        this.previewProperties = previewProperties;
         setDisplayName(NbBundle.getMessage(LegendNode.class, "LegendNode.displayName"));
     }
 
@@ -60,7 +55,7 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         itemSet.setName(label);
         for (PreviewProperty property : properties) {
             System.out.println("@Var: createSheet property: "+property.getName());
-            Node.Property nodeProperty = new PreviewPropertyWrapper(property);
+            Node.Property nodeProperty = new PreviewPropertyWrapper(property, previewProperties);
             itemSet.put(nodeProperty);
         }
         
@@ -69,7 +64,7 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         PreviewProperty[] dynamicProperties = activeLegendItem.getData(LegendItem.DYNAMIC_PROPERTIES);
         for (PreviewProperty property : dynamicProperties) {
             System.out.println("@Var: createSheet dynamic property: "+property.getName());
-            Node.Property nodeProperty = new PreviewPropertyWrapper(property);
+            Node.Property nodeProperty = new PreviewPropertyWrapper(property, previewProperties);
             itemSet.put(nodeProperty);
         }
         
@@ -127,19 +122,22 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
     public static class PreviewPropertyWrapper extends PropertySupport.ReadWrite {
 
         private final PreviewProperty property;
+        private final PreviewProperties previewProperties;
 
-        public PreviewPropertyWrapper(PreviewProperty previewProperty) {
+        public PreviewPropertyWrapper(PreviewProperty previewProperty, PreviewProperties previewProperties) {
             super(previewProperty.getName(), previewProperty.getType(), previewProperty.getDisplayName(), previewProperty.getDescription());
             this.property = previewProperty;
+            this.previewProperties = previewProperties;
         }
 
         @Override
         public Object getValue() throws IllegalAccessException, InvocationTargetException {
-            return property.getValue();
+            return previewProperties.getValue(property.getName());
         }
 
         @Override
         public void setValue(Object t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+            previewProperties.putValue(property.getName(), t);
             property.setValue(t);
         }
 

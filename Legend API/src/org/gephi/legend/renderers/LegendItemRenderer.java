@@ -15,10 +15,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
-import org.apache.batik.svggen.*;
+import org.apache.batik.svggen.DefaultExtensionHandler;
+import org.apache.batik.svggen.ImageHandlerBase64Encoder;
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
+import static org.gephi.legend.api.LegendItem.TRANSFORMATION_ANCHOR_LINE_THICK;
+import static org.gephi.legend.api.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
 import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.MouseResponsiveRenderer;
@@ -48,6 +54,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         if (item != null) {
             currentItemIndex = item.getData(LegendItem.ITEM_INDEX);
 
+
             // DIMENSIONS
             currentWidth = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.WIDTH));
             currentHeight = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.HEIGHT));
@@ -69,20 +76,46 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             // REAL POSITION
             currentRealOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_X));
             currentRealOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_Y));
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         }
     }
 
     public void readLegendPropertiesAndValues(Item item, PreviewProperties previewProperties) {
 
         if (item != null) {
+<<<<<<< HEAD
             currentIsSelected = item.getData(LegendItem.IS_SELECTED);
             currentIsBeingTransformed = item.getData(LegendItem.IS_BEING_TRANSFORMED);
+=======
+
+//            PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
+//            String label = properties[0].getValue();
+
+//            itemIndex = item.getData(LegendItem.ITEM_INDEX);
+//            isScaling = item.getData(LegendItem.IS_SELECTED);
+
+            currentIsSelected = item.getData(LegendItem.IS_SELECTED);
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
 
             readLocationProperties(item, previewProperties);
 
             // IS DISPLAYING
             isDisplayingLegend = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.IS_DISPLAYING));
 
+<<<<<<< HEAD
+=======
+
+//            // DIMENSIONS
+//            currentWidth = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+//            currentHeight = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
             //TITLE
             isDisplayingTitle = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_IS_DISPLAYING));
             titleFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT));
@@ -99,11 +132,24 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
 
 
+<<<<<<< HEAD
             processingMargin = 0f;
 //            if(properties.hasProperty(PreviewProperty.MARGIN)){
 //                processingMargin = properties.getFloatValue(PreviewProperty.MARGIN);
 //                float tempWidth = previewModel.getProperties().getFloatValue("width");
 //                float tempHeight = previewModel.getProperties().getFloatValue("height");
+=======
+//            originTranslation = new AffineTransform();
+
+
+
+
+            processingMargin = 0f;
+//            if(properties.hasProperty(PreviewProperty.MARGIN)){
+//                processingMargin = properties.getFloatValue(PreviewProperty.MARGIN);
+//                float tempWidth = previewModel.getProperties().getFloatValue("currentWidth");
+//                float tempHeight = previewModel.getProperties().getFloatValue("currentHeight");
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
 //                graphOriginX = tempWidth* processingMargin/100f;
 //                graphOriginY = tempHeight * processingMargin/100f;
 //            }
@@ -194,6 +240,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     }
 
     private void renderProcessing(ProcessingTarget target) {
+
         Graphics2D graphics2D = (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
 
 
@@ -220,6 +267,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
 //        originTranslation.scale(graphTransform.getScaleX(), graphTransform.getScaleY());
 
+<<<<<<< HEAD
         // temp
         if (currentIsBeingTransformed) {
             renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
@@ -251,6 +299,13 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
 
 
+=======
+        render(graphics2D, originTranslation, currentWidth, currentHeight);
+        graphics2D.setTransform(saveState);
+    }
+
+    public void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -287,9 +342,14 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             {width - TRANSFORMATION_ANCHOR_SIZE / 2, height - TRANSFORMATION_ANCHOR_SIZE / 2, TRANSFORMATION_ANCHOR_SIZE, TRANSFORMATION_ANCHOR_SIZE}
         };
 
+<<<<<<< HEAD
 
         graphics2D.setTransform(origin);
         graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
+=======
+        graphics2D.setTransform(origin);
+        graphics2D.setColor(TRANSFORMATION_ANCHOR_COLOR);
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         graphics2D.drawRect(0, 0, width, height);
 
         for (int i = 0; i < anchorLocations.length; i++) {
@@ -298,9 +358,15 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
             graphics2D.setColor(Color.WHITE);
             graphics2D.fillRect((int) anchorLocations[i][0] + TRANSFORMATION_ANCHOR_LINE_THICK,
+<<<<<<< HEAD
                                 (int) anchorLocations[i][1] + TRANSFORMATION_ANCHOR_LINE_THICK,
                                 (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
                                 (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
+=======
+                    (int) anchorLocations[i][1] + TRANSFORMATION_ANCHOR_LINE_THICK,
+                    (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
+                    (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         }
     }
 
@@ -432,6 +498,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     protected float computeVerticalTextSpaceUsed(Graphics2D graphics2D, String text, Font font, double x, double y, Integer width) {
         return legendDrawText(graphics2D, text, font, Color.BLACK, x, y, width, currentHeight, Alignment.LEFT, true);
     }
+<<<<<<< HEAD
 
     private int isClickingInAnchor(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -717,7 +784,16 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
                 };
     }
 
+=======
+    
+    @Override
+    public boolean needsPreviewMouseListener(PreviewMouseListener previewMouseListener){
+        return previewMouseListener instanceof LegendMouseListener;
+    }
+   
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
     private Integer currentItemIndex;
+    private float defaultMargin = 100f;
     private float graphOriginX = Float.MAX_VALUE;
     private float graphOriginY = Float.MAX_VALUE;
     private float graphWidth = 0;
@@ -745,6 +821,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     private Color titleFontColor;
     // processing margin
     private Float processingMargin;
+<<<<<<< HEAD
     // click
     private Boolean currentIsSelected;
     private float relativeX;
@@ -765,4 +842,10 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
     private final float LEGEND_MIN_WIDTH = 50;
     private final float LEGEND_MIN_HEIGHT = 50;
+=======
+    // is scaling legend
+    // TRANSFORMATION
+    private Boolean currentIsSelected = Boolean.FALSE;
+    private final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
 }

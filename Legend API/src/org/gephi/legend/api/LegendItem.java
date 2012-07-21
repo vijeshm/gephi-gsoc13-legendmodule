@@ -5,7 +5,6 @@
 package org.gephi.legend.api;
 
 import org.gephi.preview.api.PreviewProperty;
-import org.gephi.preview.plugin.items.AbstractItem;
 
 /**
  *
@@ -27,13 +26,20 @@ public interface LegendItem {
     public static final String HAS_DYNAMIC_PROPERTIES = "has dynamic properties";
     public static final String DYNAMIC_PROPERTIES = "dynamic properties";
     public static final String NUMBER_OF_DYNAMIC_PROPERTIES = "number dynamic properties";
+<<<<<<< HEAD
     
     // MOUSE RESPONSIVE
     public static final String IS_SELECTED = "is selected";
     public static final String IS_BEING_TRANSFORMED = "is being transformed";
     public static final String CURRENT_TRANSFORMATION = "current transformation";
+=======
+    public static final String IS_SELECTED = "is scaling";
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
     public static final String REAL_POSITION = "real position";
     
+    //ANCHOR CONSTANTS FOR ALL LEGEND ITEMS
+    public static final int TRANSFORMATION_ANCHOR_SIZE = 20;
+    public static final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
     
     public PreviewProperty[] getDynamicPreviewProperties();
     

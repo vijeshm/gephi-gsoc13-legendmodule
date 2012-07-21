@@ -275,16 +275,23 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         refreshActiveLegendsComboBox();
         PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
         for (PreviewProperty property : legendProperties) {
-            previewController.getModel().getProperties().addProperty(property);
+            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
         }
         PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
         for (PreviewProperty property : dynamicProperties) {
-            previewController.getModel().getProperties().addProperty(property);
+            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
         }
+<<<<<<< HEAD
 //        PreviewProperty[] realPositionProperties = item.getData(LegendItem.REAL_POSITION);
 //        for (PreviewProperty property : realPositionProperties) {
 //            previewController.getModel().getProperties().addProperty(property);
 //        }
+=======
+        PreviewProperty[] realPositionProperties = item.getData(LegendItem.REAL_POSITION);
+        for (PreviewProperty property : realPositionProperties) {
+            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+        }
+>>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         
         // update property sheet
         refreshPropertySheet(activeLegendItem);
@@ -294,14 +301,21 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     }//GEN-LAST:event_addLegendButtonActionPerformed
 
     private void refreshPropertySheet(Item activeLegendItem) {
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        
+        // check if previewModel exists
+        if(previewModel==null){
+            return;
+        }
+        
         legendPropertiesPanel.removeAll();
-
 
         System.out.println("@Var:CREATING PROPERTIES FOR Sheet activeLegend: " + activeLegendItem);
         if (activeLegendItem != null) {
             PropertySheet propertySheet = new PropertySheet();
 
-            propertySheet.setNodes(new Node[]{new LegendNode(propertySheet, activeLegendItem)});
+            propertySheet.setNodes(new Node[]{new LegendNode(propertySheet, activeLegendItem, previewModel.getProperties())});
             propertySheet.setDescriptionAreaVisible(true);
             // @bug: check
             legendPropertiesPanel.add(propertySheet, BorderLayout.CENTER);

@@ -88,7 +88,8 @@ public class LegendManager {
                 PreviewProperty[] properties = (PreviewProperty[]) legendItems.get(i).getData(LegendItem.DYNAMIC_PROPERTIES);
                 for (PreviewProperty property : properties) {
                     System.out.println("@Var: adding property: " + property.getName());
-                    previewProperties.addProperty(property);
+                    //previewProperties.addProperty(property);
+                    previewProperties.putValue(property.getName(), property.getValue());
                 }
             }
         }
