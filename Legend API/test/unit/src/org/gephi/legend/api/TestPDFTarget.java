@@ -5,17 +5,20 @@
 package org.gephi.legend.api;
 
 import com.itextpdf.text.PageSize;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph; 
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
 import org.gephi.io.exporter.preview.PDFExporter;
@@ -89,9 +92,9 @@ public class TestPDFTarget {
 
 
             // pdf document
-            Rectangle pdfPageSize = PageSize.EXECUTIVE.rotate();
+            Rectangle pdfPageSize = PageSize.A4.rotate();
             com.itextpdf.text.Document pdfDocument = new com.itextpdf.text.Document(pdfPageSize);
-            FileOutputStream pdfFile = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled-A4.pdf"));
+            FileOutputStream pdfFile = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled.pdf"));
             PdfWriter writer = PdfWriter.getInstance(pdfDocument, pdfFile);
             pdfDocument.open();
             PdfContentByte pdfContentByte = writer.getDirectContent();
@@ -118,20 +121,20 @@ public class TestPDFTarget {
 
 
             previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
-            
+
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
             Integer newItemIndex = legendManager.getCurrentIndex();
 
-            
+
             // creating item
             Item item = addTextItem(newItemIndex, graph, attributeModel);
-            
-            
+
+
             // add item
             legendManager.addItem(item);
-            PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
-            for (PreviewProperty property : properties) {
-                previewController.getModel().getProperties().addProperty(property);
+            PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
+            for (PreviewProperty property : legendProperties) {
+                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
             }
 
             // render
@@ -139,14 +142,40 @@ public class TestPDFTarget {
             previewController.render(target);
 
 
-            pdfDocument.close();
+pdfDocument.close();
             pdfFile.close();
+
+            PreviewProperties props = previewModel.getProperties();
+            props.putValue(PreviewProperty.SHOW_NODE_LABELS, false);
+            props.putValue(PreviewProperty.EDGE_OPACITY, 20f);
+//            props.putValue(PreviewProperty.BACKGROUND_COLOR, new BaseColor(1, 1, 1));
+
+            PDFExporter pDFExporter = new PDFExporter();
+            pDFExporter.setLandscape(true);
+
+            pDFExporter.setWorkspace(workspace);
+            try {
+                File file = new File("/Users/edubecks/Desktop/Untitled-Exporter.pdf");
+                System.out.println(file.getAbsolutePath());
+                FileOutputStream fos = new FileOutputStream(file);
+                pDFExporter.setOutputStream(fos);
+                pDFExporter.execute();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Exceptions.printStackTrace(ex);
+            }
+
+
+            
 
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
 
         }
     }
+    
+    
+
 
     public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TextItemBuilder builder = new TextItemBuilder();

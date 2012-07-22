@@ -87,29 +87,13 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         if (item != null) {
 
-//            PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);
-//            String label = properties[0].getValue();
-
-//            itemIndex = item.getData(LegendItem.ITEM_INDEX);
-//            isScaling = item.getData(LegendItem.IS_SELECTED);
-
             currentIsSelected = item.getData(LegendItem.IS_SELECTED);
+            currentIsBeingTransformed = item.getData(LegendItem.IS_BEING_TRANSFORMED);
 
             readLocationProperties(item, previewProperties);
 
-//            // UPDATING LABEL
-//            String label = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.LABEL));
-//            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-
-            // IS DISPLAYING
             isDisplayingLegend = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.IS_DISPLAYING));
 
-
-//            // DIMENSIONS
-//            currentWidth = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
-//            currentHeight = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
-
-            //TITLE
             isDisplayingTitle = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_IS_DISPLAYING));
             titleFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT));
             titleFontColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT_COLOR));
@@ -150,24 +134,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         SVGGraphics2D graphics2D = new SVGGraphics2D(svgGeneratorContext, false);
 
-        float targetOriginX = (int) graphOriginX;
-        float targetOriginY = (int) graphOriginY;
-//        graphics2D = (SVGGraphics2D) graphics2D.create((int)targetOriginX, (int)targetOriginY, (int)graphWidth, (int)graphHeight);
-//        graphics2D.setClip((int)targetOriginX, (int)targetOriginY, (int)graphWidth, (int)graphHeight);
         originTranslation = new AffineTransform();
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
-        originTranslation.translate(targetOriginX, targetOriginY);
-//        graphics2D.setTransform(originTranslation);
-////      
-//        
-////        AffineTransform graphTransform = graphics2D.getTransform();
-////        originTranslation = new AffineTransform(graphTransform);
-////        originTranslation.translate(graphOriginX, graphOriginY);
-//
-//        graphics2D.setColor(Color.BLACK);
-//        graphics2D.fillRect(10,10, 600,600);
-//        graphics2D.setTransform(new AffineTransform());
-
         render(graphics2D, originTranslation, currentWidth, currentHeight);
 
 
@@ -182,43 +150,17 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         com.itextpdf.text.Document pdfDocument = pdfContentByte.getPdfDocument();
         pdfContentByte.saveState();
 
-        float pdfWidth = target.getPageSize().getWidth() - target.getMarginLeft() - target.getMarginRight();
-        float pdfHeight = target.getPageSize().getHeight() - target.getMarginBottom() - target.getMarginTop();
-        float scaleWidth = pdfWidth / graphWidth;
-        float scaleHeight = pdfWidth / graphHeight;
-        float scaleValue = Math.min(scaleWidth, scaleHeight);
 
-//        float pdfOriginX = pdfWidth * graphOriginX / graphWidth;
-//        float pdfOriginY = pdfHeight * graphOriginY / graphHeight;
 
-        float targetOriginX = (int) graphOriginX;
-        float targetOriginY = (int) graphOriginY - 12;
-//        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, graphWidth, graphHeight);
         originTranslation = new AffineTransform();
-        originTranslation.translate(targetOriginX, targetOriginY);
-        originTranslation.translate(currentRealOriginX, -currentRealOriginY);
-
-
-
-//        originTranslation.translate(pdfOriginX, pdfOriginY);
-//                originTranslation.scale(scaleValue, scaleValue);
-//        originTranslation.translate(30, 30);
+        // BUG dont know why 11
+        originTranslation.translate(graphOriginX, graphOriginY - 11);
         pdfContentByte.transform(originTranslation);
-//        Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
         Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, graphWidth, graphHeight);
-//        Graphics2D graphics2D = pdfContentByte.createGraphics(pdfDocument.getPageSize().getWidth(), pdfDocument.getPageSize().getHeight());
-        AffineTransform graphTransform = graphics2D.getTransform();
-
-
-
-
-
-
-
-//        graphics2D.setColor(Color.PINK);
-//        graphics2D.fillRect(tempX, tempY, (int) graphWidth, (int) graphHeight);
-
         originTranslation = new AffineTransform();
+
+        originTranslation.translate(-graphOriginX,-graphOriginY);
+        originTranslation.translate(currentRealOriginX, currentRealOriginY);
         render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.dispose();
         pdfContentByte.restoreState();
@@ -228,32 +170,33 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         Graphics2D graphics2D = (Graphics2D) ((PGraphicsJava2D) target.getGraphics()).g2;
 
-
-        AffineTransform graphTransform = graphics2D.getTransform();
         AffineTransform saveState = graphics2D.getTransform();
         originTranslation = new AffineTransform(saveState);
-//        originTranslation.translate(graphOriginX, graphOriginY);
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
-//        originTranslation.translate(graphTransform.getTranslateX(), graphTransform.getTranslateY());
 
-//        originTranslation.translate(graphWidth*(processingMargin)/100, graphWidth*(processingMargin)/100);
-//        originTranslation.scale(graphTransform.getScaleX(), graphTransform.getScaleY());
-
-//        originTranslation.translate(graphTransform.getTranslateX(), graphTransform.getTranslateY());
-//        originTranslation.translate(graphOriginX * graphTransform.getScaleX() , graphOriginY * graphTransform.getScaleY());
-//        originTranslation.scale(graphTransform.getScaleX(), graphTransform.getScaleY());
-//        originTranslation.translate(originX, originY);
-//        originTranslation.translate(graphTransform.getTranslateX(),graphTransform.getTranslateY());
-
-//        graphics2D.setTransform(originTranslation);
-//        graphics2D.setColor(Color.BLACK);
-//        graphics2D.drawRect(0, 0, (int)graphWidth, (int)graphHeight);
-//        graphics2D.setColor(Color.RED);
-
-//        originTranslation.scale(graphTransform.getScaleX(), graphTransform.getScaleY());
-
-        render(graphics2D, originTranslation, currentWidth, currentHeight);
+        if (currentIsBeingTransformed) {
+            renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
+            drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
+        }
+        else {
+            render(graphics2D, originTranslation, currentWidth, currentHeight);
+        }
         graphics2D.setTransform(saveState);
+    }
+
+    public void renderTransformed(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+        graphics2D.setTransform(origin);
+        graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
+        graphics2D.fillRect(0, 0, width, height);
+        graphics2D.setColor(TRANSFORMATION_LEGEND_CENTER_COLOR);
+        int lineThickness = 5;
+        graphics2D.fillRect(lineThickness, lineThickness, width - 2 * lineThickness, height - 2 * lineThickness);
+        // centeredText
+        graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
+        graphics2D.setFont(TRANSFORMATION_LEGEND_FONT);
+        int draggedLegendLabelWidth = graphics2D.getFontMetrics().stringWidth(TRANSFORMATION_LEGEND_LABEL);
+        graphics2D.drawString("Legend", (width - draggedLegendLabelWidth) / 2, height / 2);
+
     }
 
     public void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -294,9 +237,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         };
 
         graphics2D.setTransform(origin);
-        graphics2D.setColor(TRANSFORMATION_ANCHOR_COLOR);
+        graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
         graphics2D.drawRect(0, 0, width, height);
-        graphics2D.setColor(Color.DARK_GRAY);
 
         for (int i = 0; i < anchorLocations.length; i++) {
             graphics2D.setColor(TRANSFORMATION_ANCHOR_COLOR);
@@ -304,9 +246,9 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
             graphics2D.setColor(Color.WHITE);
             graphics2D.fillRect((int) anchorLocations[i][0] + TRANSFORMATION_ANCHOR_LINE_THICK,
-                    (int) anchorLocations[i][1] + TRANSFORMATION_ANCHOR_LINE_THICK,
-                    (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
-                    (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
+                                (int) anchorLocations[i][1] + TRANSFORMATION_ANCHOR_LINE_THICK,
+                                (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
+                                (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
         }
     }
 
@@ -358,9 +300,11 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
                 if (target instanceof ProcessingTarget) {
                     renderProcessing((ProcessingTarget) target);
-                } else if (target instanceof SVGTarget) {
+                }
+                else if (target instanceof SVGTarget) {
                     renderSVG((SVGTarget) target);
-                } else if (target instanceof PDFTarget) {
+                }
+                else if (target instanceof PDFTarget) {
                     renderPDF((PDFTarget) target);
                 }
             }
@@ -436,12 +380,12 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     protected float computeVerticalTextSpaceUsed(Graphics2D graphics2D, String text, Font font, double x, double y, Integer width) {
         return legendDrawText(graphics2D, text, font, Color.BLACK, x, y, width, currentHeight, Alignment.LEFT, true);
     }
-    
+
     @Override
-    public boolean needsPreviewMouseListener(PreviewMouseListener previewMouseListener){
+    public boolean needsPreviewMouseListener(PreviewMouseListener previewMouseListener) {
         return previewMouseListener instanceof LegendMouseListener;
     }
-   
+
     private Integer currentItemIndex;
     private float defaultMargin = 100f;
     private float graphOriginX = Float.MAX_VALUE;
@@ -474,5 +418,12 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     // is scaling legend
     // TRANSFORMATION
     private Boolean currentIsSelected = Boolean.FALSE;
+    private Boolean currentIsBeingTransformed;
+    private final Color TRANSFORMATION_LEGEND_BORDER_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+    private final Color TRANSFORMATION_LEGEND_CENTER_COLOR = new Color(1f, 1f, 1f, 0.5f);
+    private final Font TRANSFORMATION_LEGEND_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 24);
+    private final String TRANSFORMATION_LEGEND_LABEL = "Legend";
     private final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
+    private final int TRANSFORMATION_ANCHOR_SIZE = 20;
+    private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
 }

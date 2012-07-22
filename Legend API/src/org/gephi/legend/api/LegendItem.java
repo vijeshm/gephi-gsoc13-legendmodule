@@ -19,23 +19,26 @@ public interface LegendItem {
     //INDEX
     public static final String PROPERTIES = "properties";
     // TYPE 
-    public static final String TYPE="Legend Item";
-    public static final String SUB_TYPE="Legend Item";
+    public static final String TYPE = "Legend Item";
+    public static final String SUB_TYPE = "Legend Item";
     // DESCRIPTION
     public static final String LABEL = "label";
     public static final String HAS_DYNAMIC_PROPERTIES = "has dynamic properties";
     public static final String DYNAMIC_PROPERTIES = "dynamic properties";
     public static final String NUMBER_OF_DYNAMIC_PROPERTIES = "number dynamic properties";
+    // MOUSE RESPONSIVE
     public static final String IS_SELECTED = "is scaling";
     public static final String REAL_POSITION = "real position";
-    
+    public static final String IS_BEING_TRANSFORMED = "is being transformed";
+    public static final String CURRENT_TRANSFORMATION = "current transformation";
     //ANCHOR CONSTANTS FOR ALL LEGEND ITEMS
     public static final int TRANSFORMATION_ANCHOR_SIZE = 20;
     public static final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
-    
+    public final float LEGEND_MIN_WIDTH = 50;
+    public final float LEGEND_MIN_HEIGHT = 50;
+
     public PreviewProperty[] getDynamicPreviewProperties();
-    
-    
+
     public enum Direction {
 
         UP("Up"),
@@ -60,7 +63,6 @@ public interface LegendItem {
         RECTANGLE("Rectangle"),
         CIRCLE("Circle"),
         TRIANGLE("Triangle");
-
         private final String shape;
 
         private Shape(String shape) {
@@ -80,7 +82,6 @@ public interface LegendItem {
         RIGHT("Right"),
         CENTER("Center"),
         JUSTIFIED("Justified");
-
         private final String alignment;
 
         private Alignment(String alignment) {
@@ -93,6 +94,4 @@ public interface LegendItem {
         }
 
     }
-
-
 }
