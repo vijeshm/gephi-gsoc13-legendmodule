@@ -27,8 +27,7 @@ public interface LegendItem {
     public static final String DYNAMIC_PROPERTIES = "dynamic properties";
     public static final String NUMBER_OF_DYNAMIC_PROPERTIES = "number dynamic properties";
     // MOUSE RESPONSIVE
-    public static final String IS_SELECTED = "is scaling";
-    public static final String REAL_POSITION = "real position";
+    public static final String IS_SELECTED = "is selected";
     public static final String IS_BEING_TRANSFORMED = "is being transformed";
     public static final String CURRENT_TRANSFORMATION = "current transformation";
     //ANCHOR CONSTANTS FOR ALL LEGEND ITEMS

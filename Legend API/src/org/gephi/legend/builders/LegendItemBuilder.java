@@ -48,7 +48,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         item.setData(LegendItem.DYNAMIC_PROPERTIES, new PreviewProperty[0]);
         item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
         item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
-//        item.setData(LegendItem.REAL_POSITION, buildRealLocationProperties(newItemIndex));
+        item.setData(LegendItem.CURRENT_TRANSFORMATION, "");
         return item;
 
     }
@@ -273,8 +273,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     // IS_DISPLAYING
     protected boolean defaultIsDisplaying = true;
     //ORIGIN
-    protected float defaultOriginX = 000;
-    protected float defaultOriginY = 000;
+    protected float defaultOriginX = 0;
+    protected float defaultOriginY = 0;
     //WIDTH
     protected float defaultWidth = 500;
     protected float defaultHeight = 300f;
