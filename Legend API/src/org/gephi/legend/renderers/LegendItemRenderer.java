@@ -80,18 +80,12 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
 
 
->>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         }
     }
 
     public void readLegendPropertiesAndValues(Item item, PreviewProperties previewProperties) {
 
         if (item != null) {
-<<<<<<< HEAD
-            currentIsSelected = item.getData(LegendItem.IS_SELECTED);
-            currentIsBeingTransformed = item.getData(LegendItem.IS_BEING_TRANSFORMED);
-=======
-
             currentIsSelected = item.getData(LegendItem.IS_SELECTED);
             currentIsBeingTransformed = item.getData(LegendItem.IS_BEING_TRANSFORMED);
 
@@ -114,24 +108,18 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
 
 
-<<<<<<< HEAD
             processingMargin = 0f;
 //            if(properties.hasProperty(PreviewProperty.MARGIN)){
 //                processingMargin = properties.getFloatValue(PreviewProperty.MARGIN);
 //                float tempWidth = previewModel.getProperties().getFloatValue("width");
 //                float tempHeight = previewModel.getProperties().getFloatValue("height");
-=======
 //            originTranslation = new AffineTransform();
 
 
-
-
-            processingMargin = 0f;
 //            if(properties.hasProperty(PreviewProperty.MARGIN)){
 //                processingMargin = properties.getFloatValue(PreviewProperty.MARGIN);
 //                float tempWidth = previewModel.getProperties().getFloatValue("currentWidth");
 //                float tempHeight = previewModel.getProperties().getFloatValue("currentHeight");
->>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
 //                graphOriginX = tempWidth* processingMargin/100f;
 //                graphOriginY = tempHeight * processingMargin/100f;
 //            }
@@ -172,7 +160,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         Graphics2D graphics2D = new PdfGraphics2D(pdfContentByte, graphWidth, graphHeight);
         originTranslation = new AffineTransform();
 
-        originTranslation.translate(-graphOriginX,-graphOriginY);
+        originTranslation.translate(-graphOriginX, -graphOriginY);
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
         render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.dispose();
@@ -213,7 +201,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     }
 
     public void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
->>>>>>> fe06096bce76b1727feb2be03c2ed25d2fafb521
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -250,8 +237,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             {width - TRANSFORMATION_ANCHOR_SIZE / 2, height - TRANSFORMATION_ANCHOR_SIZE / 2, TRANSFORMATION_ANCHOR_SIZE, TRANSFORMATION_ANCHOR_SIZE}
         };
 
-<<<<<<< HEAD
 
+        
         graphics2D.setTransform(origin);
         graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
         graphics2D.drawRect(0, 0, width, height);
@@ -294,19 +281,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
 
         if (item != null) {
-
-
-
-//            graphOriginX = Float.MAX_VALUE;
-//            graphOriginY = Float.MAX_VALUE;
-//            for (Item node : previewModel.getItems(Item.NODE)) {
-//                graphOriginX = Math.min(graphOriginX, (Float) node.getData(NodeItem.X) - (Float) node.getData(NodeItem.SIZE));
-//                graphOriginY = Math.min(graphOriginY, (Float) node.getData(NodeItem.Y) - (Float) node.getData(NodeItem.SIZE));
-//            }
-
-
-//            graphOriginX -= defaultMargin;
-//            graphOriginY -= defaultMargin;
 
 
             readLegendPropertiesAndValues(item, properties);
@@ -431,29 +405,10 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     private Color titleFontColor;
     // processing margin
     private Float processingMargin;
-<<<<<<< HEAD
-    // click
-    private Boolean currentIsSelected;
     private float relativeX;
     private float relativeY;
     private float relativeAnchorX;
     private float relativeAnchorY;
-    // TRANSFORMATION
-    private Boolean currentIsBeingTransformed;
-    private int currentClickedAnchor;
-    private final Color TRANSFORMATION_LEGEND_BORDER_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-    private final Color TRANSFORMATION_LEGEND_CENTER_COLOR = new Color(1f, 1f, 1f, 0.5f);
-    private final Font TRANSFORMATION_LEGEND_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 24);
-    private final String TRANSFORMATION_LEGEND_LABEL = "Legend";
-    private final String TRANSFORMATION_SCALE_OPERATION = "Scale operation";
-    private final String TRANSFORMATION_TRANSLATE_OPERATION = "Translate operation";
-    private final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
-    private final int TRANSFORMATION_ANCHOR_SIZE = 20;
-    private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
-    private final float LEGEND_MIN_WIDTH = 50;
-    private final float LEGEND_MIN_HEIGHT = 50;
-=======
-    // is scaling legend
     // TRANSFORMATION
     private Boolean currentIsSelected = Boolean.FALSE;
     private Boolean currentIsBeingTransformed;
