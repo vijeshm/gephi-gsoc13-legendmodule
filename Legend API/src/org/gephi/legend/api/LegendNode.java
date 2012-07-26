@@ -71,51 +71,6 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         
         sheet.put(itemSet);
 
-//        Sheet sheet = Sheet.createDefault();
-//        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-//        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
-//
-//        Workspace workspace = projectController.getCurrentWorkspace();
-//        PreviewModel previewModel = previewController.getModel(workspace);
-
-
-//        if (previewModel != null) {
-//            PreviewProperties previewProperties = previewModel.getProperties();
-//            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-//
-//            if (legendManager.hasActiveLegends()) {
-//
-//                ArrayList<String> items = legendManager.getItems();
-//
-//                Sheet.Set itemSet = Sheet.createPropertiesSet();
-//                String label = previewProperties.getStringValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, activeLegend, LegendProperty.LABEL));
-//                itemSet.setDisplayName(label);
-//                itemSet.setName(label);
-//                for (PreviewProperty property : previewProperties.getProperties()) {
-//                    if (LegendManager.isLegendPropertyForItem(property, items.get(activeLegend))) {
-//                        Node.Property nodeProperty = new PreviewPropertyWrapper(property);
-//                        itemSet.put(nodeProperty);
-//                    }
-//                }
-//                sheet.put(itemSet);
-//            }
-//
-////            for (int i = 0; i < items.size(); i++) {
-////                Sheet.Set itemSet = Sheet.createPropertiesSet();
-////                String name = "Item " + i + " [" + legendTypes.get(i) + "]";
-////                itemSet.setDisplayName(name);
-////                itemSet.setName(name);
-////                for (PreviewProperty property : previewProperties.getProperties()) {
-////                    if (LegendManager.isLegendPropertyForItem(property, items.get(i))) {
-////                        Node.Property nodeProperty = new PreviewPropertyWrapper(property);
-////                        itemSet.put(nodeProperty);
-////                    }
-////                }
-////                sheet.put(itemSet);
-////
-////            }
-//
-//        }
         return sheet;
     }
 

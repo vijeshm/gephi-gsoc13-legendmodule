@@ -41,7 +41,26 @@ import processing.core.PGraphicsJava2D;
  */
 public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRenderer {
 
-    public abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
+    /**
+     *
+     * Function that actually renders the legend
+     *
+     * @param graphics2D Graphics2D instance used to render legend
+     * @param origin transformation that contains the origin and level zoom of
+     * the legend
+     * @param width width of the legend to be rendered
+     * @param height height of the legend to be rendered
+     */
+    protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
+
+    /**
+     * Function that reads the custom property's values from the
+     * PreviewProperties of the current PreviewModel
+     *
+     * @param item current Legend Item
+     * @param properties PreviewProperties of the current PreviewModel
+     */
+    public abstract void readOwnPropertiesAndValues(Item item, PreviewProperties properties);
 
     public void readLocationProperties(Item item, PreviewProperties previewProperties) {
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
@@ -50,19 +69,17 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
     }
 
-    public void readLocationProperties(Item item, PreviewProperties previewProperties, Workspace workspace) {
+    public final void readLocationProperties(Item item, PreviewProperties previewProperties, Workspace workspace) {
         if (item != null) {
             currentItemIndex = item.getData(LegendItem.ITEM_INDEX);
 
 
-            // DIMENSIONS
+            // LEGEND DIMENSIONS
             currentWidth = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.WIDTH));
             currentHeight = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.HEIGHT));
 
 
-
-
-
+            // GRAPH DIMENSIONS
             PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
             PreviewModel previewModel = previewController.getModel(workspace);
             Dimension dimensions = previewModel.getDimensions();
@@ -73,17 +90,15 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             graphOriginY = topLeftPosition.y;
 
 
-            // REAL POSITION
+            // LEGEND POSITION
             currentRealOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_X));
             currentRealOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_Y));
-
-
 
 
         }
     }
 
-    public void readLegendPropertiesAndValues(Item item, PreviewProperties previewProperties) {
+    public final void readLegendPropertiesAndValues(Item item, PreviewProperties previewProperties) {
 
         if (item != null) {
             currentIsSelected = item.getData(LegendItem.IS_SELECTED);
@@ -190,8 +205,10 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
         graphics2D.fillRect(0, 0, width, height);
         graphics2D.setColor(TRANSFORMATION_LEGEND_CENTER_COLOR);
-        int lineThickness = 5;
-        graphics2D.fillRect(lineThickness, lineThickness, width - 2 * lineThickness, height - 2 * lineThickness);
+        graphics2D.fillRect(TRANSFORMATION_ANCHOR_LINE_THICK,
+                            TRANSFORMATION_ANCHOR_LINE_THICK,
+                            width - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
+                            height - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
         // centeredText
         graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
         graphics2D.setFont(TRANSFORMATION_LEGEND_FONT);
@@ -223,7 +240,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         renderDescription(graphics2D, descriptionOrigin, width, height);
 
 
-        // is scaling
+        // is selected
         if (currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
@@ -238,7 +255,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         };
 
 
-        
         graphics2D.setTransform(origin);
         graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
         graphics2D.drawRect(0, 0, width, height);
@@ -274,8 +290,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     @Override
     public void preProcess(PreviewModel previewModel) {
     }
-
-    public abstract void readOwnPropertiesAndValues(Item item, PreviewProperties properties);
 
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {

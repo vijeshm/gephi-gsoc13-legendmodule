@@ -4,12 +4,9 @@
  */
 package org.gephi.legend.api;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
@@ -18,7 +15,6 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
-import org.openide.nodes.PropertySupport;
 import org.openide.util.Lookup;
 
 /**
@@ -34,8 +30,6 @@ public class LegendManager {
     private ArrayList<String> items;
     private ArrayList<Item> legendItems;
     // reference to combobox
-    private JComboBox activeLegendsComboBox;
-    private JPanel legendManagerPanel;
     public static final String LEGEND_PROPERTIES = "legend properties";
     public static final String INDEX = "index";
     private static final String LEGEND_DESCRIPTION = "legend";
@@ -79,7 +73,6 @@ public class LegendManager {
 
         // clear old properties
         for (PreviewProperty property : previewProperties.getProperties(LegendProperty.DYNAMIC)) {
-            System.out.println("@Var: removing property: " + property.getName());
             previewProperties.removeProperty(property);
         }
 
@@ -188,7 +181,6 @@ public class LegendManager {
                                   + ITEM_DESCRIPTION + itemIndex
                                   + property);
             properties.add(newProperty);
-//            System.out.println("Creating >>> " + newProperty);
         }
         return properties;
     }
@@ -204,7 +196,6 @@ public class LegendManager {
                                   + ITEM_DESCRIPTION + itemIndex
                                   + property);
             properties.add(newProperty);
-//            System.out.println("Creating >>> " + newProperty);
         }
         return properties;
     }
@@ -213,7 +204,6 @@ public class LegendManager {
         String property = (LEGEND_DESCRIPTION
                            + ITEM_DESCRIPTION + itemIndex
                            + PROPERTIES[legendProperty]);
-//        System.out.println("@Var: property: " + property);
         return property;
     }
 

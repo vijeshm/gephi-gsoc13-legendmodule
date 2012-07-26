@@ -29,14 +29,80 @@ import org.openide.util.NbBundle;
  */
 public abstract class LegendItemBuilder implements ItemBuilder {
 
+    /**
+     * Function used to override default values of <code>properties</code>
+     * Possible values to be overriden:<br />
+     * 
+     * LABEL:
+     * <ul>
+     * <li> defaultLabel </li>
+     * </ul>
+     * IS_DISPLAYING:
+     * <ul>
+     * <li> defaultIsDisplaying </li>
+     * </ul>
+     * ORIGIN
+     * <ul>
+     * <li> defaultOriginX </li>
+     * <li> defaultOriginY </li>
+     * </ul>
+     * WIDTH
+     * <ul>
+     * <li> defaultWidth </li>
+     * <li> defaultHeight </li>
+     * </ul>
+     * TITLE:
+     * <ul>
+     * <li> defaultIsDisplayingTitle </li>
+     * <li> defaultTitle </li>
+     * <li> defaultTitleFont </li>
+     * <li> defaultTitleAlignment </li>
+     * <li> defaultTitleFontColor </li>
+     * </ul>
+     * DESCRIPTION:
+     * <ul>
+     * <li> defaultDescription </li>
+     * <li> defaultIsDisplayingDescription </li>
+     * <li> defaultDescriptionFontColor </li>
+     * <li> defaultDescriptionAlignment </li>
+     * <li> defaultDescriptionFont </li>
+     * </ul>
+     */
     protected abstract void setDefaultValues();
 
+    /**
+     * Based on <code>properties</code>, determine whether this builder was
+     * used to build <code>Item</code>.
+     * @param item the item to be tested
+     * @return <code>true</code> if <code>item</code> was built by this
+     * builder, <code>false</code> otherwise
+     */
     protected abstract boolean isBuilderForItem(Item item);
 
+    /**
+     * Builds and item based on <code>graph</code> and <code>attributeModel</code> data
+     * @param graph
+     * @param attributeModel
+     * @return 
+     */
     protected abstract Item buildItem(Graph graph, AttributeModel attributeModel);
 
+    /**
+     * Used to determine if the <code>item</code> has dynamic 
+     * properties to be displayed in the PropertySheet Editor
+     * @return <code>true</code> if <code>item</code> has dynamic
+     * properties, <code>false</code> otherwise
+     */
     protected abstract Boolean hasDynamicProperties();
 
+    /**
+     * Function used to create the specific PreviewProperty for each type of
+     * LegendItem
+     * 
+     * @param item
+     * @return an array of PreviewProperty to be appended to the general 
+     * LegendItem's PreviewProperty
+     */
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
 
     public Item createItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
@@ -53,37 +119,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     }
 
-    private PreviewProperty[] buildRealLocationProperties(Integer newItemIndex) {
-
-
-        // real position
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = pc.getCurrentWorkspace();
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel(workspace);
-
-        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, newItemIndex);
-
-
-        return new PreviewProperty[]{
-                    PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.REAL_ORIGIN_X),
-                                                   Float.class,
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.displayName"),
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(previewModel.getTopLeftPosition().x),
-                    PreviewProperty.createProperty(this,
-                                                   legendProperties.get(LegendProperty.REAL_ORIGIN_Y),
-                                                   Float.class,
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.displayName"),
-                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.description"),
-                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(previewModel.getTopLeftPosition().y),};
-    }
 
     @Override
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
-
-
 
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
@@ -111,8 +149,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         setDefaultValues();
-
-
 
         ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, itemIndex);
 
@@ -262,11 +298,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return true;
     }
 
-//    protected static void addPreviewProperty(Item item, int currentNumOfProperties, int numNewProperties) {
-//    }
-//
-//    protected static void removePreviewProperty(Item item, int numRemoveProperties) {
-//    }
+
     //DEFAULT VALUES 
     // LABEL
     protected String defaultLabel = "";

@@ -87,7 +87,6 @@ public class TestPartitionData {
             }
 
             PartitionData partitionData = new PartitionData();
-            partitionData.retrieveData();
         } catch (Exception e) {
             System.out.println("@Var: e: "+e);
         }

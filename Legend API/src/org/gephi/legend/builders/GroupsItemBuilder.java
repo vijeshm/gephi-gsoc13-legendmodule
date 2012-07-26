@@ -54,7 +54,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
         
         PartitionData partitionData = new PartitionData();
-        partitionData.retrieveData();
 
 
         ArrayList<String> labelsGroup = partitionData.getLabels();

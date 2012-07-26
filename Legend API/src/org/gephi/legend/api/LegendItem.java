@@ -36,6 +36,10 @@ public interface LegendItem {
     public final float LEGEND_MIN_WIDTH = 50;
     public final float LEGEND_MIN_HEIGHT = 50;
 
+    /**
+     * If the type of Legend has dynamic PreviewProperty it returns it
+     * @return an array of the dynamic PreviewProperty
+     */
     public PreviewProperty[] getDynamicPreviewProperties();
 
     public enum Direction {
