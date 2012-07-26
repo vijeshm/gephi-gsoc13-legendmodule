@@ -21,6 +21,7 @@ public class DescriptionProperty {
     public static final int DESCRIPTION_NUMBER_OF_ITEMS = 8;
     public static final int DESCRIPTION_KEY = 9;
     public static final int DESCRIPTION_VALUE = 10;
+    public static final int DESCRIPTION_TEMP = 11;
     public static final String[] OWN_PROPERTIES = {
         ".key.font",
         ".key.font.color",
@@ -32,6 +33,7 @@ public class DescriptionProperty {
         ".data",
         ".numberOfItems",
         ".key",
-        ".value"
+        ".value",
+        ".temp"
     };
 }

@@ -13,8 +13,8 @@ import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.items.DescriptionItem;
-//import org.gephi.legend.items.DescriptionItem.DescriptionData;
-import org.gephi.legend.items.DescriptionData;
+//import org.gephi.legend.items.DescriptionItem.DescriptionElement;
+import org.gephi.legend.items.DescriptionElement;
 import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
@@ -103,13 +103,14 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
                                            Boolean.class,
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout)
-//            PreviewProperty.createProperty(this,
-//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_NUMBER_OF_ITEMS),
-//                                           Integer.class,
-//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.displayName"),
-//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.numberOfItems.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultNumberOfItems)
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
+            PreviewProperty.createProperty(this,
+                                           legendProperties.get(DescriptionProperty.DESCRIPTION_TEMP),
+                                           DescriptionElement.class,
+                                           "temp",
+                                           "temp",
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionElement)
+
         };
 
 
@@ -207,15 +208,14 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     private Alignment defaultKeyAlignment = Alignment.LEFT;
     private Alignment defaultValueAlignment = Alignment.LEFT;
     private Boolean defaultIsFlowLayout = true;
+    private DescriptionElement defaultDescriptionElement = new DescriptionElement();
+    
 
     @Override
     protected boolean isBuilderForItem(Item item) {
         return item instanceof DescriptionItem;
     }
 
-    // temp
-    private DescriptionData defaultDescriptionData = new DescriptionData();
-    private Integer defaultNumberOfItems = 0;
 
     @Override
     protected Boolean hasDynamicProperties() {
