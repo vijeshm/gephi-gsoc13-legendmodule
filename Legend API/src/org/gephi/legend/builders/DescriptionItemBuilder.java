@@ -27,7 +27,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-@ServiceProvider(service = ItemBuilder.class, position = 103)
+@ServiceProvider(service = LegendItemBuilder.class, position = 103)
 public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
@@ -198,7 +198,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return DescriptionItem.LEGEND_TYPE;
+        return NbBundle.getMessage(LegendManager.class, "DescriptionItem.name");
     }
 
     private Font defaultKeyFont = new Font("Arial", Font.PLAIN, 13);
@@ -220,5 +220,10 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     @Override
     protected Boolean hasDynamicProperties() {
         return Boolean.TRUE;
+    }
+    
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
     }
 }

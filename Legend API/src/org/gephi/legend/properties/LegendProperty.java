@@ -38,6 +38,11 @@ public class LegendProperty {
     //LOCATION
     public static final int REAL_ORIGIN_X = 16;
     public static final int REAL_ORIGIN_Y = 17;
+    //LOCATION
+    public static final int BACKGROUND_COLOR = 18;
+    public static final int BACKGROUND_BORDER_COLOR = 19;
+    public static final int BACKGROUND_BORDER_LINE_THICK = 20;
+    public static final int BACKGROUND_IS_DISPLAYING = 21;
     
     public static final String[] LEGEND_PROPERTIES = {
         //LOCATION
@@ -61,7 +66,11 @@ public class LegendProperty {
         ".isDisplaying",
         ".label",
         ".realOriginX",
-        ".realOriginY"
+        ".realOriginY",
+        ".background.color",
+        ".background.border.color",
+        ".background.border.lineThick",
+        ".background.isDisplaying"
     };
     
     

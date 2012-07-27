@@ -38,7 +38,7 @@ public class TextItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return TextItem.LEGEND_TYPE;
+        return NbBundle.getMessage(LegendManager.class, "TextItem.name");
     }
 
     @Override
@@ -96,5 +96,10 @@ public class TextItemBuilder extends LegendItemBuilder {
     @Override
     protected Boolean hasDynamicProperties() {
         return Boolean.FALSE;
+    }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
     }
 }

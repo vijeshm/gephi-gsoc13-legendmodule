@@ -39,7 +39,7 @@ public class ImageItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return ImageItem.LEGEND_TYPE;
+        return NbBundle.getMessage(LegendManager.class, "ImageItem.name");
     }
 
     @Override
@@ -74,4 +74,11 @@ public class ImageItemBuilder extends LegendItemBuilder {
     protected Boolean hasDynamicProperties() {
         return Boolean.FALSE;
     }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
+    }
+    
+    
 }

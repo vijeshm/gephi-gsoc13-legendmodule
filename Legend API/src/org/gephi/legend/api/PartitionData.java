@@ -66,25 +66,33 @@ public class PartitionData {
 
     private void retrieveData() {
 
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = pc.getCurrentWorkspace();
-
-
-        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
-        PartitionModel partitionModel = partitionController.getModel();
-
         this.labels = new ArrayList<String>();
         this.colors = new ArrayList<Color>();
         this.values = new ArrayList<Float>();
 
-        if (partitionModel.getSelectedPartition() != null && partitionModel.getSelectedPartitioning() == PartitionModel.NODE_PARTITIONING) {
-            NodePartition nodesPartition = (NodePartition) partitionModel.getSelectedPartition();
-            for (Part<Node> part : nodesPartition.getParts()) {
+
+        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+        Workspace workspace = pc.getCurrentWorkspace();
+        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+        PartitionModel partitionModel = partitionController.getModel();
+
+
+        if (partitionModel.getSelectedPartition() != null) {
+            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
                 values.add(part.getPercentage());
                 colors.add(part.getColor());
                 labels.add(part.getValue().toString());
             }
         }
+    }
+
+    public boolean isPartitioned() {
+        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+        PartitionModel partitionModel = partitionController.getModel();
+        if(partitionModel != null){
+            return (partitionModel.getSelectedPartition().getPartsCount() > 1);
+        }
+        return false;
     }
 
 }

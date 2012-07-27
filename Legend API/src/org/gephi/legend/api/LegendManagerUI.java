@@ -5,7 +5,9 @@
 package org.gephi.legend.api;
 
 import java.awt.*;
+import java.beans.PropertyEditorManager;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import javax.print.attribute.standard.SheetCollate;
 import javax.swing.Icon;
@@ -26,6 +28,7 @@ import org.gephi.preview.spi.PreviewUI;
 import org.gephi.legend.api.LegendNode.PreviewPropertyWrapper;
 import org.gephi.legend.builders.*;
 import org.gephi.legend.items.*;
+import org.gephi.legend.items.propertyeditors.DescriptionItemElementPropertyEditor;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -52,22 +55,26 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     public LegendManagerUI() {
         initComponents();
 
-
-        String[] legendTypes = {
-            TextItem.LEGEND_TYPE,
-            GroupsItem.LEGEND_TYPE,
-            DescriptionItem.LEGEND_TYPE,
-            ImageItem.LEGEND_TYPE,
-            TableItem.LEGEND_TYPE
-        };
-
-        for (String legendType : legendTypes) {
-            legendItemsComboBox.addItem(legendType);
-        }
+        registerEditors();
+        refreshAvailableLegendItemBuilders();
+        
 
         numberOfItemsLabel.setVisible(false);
         numberOfItemsTextField.setVisible(false);
 
+    }
+    
+    public void refreshAvailableLegendItemBuilders(){
+        Collection<? extends LegendItemBuilder> legendItemBuilders = Lookup.getDefault().lookupAll(LegendItemBuilder.class);
+        
+        legendItemBuildersComboBox.removeAllItems();
+        for (LegendItemBuilder legendItemBuilder : legendItemBuilders) {
+            if(legendItemBuilder.isAvailableToBuild()){
+                legendItemBuildersComboBox.addItem(legendItemBuilder);
+            }
+            
+        }
+        
     }
 
     /**
@@ -81,7 +88,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         java.awt.GridBagConstraints gridBagConstraints;
 
         addLegendButton = new javax.swing.JButton();
-        legendItemsComboBox = new javax.swing.JComboBox();
+        legendItemBuildersComboBox = new javax.swing.JComboBox();
         legendManagerPanel = new javax.swing.JPanel();
         activeLegendsComboBox = new javax.swing.JComboBox();
         activeLegendLabel = new javax.swing.JLabel();
@@ -107,7 +114,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(legendItemsComboBox, gridBagConstraints);
+        add(legendItemBuildersComboBox, gridBagConstraints);
 
         legendManagerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.legendManagerPanel.border.title"), javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP)); // NOI18N
         legendManagerPanel.setLayout(new java.awt.GridBagLayout());
@@ -237,7 +244,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         
         PreviewProperties previewProperties = previewModel.getProperties();
 
-        String selectedType = legendItemsComboBox.getSelectedItem().toString();
+        String selectedType = legendItemBuildersComboBox.getSelectedItem().toString();
         System.out.println("@Var: selectedType: " + selectedType);
 
 
@@ -249,23 +256,23 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
         Integer newItemIndex = legendManager.getCurrentIndex();
 
-        LegendItemBuilder builder = null;
-        if (selectedType.equals(DescriptionItem.LEGEND_TYPE)) {
-            builder = new DescriptionItemBuilder();
-
-        }
-        else if (selectedType.equals(TextItem.LEGEND_TYPE)) {
-            builder = new TextItemBuilder();
-        }
-        else if (selectedType.equals(GroupsItem.LEGEND_TYPE)) {
-            builder = new GroupsItemBuilder();
-        }
-        else if (selectedType.equals(ImageItem.LEGEND_TYPE)) {
-            builder = new ImageItemBuilder();
-        }
-        else if (selectedType.equals(TableItem.LEGEND_TYPE)) {
-            builder = new TableItemBuilder();
-        }
+        LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
+//        if (selectedType.equals(DescriptionItem.LEGEND_TYPE)) {
+//            builder = new DescriptionItemBuilder();
+//
+//        }
+//        else if (selectedType.equals(TextItem.LEGEND_TYPE)) {
+//            builder = new TextItemBuilder();
+//        }
+//        else if (selectedType.equals(GroupsItem.LEGEND_TYPE)) {
+//            builder = new GroupsItemBuilder();
+//        }
+//        else if (selectedType.equals(ImageItem.LEGEND_TYPE)) {
+//            builder = new ImageItemBuilder();
+//        }
+//        else if (selectedType.equals(TableItem.LEGEND_TYPE)) {
+//            builder = new TableItemBuilder();
+//        }
 
         Item item = builder.createItem(newItemIndex, graph, attributeModel);
 
@@ -404,7 +411,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     private javax.swing.JLabel activeLegendLabel;
     private javax.swing.JComboBox activeLegendsComboBox;
     private javax.swing.JButton addLegendButton;
-    private javax.swing.JComboBox legendItemsComboBox;
+    private javax.swing.JComboBox legendItemBuildersComboBox;
     private javax.swing.JPanel legendManagerPanel;
     private javax.swing.JPanel legendPropertiesPanel;
     private javax.swing.JLabel numberOfItemsLabel;
@@ -434,6 +441,10 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     @Override
     public String getPanelTitle() {
         return NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.title");
+    }
+    
+    public void registerEditors(){
+        PropertyEditorManager.registerEditor(DescriptionElement.class, DescriptionItemElementPropertyEditor.class);
     }
 
 }

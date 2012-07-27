@@ -46,7 +46,7 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return TableItem.LEGEND_TYPE;
+        return NbBundle.getMessage(LegendManager.class, "TableItem.name");
     }
 
     @Override
@@ -218,5 +218,10 @@ public class TableItemBuilder extends LegendItemBuilder {
     @Override
     protected Boolean hasDynamicProperties() {
         return Boolean.FALSE;
+    }
+    
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
     }
 }

@@ -24,13 +24,12 @@ public class DescriptionItemElementPanel extends javax.swing.JPanel implements I
      * Creates new form DescriptionItemElementPanel
      */
     public DescriptionItemElementPanel() {
-        customValueTextField.setVisible(false);
+        initComponents();
         valueComboBox.addItem(FUNCTION1);
         valueComboBox.addItem(FUNCTION2);
         valueComboBox.addItem(FUNCTION3);
         // custom value
         valueComboBox.addItem(CUSTOM_VALUE);
-        initComponents();
     }
 
     /**

@@ -6,7 +6,6 @@ package org.gephi.legend.builders;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
@@ -104,6 +103,14 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * LegendItem's PreviewProperty
      */
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
+    
+    /**
+     * Used to determine if the <code>builder</code> can create a new item
+     * Ex: GroupsItem can only be built if some partition was applied first
+     * @return <code>true</code> if <code>item</code> has dynamic
+     * properties, <code>false</code> otherwise
+     */
+    public abstract boolean isAvailableToBuild();
 
     public Item createItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
         Item item = buildItem(graph, attributeModel);
@@ -189,6 +196,30 @@ public abstract class LegendItemBuilder implements ItemBuilder {
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.displayName"),
                                                    NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.description"),
                                                    PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHeight),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.BACKGROUND_IS_DISPLAYING),
+                                                   Boolean.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.isDisplaying.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.isDisplaying.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBackgroundIsDisplaying),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.BACKGROUND_COLOR),
+                                                   Color.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.color.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.color.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBackgroundColor),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.BACKGROUND_BORDER_COLOR),
+                                                   Color.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.color.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.color.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBackgroundBorderColor),
+                    PreviewProperty.createProperty(this,
+                                                   legendProperties.get(LegendProperty.BACKGROUND_BORDER_LINE_THICK),
+                                                   Integer.class,
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.lineThick.displayName"),
+                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.lineThick.description"),
+                                                   PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBackgroundBorderLineThick),
                     PreviewProperty.createProperty(this,
                                                    legendProperties.get(LegendProperty.TITLE_IS_DISPLAYING),
                                                    Boolean.class,
@@ -298,8 +329,20 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return getType();
+    }
+    
+
+    
 
     //DEFAULT VALUES 
+    // BACKGROUND AND BORDER
+    protected boolean defaultBackgroundIsDisplaying = false;
+    protected Color defaultBackgroundColor = Color.WHITE;
+    protected Color defaultBackgroundBorderColor = Color.BLACK;
+    protected int defaultBackgroundBorderLineThick = 1;
     // LABEL
     protected String defaultLabel = "";
     // IS_DISPLAYING

@@ -108,6 +108,13 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
             isDisplayingLegend = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.IS_DISPLAYING));
 
+            // BACKGROUND
+            backgroundIsDisplaying = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.BACKGROUND_IS_DISPLAYING));
+            backgroundColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.BACKGROUND_COLOR));
+            backgroundBorderColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.BACKGROUND_BORDER_COLOR));
+            backgroundBorderLineThick = previewProperties.getIntValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.BACKGROUND_BORDER_LINE_THICK));
+
+            // TITLE
             isDisplayingTitle = previewProperties.getBooleanValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_IS_DISPLAYING));
             titleFont = previewProperties.getFontValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT));
             titleFontColor = previewProperties.getColorValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.TITLE_FONT_COLOR));
@@ -221,6 +228,9 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        //BACKGROUND
+        renderBackground(graphics2D, origin, width, height);
+
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
         float titleSpaceUsed = renderTitle(graphics2D, titleOrigin, width, height);
@@ -277,6 +287,18 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             return legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
         }
         return 0f;
+    }
+
+    public void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+        if (backgroundIsDisplaying) {
+            graphics2D.setTransform(origin);
+            graphics2D.setColor(backgroundColor);
+            graphics2D.fillRect(0, 0, width, height);
+            graphics2D.setColor(backgroundBorderColor);
+            for (int i = 0; i < backgroundBorderLineThick; i++) {
+                graphics2D.drawRect(-i, -i, width + 2 * i, height + 2 * i);
+            }
+        }
     }
 
     public float renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -399,6 +421,11 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     // VARIABLES
     // IS DISPLAYING
     private Boolean isDisplayingLegend;
+    // BACKGROUND
+    private boolean backgroundIsDisplaying;
+    private Color backgroundColor;
+    private Color backgroundBorderColor;
+    private int backgroundBorderLineThick;
     // DIMENSIONS
     protected Integer currentWidth;
     protected Integer currentHeight;
@@ -419,10 +446,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     private Color titleFontColor;
     // processing margin
     private Float processingMargin;
-    private float relativeX;
-    private float relativeY;
-    private float relativeAnchorX;
-    private float relativeAnchorY;
     // TRANSFORMATION
     private Boolean currentIsSelected = Boolean.FALSE;
     private Boolean currentIsBeingTransformed;
