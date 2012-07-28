@@ -288,6 +288,10 @@
                 <binary-origin>release/modules/ext/itextpdf-5.3.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/gson-2.2.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/gson-2.2.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
             </class-path-extension>

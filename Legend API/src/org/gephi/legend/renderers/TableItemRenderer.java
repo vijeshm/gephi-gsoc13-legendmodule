@@ -8,6 +8,9 @@ package org.gephi.legend.renderers;
  *
  * @author edubecks
  */
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -332,7 +335,20 @@ public class TableItemRenderer extends LegendItemRenderer {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         //values
-        labels = item.getData(TableItem.LABELS);
+        labels =item.getData(TableItem.LABELS_IDS);
+        labelsJSON = properties.getStringValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_LABELS));
+        labelsJSON = "{\n"+labelsJSON+"\n}";
+        System.out.println("@Var: labelsJSON: "+labelsJSON);
+        
+        JsonParser jsonParser = new JsonParser();
+        JsonObject json = jsonParser.parse(labelsJSON).getAsJsonObject();
+        
+        for (int i = 0; i < labels.size(); i++) {
+            System.out.printf("Changing from %s\n",labels.get(i));
+            labels.set(i,json.get(labels.get(i)).getAsString());
+            System.out.printf("Changing to %s\n",labels.get(i));
+        }
+        
         tableValues = item.getData(TableItem.TABLE_VALUES);
         colors = item.getData(TableItem.LIST_OF_COLORS);
 
@@ -358,6 +374,7 @@ public class TableItemRenderer extends LegendItemRenderer {
     private Font font;
     private Color fontColor;
     private ArrayList<String> labels;
+    private String labelsJSON;
     private ArrayList<Color> colors;
     private Integer cellSizeWidth;
     private Integer cellSizeHeight;

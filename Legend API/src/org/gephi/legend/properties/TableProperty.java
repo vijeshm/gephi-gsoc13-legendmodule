@@ -22,6 +22,7 @@ public class TableProperty{
     public static final int TABLE_VERTICAL_TEXT_ROTATION = 8;
     public static final int TABLE_VERTICAL_EXTRA_MARGIN = 9;
     public static final int TABLE_CELL_COLORING_DIRECTION = 10;
+    public static final int TABLE_LABELS = 11;
     
     public static String[] OWN_PROPERTIES = {
         ".table.font",
@@ -34,7 +35,8 @@ public class TableProperty{
         ".table.verticalText.alignment",
         ".table.verticalText.rotation",
         ".table.vertical.extraMargin",
-        ".table.cellColoringDirection"
+        ".table.cellColoringDirection",
+        ".table.labels"
     };
     /*
      *     protected final Direction defaultCellColoringDirection = Direction.UP;

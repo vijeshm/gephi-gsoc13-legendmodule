@@ -21,9 +21,11 @@ import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
+import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.properties.LegendProperty;
+import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -124,7 +126,7 @@ public class TestProcessingTarget {
 
             // creating item
 //            Item item = addImageItem(itemIndex, graph, attributeModel);
-            Item item = addTextItem(itemIndex, graph, attributeModel);
+            Item item = addTableItem(itemIndex, graph, attributeModel);
 
 
             // add item
@@ -134,6 +136,7 @@ public class TestProcessingTarget {
             for (PreviewProperty property : legendProperties) {
                 previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
             }
+            testTable(item, previewProperties);
             
             //test
 //            previewProperties.getProperty(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS)).setValue(2);
@@ -174,6 +177,12 @@ public class TestProcessingTarget {
         return item;
     }
     
+    public Item addTableItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
+        TableItemBuilder builder = new TableItemBuilder();
+        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        return item;
+    }
+    
     public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         ImageItemBuilder builder = new ImageItemBuilder();
         Item item = builder.createItem(newItemIndex, graph, attributeModel);
@@ -184,6 +193,11 @@ public class TestProcessingTarget {
         GroupsItemBuilder builder = new GroupsItemBuilder();
         Item item = builder.createItem(newItemIndex, graph, attributeModel);
         return item;
+    }
+    
+    public void testTable(Item item, PreviewProperties properties){
+        TableItemRenderer tableItemRenderer = new TableItemRenderer();
+        tableItemRenderer.readOwnPropertiesAndValues(item,properties);
     }
     
     
