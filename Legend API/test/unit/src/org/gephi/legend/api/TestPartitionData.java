@@ -4,18 +4,20 @@
  */
 package org.gephi.legend.api;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
+import org.gephi.legend.api.PartitionData;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.partition.api.Partition;
+import org.gephi.partition.api.PartitionController;
+import org.gephi.partition.api.PartitionModel;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.junit.After;
@@ -23,7 +25,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.openide.util.Lookup;
 
 /**
@@ -68,8 +69,8 @@ public class TestPartitionData {
             ImportController importController = Lookup.getDefault().lookup(ImportController.class);
             FileImporter fileImporter = importController.getFileImporter(".gexf");
 //            FileImporter fileImporter = importController.getFileImporter(new File("/Users/eduBecKs/Desktop/partitions.gephi"));
-            System.out.println("@Var: fileImporter: "+fileImporter);
-            
+            System.out.println("@Var: fileImporter: " + fileImporter);
+
             Container container = importController.importFile(stream, fileImporter);
 
             importController.process(container, new DefaultProcessor(), workspace);
@@ -80,15 +81,37 @@ public class TestPartitionData {
             Node node = graph.getNode(12);
             System.out.println("Self loop " + node.getNodeData().getLabel());
             graph.addEdge(graphController.getModel().factory().newEdge(node, node, 31, true));
+            
+            
+            PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+            PartitionModel partitionModel = partitionController.getModel();
+            partitionController.refreshPartitions();
+            
+
+//
+//            for (Partition partition : partitionArray) {
+//                System.out.println("@Var: partition: " + partition);
+//            }
+            partitionController.setSelectedPartitioning(PartitionModel.NODE_PARTITIONING);
+            Partition[] partitionArray = partitionModel.getNodePartitions();
+            partitionController.setSelectedPartition(partitionArray[0]);
+            partitionController.transform(partitionModel.getSelectedPartition(), partitionModel.getSelectedTransformer());
+            
+            
+            PartitionData partitionData = new PartitionData();
+            partitionData.getColors();
+            
+//            System.out.println("@Var: partitionModel.getSelectedPartition(): " + partitionModel.getSelectedPartition());
+//
+//            partitionController.transform(partitionModel.getSelectedPartition(), partitionModel.getSelectedTransformer());
 
             //Set label edges       
             for (Edge edge : graphController.getModel().getGraph().getEdges()) {
                 edge.getEdgeData().setLabel("Label test");
             }
 
-            PartitionData partitionData = new PartitionData();
         } catch (Exception e) {
-            System.out.println("@Var: e: "+e);
+            System.out.println("@Var: e: " + e);
         }
     }
 

@@ -19,6 +19,7 @@ import org.gephi.legend.api.LegendItem.Direction;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.api.PartitionData;
+import org.gephi.legend.api.StatisticData;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.partition.api.NodePartition;
@@ -116,15 +117,27 @@ public class TableItemBuilder extends LegendItemBuilder {
 
         }
 
+        ArrayList<String> labels = new ArrayList<String>();
+        ArrayList<Color> colors = new ArrayList<Color>();
+        ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
+        System.out.println("@Var: values: " + values);
+        StatisticData.generateTable(labels, colors, values);
+        System.out.println("@Var: labels: " + labels);
+        System.out.println("@Var: colors: " + colors);
+        System.out.println("@Var: values: " + values);
+
+
         TableItem item = new TableItem(graph);
-        item.setData(TableItem.LABELS_IDS, labels1);
-        item.setData(TableItem.TABLE_VALUES, tableValues1);
-        item.setData(TableItem.LIST_OF_COLORS, listOfColors);
+        item.setData(TableItem.LABELS_IDS, labels);
+        item.setData(TableItem.TABLE_VALUES, values);
+        item.setData(TableItem.LIST_OF_COLORS, colors);
         item.setData(LegendItem.SUB_TYPE, getType());
         return item;
 
 
     }
+
+    
 
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
@@ -132,27 +145,37 @@ public class TableItemBuilder extends LegendItemBuilder {
 
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        StringBuilder labelsJSON = new StringBuilder();
-        ArrayList<String> labelsGroup = item.getData(TableItem.LABELS_IDS);
-        for (int i = 0; i < labelsGroup.size() - 1; i++) {
-
-            labelsJSON.append("\"" + labelsGroup.get(i) + "\" : \"" + labelsGroup.get(i) + "\",\n");
-        }
-        labelsJSON.append("\"" + labelsGroup.get(labelsGroup.size() - 1) + "\" : \"" + labelsGroup.get(labelsGroup.size() - 1) + "\"");
-        System.out.println("@Var: labelsJSON: "+labelsJSON);
-//        item.setData(TableItem.LABELS, labelsJSON.toString());
-
+//        StringBuilder labelsJSON = new StringBuilder();
+//        for (int i = 0; i < labelsGroup.size() - 1; i++) {
+//
+//            labelsJSON.append("\"" + labelsGroup.get(i) + "\" : \"" + labelsGroup.get(i) + "\",\n");
+//        }
+//        labelsJSON.append("\"" + labelsGroup.get(labelsGroup.size() - 1) + "\" : \"" + labelsGroup.get(labelsGroup.size() - 1) + "\"");
+//        System.out.println("@Var: labelsJSON: " + labelsJSON);
+////        item.setData(TableItem.LABELS, labelsJSON.toString());
+//
         ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, itemIndex);
 
 
+        ArrayList<String> labelsGroup = item.getData(TableItem.LABELS_IDS);
+        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
+        for (int i = 0; i < labelProperties.length; i++) {
+            labelProperties[i] = PreviewProperty.createProperty(this,
+                                                                TableProperty.getLabelProperty(itemIndex, i),
+                                                                String.class,
+                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName")+" "+i,
+                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description")+" "+i,
+                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(i+"");
+
+        }
 
         PreviewProperty[] properties = {
-            PreviewProperty.createProperty(this,
-                                           tableProperties.get(TableProperty.TABLE_LABELS),
-                                           String.class,
-                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(labelsJSON.toString()),
+//            PreviewProperty.createProperty(this,
+//                                           tableProperties.get(TableProperty.TABLE_LABELS),
+//                                           String.class,
+//                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(labelsJSON.toString()),
             PreviewProperty.createProperty(this,
                                            tableProperties.get(TableProperty.TABLE_VERTICAL_EXTRA_MARGIN),
                                            Integer.class,
@@ -220,8 +243,12 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),};
 
+        
+        PreviewProperty[] tableItemProperties = new PreviewProperty[labelProperties.length + properties.length];
+        System.arraycopy(labelProperties, 0, tableItemProperties, 0, labelProperties.length);
+        System.arraycopy(properties, 0, tableItemProperties, labelProperties.length, properties.length);
 
-        return properties;
+        return tableItemProperties;
     }
 
     //default values
@@ -245,7 +272,13 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     public boolean isAvailableToBuild() {
-        return true;
+        PartitionData partitionData = new PartitionData();
+        return partitionData.isPartitioned();
+    }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return NbBundle.getMessage(LegendManager.class, "TableItem.stepsNeeded");
     }
 
 }

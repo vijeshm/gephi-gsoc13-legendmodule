@@ -79,6 +79,11 @@ public class ImageItemBuilder extends LegendItemBuilder {
     public boolean isAvailableToBuild() {
         return true;
     }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return "";
+    }
     
     
 }

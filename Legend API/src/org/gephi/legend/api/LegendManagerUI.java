@@ -13,6 +13,7 @@ import javax.print.attribute.standard.SheetCollate;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
@@ -57,24 +58,21 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         registerEditors();
         refreshAvailableLegendItemBuilders();
-        
+
 
         numberOfItemsLabel.setVisible(false);
         numberOfItemsTextField.setVisible(false);
 
     }
-    
-    public void refreshAvailableLegendItemBuilders(){
+
+    public void refreshAvailableLegendItemBuilders() {
         Collection<? extends LegendItemBuilder> legendItemBuilders = Lookup.getDefault().lookupAll(LegendItemBuilder.class);
-        
+
         legendItemBuildersComboBox.removeAllItems();
         for (LegendItemBuilder legendItemBuilder : legendItemBuilders) {
-            if(legendItemBuilder.isAvailableToBuild()){
-                legendItemBuildersComboBox.addItem(legendItemBuilder);
-            }
-            
+            legendItemBuildersComboBox.addItem(legendItemBuilder);
         }
-        
+
     }
 
     /**
@@ -236,12 +234,12 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
-        
+
         // check if previewModel exists
-        if(previewModel==null){
+        if (previewModel == null) {
             return;
         }
-        
+
         PreviewProperties previewProperties = previewModel.getProperties();
 
         String selectedType = legendItemBuildersComboBox.getSelectedItem().toString();
@@ -257,54 +255,46 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         Integer newItemIndex = legendManager.getCurrentIndex();
 
         LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
-//        if (selectedType.equals(DescriptionItem.LEGEND_TYPE)) {
-//            builder = new DescriptionItemBuilder();
-//
-//        }
-//        else if (selectedType.equals(TextItem.LEGEND_TYPE)) {
-//            builder = new TextItemBuilder();
-//        }
-//        else if (selectedType.equals(GroupsItem.LEGEND_TYPE)) {
-//            builder = new GroupsItemBuilder();
-//        }
-//        else if (selectedType.equals(ImageItem.LEGEND_TYPE)) {
-//            builder = new ImageItemBuilder();
-//        }
-//        else if (selectedType.equals(TableItem.LEGEND_TYPE)) {
-//            builder = new TableItemBuilder();
-//        }
 
-        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        if (builder.isAvailableToBuild()) {
+
+            Item item = builder.createItem(newItemIndex, graph, attributeModel);
 
 
-        legendManager.addItem(item);
-        Item activeLegendItem = legendManager.getActiveLegendItem();
-        refreshActiveLegendsComboBox();
-        PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
-        for (PreviewProperty property : legendProperties) {
-            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            legendManager.addItem(item);
+            Item activeLegendItem = legendManager.getActiveLegendItem();
+            refreshActiveLegendsComboBox();
+            PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
+            for (PreviewProperty property : legendProperties) {
+                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            }
+            PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+            for (PreviewProperty property : dynamicProperties) {
+                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            }
+
+            // update property sheet
+            refreshPropertySheet(activeLegendItem);
         }
-        PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
-        for (PreviewProperty property : dynamicProperties) {
-            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+        else {
+            JOptionPane.showMessageDialog(this, builder.stepsNeededToBuild(),
+                                         NbBundle.getMessage(LegendManager.class, "LegendItem.stepsNeededToBuildItem"),
+                                         JOptionPane.INFORMATION_MESSAGE,
+                                         null);
+
         }
-        
-        // update property sheet
-        refreshPropertySheet(activeLegendItem);
 
-
-//        currentUsedLegends.revalidate();
     }//GEN-LAST:event_addLegendButtonActionPerformed
 
     private void refreshPropertySheet(Item activeLegendItem) {
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel();
-        
+
         // check if previewModel exists
-        if(previewModel==null){
+        if (previewModel == null) {
             return;
         }
-        
+
         legendPropertiesPanel.removeAll();
 
         System.out.println("@Var:CREATING PROPERTIES FOR Sheet activeLegend: " + activeLegendItem);
@@ -442,8 +432,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     public String getPanelTitle() {
         return NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.title");
     }
-    
-    public void registerEditors(){
+
+    public void registerEditors() {
         PropertyEditorManager.registerEditor(DescriptionElement.class, DescriptionItemElementPropertyEditor.class);
     }
 

@@ -236,8 +236,8 @@ public class TableItemRenderer extends LegendItemRenderer {
 
     @Override
     public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        System.out.println("@Var: width: "+width);
-        System.out.println("@Var: height: "+height);
+        System.out.println("@Var: width: " + width);
+        System.out.println("@Var: height: " + height);
         graphics2D.setFont(font);
         FontMetrics fontMetrics = graphics2D.getFontMetrics();
 
@@ -253,11 +253,11 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         Integer horizontalTextWidth = maxTextWidth + 2 * minimumMargin;
 //        Integer verticalTextHeight = maxTextWidth  * (int) Math.abs(Math.sin(verticalTextDirection.rotationAngle())) + 2 * minimumMargin ;
-        Integer verticalTextHeight = maxTextWidth  + 2 * minimumMargin ;
-        int tempTableWidth = (int) (width - horizontalExtraMargin -minimumMargin - horizontalTextWidth - maxTextWidth * Math.abs(Math.cos(verticalTextDirection.rotationAngle())));
-        System.out.println("@Var: tempTableWidth: "+tempTableWidth);
+        Integer verticalTextHeight = maxTextWidth + 2 * minimumMargin;
+        int tempTableWidth = (int) (width - horizontalExtraMargin - minimumMargin - horizontalTextWidth - maxTextWidth * Math.abs(Math.cos(verticalTextDirection.rotationAngle())));
+        System.out.println("@Var: tempTableWidth: " + tempTableWidth);
         int tempTableHeight = (int) (height - verticalExtraMargin - minimumMargin - verticalTextHeight);
-        System.out.println("@Var: tempTableHeight: "+tempTableHeight);
+        System.out.println("@Var: tempTableHeight: " + tempTableHeight);
 
 //        int tempTableWidth = 0, tempTableHeight = 0;
 //        if (verticalTextDirection == VerticalTextDirection.DIAGONAL) {
@@ -280,12 +280,12 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
 
-        System.out.println("@Var: horizontalTextWidth: "+horizontalTextWidth);
+        System.out.println("@Var: horizontalTextWidth: " + horizontalTextWidth);
         Integer horizontalTextHeight = cellSizeHeight * labels.size();
-        System.out.println("@Var: horizontalTextHeight: "+horizontalTextHeight);
-        System.out.println("@Var: verticalTextHeight: "+verticalTextHeight);
+        System.out.println("@Var: horizontalTextHeight: " + horizontalTextHeight);
+        System.out.println("@Var: verticalTextHeight: " + verticalTextHeight);
         Integer verticalTextWidth = cellSizeWidth * labels.size();
-        System.out.println("@Var: verticalTextWidth: "+verticalTextWidth);
+        System.out.println("@Var: verticalTextWidth: " + verticalTextWidth);
 
         AffineTransform arrangeTranslation = new AffineTransform();
         arrangeTranslation.setTransform(origin);
@@ -335,22 +335,39 @@ public class TableItemRenderer extends LegendItemRenderer {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         //values
-        labels =item.getData(TableItem.LABELS_IDS);
-        labelsJSON = properties.getStringValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_LABELS));
-        labelsJSON = "{\n"+labelsJSON+"\n}";
-        System.out.println("@Var: labelsJSON: "+labelsJSON);
-        
-        JsonParser jsonParser = new JsonParser();
-        JsonObject json = jsonParser.parse(labelsJSON).getAsJsonObject();
-        
-        for (int i = 0; i < labels.size(); i++) {
-            System.out.printf("Changing from %s\n",labels.get(i));
-            labels.set(i,json.get(labels.get(i)).getAsString());
-            System.out.printf("Changing to %s\n",labels.get(i));
+//        labelsJSON = properties.getStringValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_LABELS));
+//        labelsJSON = "{\n"+labelsJSON+"\n}";
+//        System.out.println("@Var: labelsJSON: "+labelsJSON);
+//        
+//        JsonParser jsonParser = new JsonParser();
+//        JsonObject json = jsonParser.parse(labelsJSON).getAsJsonObject();
+//        
+//        for (int i = 0; i < labels.size(); i++) {
+//            System.out.printf("Changing from %s\n",labels.get(i));
+//            labels.set(i,json.get(labels.get(i)).getAsString());
+//            System.out.printf("Changing to %s\n",labels.get(i));
+//        }
+
+//        labels =item.getData(TableItem.LABELS_IDS);
+        tableValuesArrayList = item.getData(TableItem.TABLE_VALUES);
+        System.out.println("@Var: tableValuesArrayList: "+tableValuesArrayList);
+        tableValues = new Float[tableValuesArrayList.size()][tableValuesArrayList.get(0).size()];
+
+        for (int i = 0; i < tableValuesArrayList.size(); i++) {
+            for (int j = 0; j < tableValuesArrayList.get(i).size(); j++) {
+                tableValues[i][j] = tableValuesArrayList.get(i).get(j);
+            }
         }
-        
-        tableValues = item.getData(TableItem.TABLE_VALUES);
         colors = item.getData(TableItem.LIST_OF_COLORS);
+        System.out.println("@Var: colors: "+colors);
+        
+
+        labels = new ArrayList<String>();
+        for (int i = 0; i < colors.size(); i++) {
+            labels.add(properties.getStringValue(TableProperty.getLabelProperty(itemIndex, i)));
+        }
+        System.out.println("@Var: labels: "+labels);
+
 
         //properties
         font = properties.getFontValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_FONT));
@@ -389,5 +406,6 @@ public class TableItemRenderer extends LegendItemRenderer {
     private Integer verticalExtraMargin;
     private Integer horizontalExtraMargin;
     private Integer minimumMargin = 3;
+    private ArrayList<ArrayList<Float>> tableValuesArrayList;
     private Float[][] tableValues;
 }

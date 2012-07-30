@@ -4,6 +4,9 @@
  */
 package org.gephi.legend.properties;
 
+import java.util.ArrayList;
+import org.gephi.legend.api.LegendManager;
+
 /**
  *
  * @author eduBecKs
@@ -22,7 +25,7 @@ public class TableProperty{
     public static final int TABLE_VERTICAL_TEXT_ROTATION = 8;
     public static final int TABLE_VERTICAL_EXTRA_MARGIN = 9;
     public static final int TABLE_CELL_COLORING_DIRECTION = 10;
-    public static final int TABLE_LABELS = 11;
+    public static final int TABLE_LABEL = 11;
     
     public static String[] OWN_PROPERTIES = {
         ".table.font",
@@ -36,13 +39,12 @@ public class TableProperty{
         ".table.verticalText.rotation",
         ".table.vertical.extraMargin",
         ".table.cellColoringDirection",
-        ".table.labels"
+        ".table.label"
     };
-    /*
-     *     protected final Direction defaultCellColoringDirection = Direction.UP;
-    protected final Direction defaultHorizontalAlignment = Direction.LEFT;
-    protected final Direction defaultHorizontalTextAlignment = Direction.RIGHT;
-    protected final Direction defaultVerticalAlignment = Direction.UP;
-    protected final Float defaultVerticalTextRotation = 90f;
-     */
+    
+    
+    public static String getLabelProperty(Integer itemIndex, int i) {
+        ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, itemIndex);
+        return tableProperties.get(TableProperty.TABLE_LABEL) + i;
+    }
 }

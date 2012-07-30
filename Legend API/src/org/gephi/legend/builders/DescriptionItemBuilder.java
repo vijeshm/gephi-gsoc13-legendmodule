@@ -226,4 +226,9 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     public boolean isAvailableToBuild() {
         return true;
     }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return "";
+    }
 }

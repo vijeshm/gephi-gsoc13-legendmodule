@@ -43,8 +43,8 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
-        return NbBundle.getMessage(LegendManager.class, "TextItem.name");
-    }
+        return NbBundle.getMessage(LegendManager.class, "GroupsItem.name");
+    }   
 
 
     @Override
@@ -193,6 +193,13 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         PartitionData partitionData = new PartitionData();
         return partitionData.isPartitioned();
     }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return NbBundle.getMessage(LegendManager.class, "GroupsItem.stepsNeeded");
+    }
+    
+    
 
 
 }

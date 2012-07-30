@@ -111,6 +111,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * properties, <code>false</code> otherwise
      */
     public abstract boolean isAvailableToBuild();
+    
+    public abstract String stepsNeededToBuild();
 
     public Item createItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
         Item item = buildItem(graph, attributeModel);

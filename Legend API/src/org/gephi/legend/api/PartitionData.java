@@ -89,8 +89,10 @@ public class PartitionData {
     public boolean isPartitioned() {
         PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
         PartitionModel partitionModel = partitionController.getModel();
-        if(partitionModel != null){
-            return (partitionModel.getSelectedPartition().getPartsCount() > 1);
+        if (partitionModel != null) {
+            if (partitionModel.getSelectedPartition() != null) {
+                return (partitionModel.getSelectedPartition().getPartsCount() > 1);
+            }
         }
         return false;
     }
