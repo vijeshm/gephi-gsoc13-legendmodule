@@ -81,7 +81,7 @@ public class PartitionData {
             for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
                 values.add(part.getPercentage());
                 colors.add(part.getColor());
-                labels.add(part.getValue().toString());
+                labels.add(part.getDisplayName());
             }
         }
     }
