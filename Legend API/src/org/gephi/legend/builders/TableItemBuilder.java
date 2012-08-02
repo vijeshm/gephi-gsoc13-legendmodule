@@ -99,25 +99,6 @@ public class TableItemBuilder extends LegendItemBuilder {
         labels1.add("Holaaaaaaaaaa");
 
 
-        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
-        PartitionModel model = partitionController.getModel();
-
-        if (model != null) {
-            NodePartition[] nodePartitions = model.getNodePartitions();
-            System.out.println("@Var: num Partitions: " + nodePartitions.length);
-
-
-            Float[][] tableValues = new Float[nodePartitions.length][nodePartitions.length];
-            for (int i = 0; i < nodePartitions.length; i++) {
-                System.out.println("@Var: nodePartitions: (elements):" + nodePartitions[i].getElementsCount());
-
-                for (int j = 0; j < nodePartitions.length; j++) {
-                    tableValues[i][j] = 0f;
-
-                }
-            }
-
-        }
 
         ArrayList<String> labels = new ArrayList<String>();
         ArrayList<Color> colors = new ArrayList<Color>();
@@ -135,8 +116,6 @@ public class TableItemBuilder extends LegendItemBuilder {
         item.setData(TableItem.LIST_OF_COLORS, colors);
         item.setData(LegendItem.SUB_TYPE, getType());
         return item;
-
-
     }
     
 
@@ -181,9 +160,9 @@ public class TableItemBuilder extends LegendItemBuilder {
             labelProperties[i] = PreviewProperty.createProperty(this,
                                                                 TableProperty.getLabelProperty(itemIndex, i),
                                                                 String.class,
-                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName") + " " + i,
-                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description") + " " + i,
-                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
+                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName")+" "+i,
+                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description")+" "+i,
+                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i));
 
         }
 
