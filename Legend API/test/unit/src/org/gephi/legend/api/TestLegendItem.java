@@ -127,7 +127,7 @@ public class TestLegendItem {
 
             // CREATE ITEM AND ADD IT TO LEGEND MANAGER
             Integer newItemIndex = 0;
-            item = builder.createItem(newItemIndex, null, null);
+            item = builder.createDefaultItem(newItemIndex, null, null);
 
 
             System.out.println("@Var: item: " + item.getData(LegendItem.SUB_TYPE));
@@ -161,19 +161,19 @@ public class TestLegendItem {
 
     public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TextItemBuilder builder = new TextItemBuilder();
-        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
         return item;
     }
 
     public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         ImageItemBuilder builder = new ImageItemBuilder();
-        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
         return item;
     }
 
     public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         GroupsItemBuilder builder = new GroupsItemBuilder();
-        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
         return item;
     }
 

@@ -391,6 +391,8 @@ public class TableItemRenderer extends LegendItemRenderer {
     private Font font;
     private Color fontColor;
     private ArrayList<String> labels;
+    private ArrayList<String> horizontalLabels;
+    private ArrayList<String> verticalLabels;
     private String labelsJSON;
     private ArrayList<Color> colors;
     private Integer cellSizeWidth;

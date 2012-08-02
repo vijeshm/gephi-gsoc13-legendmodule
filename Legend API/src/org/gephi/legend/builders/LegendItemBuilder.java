@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
@@ -29,93 +30,91 @@ import org.openide.util.NbBundle;
 public abstract class LegendItemBuilder implements ItemBuilder {
 
     /**
-     * Function used to override default values of <code>properties</code>
-     * Possible values to be overriden:<br />
-     * 
-     * LABEL:
-     * <ul>
-     * <li> defaultLabel </li>
-     * </ul>
-     * IS_DISPLAYING:
-     * <ul>
-     * <li> defaultIsDisplaying </li>
-     * </ul>
-     * ORIGIN
-     * <ul>
-     * <li> defaultOriginX </li>
-     * <li> defaultOriginY </li>
-     * </ul>
-     * WIDTH
-     * <ul>
-     * <li> defaultWidth </li>
-     * <li> defaultHeight </li>
-     * </ul>
-     * TITLE:
-     * <ul>
-     * <li> defaultIsDisplayingTitle </li>
-     * <li> defaultTitle </li>
-     * <li> defaultTitleFont </li>
-     * <li> defaultTitleAlignment </li>
-     * <li> defaultTitleFontColor </li>
-     * </ul>
-     * DESCRIPTION:
-     * <ul>
-     * <li> defaultDescription </li>
-     * <li> defaultIsDisplayingDescription </li>
-     * <li> defaultDescriptionFontColor </li>
-     * <li> defaultDescriptionAlignment </li>
-     * <li> defaultDescriptionFont </li>
-     * </ul>
+     * Function used to override default values of
+     * <code>properties</code> Possible values to be overriden:<br />
+     *
+     * LABEL: <ul> <li> defaultLabel </li> </ul> IS_DISPLAYING: <ul> <li>
+     * defaultIsDisplaying </li> </ul> ORIGIN <ul> <li> defaultOriginX </li>
+     * <li> defaultOriginY </li> </ul> WIDTH <ul> <li> defaultWidth </li> <li>
+     * defaultHeight </li> </ul> TITLE: <ul> <li> defaultIsDisplayingTitle </li>
+     * <li> defaultTitle </li> <li> defaultTitleFont </li> <li>
+     * defaultTitleAlignment </li> <li> defaultTitleFontColor </li> </ul>
+     * DESCRIPTION: <ul> <li> defaultDescription </li> <li>
+     * defaultIsDisplayingDescription </li> <li> defaultDescriptionFontColor
+     * </li> <li> defaultDescriptionAlignment </li> <li> defaultDescriptionFont
+     * </li> </ul>
      */
     protected abstract void setDefaultValues();
 
     /**
-     * Based on <code>properties</code>, determine whether this builder was
-     * used to build <code>Item</code>.
+     * Based on
+     * <code>properties</code>, determine whether this builder was used to build
+     * <code>Item</code>.
+     *
      * @param item the item to be tested
-     * @return <code>true</code> if <code>item</code> was built by this
-     * builder, <code>false</code> otherwise
+     * @return <code>true</code> if <code>item</code> was built by this      * builder, <code>false</code> otherwise
      */
     protected abstract boolean isBuilderForItem(Item item);
 
     /**
-     * Builds and item based on <code>graph</code> and <code>attributeModel</code> data
+     * Builds and item based on
+     * <code>graph</code> and
+     * <code>attributeModel</code> data
+     *
      * @param graph
      * @param attributeModel
-     * @return 
+     * @return
      */
-    protected abstract Item buildItem(Graph graph, AttributeModel attributeModel);
+    protected abstract Item buildDefaultItem(Graph graph, AttributeModel attributeModel);
+
+    protected abstract Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel);
+    
 
     /**
-     * Used to determine if the <code>item</code> has dynamic 
-     * properties to be displayed in the PropertySheet Editor
-     * @return <code>true</code> if <code>item</code> has dynamic
-     * properties, <code>false</code> otherwise
+     * Used to determine if the
+     * <code>item</code> has dynamic properties to be displayed in the
+     * PropertySheet Editor
+     *
+     * @return <code>true</code> if <code>item</code> has dynamic      * properties, <code>false</code> otherwise
      */
     protected abstract Boolean hasDynamicProperties();
 
     /**
      * Function used to create the specific PreviewProperty for each type of
      * LegendItem
-     * 
+     *
      * @param item
-     * @return an array of PreviewProperty to be appended to the general 
+     * @return an array of PreviewProperty to be appended to the general
      * LegendItem's PreviewProperty
      */
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
-    
+
     /**
-     * Used to determine if the <code>builder</code> can create a new item
-     * Ex: GroupsItem can only be built if some partition was applied first
-     * @return <code>true</code> if <code>item</code> has dynamic
-     * properties, <code>false</code> otherwise
+     * Used to determine if the
+     * <code>builder</code> can create a new item Ex: GroupsItem can only be
+     * built if some partition was applied first
+     *
+     * @return <code>true</code> if <code>item</code> has dynamic      * properties, <code>false</code> otherwise
      */
     public abstract boolean isAvailableToBuild();
-    
+
     public abstract String stepsNeededToBuild();
 
-    public Item createItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
-        Item item = buildItem(graph, attributeModel);
+    public Item createDefaultItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
+        Item item = buildDefaultItem(graph, attributeModel);
+        createDefaultPropertiers(newItemIndex, item);
+        return item;
+    }
+
+    public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
+        System.out.println("@Var: creating createCustomItem: ");
+        Item item = buildCustomItem(builder, graph, attributeModel);
+        createDefaultPropertiers(newItemIndex, item);
+        return item;
+
+    }
+
+    private void createDefaultPropertiers(Integer newItemIndex, Item item) {
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, getLegendProperties(item));
         item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);
@@ -124,10 +123,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
         item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
         item.setData(LegendItem.CURRENT_TRANSFORMATION, "");
-        return item;
-
     }
-
 
     @Override
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
@@ -335,9 +331,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     public String toString() {
         return getType();
     }
-    
-
-    
 
     //DEFAULT VALUES 
     // BACKGROUND AND BORDER

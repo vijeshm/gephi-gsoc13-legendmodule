@@ -4,16 +4,12 @@
  */
 package org.gephi.legend.api;
 
-import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
-import org.gephi.dynamic.api.DynamicController;
-import org.gephi.dynamic.api.DynamicModel;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
-import org.gephi.legend.api.PartitionData;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
@@ -32,34 +28,32 @@ import org.openide.util.Lookup;
 
 /**
  *
- * @author eduBecKs
+ * @author edubecks
  */
-public class TestPartitionData {
-
-    public TestPartitionData() {
+public class TestPartition {
+    
+    public TestPartition() {
     }
-
+    
     @BeforeClass
     public static void setUpClass() {
     }
-
+    
     @AfterClass
     public static void tearDownClass() {
     }
-
+    
     @Before
     public void setUp() {
     }
-
+    
     @After
     public void tearDown() {
     }
 
     @Test
-    public void testPartitionData() {
-        try {
-
-
+    public void someTest(){
+        
             //Init a project - and therefore a workspace
             ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
             pc.newProject();
@@ -84,31 +78,25 @@ public class TestPartitionData {
             Node node = graph.getNode(12);
             System.out.println("Self loop " + node.getNodeData().getLabel());
             graph.addEdge(graphController.getModel().factory().newEdge(node, node, 31, true));
-
-
-            PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
-            DynamicController dynamicController =  Lookup.getDefault().lookup(DynamicController.class);
-            DynamicModel model = dynamicController.getModel();
-            System.out.println("@Var: model: "+model);
-            PartitionModel partitionModel = partitionController.getModel();
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                System.out.println("@Var: e: "+e);
-            }
-            partitionController.refreshPartitions();
-
-            partitionController.refreshPartitions();
-            partitionController.setSelectedPartitioning(PartitionModel.NODE_PARTITIONING);
             
+            
+            PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+            PartitionModel partitionModel = partitionController.getModel();
+            partitionController.refreshPartitions();
+            
+
             Partition[] partitionArray = partitionModel.getNodePartitions();
+//
+//            for (Partition partition : partitionArray) {
+//                System.out.println("@Var: partition: " + partition);
+//            }
+            partitionController.setSelectedPartitioning(PartitionModel.NODE_PARTITIONING);
             partitionController.setSelectedPartition(partitionArray[0]);
             partitionController.transform(partitionModel.getSelectedPartition(), partitionModel.getSelectedTransformer());
-
-
+            
+            
             PartitionData partitionData = new PartitionData();
-            partitionData.getColors();
-
+            
 //            System.out.println("@Var: partitionModel.getSelectedPartition(): " + partitionModel.getSelectedPartition());
 //
 //            partitionController.transform(partitionModel.getSelectedPartition(), partitionModel.getSelectedTransformer());
@@ -117,10 +105,5 @@ public class TestPartitionData {
             for (Edge edge : graphController.getModel().getGraph().getEdges()) {
                 edge.getEdgeData().setLabel("Label test");
             }
-
-        } catch (Exception e) {
-            System.out.println("@Var: e: " + e);
-        }
     }
-
 }

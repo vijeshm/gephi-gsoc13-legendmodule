@@ -9,6 +9,9 @@ import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomLegendItemBuilder;
+import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.api.CustomTextItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
@@ -42,9 +45,20 @@ public class TextItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public Item buildItem(Graph graph, AttributeModel attributeModel) {
+    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
         TextItem item = new TextItem(graph);
-        item.setData(TextItem.BODY, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In venenatis nibh eget dolor accumsan rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec felis leo, eget placerat eros. Curabitur eros erat, vulputate nec laoreet sed, aliquam ac sem. Nullam sollicitudin, dui eu placerat pulvinar, odio lacus molestie neque, sagittis commodo dui enim luctus est. Etiam quis orci felis, a tristique enim. Phasellus placerat est suscipit nisi dapibus non sollicitudin massa lobortis. Vestibulum ac malesuada diam.");
+        item.setData(TextItem.BODY, defaultBody);
+        item.setData(LegendItem.SUB_TYPE, getType());
+        return item;
+    }
+
+    
+    @Override
+    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+        CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
+        TextItem item = new TextItem(graph);
+        item.setData(TextItem.BODY, customBuilder.getText());
+        System.out.println("@ debug--------------> @Var: customBuilder.getText(): "+customBuilder.getText());
         item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
@@ -53,6 +67,7 @@ public class TextItemBuilder extends LegendItemBuilder {
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        
 
         ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES, itemIndex);
 
@@ -62,7 +77,7 @@ public class TextItemBuilder extends LegendItemBuilder {
                                            String.class,
                                            NbBundle.getMessage(LegendManager.class, "TextItem.property.body.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TextItem.property.body.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBody),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(item.getData(TextItem.BODY)),
             PreviewProperty.createProperty(this,
                                            textProperties.get(TextProperty.TEXT_BODY_FONT),
                                            Font.class,
@@ -107,4 +122,6 @@ public class TextItemBuilder extends LegendItemBuilder {
     public String stepsNeededToBuild() {
         return "";
     }
+
+    
 }

@@ -1,0 +1,117 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.gephi.legend.builders;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.gephi.legend.api.LegendItem;
+import org.gephi.legend.api.CustomLegendItemBuilder;
+import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.api.TableGenerator;
+import org.gephi.legend.items.TableItem;
+import org.gephi.partition.api.Part;
+import org.gephi.partition.api.PartitionController;
+import org.gephi.partition.api.PartitionModel;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
+import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
+
+/**
+ *
+ * @author edubecks
+ */
+
+@ServiceProvider(service=CustomTableItemBuilder.class, position=1)
+public class TableAverageNumberOfNodesInPartition extends CustomLegendItemBuilder implements CustomTableItemBuilder{
+
+
+    @Override
+    public String getDescription() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getTitle() {
+        return "Average Number of Nodes";
+    }
+
+    public void retrieveDataOLD(ArrayList<String> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<Color> colors, ArrayList<ArrayList<Float>> values) {
+        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+        Workspace workspace = projectController.getCurrentWorkspace();
+        GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
+        GraphModel model = graphController.getModel(workspace);
+        Graph graph = model.getGraph();
+        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+        PartitionModel partitionModel = partitionController.getModel();
+
+
+
+
+
+
+        if (partitionModel.getSelectedPartition() != null) {
+
+            float[][] valuesTemp = new float[partitionModel.getSelectedPartition().getPartsCount()][partitionModel.getSelectedPartition().getPartsCount()];
+
+            HashMap<String, Integer> labelsMap = new HashMap<String, Integer>();
+
+            // FILLING LABELS
+            int index = 0;
+            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
+                labelsMap.put(part.getDisplayName(), index++);
+                horizontalLabels.add(part.getDisplayName());
+                verticalLabels.add(part.getDisplayName());
+                labels.add(part.getDisplayName());
+            }
+            
+
+
+            // FILLING COLORS
+            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
+                colors.add(part.getColor());
+            }
+
+            // FILLING VALUES
+            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
+                Node[] nodes = part.getObjects();
+                for (Node node : nodes) {
+                    for (Edge edge : graph.getEdges(node).toArray()) {
+                        Node anotherNode = (node.equals(edge.getSource())) ? edge.getTarget() : edge.getSource();
+                        Part anotherPart = partitionModel.getSelectedPartition().getPart(anotherNode);
+                        valuesTemp[labelsMap.get(part.getDisplayName())][labelsMap.get(anotherPart.getDisplayName())]++;
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < valuesTemp.length; i++) {
+                ArrayList<Float> row= new ArrayList<Float>();
+                for (int j = 0; j < valuesTemp[i].length; j++) {
+                    row.add(valuesTemp[i][j]);
+                }
+                values.add(row);
+            }
+
+
+        }
+    }
+
+    @Override
+    public void retrieveData(ArrayList<StringBuffer> labels, ArrayList<StringBuffer> horizontalLabels, ArrayList<StringBuffer> verticalLabels, ArrayList<Color> colors, ArrayList<ArrayList<Float>> values) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+
+
+
+    
+}

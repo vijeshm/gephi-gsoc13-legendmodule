@@ -17,7 +17,8 @@ public class TableItem extends AbstractItem implements LegendItem {
     public static final String LEGEND_TYPE = "Table Legend";
     //data
     public static final String TABLE_VALUES = "table values";
-    public static final String LABELS = "labels";
+    public static final String HORIZONTAL_LABELS = "horizontal labels";
+    public static final String VERTICAL_LABELS = "vertical labels";
     public static final String LABELS_IDS = "labels ids";
     public static final String LIST_OF_COLORS = "list of colors";
 

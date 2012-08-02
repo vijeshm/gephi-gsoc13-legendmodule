@@ -144,7 +144,7 @@ public class LegendItemsTest {
 
 
         // CREATE ITEM AND ADD IT TO LEGEND MANAGER
-        item = builder.createItem(newItemIndex, graph, attributeModel);
+        item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
 
 
         legendManager.addItem(item);

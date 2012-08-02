@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
@@ -35,7 +36,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public Item buildItem(Graph graph, AttributeModel attributeModel) {
+    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
         ArrayList<String> descriptions = new ArrayList<String>();
         descriptions.add("Test 1");
         descriptions.add("Test 2222");
@@ -230,5 +231,10 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     @Override
     public String stepsNeededToBuild() {
         return "";
+    }
+
+    @Override
+    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -179,7 +179,7 @@ pdfDocument.close();
 
     public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TextItemBuilder builder = new TextItemBuilder();
-        Item item = builder.createItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
         return item;
     }
 

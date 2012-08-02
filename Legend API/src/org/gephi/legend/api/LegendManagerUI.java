@@ -87,6 +87,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         addLegendButton = new javax.swing.JButton();
         legendItemBuildersComboBox = new javax.swing.JComboBox();
+        builderTypeComboBox = new javax.swing.JComboBox();
         legendManagerPanel = new javax.swing.JPanel();
         activeLegendsComboBox = new javax.swing.JComboBox();
         activeLegendLabel = new javax.swing.JLabel();
@@ -108,11 +109,26 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         gridBagConstraints.gridy = 0;
         add(addLegendButton, gridBagConstraints);
 
+        legendItemBuildersComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                legendItemBuildersComboBoxActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(legendItemBuildersComboBox, gridBagConstraints);
+
+        builderTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        add(builderTypeComboBox, gridBagConstraints);
 
         legendManagerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.legendManagerPanel.border.title"), javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP)); // NOI18N
         legendManagerPanel.setLayout(new java.awt.GridBagLayout());
@@ -181,7 +197,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -258,7 +274,16 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         if (builder.isAvailableToBuild()) {
 
-            Item item = builder.createItem(newItemIndex, graph, attributeModel);
+            Item item = null;
+            if (builderTypeComboBox.getSelectedItem() == DEFAULT_BUILDER_TYPE) {
+                item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+            }
+            else{
+                System.out.printf("Building custom type\n");
+                
+                System.out.println("@Var: builderTypeComboBox.getSelectedItem(): "+builderTypeComboBox.getSelectedItem());
+                item = builder.createCustomItem(newItemIndex, graph, attributeModel, (CustomLegendItemBuilder)builderTypeComboBox.getSelectedItem());
+            }
 
 
             legendManager.addItem(item);
@@ -278,9 +303,9 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         }
         else {
             JOptionPane.showMessageDialog(this, builder.stepsNeededToBuild(),
-                                         NbBundle.getMessage(LegendManager.class, "LegendItem.stepsNeededToBuildItem"),
-                                         JOptionPane.INFORMATION_MESSAGE,
-                                         null);
+                                          NbBundle.getMessage(LegendManager.class, "LegendItem.stepsNeededToBuildItem"),
+                                          JOptionPane.INFORMATION_MESSAGE,
+                                          null);
 
         }
 
@@ -397,10 +422,37 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         }
     }//GEN-LAST:event_numberOfItemsTextFieldActionPerformed
 
+    private void legendItemBuildersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_legendItemBuildersComboBoxActionPerformed
+        builderTypeComboBox.removeAllItems();
+        builderTypeComboBox.addItem(DEFAULT_BUILDER_TYPE);
+        
+        // TABLE BUILDERS
+        if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(TableItemBuilder.class)) {
+            Collection<? extends CustomTableItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTableItemBuilder.class);
+            if (!customBuilders.isEmpty()) {
+                for (CustomTableItemBuilder customBuilder : customBuilders) {
+                    builderTypeComboBox.addItem(customBuilder);
+                }
+            }
+        }
+        
+        // TEXT BUILDERS
+        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(TextItemBuilder.class)) {
+            Collection<? extends CustomTextItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTextItemBuilder.class);
+            if (!customBuilders.isEmpty()) {
+                for (CustomTextItemBuilder customBuilder : customBuilders) {
+                    builderTypeComboBox.addItem(customBuilder);
+                }
+            }
+            
+        }
+    }//GEN-LAST:event_legendItemBuildersComboBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel activeLegendLabel;
     private javax.swing.JComboBox activeLegendsComboBox;
     private javax.swing.JButton addLegendButton;
+    private javax.swing.JComboBox builderTypeComboBox;
     private javax.swing.JComboBox legendItemBuildersComboBox;
     private javax.swing.JPanel legendManagerPanel;
     private javax.swing.JPanel legendPropertiesPanel;
@@ -437,4 +489,5 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         PropertyEditorManager.registerEditor(DescriptionElement.class, DescriptionItemElementPropertyEditor.class);
     }
 
+    private final static String DEFAULT_BUILDER_TYPE = "Default";
 }

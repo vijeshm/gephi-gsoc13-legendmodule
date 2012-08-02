@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.preview.api.Item;
@@ -43,7 +44,7 @@ public class ImageItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public Item buildItem(Graph graph, AttributeModel attributeModel) {
+    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
         ImageItem item = new ImageItem(graph);
         item.setData(LegendItem.SUB_TYPE, getType());
         return item;
@@ -83,6 +84,11 @@ public class ImageItemBuilder extends LegendItemBuilder {
     @Override
     public String stepsNeededToBuild() {
         return "";
+    }
+
+    @Override
+    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     
