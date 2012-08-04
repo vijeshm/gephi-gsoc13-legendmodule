@@ -113,7 +113,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         TableItem item = new TableItem(graph);
         item.setData(TableItem.LABELS_IDS, labels);
         item.setData(TableItem.TABLE_VALUES, values);
-        item.setData(TableItem.LIST_OF_COLORS, colors);
+        item.setData(TableItem.COLOR_VALUES, colors);
         item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
@@ -122,24 +122,33 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        CustomTableItemBuilder customTableBuilder = (CustomTableItemBuilder) builder;
+        
         TableItem item = new TableItem(graph);
         item.setData(LegendItem.SUB_TYPE, getType());
         
-        ArrayList<StringBuffer> verticalLabels = new ArrayList<StringBuffer>();
-        ArrayList<StringBuffer> horizontalLabels = new ArrayList<StringBuffer>();
-        ArrayList<StringBuffer> labels = new ArrayList<StringBuffer>();
-        ArrayList<Color> colors = new ArrayList<Color>();
+        // labels
+        ArrayList<StringBuilder> verticalLabels = new ArrayList<StringBuilder>();
+        ArrayList<StringBuilder> horizontalLabels = new ArrayList<StringBuilder>();
+        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
+        // values
         ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
+        // colors
+        ArrayList<Color> horizontalColors = new ArrayList<Color>();
+        ArrayList<Color> verticalColors = new ArrayList<Color>();
+        ArrayList<ArrayList<Color>> valueColors = new ArrayList<ArrayList<Color>>();
         
-        customTableBuilder.retrieveData(labels, horizontalLabels, verticalLabels, colors, values);
+        // retrieving data
+        CustomTableItemBuilder customTableBuilder = (CustomTableItemBuilder) builder;
+        customTableBuilder.retrieveData(labels, horizontalLabels, verticalLabels, values, horizontalColors, verticalColors, valueColors);
         
-        
+        // setting data
         item.setData(TableItem.HORIZONTAL_LABELS, horizontalLabels);
         item.setData(TableItem.VERTICAL_LABELS, verticalLabels);
         item.setData(TableItem.LABELS_IDS, labels);
         item.setData(TableItem.TABLE_VALUES, values);
-        item.setData(TableItem.LIST_OF_COLORS, colors);
+        item.setData(TableItem.COLOR_VALUES, valueColors);
+        item.setData(TableItem.COLOR_HORIZONTAL, horizontalColors);
+        item.setData(TableItem.COLOR_VERTICAL, verticalColors);
         
         return item;
         
@@ -154,7 +163,8 @@ public class TableItemBuilder extends LegendItemBuilder {
         ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, itemIndex);
 
 
-        ArrayList<StringBuffer> labelsGroup = item.getData(TableItem.LABELS_IDS);
+        // creating one property for each label
+        ArrayList<StringBuilder> labelsGroup = item.getData(TableItem.LABELS_IDS);
         PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
         for (int i = 0; i < labelProperties.length; i++) {
             labelProperties[i] = PreviewProperty.createProperty(this,
@@ -162,9 +172,11 @@ public class TableItemBuilder extends LegendItemBuilder {
                                                                 String.class,
                                                                 NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName")+" "+i,
                                                                 NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description")+" "+i,
-                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i));
+                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
 
         }
+        
+        
 
         PreviewProperty[] properties = {
             PreviewProperty.createProperty(this,

@@ -6,13 +6,14 @@ package org.gephi.legend.api;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  *
  * @author edubecks
  */
 public interface CustomTableItemBuilder {
-    
-    public void retrieveData(ArrayList<StringBuffer> labels, ArrayList<StringBuffer> horizontalLabels, ArrayList<StringBuffer> verticalLabels, ArrayList<Color> colors, ArrayList<ArrayList<Float>> values);
+
+    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
 
 }

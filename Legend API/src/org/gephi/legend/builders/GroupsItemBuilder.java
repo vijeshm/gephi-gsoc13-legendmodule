@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomGroupsItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
@@ -60,38 +61,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         ArrayList<String> labelsGroup = partitionData.getLabels();
         ArrayList<Color> colorsGroup = partitionData.getColors();
         ArrayList<Float> valuesGroup = partitionData.getValues();
-
-//        // TEST
-//        labelsGroup = new ArrayList<String>();
-//        colorsGroup = new ArrayList<Color>();
-//        valuesGroup = new ArrayList<Float>();
-//        colorsGroup.add(new Color(129, 169, 48));
-//        colorsGroup.add(new Color(129, 48, 169));
-//        colorsGroup.add(new Color(169, 129, 48));
-//        colorsGroup.add(new Color(169, 48, 129));
-//        colorsGroup.add(new Color(169, 48, 48));
-//        colorsGroup.add(new Color(48, 129, 169));
-//        colorsGroup.add(new Color(48, 169, 129));
-//        colorsGroup.add(new Color(48, 169, 48));
-//        colorsGroup.add(new Color(48, 48, 169));
-//        labelsGroup.add("sjajhasjha sjhdjhadsjh");
-//        labelsGroup.add("LABEL" + 1);
-//        labelsGroup.add("" + 2);
-//        labelsGroup.add("" + 3);
-//        labelsGroup.add("" + 4);
-//        labelsGroup.add("" + 5);
-//        labelsGroup.add("" + 6);
-//        labelsGroup.add("" + 7);
-//        labelsGroup.add("" + 8);
-//        valuesGroup.add(0.025974026f);
-//        valuesGroup.add(0.038961038f);
-//        valuesGroup.add(0.277922076f);
-//        valuesGroup.add(0.103896104f);
-//        valuesGroup.add(0.12987013f);
-//        valuesGroup.add(0.54285715f);
-//        valuesGroup.add(0.14285715f);
-//        valuesGroup.add(0.14285715f);
-//        valuesGroup.add(0.19480519f);
 
 
         for (int i = 0; i < valuesGroup.size(); i++) {
@@ -202,7 +171,23 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        
+        GroupsItem item = new GroupsItem(graph);
+        item.setData(LegendItem.SUB_TYPE, getType());
+        
+        ArrayList<String> labels = new ArrayList<String>(); 
+        ArrayList<Color> colors = new ArrayList<Color>(); 
+        ArrayList<Float> values =  new ArrayList<Float>();
+        
+        CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder)builder;
+        customGroupsBuilder.retrieveData(labels, colors, values);
+        
+        item.setData(GroupsItem.COLORS_GROUP, colors);
+        item.setData(GroupsItem.LABELS_GROUP, labels);
+        item.setData(GroupsItem.VALUES_GROUP, values);
+        
+        return item;
+        
     }
     
     

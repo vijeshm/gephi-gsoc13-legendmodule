@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.builders;
+package org.gephi.legend.custombuilders.table;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import org.gephi.graph.api.Node;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.api.TableGenerator;
 import org.gephi.legend.items.TableItem;
 import org.gephi.partition.api.Part;
@@ -23,6 +24,7 @@ import org.gephi.partition.api.PartitionModel;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -31,20 +33,22 @@ import org.openide.util.lookup.ServiceProvider;
  */
 
 @ServiceProvider(service=CustomTableItemBuilder.class, position=1)
-public class TableAverageNumberOfNodesInPartition extends CustomLegendItemBuilder implements CustomTableItemBuilder{
+public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder implements CustomTableItemBuilder{
 
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.AverageNumberOfNodesInPartition.description");
     }
 
     @Override
     public String getTitle() {
-        return "Average Number of Nodes";
+        return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.AverageNumberOfNodesInPartition.title");
     }
 
-    public void retrieveDataOLD(ArrayList<String> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<Color> colors, ArrayList<ArrayList<Float>> values) {
+
+    @Override
+    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
@@ -52,9 +56,6 @@ public class TableAverageNumberOfNodesInPartition extends CustomLegendItemBuilde
         Graph graph = model.getGraph();
         PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
         PartitionModel partitionModel = partitionController.getModel();
-
-
-
 
 
 
@@ -67,18 +68,14 @@ public class TableAverageNumberOfNodesInPartition extends CustomLegendItemBuilde
             // FILLING LABELS
             int index = 0;
             for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
-                labelsMap.put(part.getDisplayName(), index++);
-                horizontalLabels.add(part.getDisplayName());
-                verticalLabels.add(part.getDisplayName());
-                labels.add(part.getDisplayName());
+                StringBuilder label = new StringBuilder(part.getDisplayName());
+                labelsMap.put(label.toString(), index++);
+                horizontalLabels.add(label);
+                verticalLabels.add(label);
+                labels.add(label);
             }
             
 
-
-            // FILLING COLORS
-            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
-                colors.add(part.getColor());
-            }
 
             // FILLING VALUES
             for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
@@ -100,14 +97,22 @@ public class TableAverageNumberOfNodesInPartition extends CustomLegendItemBuilde
                 }
                 values.add(row);
             }
+            
+            
+            // FILLING COLORS
+            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
+                Color color = part.getColor();
+                verticalColors.add(color);
+                horizontalColors.add(color);
+                ArrayList<Color> colorRow = new ArrayList<Color>();
+                for (int i = 0; i < valuesTemp.length; i++) {
+                    colorRow.add(color);
+                }
+                valueColors.add(colorRow);
+            }
 
 
         }
-    }
-
-    @Override
-    public void retrieveData(ArrayList<StringBuffer> labels, ArrayList<StringBuffer> horizontalLabels, ArrayList<StringBuffer> verticalLabels, ArrayList<Color> colors, ArrayList<ArrayList<Float>> values) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 

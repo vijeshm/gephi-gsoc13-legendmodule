@@ -21,7 +21,9 @@ import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
+import org.gephi.legend.builders.LegendItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
+import org.gephi.legend.custombuilders.table.TableSampleBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.properties.LegendProperty;
@@ -126,7 +128,7 @@ public class TestProcessingTarget {
 
             // creating item
 //            Item item = addImageItem(itemIndex, graph, attributeModel);
-            Item item = addTableItem(itemIndex, graph, attributeModel);
+            Item item = addCustomTableItem(itemIndex, graph, attributeModel);
 
 
             // add item
@@ -182,6 +184,14 @@ public class TestProcessingTarget {
         Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
         return item;
     }
+    
+    public Item addCustomTableItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
+        TableItemBuilder builder = new TableItemBuilder();
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new TableSampleBuilder());
+        return item;
+    }
+    
+    
     
     public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         ImageItemBuilder builder = new ImageItemBuilder();

@@ -20,7 +20,10 @@ public class TableItem extends AbstractItem implements LegendItem {
     public static final String HORIZONTAL_LABELS = "horizontal labels";
     public static final String VERTICAL_LABELS = "vertical labels";
     public static final String LABELS_IDS = "labels ids";
-    public static final String LIST_OF_COLORS = "list of colors";
+    // colors
+    public static final String COLOR_VALUES = "color values";
+    public static final String COLOR_VERTICAL = "color vertical";
+    public static final String COLOR_HORIZONTAL = "color horizontal";
 
 
     public enum VerticalTextDirection {
