@@ -130,7 +130,6 @@ public class TestLegendItem {
             item = builder.createDefaultItem(newItemIndex, null, null);
 
 
-            System.out.println("@Var: item: " + item.getData(LegendItem.SUB_TYPE));
 
             // ADDING ITS PROPERTIES TO PREVIEW PROPERTIES
             PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);

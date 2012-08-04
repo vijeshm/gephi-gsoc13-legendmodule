@@ -77,7 +77,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         item.setData(GroupsItem.COLORS_GROUP, colorsGroup);
         item.setData(GroupsItem.LABELS_GROUP, labelsGroup);
         item.setData(GroupsItem.VALUES_GROUP, valuesGroup);
-        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
 
@@ -173,7 +172,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
         
         GroupsItem item = new GroupsItem(graph);
-        item.setData(LegendItem.SUB_TYPE, getType());
         
         ArrayList<String> labels = new ArrayList<String>(); 
         ArrayList<Color> colors = new ArrayList<Color>(); 

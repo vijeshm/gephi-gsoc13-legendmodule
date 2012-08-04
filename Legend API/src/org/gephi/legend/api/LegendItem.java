@@ -20,7 +20,6 @@ public interface LegendItem {
     public static final String PROPERTIES = "properties";
     // TYPE 
     public static final String TYPE = "Legend Item";
-    public static final String SUB_TYPE = "Legend Sub-type";
     // DESCRIPTION
     public static final String LABEL = "label";
     public static final String HAS_DYNAMIC_PROPERTIES = "has dynamic properties";

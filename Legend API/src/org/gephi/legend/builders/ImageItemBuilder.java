@@ -46,7 +46,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
     @Override
     public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
         ImageItem item = new ImageItem(graph);
-        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
 

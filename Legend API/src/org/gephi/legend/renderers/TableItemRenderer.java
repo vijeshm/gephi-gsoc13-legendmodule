@@ -8,10 +8,6 @@ package org.gephi.legend.renderers;
  *
  * @author edubecks
  */
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -22,14 +18,11 @@ import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.legend.items.TableItem;
 import org.gephi.legend.builders.TableItemBuilder;
-import org.gephi.legend.items.TableItem.VerticalTextDirection;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-import processing.core.PGraphics;
-import processing.core.PGraphicsJava2D;
 
 @ServiceProvider(service = Renderer.class, position = 501)
 public class TableItemRenderer extends LegendItemRenderer {
@@ -51,22 +44,6 @@ public class TableItemRenderer extends LegendItemRenderer {
 
     public void createVerticalText(Graphics2D graphics2D, AffineTransform affineTransform, Integer width, Integer height) {
 
-
-//        Float[][] tableValues = tableItem.getData(TableItem.TABLE_VALUES);
-//        Boolean isCellColoring = tableItem.getData(TableItem.IS_CELL_COLORING);
-//
-//        Color BACKGROUND = tableItem.getData(TableItem.BACKGROUND);
-//        TableItem.VerticalTextDirection verticalTextDirection = tableItem.getData(TableItem.VERTICAL_TEXT_DIRECTION);
-//
-//
-//        Integer cellSizeWidth = tableItem.getData(TableItem.CELL_SIZE_WIDTH);
-//        Integer cellSizeHeight = tableItem.getData(TableItem.CELL_SIZE_HEIGHT);
-//
-//        //margins
-//        Integer verticalExtraMargin = tableItem.getData(TableItem.VERTICAL_EXTRA_MARGIN);
-//        Integer horizontalExtraAlignment = tableItem.getData(TableItem.HORIZONTAL_EXTRA_ALIGNMENT);
-//        Integer minimumMargin = tableItem.getData(TableItem.MINIMUM_MARGIN);
-
         // diagonal shift
         Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
 
@@ -81,10 +58,9 @@ public class TableItemRenderer extends LegendItemRenderer {
         //metrics
         FontMetrics metrics = graphics2D.getFontMetrics();
 
-        //margin
+        //overriding centerdistance
         int centerDistance = (cellSizeWidth - metrics.getHeight()) / 2;
 
-        //overriding centerdistance
 
 
 
@@ -206,12 +182,9 @@ public class TableItemRenderer extends LegendItemRenderer {
         for (int i = 0; i < tableValues.length; i++) {
 
             for (int j = 0; j < tableValues[i].length; j++) {
-//                System.out.printf("[%d][%d] -> (%f) -> Direction %s\n", i, j,
-//                                  tableValues[i][j], cellColoring.toString());
                 if (isCellColoring) {
                     graphics.setColor(valueColors.get(i).get(j));
                 }
-                System.out.println("@Var: printing " + tableValues[i][j] + " valueColors: " + valueColors.get(i).get(j));
 
                 switch (cellColoringDirection) {
                     case UP:

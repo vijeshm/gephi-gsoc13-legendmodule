@@ -48,7 +48,6 @@ public class TextItemBuilder extends LegendItemBuilder {
     public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
         TextItem item = new TextItem(graph);
         item.setData(TextItem.BODY, defaultBody);
-        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
 
@@ -59,7 +58,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         TextItem item = new TextItem(graph);
         item.setData(TextItem.BODY, customBuilder.getText());
         System.out.println("@ debug--------------> @Var: customBuilder.getText(): "+customBuilder.getText());
-        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
 

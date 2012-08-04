@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.custombuilders.table;
+package org.gephi.legend.builders.table;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author edubecks
  */
 @ServiceProvider(service = CustomTableItemBuilder.class, position = 2)
-public class TableSampleBuilder extends CustomLegendItemBuilder implements CustomTableItemBuilder {
+public class Default extends CustomLegendItemBuilder implements CustomTableItemBuilder {
 
     @Override
     public String getDescription() {
@@ -68,6 +68,16 @@ public class TableSampleBuilder extends CustomLegendItemBuilder implements Custo
         colorsRow.add(color3);
         valueColors.add(colorsRow);
         
+    }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
+    }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return NONE_NEEDED;
     }
 
 }

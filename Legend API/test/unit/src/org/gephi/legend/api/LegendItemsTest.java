@@ -148,7 +148,6 @@ public class LegendItemsTest {
 
 
         legendManager.addItem(item);
-        System.out.println("@Var: item: " + item.getData(LegendItem.SUB_TYPE));
 
         // ADDING ITS PROPERTIES TO PREVIEW PROPERTIES
         PreviewProperty[] properties = item.getData(LegendItem.PROPERTIES);

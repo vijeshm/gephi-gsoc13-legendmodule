@@ -8,7 +8,6 @@ package org.gephi.legend.builders;
  *
  * @author edubecks
  */
-import org.gephi.legend.items.TableItem;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
@@ -17,20 +16,16 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendItem.Direction;
 import org.gephi.legend.api.LegendItem.Alignment;
+import org.gephi.legend.api.LegendItem.Direction;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.api.PartitionData;
 import org.gephi.legend.api.StatisticData;
+import org.gephi.legend.items.TableItem;
 import org.gephi.legend.properties.TableProperty;
-import org.gephi.legend.renderers.TableItemRenderer;
-import org.gephi.partition.api.NodePartition;
-import org.gephi.partition.api.PartitionController;
-import org.gephi.partition.api.PartitionModel;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -114,7 +109,6 @@ public class TableItemBuilder extends LegendItemBuilder {
         item.setData(TableItem.LABELS_IDS, labels);
         item.setData(TableItem.TABLE_VALUES, values);
         item.setData(TableItem.COLOR_VALUES, colors);
-        item.setData(LegendItem.SUB_TYPE, getType());
         return item;
     }
     
@@ -124,7 +118,6 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
         
         TableItem item = new TableItem(graph);
-        item.setData(LegendItem.SUB_TYPE, getType());
         
         // labels
         ArrayList<StringBuilder> verticalLabels = new ArrayList<StringBuilder>();

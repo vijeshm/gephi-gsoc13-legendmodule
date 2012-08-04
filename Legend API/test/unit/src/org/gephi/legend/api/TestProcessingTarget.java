@@ -23,7 +23,7 @@ import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.LegendItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
-import org.gephi.legend.custombuilders.table.TableSampleBuilder;
+import org.gephi.legend.builders.table.Default;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.properties.LegendProperty;
@@ -187,7 +187,7 @@ public class TestProcessingTarget {
     
     public Item addCustomTableItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TableItemBuilder builder = new TableItemBuilder();
-        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new TableSampleBuilder());
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new Default());
         return item;
     }
     

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.custombuilders.table;
+package org.gephi.legend.builders.table;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -113,6 +113,16 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
 
         }
+    }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String stepsNeededToBuild() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 

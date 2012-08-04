@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.custombuilders.text;
+package org.gephi.legend.builders.text;
 
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author edubecks
  */
 @ServiceProvider(service=CustomTextItemBuilder.class, position=1)
-public class TextSampleBuilder extends CustomLegendItemBuilder implements CustomTextItemBuilder{
+public class Default extends CustomLegendItemBuilder implements CustomTextItemBuilder{
 
     @Override
     public String getDescription() {
@@ -30,6 +30,16 @@ public class TextSampleBuilder extends CustomLegendItemBuilder implements Custom
     @Override
     public String getText() {
         return "Random Text";
+    }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
+    }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return NONE_NEEDED;
     }
     
 }

@@ -50,7 +50,6 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         item.setData(DescriptionItem.KEY, descriptions);
         item.setData(DescriptionItem.VALUE, values);
         item.setData(DescriptionItem.NUMBER_OF_ITEMS, 0);
-        item.setData(LegendItem.SUB_TYPE, getType());
 
         return item;
     }

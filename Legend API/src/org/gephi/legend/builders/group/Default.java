@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.custombuilders.group;
+package org.gephi.legend.builders.group;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author edubecks
  */
 @ServiceProvider(service=CustomGroupsItemBuilder.class, position=100)
-public class SampleBuilder extends CustomLegendItemBuilder implements CustomGroupsItemBuilder{
+public class Default extends CustomLegendItemBuilder implements CustomGroupsItemBuilder{
 
     @Override
     public String getDescription() {
@@ -47,6 +47,16 @@ public class SampleBuilder extends CustomLegendItemBuilder implements CustomGrou
         Float value2=0.4f;
         values.add(value1);
         values.add(value2);
+    }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        return true;
+    }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return NONE_NEEDED;
     }
     
 }
