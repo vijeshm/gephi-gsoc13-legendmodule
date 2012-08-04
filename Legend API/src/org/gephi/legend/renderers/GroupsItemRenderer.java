@@ -21,6 +21,8 @@ import org.gephi.legend.items.GroupsItem;
 import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.api.LegendItem.Shape;
 import org.gephi.legend.api.LegendItem.Direction;
+import org.gephi.legend.items.TableItem;
+import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -33,8 +35,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 
     @Override
     public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        
-        if(labelsGroup.isEmpty()){
+
+        if (labels.isEmpty()) {
             return;
         }
 
@@ -42,7 +44,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 
         System.out.println("@Var: height: " + height);
         System.out.println("@Var: width: " + width);
-        int numGroups = labelsGroup.size();
+        int numGroups = labels.size();
         System.out.println("@Var: numGroups: " + numGroups);
         int numRows = (int) Math.ceil((double) numGroups / numColumns);
         System.out.println("@Var: numColumns: " + numColumns);
@@ -58,21 +60,21 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 //        int elementWidth = width / numColumns - paddingBetweenElements;
         System.out.println("@Var: elemendWidth: " + elementWidth);
         System.out.println("@Var: elemendHeight: " + elementHeight);
-        
-                int maxLabelWidth = Integer.MIN_VALUE;
+
+        int maxLabelWidth = Integer.MIN_VALUE;
         int maxLabelHeight = Integer.MIN_VALUE;
-        
+
         // computing max label width
-        for (String label : labelsGroup) {
-            maxLabelHeight = (int) Math.max(maxLabelHeight, computeVerticalTextSpaceUsed(graphics2D, label, labelFont, 0, 0, width));
+        for (StringBuilder label : labels) {
+            maxLabelHeight = (int) Math.max(maxLabelHeight, computeVerticalTextSpaceUsed(graphics2D, label.toString(), labelFont, 0, 0, width));
         }
-        
+
         // computing max label height
-        for (String label : labelsGroup) {
-            maxLabelWidth = Math.max(maxLabelWidth, fontMetrics.stringWidth(label));
+        for (StringBuilder label : labels) {
+            maxLabelWidth = Math.max(maxLabelWidth, fontMetrics.stringWidth(label.toString()));
         }
-        
-        
+
+
         System.out.println("@Var: maxLabelHeight: " + maxLabelHeight);
         System.out.println("@Var: maxLabelWidth: " + maxLabelWidth);
 
@@ -99,13 +101,13 @@ public class GroupsItemRenderer extends LegendItemRenderer {
                 valuesNormalized.add(value / maxValue);
             }
         }
-        else{
+        else {
             for (Float value : valuesGroup) {
                 valuesNormalized.add(1f);
             }
         }
 
-        for (int i = 0; i < labelsGroup.size(); i++) {
+        for (int i = 0; i < labels.size(); i++) {
             int x = (i % numColumns) * elementWidth + paddingBetweenElements;
             int y = (i / numColumns) * elementHeight + paddingBetweenElements;
             int xShape = 0, yShape = 0, xLabel = 0, yLabel = 0;
@@ -141,23 +143,23 @@ public class GroupsItemRenderer extends LegendItemRenderer {
             }
 
             drawShape(graphics2D, shape, colorsGroup.get(i), xShape, yShape, shapeWidth, shapeHeight, valuesNormalized.get(i));
-            legendDrawText(graphics2D, labelsGroup.get(i), labelFont, colorsGroup.get(i), xLabel, yLabel, labelWidth, labelHeight, LegendItem.Alignment.CENTER);
+            legendDrawText(graphics2D, labels.get(i).toString(), labelFont, colorsGroup.get(i), xLabel, yLabel, labelWidth, labelHeight, LegendItem.Alignment.CENTER);
         }
     }
 
     public void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height, float scale) {
-        System.out.println("@Var: shape: "+"--------------");
-        System.out.println("@Var: shape: "+shape);
-        System.out.println("@Var: color: "+color);
-        System.out.println("@Var: x: "+x);
-        System.out.println("@Var: y: "+y);
-        System.out.println("@Var: width: "+width);
-        System.out.println("@Var: height: "+height);
-        
+        System.out.println("@Var: shape: " + "--------------");
+        System.out.println("@Var: shape: " + shape);
+        System.out.println("@Var: color: " + color);
+        System.out.println("@Var: x: " + x);
+        System.out.println("@Var: y: " + y);
+        System.out.println("@Var: width: " + width);
+        System.out.println("@Var: height: " + height);
+
         int shapeWidth = (int) (width * scale);
         int shapeHeight = (int) (height * scale);
-        x = (int) (x + (width-shapeWidth) / 2); 
-        y = (int) (y + (height-shapeHeight) / 2);
+        x = (int) (x + (width - shapeWidth) / 2);
+        y = (int) (y + (height - shapeHeight) / 2);
         graphics2D.setColor(color);
         switch (shape) {
             case RECTANGLE: {
@@ -182,19 +184,28 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
+
+        // READING LABELS
+        labels = item.getData(GroupsItem.LABELS_IDS);
+        for (int i = 0; i < labels.size(); i++) {
+            StringBuilder label = labels.get(i);
+            String newLabel = properties.getStringValue(GroupsProperty.getLabelProperty(itemIndex, i));
+            label.replace(0, newLabel.length(), newLabel);
+        }
+        
+        
+        colorsGroup = item.getData(GroupsItem.COLORS);
+        valuesGroup = item.getData(GroupsItem.VALUES);
+
         // properties
         numColumns = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS));
+        numColumns = Math.min(numColumns, labels.size());
         labelPosition = (LegendItem.Direction) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_POSITION));
         shape = (LegendItem.Shape) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
         labelFont = properties.getFontValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
         labelFontColor = properties.getColorValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_COLOR));
         isScalingShapes = properties.getBooleanValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SCALE_SHAPE));
-
-        //values
-        labelsGroup = item.getData(GroupsItem.LABELS_GROUP);
-        colorsGroup = item.getData(GroupsItem.COLORS_GROUP);
-        valuesGroup = item.getData(GroupsItem.VALUES_GROUP);
-
+        
         paddingBetweenTextAndShape = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
         paddingBetweenElements = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
 
@@ -226,7 +237,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
     // TO ADD
     private Boolean isScalingShapes;
     //VALUES
-    private ArrayList<String> labelsGroup;
+    private ArrayList<StringBuilder> labels;
     private ArrayList<Color> colorsGroup;
     private ArrayList<Float> valuesGroup;
     // min shape size

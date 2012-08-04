@@ -15,9 +15,9 @@ import org.gephi.preview.plugin.items.AbstractItem;
 public class GroupsItem extends AbstractItem implements LegendItem {
 
     public static final String LEGEND_TYPE = "Groups Item";
-    public static final String LABELS_GROUP = "labels group";
-    public static final String COLORS_GROUP = "colors group";
-    public static final String VALUES_GROUP = "values group";
+    public static final String LABELS_IDS = "labels group";
+    public static final String COLORS = "colors group";
+    public static final String VALUES = "values group";
 
     //BODY
     public GroupsItem(Object source) {

@@ -166,7 +166,6 @@ public class TableItemBuilder extends LegendItemBuilder {
                                                                 NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName")+" "+i,
                                                                 NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description")+" "+i,
                                                                 PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
-
         }
         
         
@@ -240,11 +239,10 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),};
 
 
-        PreviewProperty[] tableItemProperties = new PreviewProperty[labelProperties.length + properties.length];
-        System.arraycopy(labelProperties, 0, tableItemProperties, 0, labelProperties.length);
-        System.arraycopy(properties, 0, tableItemProperties, labelProperties.length, properties.length);
-
-        return tableItemProperties;
+        PreviewProperty[] propertiesWithLabels = new PreviewProperty[labelProperties.length + properties.length];
+        System.arraycopy(labelProperties, 0, propertiesWithLabels, 0, labelProperties.length);
+        System.arraycopy(properties, 0, propertiesWithLabels, labelProperties.length, properties.length);
+        return propertiesWithLabels;
     }
 
     //default values

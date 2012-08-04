@@ -23,7 +23,7 @@ public class Default extends CustomLegendItemBuilder implements CustomTextItemBu
 
     @Override
     public String getTitle() {
-        return "Some Text Builder";
+        return DEFAULT_TITLE;
     }
 
 

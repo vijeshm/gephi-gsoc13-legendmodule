@@ -13,6 +13,6 @@ import java.util.ArrayList;
  */
 public interface CustomGroupsItemBuilder {
 
-    public void retrieveData(ArrayList<String> labels, ArrayList<Color> colors, ArrayList<Float> values);
+    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<Color> colors, ArrayList<Float> values);
 
 }

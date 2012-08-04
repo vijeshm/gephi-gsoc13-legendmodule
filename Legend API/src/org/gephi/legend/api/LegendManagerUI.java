@@ -93,8 +93,10 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         add(addLegendButton, gridBagConstraints);
 
         legendItemBuildersComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -103,7 +105,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -111,7 +113,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         builderTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -175,6 +177,9 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         legendManagerPanel.add(numberOfItemsTextField, gridBagConstraints);
 
         numberOfItemsLabel.setText(org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.numberOfItemsLabel.text")); // NOI18N
@@ -260,18 +265,16 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
 
-        if (builder.isAvailableToBuild()) {
 
-            Item item = null;
-            if (builderTypeComboBox.getSelectedItem() == DEFAULT_BUILDER_TYPE) {
-                item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
-            }
-            else{
-                System.out.printf("Building custom type\n");
-                
-                System.out.println("@Var: builderTypeComboBox.getSelectedItem(): "+builderTypeComboBox.getSelectedItem());
-                item = builder.createCustomItem(newItemIndex, graph, attributeModel, (CustomLegendItemBuilder)builderTypeComboBox.getSelectedItem());
-            }
+        Item item = null;
+
+        System.out.printf("Building custom type\n");
+
+        System.out.println("@Var: builderTypeComboBox.getSelectedItem(): " + builderTypeComboBox.getSelectedItem());
+        CustomLegendItemBuilder customBuilder = (CustomLegendItemBuilder) builderTypeComboBox.getSelectedItem();
+        if (customBuilder.isAvailableToBuild()) {
+            
+            item = builder.createCustomItem(newItemIndex, graph, attributeModel, customBuilder);
 
 
             legendManager.addItem(item);
@@ -294,7 +297,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
                                           NbBundle.getMessage(LegendManager.class, "LegendItem.stepsNeededToBuildItem"),
                                           JOptionPane.INFORMATION_MESSAGE,
                                           null);
-
         }
 
     }//GEN-LAST:event_addLegendButtonActionPerformed
@@ -337,7 +339,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
         if (previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
 
-//            Integer activeLegend = activeLegendsComboBox.getSelectedIndex();
             Integer activeLegend = ((Item) activeLegendsComboBox.getSelectedItem()).getData(LegendItem.ITEM_INDEX);
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
             legendManager.removeItem(activeLegend);
@@ -345,19 +346,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             System.out.println("@Var: legendManager.getActiveLegend(): " + legendManager.getActiveLegend());
             refreshPropertySheet(legendManager.getActiveLegendItem());
 
-//            if (activeLegend != -1) {
-//                System.out.println("Removing ..... @Var: activeLegend: " + activeLegend);
-//                // clean previewProperties
-//                for (PreviewProperty property : previewProperties.getProperties()) {
-//
-//                    if (LegendManager.getItemIndexFromProperty(property, activeLegend)) {
-//                        previewProperties.removeProperty(property);
-//                    }
-////                activeLegendsComboBox.removeItemAt(activeLegend);
-//                }
-//                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-//                legendManager.removeItem(activeLegend);
-//            }
         }
     }//GEN-LAST:event_removeLegendButtonActionPerformed
 
@@ -412,8 +400,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
     private void legendItemBuildersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_legendItemBuildersComboBoxActionPerformed
         builderTypeComboBox.removeAllItems();
-        builderTypeComboBox.addItem(DEFAULT_BUILDER_TYPE);
-        
+
         // TABLE BUILDERS
         if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(TableItemBuilder.class)) {
             Collection<? extends CustomTableItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTableItemBuilder.class);
@@ -423,7 +410,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
                 }
             }
         }
-        
         // TEXT BUILDERS
         else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(TextItemBuilder.class)) {
             Collection<? extends CustomTextItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTextItemBuilder.class);
@@ -432,8 +418,40 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
                     builderTypeComboBox.addItem(customBuilder);
                 }
             }
-            
         }
+        // IMAGE BUILDERS
+        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(ImageItemBuilder.class)) {
+            Collection<? extends CustomImageItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomImageItemBuilder.class);
+            if (!customBuilders.isEmpty()) {
+                for (CustomImageItemBuilder customBuilder : customBuilders) {
+                    builderTypeComboBox.addItem(customBuilder);
+                }
+            }
+        }
+        // GROUPS BUILDERS
+        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(GroupsItemBuilder.class)) {
+            Collection<? extends CustomGroupsItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomGroupsItemBuilder.class);
+            if (!customBuilders.isEmpty()) {
+                for (CustomGroupsItemBuilder customBuilder : customBuilders) {
+                    builderTypeComboBox.addItem(customBuilder);
+                }
+            }
+        }
+        // DESCRIPTION BUILDERS
+        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(DescriptionItemBuilder.class)) {
+            Collection<? extends CustomDescriptionItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomDescriptionItemBuilder.class);
+            if (!customBuilders.isEmpty()) {
+                for (CustomDescriptionItemBuilder customBuilder : customBuilders) {
+                    builderTypeComboBox.addItem(customBuilder);
+                }
+            }
+        }
+
+
+
+
+
+
     }//GEN-LAST:event_legendItemBuildersComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -477,5 +495,4 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         PropertyEditorManager.registerEditor(DescriptionElement.class, DescriptionItemElementPropertyEditor.class);
     }
 
-    private final static String DEFAULT_BUILDER_TYPE = "Default";
 }

@@ -25,6 +25,7 @@ public abstract class CustomLegendItemBuilder {
     public abstract String stepsNeededToBuild();
     
     public static final String NONE_NEEDED="";
+    public static final String DEFAULT_TITLE="Default";
     
     @Override
     public String toString(){

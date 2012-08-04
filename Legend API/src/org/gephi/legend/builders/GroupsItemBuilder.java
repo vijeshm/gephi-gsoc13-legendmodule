@@ -17,7 +17,9 @@ import org.gephi.legend.api.PartitionData;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.legend.items.GroupsItem;
+import org.gephi.legend.items.TableItem;
 import org.gephi.legend.properties.GroupsProperty;
+import org.gephi.legend.properties.TableProperty;
 import org.gephi.legend.renderers.TextItemRenderer;
 import org.gephi.partition.api.NodePartition;
 import org.gephi.partition.api.PartitionController;
@@ -46,15 +48,14 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     @Override
     public String getType() {
         return NbBundle.getMessage(LegendManager.class, "GroupsItem.name");
-    }   
-
+    }
 
     @Override
     public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
-        
 
 
-        
+
+
         PartitionData partitionData = new PartitionData();
 
 
@@ -71,12 +72,12 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
 
         GroupsItem item = new GroupsItem(graph);
-        
-        System.out.println("@Var: Group buildItem: "+item.getType());
-        
-        item.setData(GroupsItem.COLORS_GROUP, colorsGroup);
-        item.setData(GroupsItem.LABELS_GROUP, labelsGroup);
-        item.setData(GroupsItem.VALUES_GROUP, valuesGroup);
+
+        System.out.println("@Var: Group buildItem: " + item.getType());
+
+        item.setData(GroupsItem.COLORS, colorsGroup);
+        item.setData(GroupsItem.LABELS_IDS, labelsGroup);
+        item.setData(GroupsItem.VALUES, valuesGroup);
         return item;
     }
 
@@ -84,6 +85,18 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+        // creating one property for each label
+        ArrayList<StringBuilder> labelsGroup = item.getData(GroupsItem.LABELS_IDS);
+        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
+        for (int i = 0; i < labelProperties.length; i++) {
+            labelProperties[i] = PreviewProperty.createProperty(this,
+                                                                GroupsProperty.getLabelProperty(itemIndex, i),
+                                                                String.class,
+                                                                NbBundle.getMessage(LegendManager.class, "GroupsItem.property.labels.displayName") + " " + i,
+                                                                NbBundle.getMessage(LegendManager.class, "GroupsItem.property.labels.description") + " " + i,
+                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
+        }
 
         ArrayList<String> groupsProperties = LegendManager.getProperties(GroupsProperty.OWN_PROPERTIES, itemIndex);
 
@@ -138,7 +151,11 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsScalingShapes)
         };
 
-        return properties;
+        PreviewProperty[] propertiesWithLabels = new PreviewProperty[labelProperties.length + properties.length];
+        System.arraycopy(labelProperties, 0, propertiesWithLabels, 0, labelProperties.length);
+        System.arraycopy(properties, 0, propertiesWithLabels, labelProperties.length, properties.length);
+        return propertiesWithLabels;
+
     }
 
     // DEFAULT PROPERTIES
@@ -155,8 +172,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     protected Boolean hasDynamicProperties() {
         return Boolean.FALSE;
     }
-    
-    
+
     @Override
     public boolean isAvailableToBuild() {
         PartitionData partitionData = new PartitionData();
@@ -170,25 +186,22 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        
-        GroupsItem item = new GroupsItem(graph);
-        
-        ArrayList<String> labels = new ArrayList<String>(); 
-        ArrayList<Color> colors = new ArrayList<Color>(); 
-        ArrayList<Float> values =  new ArrayList<Float>();
-        
-        CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder)builder;
-        customGroupsBuilder.retrieveData(labels, colors, values);
-        
-        item.setData(GroupsItem.COLORS_GROUP, colors);
-        item.setData(GroupsItem.LABELS_GROUP, labels);
-        item.setData(GroupsItem.VALUES_GROUP, values);
-        
-        return item;
-        
-    }
-    
-    
 
+        GroupsItem item = new GroupsItem(graph);
+
+        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
+        ArrayList<Color> colors = new ArrayList<Color>();
+        ArrayList<Float> values = new ArrayList<Float>();
+
+        CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder) builder;
+        customGroupsBuilder.retrieveData(labels, colors, values);
+
+        item.setData(GroupsItem.COLORS, colors);
+        item.setData(GroupsItem.LABELS_IDS, labels);
+        item.setData(GroupsItem.VALUES, values);
+
+        return item;
+
+    }
 
 }

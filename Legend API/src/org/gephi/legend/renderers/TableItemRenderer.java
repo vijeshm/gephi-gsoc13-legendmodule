@@ -150,9 +150,7 @@ public class TableItemRenderer extends LegendItemRenderer {
         graphics.setColor(Color.WHITE);
         for (int i = 0; i < horizontalLabels.size(); i++) {
             String label = horizontalLabels.get(i).toString();
-            if (isCellColoring) {
-                graphics.setColor(horizontalColors.get(i));
-            }
+            graphics.setColor(horizontalColors.get(i));
 
             switch (horizontalTextAlignment) {
                 case RIGHT: {
@@ -182,35 +180,32 @@ public class TableItemRenderer extends LegendItemRenderer {
         for (int i = 0; i < tableValues.length; i++) {
 
             for (int j = 0; j < tableValues[i].length; j++) {
+
+                graphics.setColor(valueColors.get(i).get(j));
+
                 if (isCellColoring) {
-                    graphics.setColor(valueColors.get(i).get(j));
-                }
-
-                switch (cellColoringDirection) {
-                    case UP:
-                        int x1 = j * cellSizeWidth;
-                        int y2 = (int) (cellSizeHeight * tableValues[i][j]) - 1;
-                        int y1 = ((i + 1) * cellSizeHeight) - y2;
-                        int x2 = cellSizeWidth - 1;
+                    switch (cellColoringDirection) {
+                        case UP:
+                            int x1 = j * cellSizeWidth;
+                            int y2 = (int) (cellSizeHeight * tableValues[i][j]) - 1;
+                            int y1 = ((i + 1) * cellSizeHeight) - y2;
+                            int x2 = cellSizeWidth - 1;
 //                        System.out.printf("(%d,%d)->(%d,%d)\n", x1, y1, x1 + x2, y1 + y2);
-                        graphics.fillRect(x1, y1, x2, y2);
-                        break;
+                            graphics.fillRect(x1, y1, x2, y2);
+                            break;
+                    }
+                }
+                else {
+                    int x1 = j * cellSizeWidth;
+                    int y2 = (int) (cellSizeHeight) - 1;
+                    int y1 = ((i + 1) * cellSizeHeight) - y2;
+                    int x2 = cellSizeWidth - 1;
+                    legendDrawText(graphics, tableValues[i][j] + "", font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
                 }
 
             }
         }
 
-    }
-
-    private String longestLabel(ArrayList<String> labels) {
-
-        String maxLabel = labels.get(0);
-        for (int i = 1; i < labels.size(); i++) {
-            if (labels.get(i).length() > maxLabel.length()) {
-                maxLabel = labels.get(i);
-            }
-        }
-        return maxLabel;
     }
 
     @Override
@@ -340,8 +335,9 @@ public class TableItemRenderer extends LegendItemRenderer {
 //        labels =item.getData(TableItem.LABELS_IDS);
         tableValuesArrayList = item.getData(TableItem.TABLE_VALUES);
         System.out.println("@Var: tableValuesArrayList: " + tableValuesArrayList);
-        tableValues = new Float[tableValuesArrayList.size()][tableValuesArrayList.get(0).size()];
 
+        // READING VALUES
+        tableValues = new Float[tableValuesArrayList.size()][tableValuesArrayList.get(0).size()];
         for (int i = 0; i < tableValuesArrayList.size(); i++) {
             for (int j = 0; j < tableValuesArrayList.get(i).size(); j++) {
                 tableValues[i][j] = tableValuesArrayList.get(i).get(j);
@@ -353,7 +349,6 @@ public class TableItemRenderer extends LegendItemRenderer {
         valueColors = item.getData(TableItem.COLOR_VALUES);
         verticalColors = item.getData(TableItem.COLOR_VERTICAL);
         horizontalColors = item.getData(TableItem.COLOR_HORIZONTAL);
-        System.out.println("@Var: colors: " + valueColors);
 
 
         // READING LABELS

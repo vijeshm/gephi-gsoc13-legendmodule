@@ -48,6 +48,12 @@ public class ImageItemBuilder extends LegendItemBuilder {
         ImageItem item = new ImageItem(graph);
         return item;
     }
+    
+        @Override
+    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+        ImageItem item = new ImageItem(graph);
+        return item;
+    }
 
     @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
@@ -85,10 +91,7 @@ public class ImageItemBuilder extends LegendItemBuilder {
         return "";
     }
 
-    @Override
-    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+
     
     
 }

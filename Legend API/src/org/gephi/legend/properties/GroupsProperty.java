@@ -4,6 +4,9 @@
  */
 package org.gephi.legend.properties;
 
+import java.util.ArrayList;
+import org.gephi.legend.api.LegendManager;
+
 /**
  *
  * @author edubecks
@@ -18,6 +21,8 @@ public class GroupsProperty {
     public static final int GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE = 5;
     public static final int GROUPS_PADDING_BETWEEN_ELEMENTS = 6;
     public static final int GROUPS_SCALE_SHAPE = 7;
+    public static final int GROUPS_LABEL = 8;
+    
     public static final String[] OWN_PROPERTIES = {
         ".numberColumns",
         ".shape",
@@ -26,6 +31,12 @@ public class GroupsProperty {
         ".label.font.color",
         ".paddingBetweenTextAndShape",
         ".paddingBetweenElements",
-        ".scaleShape"
+        ".scaleShape",
+        ".label"
     };
+    
+    public static String getLabelProperty(Integer itemIndex, int i) {
+        ArrayList<String> properties = LegendManager.getProperties(OWN_PROPERTIES, itemIndex);
+        return properties.get(GROUPS_LABEL) + i;
+    }
 }

@@ -24,15 +24,24 @@ public class Default extends CustomLegendItemBuilder implements CustomGroupsItem
 
     @Override
     public String getTitle() {
-        return "Sample Groups";
+        return DEFAULT_TITLE;
     }
 
     @Override
-    public void retrieveData(ArrayList<String> labels, ArrayList<Color> colors, ArrayList<Float> values) {
-        
+    public boolean isAvailableToBuild() {
+        return true;
+    }
+
+    @Override
+    public String stepsNeededToBuild() {
+        return NONE_NEEDED;
+    }
+
+    @Override
+    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<Color> colors, ArrayList<Float> values) {
         // FILLING LABELS
-        String group1 = "group 1";
-        String group2 = "group 2";
+        StringBuilder group1 = new StringBuilder("group 1");
+        StringBuilder group2 = new StringBuilder("group 2");
         labels.add(group1);
         labels.add(group2);
         
@@ -47,16 +56,6 @@ public class Default extends CustomLegendItemBuilder implements CustomGroupsItem
         Float value2=0.4f;
         values.add(value1);
         values.add(value2);
-    }
-
-    @Override
-    public boolean isAvailableToBuild() {
-        return true;
-    }
-
-    @Override
-    public String stepsNeededToBuild() {
-        return NONE_NEEDED;
     }
     
 }

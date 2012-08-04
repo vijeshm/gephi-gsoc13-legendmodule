@@ -55,6 +55,12 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     }
 
     @Override
+    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+        DescriptionItem item = new DescriptionItem(graph);
+        return item;
+    }
+
+    @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -110,7 +116,6 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
                                            "temp",
                                            "temp",
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionElement)
-
         };
 
 
@@ -140,9 +145,8 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 //        item.setData(DescriptionItem.NUMBER_OF_ITEMS, numOfProperties);
 //        return true;
 //    }
-    
-    
-    protected static void removePreviewProperty(Item item,int numOfProperties){
+
+    protected static void removePreviewProperty(Item item, int numOfProperties) {
         // item index
         PreviewProperty[] itemProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
         PreviewProperty[] newDescriptionProperties = new PreviewProperty[itemProperties.length - numOfProperties * 2];
@@ -185,11 +189,11 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         PreviewProperty[] previewProperties = new PreviewProperty[itemProperties.length + newDescriptionProperties.length];
         System.arraycopy(itemProperties, 0, previewProperties, 0, itemProperties.length);
         System.arraycopy(newDescriptionProperties, 0, previewProperties, itemProperties.length, newDescriptionProperties.length);
-        
+
         for (PreviewProperty previewProperty : previewProperties) {
-            System.out.println("@Var: adding previewProperty: "+previewProperty);
-            System.out.println("@Var: adding previewProperty: "+previewProperty.getName());
-            
+            System.out.println("@Var: adding previewProperty: " + previewProperty);
+            System.out.println("@Var: adding previewProperty: " + previewProperty.getName());
+
         }
 
         item.setData(LegendItem.DYNAMIC_PROPERTIES, previewProperties);
@@ -209,19 +213,17 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     private Alignment defaultValueAlignment = Alignment.LEFT;
     private Boolean defaultIsFlowLayout = true;
     private DescriptionElement defaultDescriptionElement = new DescriptionElement();
-    
 
     @Override
     protected boolean isBuilderForItem(Item item) {
         return item instanceof DescriptionItem;
     }
 
-
     @Override
     protected Boolean hasDynamicProperties() {
         return Boolean.TRUE;
     }
-    
+
     @Override
     public boolean isAvailableToBuild() {
         return true;
@@ -232,8 +234,4 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         return "";
     }
 
-    @Override
-    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
