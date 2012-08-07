@@ -233,21 +233,21 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
-        float titleSpaceUsed = renderTitle(graphics2D, titleOrigin, width, height);
-        boolean descriptionComputeSpace = true;
-        float descriptionSpaceUsed = legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, origin.getTranslateX(), origin.getTranslateY(), width, height, descriptionAlignment, descriptionComputeSpace);
+        float titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, origin.getTranslateX(), origin.getTranslateY(), width);
+        renderTitle(graphics2D, titleOrigin, width, (int)titleHeight);
+        float descriptionHeight = computeVerticalTextSpaceUsed(graphics2D, description, descriptionFont, origin.getTranslateX(), origin.getTranslateY(), width);
 
         // LEGEND
         AffineTransform legendOrigin = new AffineTransform(origin);
-        legendOrigin.translate(0, titleSpaceUsed);
+        legendOrigin.translate(0, titleHeight);
         int legendWidth = width;
-        int legendHeight = (Integer) (height - Math.round(titleSpaceUsed) - Math.round(descriptionSpaceUsed));
+        int legendHeight = (Integer) (height - Math.round(titleHeight) - Math.round(descriptionHeight));
         renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
 
         // DESCRIPTION
         AffineTransform descriptionOrigin = new AffineTransform(origin);
-        descriptionOrigin.translate(0, titleSpaceUsed + legendHeight);
-        renderDescription(graphics2D, descriptionOrigin, width, height);
+        descriptionOrigin.translate(0, titleHeight + legendHeight);
+        renderDescription(graphics2D, descriptionOrigin, width, (int)descriptionHeight);
 
 
         // is selected
@@ -400,6 +400,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     }
 
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment) {
+        float spaceUsed = legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, true);
+        y = y+ (height-spaceUsed)/2;
         return legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, false);
     }
 

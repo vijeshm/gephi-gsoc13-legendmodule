@@ -42,7 +42,7 @@ import org.w3c.dom.DOMImplementation;
  * @author edubecks
  */
 public class TestProcessingTarget {
-    
+
     public TestProcessingTarget() {
     }
 
@@ -53,16 +53,15 @@ public class TestProcessingTarget {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    
     @Test
     public void testPNG() {
         try {
@@ -97,9 +96,9 @@ public class TestProcessingTarget {
             // svg document
 
 
-            
-            
-            
+
+
+
 
 
 
@@ -116,7 +115,8 @@ public class TestProcessingTarget {
 
             previewModel.getProperties().putValue("width", 1000);
             previewModel.getProperties().putValue("height", 1000);
-            ProcessingTarget target = (ProcessingTarget) previewController.getRenderTarget(RenderTarget.PROCESSING_TARGET, workspace);
+            ProcessingTarget target = (ProcessingTarget) previewController.getRenderTarget(
+                    RenderTarget.PROCESSING_TARGET, workspace);
 
 
 
@@ -127,44 +127,36 @@ public class TestProcessingTarget {
 
 
             // creating item
-//            Item item = addImageItem(itemIndex, graph, attributeModel);
-            Item item = addCustomTableItem(itemIndex, graph, attributeModel);
+            Item item = addTableItem(itemIndex, graph, attributeModel);
+//            Item item = addTextItem(itemIndex, graph, attributeModel);
 
 
             // add item
             legendManager.addItem(item);
-            
+
             PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
             for (PreviewProperty property : legendProperties) {
                 previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
             }
-            testTable(item, previewProperties);
-            
-            //test
-//            previewProperties.getProperty(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS)).setValue(2);
-//            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X)).setValue(-100);
-//            previewProperties.getProperty(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y)).setValue(-100);
-//            item.setData(LegendItem.IS_SELECTED, Boolean.TRUE);
-            
 
 
 
             // render
             previewController.refreshPreview(workspace);
             previewController.render(target);
-            
-            
+
+
             OutputStream fos = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled.png"));
             Writer writer = new OutputStreamWriter(fos, "UTF-8");
-            
-            
+
+
             PNGExporter pngExporter = new PNGExporter();
 //            pngExporter.setHeight(2000);
 //            pngExporter.setWidth(2000);
             pngExporter.setWorkspace(workspace);
             pngExporter.setOutputStream(fos);
             pngExporter.execute();
-            
+
 
 
 
@@ -175,40 +167,31 @@ public class TestProcessingTarget {
 
     public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TextItemBuilder builder = new TextItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.text.Default());
         return item;
     }
-    
+
     public Item addTableItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TableItemBuilder builder = new TableItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.table.Default());
         return item;
     }
-    
-    public Item addCustomTableItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
-        TableItemBuilder builder = new TableItemBuilder();
-        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new Default());
-        return item;
-    }
-    
-    
-    
+
     public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         ImageItemBuilder builder = new ImageItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.image.Default());
         return item;
     }
-    
+
     public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         GroupsItemBuilder builder = new GroupsItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.text.Default());
         return item;
     }
-    
-    public void testTable(Item item, PreviewProperties properties){
+
+    public void testTable(Item item, PreviewProperties properties) {
         TableItemRenderer tableItemRenderer = new TableItemRenderer();
-        tableItemRenderer.readOwnPropertiesAndValues(item,properties);
+        tableItemRenderer.readOwnPropertiesAndValues(item, properties);
     }
-    
-    
+
 }

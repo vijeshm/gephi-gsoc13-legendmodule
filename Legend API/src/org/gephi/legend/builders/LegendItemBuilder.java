@@ -65,7 +65,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * @param attributeModel
      * @return
      */
-    protected abstract Item buildDefaultItem(Graph graph, AttributeModel attributeModel);
 
     protected abstract Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel);
     
@@ -89,22 +88,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      */
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
 
-    /**
-     * Used to determine if the
-     * <code>builder</code> can create a new item Ex: GroupsItem can only be
-     * built if some partition was applied first
-     *
-     * @return <code>true</code> if <code>item</code> has dynamic      * properties, <code>false</code> otherwise
-     */
-    public abstract boolean isAvailableToBuild();
 
-    public abstract String stepsNeededToBuild();
-
-    public Item createDefaultItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel) {
-        Item item = buildDefaultItem(graph, attributeModel);
-        createDefaultPropertiers(newItemIndex, item);
-        return item;
-    }
 
     public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
         System.out.println("@Var: creating createCustomItem: ");
@@ -334,7 +318,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     //DEFAULT VALUES 
     // BACKGROUND AND BORDER
-    protected boolean defaultBackgroundIsDisplaying = false;
+    protected boolean defaultBackgroundIsDisplaying = true;
     protected Color defaultBackgroundColor = Color.WHITE;
     protected Color defaultBackgroundBorderColor = Color.BLACK;
     protected int defaultBackgroundBorderLineThick = 1;
@@ -355,7 +339,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     protected final Alignment defaultTitleAlignment = Alignment.CENTER;
     protected final Color defaultTitleFontColor = Color.BLACK;
     // DESCRIPTION
-    protected final String defaultDescription = "description ... ";
+    protected final String defaultDescription = "description ... description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...";
     protected Boolean defaultIsDisplayingDescription = true;
     protected final Color defaultDescriptionFontColor = Color.BLACK;
     protected final Alignment defaultDescriptionAlignment = Alignment.LEFT;

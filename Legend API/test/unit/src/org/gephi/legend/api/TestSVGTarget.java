@@ -23,6 +23,7 @@ import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
@@ -171,13 +172,20 @@ public class TestSVGTarget {
 
     public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TextItemBuilder builder = new TextItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel,new org.gephi.legend.builders.text.Default());
+        return item;
+    }
+
+    public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
+        ImageItemBuilder builder = new ImageItemBuilder();
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel,new org.gephi.legend.builders.image.Default());
+        return item;
+    }
+
+    public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
+        GroupsItemBuilder builder = new GroupsItemBuilder();
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel,new org.gephi.legend.builders.text.Default());
         return item;
     }
     
-    public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
-        ImageItemBuilder builder = new ImageItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
-        return item;
-    }
 }

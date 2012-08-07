@@ -127,7 +127,6 @@ public class TestLegendItem {
 
             // CREATE ITEM AND ADD IT TO LEGEND MANAGER
             Integer newItemIndex = 0;
-            item = builder.createDefaultItem(newItemIndex, null, null);
 
 
 
@@ -160,19 +159,19 @@ public class TestLegendItem {
 
     public Item addTextItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         TextItemBuilder builder = new TextItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel,new org.gephi.legend.builders.text.Default());
         return item;
     }
 
     public Item addImageItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         ImageItemBuilder builder = new ImageItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel,new org.gephi.legend.builders.image.Default());
         return item;
     }
 
     public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         GroupsItemBuilder builder = new GroupsItemBuilder();
-        Item item = builder.createDefaultItem(newItemIndex, graph, attributeModel);
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel,new org.gephi.legend.builders.text.Default());
         return item;
     }
 

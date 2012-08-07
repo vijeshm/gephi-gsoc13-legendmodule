@@ -35,24 +35,6 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     protected void setDefaultValues() {
     }
 
-    @Override
-    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
-        ArrayList<String> descriptions = new ArrayList<String>();
-        descriptions.add("Test 1");
-        descriptions.add("Test 2222");
-        descriptions.add("Test 33");
-        ArrayList<String> values = new ArrayList<String>();
-        values.add("Value 11111");
-        values.add("Value 222");
-        values.add("Value 33333333");
-
-        DescriptionItem item = new DescriptionItem(graph);
-        item.setData(DescriptionItem.KEY, descriptions);
-        item.setData(DescriptionItem.VALUE, values);
-        item.setData(DescriptionItem.NUMBER_OF_ITEMS, 0);
-
-        return item;
-    }
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
@@ -224,14 +206,5 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         return Boolean.TRUE;
     }
 
-    @Override
-    public boolean isAvailableToBuild() {
-        return true;
-    }
-
-    @Override
-    public String stepsNeededToBuild() {
-        return "";
-    }
 
 }

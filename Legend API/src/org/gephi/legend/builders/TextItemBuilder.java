@@ -44,13 +44,7 @@ public class TextItemBuilder extends LegendItemBuilder {
         return NbBundle.getMessage(LegendManager.class, "TextItem.name");
     }
 
-    @Override
-    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
-        TextItem item = new TextItem(graph);
-        item.setData(TextItem.BODY, defaultBody);
-        return item;
-    }
-
+   
     
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
@@ -111,15 +105,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         return Boolean.FALSE;
     }
 
-    @Override
-    public boolean isAvailableToBuild() {
-        return true;
-    }
-
-    @Override
-    public String stepsNeededToBuild() {
-        return "";
-    }
 
     
 }

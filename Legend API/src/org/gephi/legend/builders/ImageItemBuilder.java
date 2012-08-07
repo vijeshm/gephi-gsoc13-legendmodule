@@ -44,12 +44,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
-        ImageItem item = new ImageItem(graph);
-        return item;
-    }
-    
-        @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
         ImageItem item = new ImageItem(graph);
         return item;
@@ -81,15 +75,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
         return Boolean.FALSE;
     }
 
-    @Override
-    public boolean isAvailableToBuild() {
-        return true;
-    }
-
-    @Override
-    public String stepsNeededToBuild() {
-        return "";
-    }
 
 
     

@@ -51,37 +51,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
-
-
-
-
-        PartitionData partitionData = new PartitionData();
-
-
-        ArrayList<String> labelsGroup = partitionData.getLabels();
-        ArrayList<Color> colorsGroup = partitionData.getColors();
-        ArrayList<Float> valuesGroup = partitionData.getValues();
-
-
-        for (int i = 0; i < valuesGroup.size(); i++) {
-            System.out.println("@Var: labelsGroup: " + labelsGroup.get(i));
-            System.out.println("@Var: valuesGroup: " + valuesGroup.get(i));
-            System.out.println("@Var: colorsGroup: " + colorsGroup.get(i));
-        }
-
-
-        GroupsItem item = new GroupsItem(graph);
-
-        System.out.println("@Var: Group buildItem: " + item.getType());
-
-        item.setData(GroupsItem.COLORS, colorsGroup);
-        item.setData(GroupsItem.LABELS_IDS, labelsGroup);
-        item.setData(GroupsItem.VALUES, valuesGroup);
-        return item;
-    }
-
-    @Override
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -171,17 +140,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     @Override
     protected Boolean hasDynamicProperties() {
         return Boolean.FALSE;
-    }
-
-    @Override
-    public boolean isAvailableToBuild() {
-        PartitionData partitionData = new PartitionData();
-        return partitionData.isPartitioned();
-    }
-
-    @Override
-    public String stepsNeededToBuild() {
-        return NbBundle.getMessage(LegendManager.class, "GroupsItem.stepsNeeded");
     }
 
     @Override

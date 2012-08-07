@@ -293,7 +293,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             refreshPropertySheet(activeLegendItem);
         }
         else {
-            JOptionPane.showMessageDialog(this, builder.stepsNeededToBuild(),
+            JOptionPane.showMessageDialog(this, customBuilder.stepsNeededToBuild(),
                                           NbBundle.getMessage(LegendManager.class, "LegendItem.stepsNeededToBuildItem"),
                                           JOptionPane.INFORMATION_MESSAGE,
                                           null);

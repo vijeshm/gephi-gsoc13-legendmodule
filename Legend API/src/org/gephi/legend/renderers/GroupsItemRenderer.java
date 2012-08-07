@@ -64,12 +64,13 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         int maxLabelWidth = Integer.MIN_VALUE;
         int maxLabelHeight = Integer.MIN_VALUE;
 
-        // computing max label width
+        // computing max label height
         for (StringBuilder label : labels) {
-            maxLabelHeight = (int) Math.max(maxLabelHeight, computeVerticalTextSpaceUsed(graphics2D, label.toString(), labelFont, 0, 0, width));
+            maxLabelHeight = (int) Math.max(maxLabelHeight, computeVerticalTextSpaceUsed(graphics2D, label.toString(), labelFont, 0, 0, elementWidth));
+            
         }
 
-        // computing max label height
+        // computing max label width
         for (StringBuilder label : labels) {
             maxLabelWidth = Math.max(maxLabelWidth, fontMetrics.stringWidth(label.toString()));
         }
@@ -148,13 +149,6 @@ public class GroupsItemRenderer extends LegendItemRenderer {
     }
 
     public void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height, float scale) {
-        System.out.println("@Var: shape: " + "--------------");
-        System.out.println("@Var: shape: " + shape);
-        System.out.println("@Var: color: " + color);
-        System.out.println("@Var: x: " + x);
-        System.out.println("@Var: y: " + y);
-        System.out.println("@Var: width: " + width);
-        System.out.println("@Var: height: " + height);
 
         int shapeWidth = (int) (width * scale);
         int shapeHeight = (int) (height * scale);

@@ -10,6 +10,10 @@ package org.gephi.legend.api;
  */
 public interface CustomImageItemBuilder {
     
+    /**
+     * This function receives the objects that need to be filled in order to
+     * build the item
+     */
     public void retrieveData();
     
 }

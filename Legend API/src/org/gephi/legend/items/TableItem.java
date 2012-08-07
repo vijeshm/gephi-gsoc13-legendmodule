@@ -31,6 +31,7 @@ public class TableItem extends AbstractItem implements LegendItem {
         // anti clockwise
         UP(-90d),
         DOWN(-90d),
+        HORIZONTAL(0),
         DIAGONAL(-45d);
         private final double rotationAngle;
 

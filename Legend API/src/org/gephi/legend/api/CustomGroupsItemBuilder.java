@@ -13,6 +13,13 @@ import java.util.ArrayList;
  */
 public interface CustomGroupsItemBuilder {
 
+    /**
+     * This function receives the objects that need to be filled in order to
+     * build the item
+     * @param labels
+     * @param colors
+     * @param values 
+     */
     public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<Color> colors, ArrayList<Float> values);
 
 }

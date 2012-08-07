@@ -48,71 +48,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         return NbBundle.getMessage(LegendManager.class, "TableItem.name");
     }
 
-    @Override
-    protected Item buildDefaultItem(Graph graph, AttributeModel attributeModel) {
-        PartitionData partitionData = new PartitionData();
-
-
-        ArrayList<String> labelsGroup = partitionData.getLabels();
-        ArrayList<Color> colorsGroup = partitionData.getColors();
-        ArrayList<Float> valuesGroup = partitionData.getValues();
-
-        //colors
-        ArrayList<Color> listOfColors;
-        listOfColors = new ArrayList<Color>();
-        listOfColors.add(Color.RED);
-        listOfColors.add(Color.BLUE);
-        listOfColors.add(Color.LIGHT_GRAY);
-        listOfColors.add(Color.YELLOW);
-        listOfColors.add(Color.ORANGE);
-        listOfColors.add(Color.GREEN);
-        listOfColors.add(Color.PINK);
-        listOfColors.add(Color.MAGENTA);
-
-        //values
-        Float[][] tableValues1 = {
-            {9.11627487663f, 5.35347285074f, 5.53021302669f, 6.20519225239f, 5.27466987493f, 5.48850364226f, 5.48284905154f, 5.65304915413f},
-            {6.11032214404f, 5.2818160758f, 5.30893993444f, 5.30624373045f, 6.37271356504f, 5.25206050232f, 5.28980850706f, 6.03624180324f},
-            {5.04510203573f, 5.11945988425f, 5.17872911783f, 5.10501075623f, 9.25288976257f, 6.31804895499f, 5.17481323163f, 5.3245338662f},
-            {5.00305453268f, 5.78153226657f, 5.21040577561f, 5.28651327902f, 6.07657004397f, 6.43552722671f, 5.33661053887f, 6.16149432112f},
-            {5.41582039369f, 8.01040455143f, 5.70189186658f, 7.19051905857f, 5.48662725091f, 5.36079587503f, 5.65666867777f, 6.51873273528f},
-            {5.44276841441f, 5.68705442654f, 5.45203949569f, 6.3702550653f, 6.25203315678f, 6.40009442175f, 8.28908129072f, 7.81318233426f},
-            {5.35181089016f, 5.07697000134f, 5.76683083336f, 5.04885627802f, 6.51540268438f, 5.05027735868f, 7.21679046513f, 5.58756039989f},
-            {5.24203982658f, 5.67995857207f, 7.75338861595f, 7.95242620409f, 5.45866613248f, 5.34302649296f, 5.26438348233f, 5.70365120776f}};
-
-
-        //label
-        ArrayList<String> labels1;
-        labels1 = new ArrayList<String>();
-        labels1.add("Juan");
-        labels1.add("QWERTYYY");
-        labels1.add("John");
-        labels1.add("Perez");
-        labels1.add("Nada");
-        labels1.add("NadaNada");
-        labels1.add("UnNombre");
-        labels1.add("Holaaaaaaaaaa");
-
-
-
-        ArrayList<String> labels = new ArrayList<String>();
-        ArrayList<Color> colors = new ArrayList<Color>();
-        ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
-        System.out.println("@Var: values: " + values);
-        StatisticData.generateTable(labels, colors, values);
-        System.out.println("@Var: labels: " + labels);
-        System.out.println("@Var: colors: " + colors);
-        System.out.println("@Var: values: " + values);
-
-
-        TableItem item = new TableItem(graph);
-        item.setData(TableItem.LABELS_IDS, labels);
-        item.setData(TableItem.TABLE_VALUES, values);
-        item.setData(TableItem.COLOR_VALUES, colors);
-        return item;
-    }
     
-
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
@@ -236,7 +172,20 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            TableItem.VerticalTextDirection.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),};
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_IS_DISPLAYING_GRID),
+                                           Boolean.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.isDisplaying.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.isDisplaying.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplayingGrid),
+            PreviewProperty.createProperty(this,
+                                           tableProperties.get(TableProperty.TABLE_GRID_COLOR),
+                                           Color.class,
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.displayName"),
+                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.description"),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultGridColor),
+        };
 
 
         PreviewProperty[] propertiesWithLabels = new PreviewProperty[labelProperties.length + properties.length];
@@ -245,34 +194,30 @@ public class TableItemBuilder extends LegendItemBuilder {
         return propertiesWithLabels;
     }
 
+
+    @Override
+    protected Boolean hasDynamicProperties() {
+        return Boolean.FALSE;
+    }
+    
     //default values
     protected final Integer defaultVerticalExtraMargin = 3;
     protected final Integer defaultHorizontalExtraMargin = 3;
     protected final Integer defaultMinimumMargin = 3;
     protected final Font defaultFont = new Font("Arial", Font.PLAIN, 13);
     protected final Color defaultFontColor = Color.BLACK;
-    protected final Boolean defaultIsCellColoring = true;
+    // grid
+    protected final Color defaultGridColor = Color.BLACK;
+    protected final Boolean defaultIsDisplayingGrid = true;
+    // cell
+    protected final Boolean defaultIsCellColoring = false;
     protected final Direction defaultCellColoringDirection = Direction.UP;
+    // side labels
     protected final Direction defaultHorizontalTextPosition = Direction.LEFT;
     protected final Alignment defaultHorizontalTextAlignment = Alignment.LEFT;
+    // up/bottom labels
     protected final Alignment defaultVerticalTextAlignment = Alignment.LEFT;
     protected final Direction defaultVerticalTextPosition = Direction.LEFT;
-    protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
-
-    @Override
-    protected Boolean hasDynamicProperties() {
-        return Boolean.FALSE;
-    }
-
-    @Override
-    public boolean isAvailableToBuild() {
-        PartitionData partitionData = new PartitionData();
-        return partitionData.isPartitioned();
-    }
-
-    @Override
-    public String stepsNeededToBuild() {
-        return NbBundle.getMessage(LegendManager.class, "TableItem.stepsNeeded");
-    }
+    protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.HORIZONTAL;
 
 }
