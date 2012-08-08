@@ -7,6 +7,7 @@ package org.gephi.legend.builders;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collection;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
@@ -20,14 +21,19 @@ import org.gephi.legend.properties.TextProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author edubecks
  */
-@ServiceProvider(service = ItemBuilder.class, position = 101)
+@ServiceProviders(value = {
+    @ServiceProvider(service = ItemBuilder.class, position = 101),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 101)
+})
 public class TextItemBuilder extends LegendItemBuilder {
 
     @Override
@@ -44,14 +50,12 @@ public class TextItemBuilder extends LegendItemBuilder {
         return NbBundle.getMessage(LegendManager.class, "TextItem.name");
     }
 
-   
-    
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
         CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
         TextItem item = new TextItem(graph);
         item.setData(TextItem.BODY, customBuilder.getText());
-        System.out.println("@ debug--------------> @Var: customBuilder.getText(): "+customBuilder.getText());
+        System.out.println("@ debug--------------> @Var: customBuilder.getText(): " + customBuilder.getText());
         return item;
     }
 
@@ -59,7 +63,7 @@ public class TextItemBuilder extends LegendItemBuilder {
     protected PreviewProperty[] createLegendItemProperties(Item item) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        
+
 
         ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES, itemIndex);
 
@@ -105,6 +109,14 @@ public class TextItemBuilder extends LegendItemBuilder {
         return Boolean.FALSE;
     }
 
+    @Override
+    public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
+        Collection<? extends CustomTextItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTextItemBuilder.class);
+        ArrayList<CustomLegendItemBuilder> availableBuilders = new ArrayList<CustomLegendItemBuilder>();
+        for (CustomTextItemBuilder customBuilder : customBuilders) {
+            availableBuilders.add((CustomLegendItemBuilder) customBuilder);
+        }
+        return availableBuilders;
+    }
 
-    
 }

@@ -393,63 +393,18 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
                 LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
                 Item activeLegendItem = legendManager.getActiveLegendItem();
                 refreshPropertySheet(activeLegendItem);
-//                legendManager.refreshActiveLegendsComboBox();
             }
         }
     }//GEN-LAST:event_numberOfItemsTextFieldActionPerformed
 
     private void legendItemBuildersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_legendItemBuildersComboBoxActionPerformed
         builderTypeComboBox.removeAllItems();
-
-        // TABLE BUILDERS
-        if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(TableItemBuilder.class)) {
-            Collection<? extends CustomTableItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTableItemBuilder.class);
-            if (!customBuilders.isEmpty()) {
-                for (CustomTableItemBuilder customBuilder : customBuilders) {
-                    builderTypeComboBox.addItem(customBuilder);
-                }
-            }
+        
+        LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
+        ArrayList<CustomLegendItemBuilder> availableBuilders = builder.getAvailableBuilders();
+        for (CustomLegendItemBuilder availableBuilder : availableBuilders) {
+            builderTypeComboBox.addItem(availableBuilder);
         }
-        // TEXT BUILDERS
-        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(TextItemBuilder.class)) {
-            Collection<? extends CustomTextItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTextItemBuilder.class);
-            if (!customBuilders.isEmpty()) {
-                for (CustomTextItemBuilder customBuilder : customBuilders) {
-                    builderTypeComboBox.addItem(customBuilder);
-                }
-            }
-        }
-        // IMAGE BUILDERS
-        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(ImageItemBuilder.class)) {
-            Collection<? extends CustomImageItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomImageItemBuilder.class);
-            if (!customBuilders.isEmpty()) {
-                for (CustomImageItemBuilder customBuilder : customBuilders) {
-                    builderTypeComboBox.addItem(customBuilder);
-                }
-            }
-        }
-        // GROUPS BUILDERS
-        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(GroupsItemBuilder.class)) {
-            Collection<? extends CustomGroupsItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomGroupsItemBuilder.class);
-            if (!customBuilders.isEmpty()) {
-                for (CustomGroupsItemBuilder customBuilder : customBuilders) {
-                    builderTypeComboBox.addItem(customBuilder);
-                }
-            }
-        }
-        // DESCRIPTION BUILDERS
-        else if (legendItemBuildersComboBox.getSelectedItem().getClass().equals(DescriptionItemBuilder.class)) {
-            Collection<? extends CustomDescriptionItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomDescriptionItemBuilder.class);
-            if (!customBuilders.isEmpty()) {
-                for (CustomDescriptionItemBuilder customBuilder : customBuilders) {
-                    builderTypeComboBox.addItem(customBuilder);
-                }
-            }
-        }
-
-
-
-
 
 
     }//GEN-LAST:event_legendItemBuildersComboBoxActionPerformed

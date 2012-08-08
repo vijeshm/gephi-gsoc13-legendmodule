@@ -7,9 +7,12 @@ package org.gephi.legend.builders;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collection;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomDescriptionItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
+import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
@@ -21,20 +24,24 @@ import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author edubecks
  */
-@ServiceProvider(service = LegendItemBuilder.class, position = 103)
+@ServiceProviders(value = {
+    @ServiceProvider(service = ItemBuilder.class, position = 104),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 104)
+})
 public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
     protected void setDefaultValues() {
     }
-
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
@@ -206,5 +213,14 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         return Boolean.TRUE;
     }
 
+    @Override
+    public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
+        Collection<? extends CustomDescriptionItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomDescriptionItemBuilder.class);
+        ArrayList<CustomLegendItemBuilder> availableBuilders = new ArrayList<CustomLegendItemBuilder>();
+        for (CustomDescriptionItemBuilder customBuilder : customBuilders) {
+            availableBuilders.add((CustomLegendItemBuilder) customBuilder);
+        }
+        return availableBuilders;
+    }
 
 }

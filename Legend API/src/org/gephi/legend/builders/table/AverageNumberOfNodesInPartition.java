@@ -117,12 +117,19 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
     @Override
     public boolean isAvailableToBuild() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
+        PartitionModel partitionModel = partitionController.getModel();
+        if (partitionModel != null) {
+            if (partitionModel.getSelectedPartition() != null) {
+                return (partitionModel.getSelectedPartition().getPartsCount() > 1);
+            }
+        }
+        return false;
     }
 
     @Override
     public String stepsNeededToBuild() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.AverageNumberOfNodesInPartition.stepsNeeded");
     }
 
 

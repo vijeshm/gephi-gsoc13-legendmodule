@@ -62,6 +62,10 @@ public class TableItemRenderer extends LegendItemRenderer {
         int centerDistance = (cellSizeWidth - metrics.getHeight()) / 2;
 
 
+        int maxVerticalTextWidth = Integer.MIN_VALUE;
+        for (StringBuilder label : verticalLabels) {
+            maxVerticalTextWidth = Math.max(maxVerticalTextWidth, metrics.stringWidth(label.toString()));
+        }
 
 
         switch (verticalTextDirection) {
@@ -125,14 +129,14 @@ public class TableItemRenderer extends LegendItemRenderer {
 
                 break;
             }
-            case HORIZONTAL:{
+            case HORIZONTAL: {
 
-                
+
                 for (int i = 0; i < verticalLabels.size(); i++) {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          max,
+                                          maxVerticalTextWidth,
                                           metrics.getHeight());
 
                 }
@@ -242,17 +246,44 @@ public class TableItemRenderer extends LegendItemRenderer {
         for (StringBuilder label : verticalLabels) {
             maxVerticalTextWidth = Math.max(maxVerticalTextWidth, fontMetrics.stringWidth(label.toString()));
         }
+        
+        Integer horizontalLabelWidth = maxHorizontalTextWidth + 2 * minimumMargin;
+        Integer verticalLabelHeight = maxVerticalTextWidth + 2 * minimumMargin;
 
-        int maxTextHeight = fontMetrics.getHeight();
+        int tableWidth =0;
+        int tableHeight =0;
+        switch (verticalTextDirection) {
+            case UP: {
+                verticalLabelsHeight=maxVerticalTextWidth;
+                tableHeight= height - verticalLabelsHeight;
+                tableWidth = width - horizontalLabelWidth;
+
+                break;
+            }
+            case DOWN: {
+
+
+                break;
+            }
+            case DIAGONAL: {
 
 
 
-        Integer horizontalTextWidth = maxHorizontalTextWidth + 2 * minimumMargin;
-        Integer verticalTextHeight = maxHorizontalTextWidth + 2 * minimumMargin;
-        int tempTableWidth = (int) (width - horizontalExtraMargin - minimumMargin - horizontalTextWidth - maxHorizontalTextWidth * Math.abs(Math.cos(verticalTextDirection.rotationAngle())));
+                break;
+            }
+            case HORIZONTAL: {
+            }
+        }
+
+
+        
+        int tempTableWidth = (int) (width - horizontalExtraMargin - minimumMargin - horizontalLabelWidth - maxHorizontalTextWidth * Math.abs(Math.cos(verticalTextDirection.rotationAngle())));
         System.out.println("@Var: tempTableWidth: " + tempTableWidth);
-        int tempTableHeight = (int) (height - verticalExtraMargin - minimumMargin - verticalTextHeight);
+        int tempTableHeight = (int) (height - verticalExtraMargin - minimumMargin - verticalLabelHeight);
         System.out.println("@Var: tempTableHeight: " + tempTableHeight);
+
+
+
 
 
 
@@ -270,30 +301,30 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
 
-        System.out.println("@Var: horizontalTextWidth: " + horizontalTextWidth);
+        System.out.println("@Var: horizontalTextWidth: " + horizontalLabelWidth);
         Integer horizontalTextHeight = cellSizeHeight * labels.size();
         System.out.println("@Var: horizontalTextHeight: " + horizontalTextHeight);
-        System.out.println("@Var: verticalTextHeight: " + verticalTextHeight);
+        System.out.println("@Var: verticalTextHeight: " + verticalLabelHeight);
         Integer verticalTextWidth = cellSizeWidth * labels.size();
         System.out.println("@Var: verticalTextWidth: " + verticalTextWidth);
 
         AffineTransform arrangeTranslation = new AffineTransform();
         arrangeTranslation.setTransform(origin);
-        arrangeTranslation.translate(horizontalTextWidth, 0);
+        arrangeTranslation.translate(horizontalLabelWidth, 0);
 //            graphics.setTransform(translateTransform);
 
-        createVerticalText(graphics2D, arrangeTranslation, verticalTextWidth, verticalTextHeight);
+        createVerticalText(graphics2D, arrangeTranslation, verticalTextWidth, verticalLabelHeight);
 
 
         arrangeTranslation.setTransform(origin);
-        arrangeTranslation.translate(0, verticalTextHeight);
-        createHorizontalText(graphics2D, arrangeTranslation, horizontalTextWidth, horizontalTextHeight);
+        arrangeTranslation.translate(0, verticalLabelHeight);
+        createHorizontalText(graphics2D, arrangeTranslation, horizontalLabelWidth, horizontalTextHeight);
 
         if (isCellColoring) {
             normalizeWithMinValueZero(tableValues);
         }
         arrangeTranslation.setTransform(origin);
-        arrangeTranslation.translate(horizontalTextWidth, verticalTextHeight);
+        arrangeTranslation.translate(horizontalLabelWidth, verticalLabelHeight);
         createTableImage(graphics2D, arrangeTranslation);
     }
 
@@ -412,4 +443,9 @@ public class TableItemRenderer extends LegendItemRenderer {
     // Grid
     private Boolean isDisplayingGrid;
     private Color gridColor;
+    // cell
+    private int elementHeight;
+    private int elementWidth;
+    private int verticalLabelsHeight;
+    
 }

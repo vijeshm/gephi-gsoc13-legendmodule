@@ -8,9 +8,11 @@ package org.gephi.legend.builders;
  *
  * @author edubecks
  */
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collection;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
@@ -26,10 +28,15 @@ import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
-@ServiceProvider(service = ItemBuilder.class, position = 100)
+@ServiceProviders(value = {
+    @ServiceProvider(service = ItemBuilder.class, position = 100),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 100)
+})
 public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
@@ -38,7 +45,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         defaultHeight = 500;
     }
 
-    @Override   
+    @Override
     protected boolean isBuilderForItem(Item item) {
         return item instanceof TableItem;
     }
@@ -48,13 +55,11 @@ public class TableItemBuilder extends LegendItemBuilder {
         return NbBundle.getMessage(LegendManager.class, "TableItem.name");
     }
 
-    
-
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        
+
         TableItem item = new TableItem(graph);
-        
+
         // labels
         ArrayList<StringBuilder> verticalLabels = new ArrayList<StringBuilder>();
         ArrayList<StringBuilder> horizontalLabels = new ArrayList<StringBuilder>();
@@ -65,11 +70,11 @@ public class TableItemBuilder extends LegendItemBuilder {
         ArrayList<Color> horizontalColors = new ArrayList<Color>();
         ArrayList<Color> verticalColors = new ArrayList<Color>();
         ArrayList<ArrayList<Color>> valueColors = new ArrayList<ArrayList<Color>>();
-        
+
         // retrieving data
         CustomTableItemBuilder customTableBuilder = (CustomTableItemBuilder) builder;
         customTableBuilder.retrieveData(labels, horizontalLabels, verticalLabels, values, horizontalColors, verticalColors, valueColors);
-        
+
         // setting data
         item.setData(TableItem.HORIZONTAL_LABELS, horizontalLabels);
         item.setData(TableItem.VERTICAL_LABELS, verticalLabels);
@@ -78,9 +83,9 @@ public class TableItemBuilder extends LegendItemBuilder {
         item.setData(TableItem.COLOR_VALUES, valueColors);
         item.setData(TableItem.COLOR_HORIZONTAL, horizontalColors);
         item.setData(TableItem.COLOR_VERTICAL, verticalColors);
-        
+
         return item;
-        
+
     }
 
     @Override
@@ -99,12 +104,12 @@ public class TableItemBuilder extends LegendItemBuilder {
             labelProperties[i] = PreviewProperty.createProperty(this,
                                                                 TableProperty.getLabelProperty(itemIndex, i),
                                                                 String.class,
-                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName")+" "+i,
-                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description")+" "+i,
+                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName") + " " + i,
+                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description") + " " + i,
                                                                 PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
         }
-        
-        
+
+
 
         PreviewProperty[] properties = {
             PreviewProperty.createProperty(this,
@@ -184,8 +189,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            Color.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultGridColor),
-        };
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultGridColor),};
 
 
         PreviewProperty[] propertiesWithLabels = new PreviewProperty[labelProperties.length + properties.length];
@@ -194,12 +198,21 @@ public class TableItemBuilder extends LegendItemBuilder {
         return propertiesWithLabels;
     }
 
-
     @Override
     protected Boolean hasDynamicProperties() {
         return Boolean.FALSE;
     }
-    
+
+    @Override
+    public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
+        Collection<? extends CustomTableItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTableItemBuilder.class);
+        ArrayList<CustomLegendItemBuilder> availableBuilders = new ArrayList<CustomLegendItemBuilder>();
+        for (CustomTableItemBuilder customBuilder : customBuilders) {
+            availableBuilders.add((CustomLegendItemBuilder) customBuilder);
+        }
+        return availableBuilders;
+    }
+
     //default values
     protected final Integer defaultVerticalExtraMargin = 3;
     protected final Integer defaultHorizontalExtraMargin = 3;
@@ -219,5 +232,4 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected final Alignment defaultVerticalTextAlignment = Alignment.LEFT;
     protected final Direction defaultVerticalTextPosition = Direction.LEFT;
     protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.HORIZONTAL;
-
 }

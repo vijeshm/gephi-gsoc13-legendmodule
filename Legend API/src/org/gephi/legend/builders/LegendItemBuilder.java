@@ -7,9 +7,11 @@ package org.gephi.legend.builders;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collection;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
+import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.properties.LegendProperty;
@@ -87,6 +89,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * LegendItem's PreviewProperty
      */
     protected abstract PreviewProperty[] createLegendItemProperties(Item item);
+    
+    public abstract ArrayList<CustomLegendItemBuilder> getAvailableBuilders();
 
 
 

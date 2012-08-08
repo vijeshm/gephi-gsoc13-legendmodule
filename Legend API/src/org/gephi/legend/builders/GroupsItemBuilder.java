@@ -7,10 +7,12 @@ package org.gephi.legend.builders;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collection;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomGroupsItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
+import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.api.PartitionData;
@@ -28,12 +30,16 @@ import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author edubecks
  */
-@ServiceProvider(service = ItemBuilder.class, position = 103)
+@ServiceProviders(value = {
+    @ServiceProvider(service = ItemBuilder.class, position = 103),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 103)
+})
 public class GroupsItemBuilder extends LegendItemBuilder {
 
     @Override
@@ -160,6 +166,16 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
         return item;
 
+    }
+
+    @Override
+    public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
+        Collection<? extends CustomGroupsItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomGroupsItemBuilder.class);
+        ArrayList<CustomLegendItemBuilder> availableBuilders = new ArrayList<CustomLegendItemBuilder>();
+        for (CustomGroupsItemBuilder customBuilder : customBuilders) {
+            availableBuilders.add((CustomLegendItemBuilder) customBuilder);
+        }
+        return availableBuilders;
     }
 
 }
