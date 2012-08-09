@@ -229,7 +229,7 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected final Direction defaultHorizontalTextPosition = Direction.LEFT;
     protected final Alignment defaultHorizontalTextAlignment = Alignment.LEFT;
     // up/bottom labels
-    protected final Alignment defaultVerticalTextAlignment = Alignment.LEFT;
+    protected final Alignment defaultVerticalTextAlignment = Alignment.CENTER;
     protected final Direction defaultVerticalTextPosition = Direction.LEFT;
-    protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.HORIZONTAL;
+    protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
 }

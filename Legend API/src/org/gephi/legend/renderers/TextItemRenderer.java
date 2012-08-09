@@ -5,19 +5,13 @@
 package org.gephi.legend.renderers;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineBreakMeasurer;
-import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
-import java.util.ArrayList;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
-import org.gephi.legend.properties.TextProperty;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.items.TextItem;
+import org.gephi.legend.properties.TextProperty;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;

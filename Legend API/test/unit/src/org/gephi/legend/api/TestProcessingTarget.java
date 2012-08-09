@@ -5,7 +5,6 @@
 package org.gephi.legend.api;
 
 import java.io.*;
-import org.apache.batik.dom.GenericDOMImplementation;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
@@ -14,28 +13,21 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
 import org.gephi.io.exporter.preview.PNGExporter;
-import org.gephi.io.exporter.preview.SVGExporter;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
-import org.gephi.legend.builders.LegendItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
-import org.gephi.legend.builders.table.Default;
 import org.gephi.legend.builders.TextItemBuilder;
-import org.gephi.legend.properties.GroupsProperty;
-import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.w3c.dom.DOMImplementation;
 
 /**
  *
@@ -101,7 +93,7 @@ public class TestProcessingTarget {
 
 
 
-
+ 
             // attribute ???
             AttributeController attributeController = Lookup.getDefault().lookup(AttributeController.class);
             AttributeModel attributeModel = null;
