@@ -6,30 +6,23 @@ package org.gephi.legend.items.propertyeditors;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Collection;
+import org.gephi.legend.api.DescriptionItemElementValue;
+import org.gephi.legend.items.DescriptionItemElement;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author edubecks
  */
-public class DescriptionItemElementPanel extends javax.swing.JPanel implements ItemListener{
-    
-    private final static String CUSTOM_VALUE= "Custom ...";
-    
-    // temp
-    private final static String FUNCTION1= "Funcion 1";
-    private final static String FUNCTION2= "Funcion 2";
-    private final static String FUNCTION3= "Funcion 3";
+public class DescriptionItemElementPanel extends javax.swing.JPanel implements ItemListener {
 
     /**
      * Creates new form DescriptionItemElementPanel
      */
     public DescriptionItemElementPanel() {
         initComponents();
-        valueComboBox.addItem(FUNCTION1);
-        valueComboBox.addItem(FUNCTION2);
-        valueComboBox.addItem(FUNCTION3);
-        // custom value
-        valueComboBox.addItem(CUSTOM_VALUE);
+        loadDescriptionItemElementValues();
     }
 
     /**
@@ -42,34 +35,19 @@ public class DescriptionItemElementPanel extends javax.swing.JPanel implements I
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        keyLabel = new javax.swing.JLabel();
         valueLabel = new javax.swing.JLabel();
-        keyTextField = new javax.swing.JTextField();
         valueComboBox = new javax.swing.JComboBox();
         customValueTextField = new javax.swing.JTextField();
 
+        setPreferredSize(new java.awt.Dimension(400, 100));
         setLayout(new java.awt.GridBagLayout());
-
-        keyLabel.setText(org.openide.util.NbBundle.getMessage(DescriptionItemElementPanel.class, "DescriptionItemElementPanel.keyLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(keyLabel, gridBagConstraints);
 
         valueLabel.setText(org.openide.util.NbBundle.getMessage(DescriptionItemElementPanel.class, "DescriptionItemElementPanel.valueLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(valueLabel, gridBagConstraints);
-
-        keyTextField.setText(org.openide.util.NbBundle.getMessage(DescriptionItemElementPanel.class, "DescriptionItemElementPanel.keyTextField.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(keyTextField, gridBagConstraints);
+        add(valueLabel, gridBagConstraints);
 
         valueComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -78,48 +56,57 @@ public class DescriptionItemElementPanel extends javax.swing.JPanel implements I
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         add(valueComboBox, gridBagConstraints);
 
+        customValueTextField.setColumns(20);
         customValueTextField.setText(org.openide.util.NbBundle.getMessage(DescriptionItemElementPanel.class, "DescriptionItemElementPanel.customValueTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         add(customValueTextField, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void valueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_valueComboBoxActionPerformed
-        if(valueComboBox.getSelectedItem()==CUSTOM_VALUE){
-            customValueTextField.setText("");
+
+        DescriptionItemElementValue descriptionItemElementValue = (DescriptionItemElementValue) valueComboBox.getSelectedItem();
+        String value = descriptionItemElementValue.getValue();
+        customValueTextField.setText(value);
+        if (propertyEditor != null) {
+            this.propertyEditor.setValue(new DescriptionItemElement(descriptionItemElementValue, value));
         }
-        else{
-            customValueTextField.setText(valueComboBox.getSelectedItem().toString());
-        }
-        
-        // switch others
-        
-        
+
     }//GEN-LAST:event_valueComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField customValueTextField;
-    private javax.swing.JLabel keyLabel;
-    private javax.swing.JTextField keyTextField;
     private javax.swing.JComboBox valueComboBox;
     private javax.swing.JLabel valueLabel;
     // End of variables declaration//GEN-END:variables
-
-    
     private DescriptionItemElementPropertyEditor propertyEditor;
-    
+
     public void setup(DescriptionItemElementPropertyEditor propertyEditor) {
         this.propertyEditor = propertyEditor;
+        DescriptionItemElement descriptionItemElement = (DescriptionItemElement) propertyEditor.getValue();
+        valueComboBox.setSelectedItem(descriptionItemElement.getGenerator());
+        customValueTextField.setText(descriptionItemElement.getValue());
     }
-    
+
     @Override
     public void itemStateChanged(ItemEvent ie) {
-        
     }
+
+    public final void loadDescriptionItemElementValues() {
+        Collection<? extends DescriptionItemElementValue> values = Lookup.getDefault().lookupAll(DescriptionItemElementValue.class);
+        for (DescriptionItemElementValue descriptionItemElementValue : values) {
+            valueComboBox.addItem(descriptionItemElementValue);
+        }
+        
+        // load default value
+    }
+
 }

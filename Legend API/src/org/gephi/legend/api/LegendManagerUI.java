@@ -446,8 +446,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         return NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.title");
     }
 
-    public void registerEditors() {
-        PropertyEditorManager.registerEditor(DescriptionElement.class, DescriptionItemElementPropertyEditor.class);
+    public final void registerEditors() {
+        PropertyEditorManager.registerEditor(DescriptionItemElement.class, DescriptionItemElementPropertyEditor.class);
     }
 
 }

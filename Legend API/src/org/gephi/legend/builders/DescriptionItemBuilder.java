@@ -13,12 +13,13 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomDescriptionItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.api.DescriptionItemElementValue;
 import org.gephi.legend.api.LegendItem;
 import org.gephi.legend.api.LegendItem.Alignment;
 import org.gephi.legend.api.LegendManager;
 import org.gephi.legend.items.DescriptionItem;
-//import org.gephi.legend.items.DescriptionItem.DescriptionElement;
-import org.gephi.legend.items.DescriptionElement;
+//import org.gephi.legend.items.DescriptionItem.DescriptionItemElement;
+import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
@@ -28,6 +29,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
+import org.gephi.legend.builders.description.CustomValue;
 
 /**
  *
@@ -101,7 +103,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
             PreviewProperty.createProperty(this,
                                            legendProperties.get(DescriptionProperty.DESCRIPTION_TEMP),
-                                           DescriptionElement.class,
+                                           DescriptionItemElement.class,
                                            "temp",
                                            "temp",
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionElement)
@@ -150,28 +152,35 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] itemProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
 
+
         // creating new PreviewProperty[]
         PreviewProperty[] newDescriptionProperties = new PreviewProperty[numOfProperties * 2];
         for (int i = 0; i < numOfProperties; i++) {
+
             int dataIndex = begin + i;
-            String key = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
-            System.out.println("@Var: appendPreviewProperty key: " + key);
-            String value = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
-            System.out.println("@Var: appendPreviewProperty value: " + value);
+            String key = NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex;
+            System.out.println("@Var: key: " + key);
+            String keyProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
+            System.out.println("@Var: appendPreviewProperty key: " + keyProperty);
+            String valueProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
+            System.out.println("@Var: appendPreviewProperty value: " + valueProperty);
+            DescriptionItemElementValue descriptionItemElementValue = new CustomValue();
+            DescriptionItemElement value = new DescriptionItemElement(descriptionItemElementValue, (NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex));
+            System.out.println("@Var: value: " + value);
             newDescriptionProperties[2 * i] = PreviewProperty.createProperty(
                     DescriptionItemBuilder.class,
-                    key,
+                    keyProperty,
                     String.class,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
-                    LegendProperty.DYNAMIC).setValue("");
+                    LegendProperty.DYNAMIC).setValue(key);
             newDescriptionProperties[2 * i + 1] = PreviewProperty.createProperty(
                     DescriptionItemBuilder.class,
-                    value,
-                    String.class,
+                    valueProperty,
+                    DescriptionItemElement.class,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
-                    LegendProperty.DYNAMIC).setValue("");
+                    LegendProperty.DYNAMIC).setValue(defaultDescriptionElement);
         }
 
         // appending
@@ -201,7 +210,8 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     private Alignment defaultKeyAlignment = Alignment.LEFT;
     private Alignment defaultValueAlignment = Alignment.LEFT;
     private Boolean defaultIsFlowLayout = true;
-    private DescriptionElement defaultDescriptionElement = new DescriptionElement();
+    public static DescriptionItemElementValue defaultDescriptionItemElementValue = new CustomValue();
+    public static DescriptionItemElement defaultDescriptionElement = new DescriptionItemElement(defaultDescriptionItemElementValue, "");
 
     @Override
     protected boolean isBuilderForItem(Item item) {
