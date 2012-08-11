@@ -2,11 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.api;
+package org.gephi.legend.manager;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;

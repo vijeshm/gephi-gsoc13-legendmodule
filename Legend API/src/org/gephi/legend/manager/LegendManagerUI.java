@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.api;
+package org.gephi.legend.manager;
 
 import java.awt.*;
 import java.beans.PropertyEditorManager;
@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.CustomLegendItemBuilder;
+import org.gephi.legend.items.LegendItem;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
@@ -273,7 +275,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         System.out.println("@Var: builderTypeComboBox.getSelectedItem(): " + builderTypeComboBox.getSelectedItem());
         CustomLegendItemBuilder customBuilder = (CustomLegendItemBuilder) builderTypeComboBox.getSelectedItem();
         if (customBuilder.isAvailableToBuild()) {
-            
+
             item = builder.createCustomItem(newItemIndex, graph, attributeModel, customBuilder);
 
 
@@ -390,16 +392,20 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             Item item = (Item) activeLegendsComboBox.getSelectedItem();
             if (LegendItemBuilder.updatePreviewProperty(item, numberOfItems)) {
                 System.out.printf("Refresh property sheet\n");
-                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-                Item activeLegendItem = legendManager.getActiveLegendItem();
-                refreshPropertySheet(activeLegendItem);
+//                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+//                Item activeLegendItem = legendManager.getActiveLegendItem();
+                PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+                for (PreviewProperty property : dynamicProperties) {
+                    previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+                }
+                refreshPropertySheet(item);
             }
         }
     }//GEN-LAST:event_numberOfItemsTextFieldActionPerformed
 
     private void legendItemBuildersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_legendItemBuildersComboBoxActionPerformed
         builderTypeComboBox.removeAllItems();
-        
+
         LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
         ArrayList<CustomLegendItemBuilder> availableBuilders = builder.getAvailableBuilders();
         for (CustomLegendItemBuilder availableBuilder : availableBuilders) {

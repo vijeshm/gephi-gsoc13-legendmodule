@@ -4,6 +4,7 @@
  */
 package org.gephi.legend.api;
 
+import org.gephi.legend.items.LegendItem;
 import java.awt.Graphics2D;
 import java.io.*;
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -22,7 +23,7 @@ import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;

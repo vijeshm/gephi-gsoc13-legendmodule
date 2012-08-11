@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.builders.description;
+package org.gephi.legend.builders.description.elements;
 
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;

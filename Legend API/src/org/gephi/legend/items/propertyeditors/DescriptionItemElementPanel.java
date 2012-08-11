@@ -92,6 +92,9 @@ public class DescriptionItemElementPanel extends javax.swing.JPanel implements I
     public void setup(DescriptionItemElementPropertyEditor propertyEditor) {
         this.propertyEditor = propertyEditor;
         DescriptionItemElement descriptionItemElement = (DescriptionItemElement) propertyEditor.getValue();
+//        if(descriptionItemElement==null){
+//            descriptionItemElement = DescriptionItemElement.getDefaultGenerator();
+//        }
         valueComboBox.setSelectedItem(descriptionItemElement.getGenerator());
         customValueTextField.setText(descriptionItemElement.getValue());
     }

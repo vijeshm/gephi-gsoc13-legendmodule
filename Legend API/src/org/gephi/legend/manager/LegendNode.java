@@ -2,11 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.api;
+package org.gephi.legend.manager;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
+import org.gephi.legend.items.LegendItem;
 import org.gephi.preview.api.*;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.AbstractNode;

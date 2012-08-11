@@ -17,13 +17,15 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendItem.Alignment;
-import org.gephi.legend.api.LegendItem.Direction;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.items.LegendItem.Alignment;
+import org.gephi.legend.items.LegendItem.Direction;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.api.PartitionData;
 import org.gephi.legend.api.StatisticData;
 import org.gephi.legend.items.TableItem;
+import org.gephi.legend.items.TableItem.VerticalPosition;
+import org.gephi.legend.items.TableItem.HorizontalPosition;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
@@ -156,10 +158,10 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalTextAlignment),
             PreviewProperty.createProperty(this,
                                            tableProperties.get(TableProperty.TABLE_HORIZONTAL_TEXT_POSITION),
-                                           Direction.class,
+                                           HorizontalPosition.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalTextPosition),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalLabelsPosition),
             PreviewProperty.createProperty(this,
                                            tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ALIGNMENT),
                                            Alignment.class,
@@ -168,10 +170,10 @@ public class TableItemBuilder extends LegendItemBuilder {
                                            PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextAlignment),
             PreviewProperty.createProperty(this,
                                            tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_POSITION),
-                                           Direction.class,
+                                           VerticalPosition.class,
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.displayName"),
                                            NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextPosition),
+                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalLabelsPosition),
             PreviewProperty.createProperty(this,
                                            tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ROTATION),
                                            TableItem.VerticalTextDirection.class,
@@ -226,10 +228,10 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected final Boolean defaultIsCellColoring = false;
     protected final Direction defaultCellColoringDirection = Direction.UP;
     // side labels
-    protected final Direction defaultHorizontalTextPosition = Direction.LEFT;
-    protected final Alignment defaultHorizontalTextAlignment = Alignment.LEFT;
+    protected final HorizontalPosition defaultHorizontalLabelsPosition = HorizontalPosition.LEFT;
+    protected final Alignment defaultHorizontalTextAlignment = Alignment.JUSTIFIED;
     // up/bottom labels
     protected final Alignment defaultVerticalTextAlignment = Alignment.CENTER;
-    protected final Direction defaultVerticalTextPosition = Direction.LEFT;
+    protected final VerticalPosition defaultVerticalLabelsPosition = VerticalPosition.BOTTOM;
     protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
 }

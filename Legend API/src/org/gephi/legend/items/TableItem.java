@@ -4,9 +4,10 @@
  */
 package org.gephi.legend.items;
 
-import org.gephi.legend.api.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -25,6 +26,40 @@ public class TableItem extends AbstractItem implements LegendItem {
     public static final String COLOR_VERTICAL = "color vertical";
     public static final String COLOR_HORIZONTAL = "color horizontal";
 
+    
+    public enum VerticalPosition {
+
+        UP(NbBundle.getMessage(LegendManager.class, "TableItem.position.up")),
+        BOTTOM(NbBundle.getMessage(LegendManager.class, "TableItem.position.bottom"));
+        private final String position;
+
+        private VerticalPosition(String position) {
+            this.position = position;
+        }
+
+        @Override
+        public String toString() {
+            return this.position;
+        }
+
+    }
+    
+    public enum HorizontalPosition {
+
+        RIGHT(NbBundle.getMessage(LegendManager.class, "TableItem.position.right")),
+        LEFT(NbBundle.getMessage(LegendManager.class, "TableItem.position.left"));
+        private final String position;
+
+        private HorizontalPosition(String direction) {
+            this.position = direction;
+        }
+
+        @Override
+        public String toString() {
+            return this.position;
+        }
+
+    }
 
     public enum VerticalTextDirection {
 

@@ -10,6 +10,7 @@ package org.gephi.legend.api;
  */
 public abstract class DescriptionItemElementValue {
     
+    
     public abstract String getValue();
     
     public abstract String getTitle();

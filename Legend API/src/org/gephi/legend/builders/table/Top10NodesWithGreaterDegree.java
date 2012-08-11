@@ -4,7 +4,6 @@
  */
 package org.gephi.legend.builders.table;
 
-import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +16,6 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
-import org.gephi.partition.api.PartitionController;
-import org.gephi.partition.api.PartitionModel;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
@@ -100,8 +97,6 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
             this.graph = graph;
         }
         
-        
-
         @Override
         public int compare(Node n1, Node n2) {
             return graph.getDegree(n1) - graph.getDegree(n2);

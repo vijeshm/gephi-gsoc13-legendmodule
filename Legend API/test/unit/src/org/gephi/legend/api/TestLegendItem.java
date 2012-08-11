@@ -4,6 +4,7 @@
  */
 package org.gephi.legend.api;
 
+import org.gephi.legend.items.LegendItem;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;

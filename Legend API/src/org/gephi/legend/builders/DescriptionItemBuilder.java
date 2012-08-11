@@ -14,9 +14,9 @@ import org.gephi.legend.api.CustomDescriptionItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.DescriptionItemElementValue;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendItem.Alignment;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.items.LegendItem.Alignment;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.items.DescriptionItem;
 //import org.gephi.legend.items.DescriptionItem.DescriptionItemElement;
 import org.gephi.legend.items.DescriptionItemElement;
@@ -29,7 +29,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
-import org.gephi.legend.builders.description.CustomValue;
+import org.gephi.legend.builders.description.elements.CustomValue;
 
 /**
  *
@@ -158,29 +158,29 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         for (int i = 0; i < numOfProperties; i++) {
 
             int dataIndex = begin + i;
-            String key = NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex;
+            String key = new String(NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex);
             System.out.println("@Var: key: " + key);
             String keyProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
             System.out.println("@Var: appendPreviewProperty key: " + keyProperty);
             String valueProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
             System.out.println("@Var: appendPreviewProperty value: " + valueProperty);
-            DescriptionItemElementValue descriptionItemElementValue = new CustomValue();
-            DescriptionItemElement value = new DescriptionItemElement(descriptionItemElementValue, (NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex));
+            DescriptionItemElementValue customValue = new CustomValue();
+            DescriptionItemElement value = new DescriptionItemElement(customValue, (NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex));
             System.out.println("@Var: value: " + value);
             newDescriptionProperties[2 * i] = PreviewProperty.createProperty(
-                    DescriptionItemBuilder.class,
+                    item,
                     keyProperty,
                     String.class,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
                     LegendProperty.DYNAMIC).setValue(key);
             newDescriptionProperties[2 * i + 1] = PreviewProperty.createProperty(
-                    DescriptionItemBuilder.class,
+                    item,
                     valueProperty,
                     DescriptionItemElement.class,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
-                    LegendProperty.DYNAMIC).setValue(defaultDescriptionElement);
+                    LegendProperty.DYNAMIC).setValue(value);
         }
 
         // appending
@@ -210,8 +210,8 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     private Alignment defaultKeyAlignment = Alignment.LEFT;
     private Alignment defaultValueAlignment = Alignment.LEFT;
     private Boolean defaultIsFlowLayout = true;
-    public static DescriptionItemElementValue defaultDescriptionItemElementValue = new CustomValue();
-    public static DescriptionItemElement defaultDescriptionElement = new DescriptionItemElement(defaultDescriptionItemElementValue, "");
+//    public static DescriptionItemElementValue defaultDescriptionItemElementValue = new CustomValue();
+    public static DescriptionItemElement defaultDescriptionElement = DescriptionItemElement.getDefaultGenerator();
 
     @Override
     protected boolean isBuilderForItem(Item item) {

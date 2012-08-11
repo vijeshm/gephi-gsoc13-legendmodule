@@ -13,8 +13,8 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomGroupsItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.api.PartitionData;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
@@ -135,7 +135,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
     // DEFAULT PROPERTIES
     private Integer defaultNumColumns = 5;
-    private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.BOTTOM;
+    private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.DOWN;
     private Color defaultLabelFontColor = Color.BLACK;
     private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 15);
     private Integer defaultPaddingBetweenTextAndShape = 5;

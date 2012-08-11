@@ -4,6 +4,8 @@
  */
 package org.gephi.legend.api;
 
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;

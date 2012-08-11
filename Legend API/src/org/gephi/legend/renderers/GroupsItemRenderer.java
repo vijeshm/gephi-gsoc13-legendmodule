@@ -8,8 +8,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewModel;
@@ -19,8 +19,8 @@ import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.NbBundle;
 import org.gephi.legend.items.GroupsItem;
 import org.gephi.legend.properties.GroupsProperty;
-import org.gephi.legend.api.LegendItem.Shape;
-import org.gephi.legend.api.LegendItem.Direction;
+import org.gephi.legend.items.LegendItem.Shape;
+import org.gephi.legend.items.LegendItem.Direction;
 import org.gephi.legend.items.TableItem;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.spi.Renderer;
@@ -87,7 +87,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
             labelWidth = maxLabelWidth;
             labelHeight = shapeHeight;
         }
-        else if (labelPosition == Direction.UP || labelPosition == Direction.BOTTOM) {
+        else if (labelPosition == Direction.UP || labelPosition == Direction.DOWN) {
             shapeWidth = elementWidth - paddingBetweenElements;
             shapeHeight = elementHeight - maxLabelHeight - paddingBetweenTextAndShape;
             labelWidth = shapeWidth;
@@ -134,7 +134,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
                     yLabel = y;
                     break;
                 }
-                case BOTTOM: {
+                case DOWN: {
                     xShape = x;
                     yShape = y;
                     xLabel = x;

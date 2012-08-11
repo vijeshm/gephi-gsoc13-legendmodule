@@ -4,6 +4,8 @@
  */
 package org.gephi.legend.api;
 
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import java.io.*;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;

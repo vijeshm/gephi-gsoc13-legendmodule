@@ -2,9 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.api;
+package org.gephi.legend.items;
 
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.preview.api.PreviewProperty;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -32,8 +34,8 @@ public interface LegendItem {
     //ANCHOR CONSTANTS FOR ALL LEGEND ITEMS
     public static final int TRANSFORMATION_ANCHOR_SIZE = 20;
     public static final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
-    public final float LEGEND_MIN_WIDTH = 50;
-    public final float LEGEND_MIN_HEIGHT = 50;
+    public static final float LEGEND_MIN_WIDTH = 50;
+    public static final float LEGEND_MIN_HEIGHT = 50;
 
     /**
      * If the type of Legend has dynamic PreviewProperty it returns it
@@ -43,10 +45,10 @@ public interface LegendItem {
 
     public enum Direction {
 
-        UP("Up"),
-        BOTTOM("Bottom"),
-        RIGHT("Right"),
-        LEFT("Left");
+        UP(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.up")),
+        DOWN(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.down")),
+        RIGHT(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.right")),
+        LEFT(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.left"));
         private final String direction;
 
         private Direction(String direction) {
@@ -62,9 +64,9 @@ public interface LegendItem {
 
     public enum Shape {
 
-        RECTANGLE("Rectangle"),
-        CIRCLE("Circle"),
-        TRIANGLE("Triangle");
+        RECTANGLE(NbBundle.getMessage(LegendManager.class, "LegendItem.shape.rectangle")),
+        CIRCLE(NbBundle.getMessage(LegendManager.class, "LegendItem.shape.circle")),
+        TRIANGLE(NbBundle.getMessage(LegendManager.class, "LegendItem.shape.triangle"));
         private final String shape;
 
         private Shape(String shape) {
@@ -80,10 +82,10 @@ public interface LegendItem {
 
     public enum Alignment {
 
-        LEFT("Left"),
-        RIGHT("Right"),
-        CENTER("Center"),
-        JUSTIFIED("Justified");
+        LEFT(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.left")),
+        RIGHT(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.right")),
+        CENTER(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.center")),
+        JUSTIFIED(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.justified"));
         private final String alignment;
 
         private Alignment(String alignment) {

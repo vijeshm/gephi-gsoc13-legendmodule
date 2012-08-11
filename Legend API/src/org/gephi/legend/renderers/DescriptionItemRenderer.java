@@ -10,11 +10,12 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendItem.Alignment;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.items.LegendItem.Alignment;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.builders.DescriptionItemBuilder;
 import org.gephi.legend.items.DescriptionItem;
+import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -103,7 +104,8 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
             for (int i = 0; i < numberOfItems; i++) {
                 String key = previewProperties.getStringValue(LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, i));
                 System.out.println("@Var: key: " + key);
-                String value = previewProperties.getStringValue(LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, i));
+                DescriptionItemElement descriptionItemElement = previewProperties.getValue(LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, i));
+                String value = descriptionItemElement.getValue();
                 System.out.println("@Var: value: " + value);
                 keys.add(key);
                 values.add(value);

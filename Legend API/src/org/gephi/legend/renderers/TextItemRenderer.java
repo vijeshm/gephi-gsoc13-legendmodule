@@ -6,9 +6,9 @@ package org.gephi.legend.renderers;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendItem.Alignment;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.items.LegendItem.Alignment;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.items.TextItem;
 import org.gephi.legend.properties.TextProperty;

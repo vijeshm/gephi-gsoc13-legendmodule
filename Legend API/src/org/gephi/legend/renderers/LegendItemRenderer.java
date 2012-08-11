@@ -19,11 +19,11 @@ import org.apache.batik.svggen.DefaultExtensionHandler;
 import org.apache.batik.svggen.ImageHandlerBase64Encoder;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.gephi.legend.api.LegendItem;
-import org.gephi.legend.api.LegendItem.Alignment;
-import static org.gephi.legend.api.LegendItem.TRANSFORMATION_ANCHOR_LINE_THICK;
-import static org.gephi.legend.api.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.items.LegendItem.Alignment;
+import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_LINE_THICK;
+import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
@@ -233,10 +233,16 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
-        float titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, origin.getTranslateX(), origin.getTranslateY(), width);
-        renderTitle(graphics2D, titleOrigin, width, (int)titleHeight);
-        float descriptionHeight = computeVerticalTextSpaceUsed(graphics2D, description, descriptionFont, origin.getTranslateX(), origin.getTranslateY(), width);
+        float titleHeight = 0;
+        if (isDisplayingTitle && !title.isEmpty()) {
+            titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, origin.getTranslateX(), origin.getTranslateY(), width);
+            renderTitle(graphics2D, titleOrigin, width, (int) titleHeight);
+        }
 
+        float descriptionHeight = 0;
+        if (isDisplayingDescription && !description.isEmpty()) {
+            descriptionHeight = computeVerticalTextSpaceUsed(graphics2D, description, descriptionFont, origin.getTranslateX(), origin.getTranslateY(), width);
+        }
         // LEGEND
         AffineTransform legendOrigin = new AffineTransform(origin);
         legendOrigin.translate(0, titleHeight);
@@ -247,7 +253,9 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         // DESCRIPTION
         AffineTransform descriptionOrigin = new AffineTransform(origin);
         descriptionOrigin.translate(0, titleHeight + legendHeight);
-        renderDescription(graphics2D, descriptionOrigin, width, (int)descriptionHeight);
+        if (isDisplayingDescription && !description.isEmpty()) {
+            renderDescription(graphics2D, descriptionOrigin, width, (int) descriptionHeight);
+        }
 
 
         // is selected
@@ -282,11 +290,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     }
 
     public float renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        if (isDisplayingDescription && !description.isEmpty()) {
-            graphics2D.setTransform(origin);
-            return legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
-        }
-        return 0f;
+        graphics2D.setTransform(origin);
+        return legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
     }
 
     public void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -302,11 +307,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     }
 
     public float renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        if (isDisplayingTitle && !title.isEmpty()) {
-            graphics2D.setTransform(origin);
-            return legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, width, height, titleAlignment);
-        }
-        return 0f;
+        graphics2D.setTransform(origin);
+        return legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, width, height, titleAlignment);
     }
 
     @Override
@@ -401,7 +403,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment) {
         float spaceUsed = legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, true);
-        y = y+ (height-spaceUsed)/2;
+        y = y + (height - spaceUsed) / 2;
         return legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, false);
     }
 

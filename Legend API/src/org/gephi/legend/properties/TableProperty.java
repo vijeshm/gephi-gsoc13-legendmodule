@@ -5,7 +5,7 @@
 package org.gephi.legend.properties;
 
 import java.util.ArrayList;
-import org.gephi.legend.api.LegendManager;
+import org.gephi.legend.manager.LegendManager;
 
 /**
  *
