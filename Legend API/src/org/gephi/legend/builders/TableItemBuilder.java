@@ -8,10 +8,8 @@ package org.gephi.legend.builders;
  *
  * @author edubecks
  */
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import java.awt.Color;
 import java.awt.Font;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
@@ -24,18 +22,12 @@ import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.items.LegendItem.Direction;
-import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.api.PartitionData;
-import org.gephi.legend.api.StatisticData;
 import org.gephi.legend.items.TableItem;
-import org.gephi.legend.items.TableItem.VerticalPosition;
 import org.gephi.legend.items.TableItem.HorizontalPosition;
-import org.gephi.legend.properties.ImageProperty;
-import org.gephi.legend.properties.LegendProperty;
+import org.gephi.legend.items.TableItem.VerticalPosition;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.api.Item;
-import org.gephi.preview.api.ManagedRenderer;
-import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.Lookup;

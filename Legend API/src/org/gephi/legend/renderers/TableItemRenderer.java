@@ -8,16 +8,15 @@ package org.gephi.legend.renderers;
  *
  * @author edubecks
  */
-import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.items.LegendItem.Direction;
-import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.items.TableItem;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;

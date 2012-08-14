@@ -4,9 +4,6 @@
  */
 package org.gephi.legend.items;
 
-import java.awt.Color;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
 

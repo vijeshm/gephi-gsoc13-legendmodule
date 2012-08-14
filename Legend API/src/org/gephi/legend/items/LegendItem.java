@@ -4,8 +4,6 @@
  */
 package org.gephi.legend.items;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.NbBundle;

@@ -6,8 +6,6 @@ package org.gephi.legend.builders.table;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.items.TableItem;

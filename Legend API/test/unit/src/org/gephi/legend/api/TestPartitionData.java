@@ -4,7 +4,6 @@
  */
 package org.gephi.legend.api;
 
-import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
 import org.gephi.dynamic.api.DynamicController;
@@ -13,7 +12,6 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
-import org.gephi.legend.api.PartitionData;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;

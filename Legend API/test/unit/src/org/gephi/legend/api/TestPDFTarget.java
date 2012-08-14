@@ -4,18 +4,13 @@
  */
 package org.gephi.legend.api;
 
-import org.gephi.legend.items.LegendItem;
-import org.gephi.legend.manager.LegendManager;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
@@ -31,11 +26,12 @@ import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 

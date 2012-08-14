@@ -4,11 +4,8 @@
  */
 package org.gephi.legend.api;
 
-import org.gephi.legend.items.LegendItem;
-import java.awt.Graphics2D;
 import java.io.*;
 import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
@@ -21,16 +18,15 @@ import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
+import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.builders.GroupsItemBuilder;
-import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.w3c.dom.DOMImplementation;

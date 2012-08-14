@@ -6,7 +6,6 @@ package org.gephi.legend.builders;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
@@ -16,14 +15,13 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomDescriptionItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
-import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.DescriptionItemElementValue;
+import org.gephi.legend.builders.description.elements.CustomValue;
+import org.gephi.legend.items.DescriptionItem;
+import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.items.DescriptionItem;
-//import org.gephi.legend.items.DescriptionItem.DescriptionItemElement;
-import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
@@ -33,8 +31,6 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
-import org.gephi.legend.builders.description.elements.CustomValue;
-import org.gephi.legend.properties.ImageProperty;
 
 /**
  *

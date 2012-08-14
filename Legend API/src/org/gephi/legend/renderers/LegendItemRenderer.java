@@ -21,8 +21,6 @@ import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
-import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_LINE_THICK;
-import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.properties.LegendProperty;

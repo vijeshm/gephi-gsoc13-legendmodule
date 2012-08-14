@@ -6,7 +6,6 @@ package org.gephi.legend.api;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Map;
 import org.gephi.legend.items.TableItem;
 
 /**

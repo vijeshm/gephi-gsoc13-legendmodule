@@ -7,7 +7,6 @@ package org.gephi.legend.api;
 import java.awt.Color;
 import java.util.ArrayList;
 import org.gephi.graph.api.Node;
-import org.gephi.partition.api.NodePartition;
 import org.gephi.partition.api.Part;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.api.PartitionModel;
