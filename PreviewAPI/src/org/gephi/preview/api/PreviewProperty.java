@@ -66,8 +66,9 @@ import org.openide.util.NbBundle;
  */
 public class PreviewProperty {
     
-        //LEGEND
-        public static final String CATEGORY_LEGENDS = NbBundle.getMessage(PreviewProperty.class, "PreviewProperty.Category.Legends");
+    //LEGEND
+    public static final String CATEGORY_LEGEND_DYNAMIC_PROPERTY = "dynamicproperty";
+    public static final String CATEGORY_LEGEND_PROPERTY = "legendproperty";
        
 
     //Constants global

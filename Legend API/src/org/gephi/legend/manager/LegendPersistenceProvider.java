@@ -31,8 +31,7 @@ public class LegendPersistenceProvider implements WorkspacePersistenceProvider{
 
     @Override
     public String getIdentifier() {
-        return LEGEND;
+        return LegendController.XML_LEGENDS;
     }
     
-    private final static String LEGEND = "legend";
 }

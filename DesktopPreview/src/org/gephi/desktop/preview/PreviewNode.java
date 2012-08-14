@@ -80,7 +80,7 @@ public class PreviewNode extends AbstractNode implements PropertyChangeListener 
         PreviewController controller = Lookup.getDefault().lookup(PreviewController.class);
 
         Set<Renderer> enabledRenderers = null;
-        if (controller.getModel()!=null && controller.getModel().getManagedRenderers() != null) {
+        if (controller.getModel() != null && controller.getModel().getManagedRenderers() != null) {
             enabledRenderers = new HashSet<Renderer>();
             for (ManagedRenderer mr : controller.getModel().getManagedRenderers()) {
                 if (mr.isEnabled()) {
@@ -103,25 +103,29 @@ public class PreviewNode extends AbstractNode implements PropertyChangeListener 
 
                 if (propertyEnabled) {
                     String category = property.getCategory();
-                    Sheet.Set sheetSet = sheetSets.get(category);
-                    if (sheetSet == null) {
-                        sheetSet = Sheet.createPropertiesSet();
-                        sheetSet.setDisplayName(category);
-                        sheetSet.setName(category);
-                    }
-                    Node.Property nodeProperty = null;
-                    PreviewProperty[] parents = properties.getParentProperties(property);
-                    PreviewProperty[] children = properties.getChildProperties(property);
-                    if (parents.length > 0) {
-                        nodeProperty = new ChildPreviewPropertyWrapper(property, parents);
-                    } else if (children.length > 0) {
-                        nodeProperty = new ParentPreviewPropertyWrapper(property, children);
-                    } else {
-                        nodeProperty = new PreviewPropertyWrapper(property);
-                    }
+                    if (!category.equals(PreviewProperty.CATEGORY_LEGEND_PROPERTY) && !category.equals(PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY)) {
+                        Sheet.Set sheetSet = sheetSets.get(category);
+                        if (sheetSet == null) {
+                            sheetSet = Sheet.createPropertiesSet();
+                            sheetSet.setDisplayName(category);
+                            sheetSet.setName(category);
+                        }
+                        Node.Property nodeProperty = null;
+                        PreviewProperty[] parents = properties.getParentProperties(property);
+                        PreviewProperty[] children = properties.getChildProperties(property);
+                        if (parents.length > 0) {
+                            nodeProperty = new ChildPreviewPropertyWrapper(property, parents);
+                        }
+                        else if (children.length > 0) {
+                            nodeProperty = new ParentPreviewPropertyWrapper(property, children);
+                        }
+                        else {
+                            nodeProperty = new PreviewPropertyWrapper(property);
+                        }
 
-                    sheetSet.put(nodeProperty);
-                    sheetSets.put(category, sheetSet);
+                        sheetSet.put(nodeProperty);
+                        sheetSets.put(category, sheetSet);
+                    }
                 }
             }
 
@@ -171,6 +175,7 @@ public class PreviewNode extends AbstractNode implements PropertyChangeListener 
         public void setValue(Object t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
             property.setValue(t);
         }
+
     }
 
     private static class ChildPreviewPropertyWrapper extends PropertySupport.ReadWrite {
@@ -203,6 +208,7 @@ public class PreviewNode extends AbstractNode implements PropertyChangeListener 
             }
             return true;
         }
+
     }
 
     private class ParentPreviewPropertyWrapper extends PropertySupport.ReadWrite {
@@ -228,10 +234,13 @@ public class PreviewNode extends AbstractNode implements PropertyChangeListener 
                 propertyChange(new PropertyChangeEvent(this, p.getName(), p.getValue(), p.getValue()));
             }
         }
+
     }
 
     /**
-     * default method for PropertyChangeListener, it is necessary to fire property change to update propertyEditor, which will refresh at runtime if a property value has been passively updated.
+     * default method for PropertyChangeListener, it is necessary to fire
+     * property change to update propertyEditor, which will refresh at runtime
+     * if a property value has been passively updated.
      *
      * @param pce a PropertyChangeEvent from a PreviewProperty object.
      */
@@ -239,10 +248,11 @@ public class PreviewNode extends AbstractNode implements PropertyChangeListener 
     public void propertyChange(PropertyChangeEvent pce) {
         firePropertyChange(pce.getPropertyName(), pce.getOldValue(), pce.getNewValue());
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
                 propertySheet.updateUI();
             }
+
         });
     }
+
 }

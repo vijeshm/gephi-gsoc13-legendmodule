@@ -5,6 +5,8 @@
 package org.gephi.legend.properties;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.gephi.legend.manager.LegendManager;
 
 /**
@@ -25,13 +27,13 @@ public class GroupsProperty {
     public static final String[] OWN_PROPERTIES = {
         ".numberColumns",
         ".shape",
+        ".scaleShape",
         ".label.position",
         ".label.font",
         ".label.font.color",
         ".paddingBetweenTextAndShape",
         ".paddingBetweenElements",
-        ".scaleShape",
-        ".label"
+        ".label.item"
     };
     
     
@@ -49,6 +51,24 @@ public class GroupsProperty {
     public static String getLabelProperty(Integer itemIndex, int i) {
         ArrayList<String> properties = LegendManager.getProperties(OWN_PROPERTIES, itemIndex);
         return properties.get(GROUPS_LABEL) + i;
+    }
+    
+    private static GroupsProperty instance = new GroupsProperty();
+    private Map<String, Integer> propertyIndex;
+
+    public int getProperty(String propertyName) {
+        return propertyIndex.get(propertyName);
+    }
+
+    private GroupsProperty() {
+        propertyIndex = new HashMap <String, Integer>();
+        for (int i = 0; i < OWN_PROPERTIES.length; i++) {
+            propertyIndex.put(OWN_PROPERTIES[i], i);
+        }
+    }
+
+    public static GroupsProperty getInstance() {
+        return instance;
     }
 
 }

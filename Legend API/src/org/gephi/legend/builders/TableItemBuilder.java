@@ -8,10 +8,8 @@ package org.gephi.legend.builders;
  *
  * @author edubecks
  */
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import java.awt.Color;
 import java.awt.Font;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
@@ -21,20 +19,17 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.items.GroupsItem;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.items.LegendItem.Direction;
-import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.api.PartitionData;
-import org.gephi.legend.api.StatisticData;
 import org.gephi.legend.items.TableItem;
-import org.gephi.legend.items.TableItem.VerticalPosition;
 import org.gephi.legend.items.TableItem.HorizontalPosition;
-import org.gephi.legend.properties.ImageProperty;
-import org.gephi.legend.properties.LegendProperty;
+import org.gephi.legend.items.TableItem.VerticalPosition;
+import org.gephi.legend.manager.LegendManager;
+import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.properties.TableProperty;
 import org.gephi.preview.api.Item;
-import org.gephi.preview.api.ManagedRenderer;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
@@ -50,9 +45,10 @@ import org.openide.util.lookup.ServiceProviders;
 public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
-    protected void setDefaultValues() {
-        defaultWidth = 600;
-        defaultHeight = 500;
+    protected boolean setDefaultValues() {
+        defaultWidth = 600f;
+        defaultHeight = 500f;
+        return false;
     }
 
     @Override
@@ -118,8 +114,8 @@ public class TableItemBuilder extends LegendItemBuilder {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         String propertyString = LegendManager.getProperty(
-                TableProperty.OWN_PROPERTIES, 
-                itemIndex, 
+                TableProperty.OWN_PROPERTIES,
+                itemIndex,
                 property);
 
         switch (property) {
@@ -130,7 +126,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Integer.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -141,7 +137,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Integer.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -152,7 +148,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Font.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.font.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.font.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -163,7 +159,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Color.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.font.color.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.font.color.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -174,7 +170,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Boolean.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.isCellColoring.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.isCellColoring.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -185,7 +181,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Direction.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.cellColoringDirection.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.cellColoringDirection.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -196,7 +192,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Alignment.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.alignment.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.alignment.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -207,7 +203,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         HorizontalPosition.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -218,7 +214,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Alignment.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.alignment.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.alignment.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -229,7 +225,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         VerticalPosition.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -240,7 +236,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         TableItem.VerticalTextDirection.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -251,7 +247,7 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Boolean.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.isDisplaying.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.isDisplaying.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -262,13 +258,32 @@ public class TableItemBuilder extends LegendItemBuilder {
                         Color.class,
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
         }
 
         return previewProperty;
+    }
+
+    private PreviewProperty createLegendLabelProperty(Item item, int numberOfLabel, Object value) {
+
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        String propertyString = TableProperty.getLabelProperty(itemIndex, numberOfLabel);
+
+        PreviewProperty property = PreviewProperty.createProperty(
+                this,
+                propertyString,
+                String.class,
+                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName") + " " + numberOfLabel,
+                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description") + " " + numberOfLabel,
+                PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+
+        System.out.println("@Var: ReadingXML property: " + propertyString + " with value: " + value);
+
+
+        return property;
     }
 
     @Override
@@ -279,22 +294,33 @@ public class TableItemBuilder extends LegendItemBuilder {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         ArrayList<String> tableProperties = LegendManager.getProperties(TableProperty.OWN_PROPERTIES, itemIndex);
 
-
+//
+//        // creating one property for each label
+//        ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
+//        TableItem.Labels labelsIDs = labels.get(0);
+//        ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
+//        ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
+//        ArrayList<StringBuilder> labelsGroup = (labelsIDs == TableItem.Labels.HORIZONTAL) ? horizontalLabels : verticalLabels;
+//        item.setData(TableItem.NUMBER_OF_LABELS, labelsGroup);
+//        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
+//        for (int i = 0; i < labelProperties.length; i++) {
+//            labelProperties[i] = PreviewProperty.createProperty(this,
+//                                                                TableProperty.getLabelProperty(itemIndex, i),
+//                                                                String.class,
+//                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName") + " " + i,
+//                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description") + " " + i,
+//                                                                PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(labelsGroup.get(i).toString());
+//        }
+        
         // creating one property for each label
         ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
         TableItem.Labels labelsIDs = labels.get(0);
         ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
         ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
         ArrayList<StringBuilder> labelsGroup = (labelsIDs == TableItem.Labels.HORIZONTAL) ? horizontalLabels : verticalLabels;
-        item.setData(TableItem.NUMBER_OF_LABELS, labelsGroup);
         PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
         for (int i = 0; i < labelProperties.length; i++) {
-            labelProperties[i] = PreviewProperty.createProperty(this,
-                                                                TableProperty.getLabelProperty(itemIndex, i),
-                                                                String.class,
-                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.displayName") + " " + i,
-                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description") + " " + i,
-                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
+            labelProperties[i] = createLegendLabelProperty(item, i, labelsGroup.get(i).toString());
         }
 
 
@@ -313,79 +339,79 @@ public class TableItemBuilder extends LegendItemBuilder {
 //                                           Integer.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalExtraMargin),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultVerticalExtraMargin),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_HORIZONTAL_EXTRA_MARGIN),
 //                                           Integer.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.vertical.extraMargin.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalExtraMargin),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultHorizontalExtraMargin),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_FONT),
 //                                           Font.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultFont),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultFont),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_FONT_COLOR),
 //                                           Color.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.color.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.font.color.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultFontColor),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultFontColor),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_IS_CELL_COLORING),
 //                                           Boolean.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.isCellColoring.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.isCellColoring.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsCellColoring),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultIsCellColoring),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_CELL_COLORING_DIRECTION),
 //                                           Direction.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.cellColoringDirection.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.cellColoringDirection.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultCellColoringDirection),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultCellColoringDirection),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_HORIZONTAL_TEXT_ALIGNMENT),
 //                                           Alignment.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.alignment.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.alignment.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalTextAlignment),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultHorizontalTextAlignment),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_HORIZONTAL_TEXT_POSITION),
 //                                           HorizontalPosition.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.horizontalText.position.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultHorizontalLabelsPosition),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultHorizontalLabelsPosition),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ALIGNMENT),
 //                                           Alignment.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.alignment.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.alignment.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextAlignment),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultVerticalTextAlignment),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_POSITION),
 //                                           VerticalPosition.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.position.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalLabelsPosition),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultVerticalLabelsPosition),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_VERTICAL_TEXT_ROTATION),
 //                                           TableItem.VerticalTextDirection.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.verticalText.rotation.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultVerticalTextRotation),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultVerticalTextRotation),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_IS_DISPLAYING_GRID),
 //                                           Boolean.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.isDisplaying.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.isDisplaying.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsDisplayingGrid),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultIsDisplayingGrid),
 //            PreviewProperty.createProperty(this,
 //                                           tableProperties.get(TableProperty.TABLE_GRID_COLOR),
 //                                           Color.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TableItem.property.grid.color.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultGridColor),};
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultGridColor),};
 
 
         PreviewProperty[] propertiesWithLabels = new PreviewProperty[labelProperties.length + previewProperties.length];
@@ -409,7 +435,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         return availableBuilders;
     }
 
-    public void writeDataToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
 
         String name = null;
         String text = null;
@@ -423,7 +449,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         name = TableItem.LABELS_IDS;
         text = labelIds.toString();
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -433,7 +459,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         name = TableItem.HORIZONTAL_LABELS;
         text = horizontalLabels.toString();
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -443,7 +469,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         name = TableItem.VERTICAL_LABELS;
         text = verticalLabels.toString();
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -460,7 +486,7 @@ public class TableItemBuilder extends LegendItemBuilder {
 //            text += row.toString();
 //        }
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -479,7 +505,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         }
         text = integerValueColors.toString();
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -494,7 +520,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         }
         text = horizontalColorsRow.toString();
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -510,7 +536,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         }
         text = verticalColorsRow.toString();
         writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute("name", name);
+        writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
         System.out.println("@Saving: : " + LegendItem.DATA + " <> " + " name: " + name + " <> " + " value: " + text);
@@ -582,20 +608,31 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public PreviewProperty readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-//        String propertyName = reader.getAttributeValue(null, XML_NAME);
-//        int propertyIndex = LegendProperty.getInstance().getProperty(propertyName);
-//        String valueString = reader.getElementText();
-//        Object value = PreviewProperties.readValueFromText(valueString, defaultValues[propertyIndex].getClass());
-//        System.out.println("@Var: reading propertyType: " + propertyName + " with value: " + value);
-//        PreviewProperty property = createLegendProperty(item, propertyIndex, value);
-//        return property;
-        return null;
+    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
     }
 
     @Override
-    public void writeItemOwnPropertiesToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
+        String propertyName = reader.getAttributeValue(null, XML_NAME);
+        String valueString = reader.getElementText();
+        int propertyIndex = TableProperty.getInstance().getProperty(propertyName);
+        Class valueClass = defaultValues[propertyIndex].getClass();
+        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
+        if (value == null) {
+            value = readValueFromText(valueString, valueClass);
+        }
+        PreviewProperty property = createLegendProperty(item, propertyIndex, value);
+        return property;
     }
 
 }

@@ -23,7 +23,9 @@ import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.legend.items.ImageItem;
 import org.gephi.legend.properties.ImageProperty;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.properties.TextProperty;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -41,7 +43,10 @@ import org.openide.util.lookup.ServiceProviders;
 public class ImageItemBuilder extends LegendItemBuilder {
 
     @Override
-    protected void setDefaultValues() {
+    protected boolean setDefaultValues() {
+        this.defaultTitleIsDisplaying = Boolean.FALSE;
+        this.defaultDescriptionIsDisplaying = Boolean.FALSE;
+        return true;
     }
 
     @Override
@@ -61,7 +66,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-
         Item item = createNewLegendItem(graph);
         return item;
     }
@@ -78,7 +82,7 @@ public class ImageItemBuilder extends LegendItemBuilder {
                                                                  File.class,
                                                                  NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.displayName"),
                                                                  NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.description"),
-                                                                 PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                                                                 PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
         }
@@ -111,14 +115,14 @@ public class ImageItemBuilder extends LegendItemBuilder {
 //                                           File.class,
 //                                           NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultImageFile)
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultImageFile)
 //        };
 //
 //
 //        return properties;
     }
 
-    private File defaultImageFile = new File("/Users/edubecks/Dropbox/gsoc2012/gephi/gephi.communication/test2.png");
+    private File defaultImageFile = new File("/Volumes/edubecks/edubecks/Dropbox/imagenes/inception.jpg");
     private final Object[] defaultValues = {
         defaultImageFile
     };
@@ -139,13 +143,11 @@ public class ImageItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeDataToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
     }
 
     @Override
     public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -154,13 +156,59 @@ public class ImageItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public PreviewProperty readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+        PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        for (PreviewProperty property : ownProperties) {
+            writeXMLFromSingleProperty(writer, property);
+        }
     }
 
     @Override
-    public void writeItemOwnPropertiesToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+
+        // own properties
+        boolean end = false;
+        while (reader.hasNext() && !end) {
+            int type = reader.next();
+            switch (type) {
+                case XMLStreamReader.START_ELEMENT: {
+                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
+                    properties.add(property);
+                    break;
+                }
+                case XMLStreamReader.CHARACTERS: {
+                    break;
+                }
+                case XMLStreamReader.END_ELEMENT: {
+                    end = true;
+                    break;
+                }
+            }
+        }
+
+        return properties;
+    }
+
+    @Override
+    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        reader.next();
+        return new ArrayList<PreviewProperty>();
+    }
+
+    @Override
+    protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
+        String propertyName = reader.getAttributeValue(null, XML_NAME);
+        String valueString = reader.getElementText();
+        int propertyIndex = ImageProperty.getInstance().getProperty(propertyName);
+        Class valueClass = defaultValues[propertyIndex].getClass();
+        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
+        if (value == null) {
+            value = readValueFromText(valueString, valueClass);
+        }
+        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+value);
+        PreviewProperty property = createLegendProperty(item, propertyIndex, value);
+        return property;
     }
 
 }

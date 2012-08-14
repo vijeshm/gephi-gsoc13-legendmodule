@@ -35,12 +35,11 @@ public class ImageItemRenderer extends LegendItemRenderer {
 
     @Override
     public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        System.out.println("@Var: origin: "+origin);
+        System.out.println("@Var: origin: " + origin);
 //        graphics2D.setTransform(origin);
         try {
             if (imageFile.exists()) {
                 BufferedImage before = ImageIO.read(imageFile);
-                System.out.println("@Var: imageFile: " + imageFile.getAbsolutePath());
 
 
                 graphics2D.setTransform(origin);
@@ -58,7 +57,7 @@ public class ImageItemRenderer extends LegendItemRenderer {
                     after = scaleOperation.filter(before, after);
 
 
-                    System.out.println("@Var: graphics2D: " + graphics2D);
+                    // EXPORTING TO SVG
                     if (graphics2D instanceof SVGGraphics2D) {
                         SVGGraphics2D svgGraphics2D = (SVGGraphics2D) graphics2D;
                         SVGGeneratorContext svgGeneratorContext = svgGraphics2D.getGeneratorContext();
@@ -70,19 +69,19 @@ public class ImageItemRenderer extends LegendItemRenderer {
                         System.out.println("@Var: encodedImage: " + encodedImage);
                         baos.close(); // should be inside a finally block
                         Document svgDocument = svgGeneratorContext.getDOMFactory();
-                        System.out.println("@Var: domFactory: "+svgDocument);
+                        System.out.println("@Var: domFactory: " + svgDocument);
 
-                        Element imageBase64 = svgDocument.createElementNS("http://www.w3.org/2000/svg","image");
-                        imageBase64.setAttribute("width", ""+after.getWidth());
-                        imageBase64.setAttribute("height", ""+after.getHeight());
+                        Element imageBase64 = svgDocument.createElementNS("http://www.w3.org/2000/svg", "image");
+                        imageBase64.setAttribute("width", "" + after.getWidth());
+                        imageBase64.setAttribute("height", "" + after.getHeight());
 //                        imageBase64.setAttribute("transform", "scale("+scaleWidth+","+scaleHeight+") translate("+origin.getTranslateX()+","+origin.getTranslateY()+")");
-                        imageBase64.setAttribute("transform", "scale(1,1) translate("+origin.getTranslateX()+","+origin.getTranslateY()+")");
-                        imageBase64.setAttribute("xlink:href", DATA_PROTOCOL_PNG_PREFIX+encodedImage);
-                        
+                        imageBase64.setAttribute("transform", "scale(1,1) translate(" + origin.getTranslateX() + "," + origin.getTranslateY() + ")");
+                        imageBase64.setAttribute("xlink:href", DATA_PROTOCOL_PNG_PREFIX + encodedImage);
+
                         svgDocument.getLastChild().appendChild(imageBase64);
 
-                        
-                        
+
+
 
 
                     }
@@ -90,13 +89,6 @@ public class ImageItemRenderer extends LegendItemRenderer {
                         graphics2D.drawImage(after, 0, 0, null);
                     }
 
-//                    ImageHandlerBase64Encoder imageHandler = (ImageHandlerBase64Encoder) svgGeneratorContext.getImageHandler();
-//                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-//                    Base64EncoderStream b64Encoder = new Base64EncoderStream(os);
-//
-//                    imageHandler.encodeImage(after, b64Encoder);
-//                    b64Encoder.close();
-//                    imageHandler.((Image) after, svgGraphics2D.getRoot(), svgGeneratorContext);
 
 
 

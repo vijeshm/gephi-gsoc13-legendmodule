@@ -140,8 +140,10 @@ public class TestPersistence {
 
 
             // creating item
-//            Item item = addTableItem(itemIndex, graph, attributeModel);
-            Item item = addTextItem(itemIndex, graph, attributeModel);
+            Item item = addTableItem(itemIndex, graph, attributeModel);
+//            Item item = addTextItem(itemIndex, graph, attributeModel);
+//            Item item = addImageItem(itemIndex, graph, attributeModel);
+//            Item item = addGroupsItem(itemIndex, graph, attributeModel);
 
 
             // add item
@@ -200,7 +202,7 @@ public class TestPersistence {
 
     public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         GroupsItemBuilder builder = new GroupsItemBuilder();
-        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.text.Default());
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.group.Default());
         return item;
     }
 

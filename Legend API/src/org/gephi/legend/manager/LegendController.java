@@ -64,17 +64,20 @@ public class LegendController {
         // LEGEND PROPERTIES
         PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
         for (PreviewProperty property : legendProperties) {
-            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            previewController.getModel().getProperties().addProperty(property);
+//            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
         }
         // LEGEND OWN PROPERTIES
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
-            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            previewController.getModel().getProperties().addProperty(property);
+//            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
         }
         // DYNAMIC PROPERTIES
         PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
         for (PreviewProperty property : dynamicProperties) {
-            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            previewController.getModel().getProperties().addProperty(property);
+//            previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
         }
     }
 
@@ -93,24 +96,23 @@ public class LegendController {
 
                 LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
                 ArrayList<Item> legendItems = legendManager.getLegendItems();
+
+
+                writer.writeStartElement(XML_LEGENDS);
                 for (Item item : legendItems) {
                     LegendItemBuilder builder = builders.get(item.getType());
 
                     writer.writeStartElement(XML_LEGEND_ITEM);
-                    builder.writeItemToXML(writer, item);
+                    builder.writeXMLFromItem(writer, item);
                     writer.writeEndElement();
 
                     //debug
 
                     xmlStreamWriter.writeStartElement(XML_LEGEND_ITEM);
-                    builder.writeItemToXML(xmlStreamWriter, item);
+                    builder.writeXMLFromItem(xmlStreamWriter, item);
                     xmlStreamWriter.writeEndElement();
-
-
-
-
-
                 }
+                writer.writeEndElement();
 
                 System.out.println("@Var: stringWriter: " + stringWriter);
             }
@@ -139,19 +141,22 @@ public class LegendController {
                 // legend item
 
                 int type = reader.next();
+                String legendItem = reader.getLocalName();
+                System.out.println("\n\n\n\n@Var: reading XML legendItem: " + legendItem);
                 switch (type) {
                     case XMLStreamReader.START_ELEMENT: {
-                        String legendItem = reader.getLocalName();
-                        System.out.println("@Var: legendItem: " + legendItem);
 
                         if (legendItem.equals(XML_LEGEND_ITEM)) {
                             reader.next();
                             String legendType = reader.getElementText();
+                            System.out.println("@Var: reading XML legendType: " + legendType);
                             LegendItemBuilder builder = builders.get(legendType);
-                            Item item = builder.createItemFromXML(reader, newItemIndex);
+                            Item item = builder.readXMLToItem(reader, newItemIndex);
 
                             // adding item
                             addItemToLegendManager(workspace, item);
+                            
+                            
                             // finish reading item
                             reader.next();
                             newItemIndex++;
@@ -162,10 +167,20 @@ public class LegendController {
                         break;
                     }
                     case XMLStreamReader.END_ELEMENT: {
+                        // finish reading legends
+                        reader.next();
                         end = true;
                         break;
                     }
                 }
+
+//                reader.next();
+//                System.out.println("@Var: reader.getLocalName(): " + reader.getLocalName());
+//                reader.next();
+//                System.out.println("@Var: reader.getLocalName(): " + reader.getLocalName());
+//                reader.next();
+//                System.out.println("@Var: reader.getLocalName(): " + reader.getLocalName());
+
             }
         } catch (XMLStreamException ex) {
             throw new RuntimeException(ex);
@@ -192,4 +207,5 @@ public class LegendController {
     }
 
     private static final String XML_LEGEND_ITEM = "legenditem";
+    public static final String XML_LEGENDS = "legends";
 }

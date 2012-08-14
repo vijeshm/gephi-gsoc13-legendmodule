@@ -19,6 +19,7 @@ public class GroupsItem extends AbstractItem implements LegendItem {
     public static final String LABELS_IDS = "labels group";
     public static final String COLORS = "colors group";
     public static final String VALUES = "values group";
+    public static final String NUMBER_OF_GROUPS = "number of groups";
 
     //BODY
     public GroupsItem(Object source) {

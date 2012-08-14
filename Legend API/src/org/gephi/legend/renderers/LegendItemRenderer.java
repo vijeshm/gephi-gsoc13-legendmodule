@@ -300,7 +300,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             graphics2D.setColor(backgroundColor);
             graphics2D.fillRect(0, 0, width, height);
             graphics2D.setColor(backgroundBorderColor);
-            for (int i = 0; i < backgroundBorderLineThick; i++) {
+            for (int i = 1; i <= backgroundBorderLineThick; i++) {
                 graphics2D.drawRect(-i, -i, width + 2 * i, height + 2 * i);
             }
         }

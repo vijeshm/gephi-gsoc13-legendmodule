@@ -23,11 +23,15 @@ import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.legend.items.GroupsItem;
 import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.legend.properties.ImageProperty;
+import org.gephi.legend.properties.LegendProperty;
+import org.gephi.legend.properties.TextProperty;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -40,7 +44,8 @@ import org.openide.util.lookup.ServiceProviders;
 public class GroupsItemBuilder extends LegendItemBuilder {
 
     @Override
-    protected void setDefaultValues() {
+    protected boolean setDefaultValues() {
+        return false;
     }
 
     @Override
@@ -73,7 +78,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         Integer.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.numColumns.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.numColumns.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -84,7 +89,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         LegendItem.Direction.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.position.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.position.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -95,7 +100,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         Font.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -106,7 +111,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         Color.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.color.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.color.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -117,7 +122,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         LegendItem.Shape.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.shape.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.shape.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -128,7 +133,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         Integer.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenTextAndShape.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenTextAndShape.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -139,7 +144,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         Integer.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenElements.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenElements.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -150,7 +155,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
                         Boolean.class,
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.scaleShape.displayName"),
                         NbBundle.getMessage(LegendManager.class, "GroupsItem.property.scaleShape.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -160,22 +165,29 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         return previewProperty;
     }
 
+    private PreviewProperty createLegendLabelProperty(Item item, int numberOfLabel, Object value) {
+
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        String propertyString = GroupsProperty.getLabelProperty(itemIndex, numberOfLabel);
+
+        PreviewProperty property = PreviewProperty.createProperty(
+                this,
+                propertyString,
+                String.class,
+                NbBundle.getMessage(LegendManager.class, "GroupsItem.property.labels.displayName") + " " + numberOfLabel,
+                NbBundle.getMessage(LegendManager.class, "GroupsItem.property.labels.description") + " " + numberOfLabel,
+                PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+
+        System.out.println("@Var: ReadingXML property: " + propertyString + " with value: " + value);
+
+
+        return property;
+    }
+
     @Override
     protected PreviewProperty[] createLegendOwnProperties(Item item) {
 
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-
-        // creating one property for each label
-        ArrayList<StringBuilder> labelsGroup = item.getData(GroupsItem.LABELS_IDS);
-        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
-        for (int i = 0; i < labelProperties.length; i++) {
-            labelProperties[i] = PreviewProperty.createProperty(this,
-                                                                GroupsProperty.getLabelProperty(itemIndex, i),
-                                                                String.class,
-                                                                NbBundle.getMessage(LegendManager.class, "GroupsItem.property.labels.displayName") + " " + i,
-                                                                NbBundle.getMessage(LegendManager.class, "GroupsItem.property.labels.description") + " " + i,
-                                                                PreviewProperty.CATEGORY_LEGENDS).setValue(labelsGroup.get(i).toString());
-        }
+        
 
 //        ArrayList<String> groupsProperties = LegendManager.getProperties(GroupsProperty.OWN_PROPERTIES, itemIndex);
 //
@@ -185,50 +197,57 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 //                                           Integer.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.numColumns.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.numColumns.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultNumColumns),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultNumColumns),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_LABEL_POSITION),
 //                                           LegendItem.Direction.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.position.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.position.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultLabelPosition),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultLabelPosition),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_LABEL_FONT),
 //                                           Font.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultLabelFont),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultLabelFont),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_LABEL_FONT_COLOR),
 //                                           Color.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.color.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.label.font.color.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultLabelFontColor),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultLabelFontColor),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_SHAPE),
 //                                           LegendItem.Shape.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.shape.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.shape.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultShape),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultShape),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE),
 //                                           Integer.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenTextAndShape.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenTextAndShape.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultPaddingBetweenTextAndShape),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultPaddingBetweenTextAndShape),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS),
 //                                           Integer.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenElements.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.paddingBetweenElements.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultPaddingBetweenElements),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultPaddingBetweenElements),
 //            PreviewProperty.createProperty(this,
 //                                           groupsProperties.get(GroupsProperty.GROUPS_SCALE_SHAPE),
 //                                           Boolean.class,
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.scaleShape.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "GroupsItem.property.scaleShape.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsScalingShapes)
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultIsScalingShapes)
 //        };
+        
+        // creating one property for each label
+        ArrayList<StringBuilder> labelsGroup = item.getData(GroupsItem.LABELS_IDS);
+        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
+        for (int i = 0; i < labelProperties.length; i++) {
+            labelProperties[i] = createLegendLabelProperty(item, i, labelsGroup.get(i).toString());
+        }
 
         int[] properties = GroupsProperty.LIST_OF_PROPERTIES;
 
@@ -285,6 +304,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder) builder;
         customGroupsBuilder.retrieveData(labels, colors, values);
 
+        item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
         item.setData(GroupsItem.COLORS, colors);
         item.setData(GroupsItem.LABELS_IDS, labels);
         item.setData(GroupsItem.VALUES, values);
@@ -303,13 +323,100 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeDataToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
+
+        String name = null;
+        String text = null;
+
+        // write number of items
+        Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
+        text = numberOfGroups.toString();
+        name = GroupsItem.NUMBER_OF_GROUPS;
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
+        // writing labels
+        ArrayList<StringBuilder> labels = item.getData(GroupsItem.LABELS_IDS);
+        text = labels.toString();
+        name = GroupsItem.LABELS_IDS;
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
+
+        // writing colors
+        ArrayList<Color> colors = item.getData(GroupsItem.COLORS);
+        name = GroupsItem.COLORS;
+        ArrayList<Integer> colorsIntegerArrayList = new ArrayList<Integer>();
+        for (Color color : colors) {
+            colorsIntegerArrayList.add(color.getRGB());
+        }
+        text = colorsIntegerArrayList.toString();
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
+        // writing values
+        ArrayList<Float> values = item.getData(GroupsItem.VALUES);
+        text = values.toString();
+        name = GroupsItem.VALUES;
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
     }
 
     @Override
     public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // read number of items
+        reader.next();
+        Integer numberOfItems = Integer.parseInt(reader.getElementText());
+        System.out.println("@Var: numberOfItems: " + numberOfItems);
+
+        // reading labels
+        reader.next();
+        String labelsString = reader.getElementText();
+        String[] labelsArray = labelsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<StringBuilder> labels= new ArrayList<StringBuilder>();
+        for (int i = 0; i < numberOfItems; i++) {
+            labels.add(new StringBuilder(labelsArray[i]));
+        }
+        System.out.println("@Var: labels: "+labels);
+        
+        // reading colors
+        reader.next();
+        String colorsString = reader.getElementText();
+        String[] colorsArray = colorsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<Color> colors= new ArrayList<Color>();
+        for (int i = 0; i < numberOfItems; i++) {
+            colors.add(new Color(Integer.parseInt(colorsArray[i])));
+        }
+        System.out.println("@Var: colors: "+colors);
+        
+        
+        // reading values
+        reader.next();
+        String valuesString = reader.getElementText();
+        String[] valuesArray = valuesString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<Float> values= new ArrayList<Float>();
+        for (int i = 0; i < numberOfItems; i++) {
+            values.add(Float.parseFloat(valuesArray[i]));
+        }
+        System.out.println("@Var: values: "+values);
+        
+        
+        
+        item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
+        item.setData(GroupsItem.COLORS, colors);
+        item.setData(GroupsItem.LABELS_IDS, labels);
+        item.setData(GroupsItem.VALUES, values);
+        
+
     }
 
     @Override
@@ -318,13 +425,87 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public PreviewProperty readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+
+        // write number of items
+        Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
+        String text = numberOfGroups.toString();
+        String name = GroupsItem.NUMBER_OF_GROUPS;
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
+        PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        for (PreviewProperty property : ownProperties) {
+            writeXMLFromSingleProperty(writer, property);
+        }
     }
 
     @Override
-    public void writeItemOwnPropertiesToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+
+        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+
+        // read number of items
+        reader.next();
+        Integer numberOfItems = Integer.parseInt(reader.getElementText());
+        System.out.println("@Var: numberOfItems: " + numberOfItems);
+
+        // reading labels
+        for (int i = 0; i < numberOfItems; i++) {
+            reader.next();
+            String valueString = reader.getElementText();
+            PreviewProperty property = createLegendLabelProperty(item, i, valueString);
+            properties.add(property);
+        }
+
+        // own properties
+        boolean end = false;
+        while (reader.hasNext() && !end) {
+            int type = reader.next();
+
+            switch (type) {
+                case XMLStreamReader.START_ELEMENT: {
+                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
+                    properties.add(property);
+                    break;
+                }
+                case XMLStreamReader.CHARACTERS: {
+                    break;
+                }
+                case XMLStreamReader.END_ELEMENT: {
+                    end = true;
+                    break;
+                }
+            }
+        }
+
+        return properties;
+
+
+    }
+
+    @Override
+    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        reader.nextTag();
+        return new ArrayList<PreviewProperty>();
+    }
+
+    @Override
+    protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
+        String propertyName = reader.getAttributeValue(null, XML_NAME);
+        String valueString = reader.getElementText();
+        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+valueString);
+        int propertyIndex = GroupsProperty.getInstance().getProperty(propertyName);
+        Class valueClass = defaultValues[propertyIndex].getClass();
+        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
+        if (value == null) {
+            value = readValueFromText(valueString, valueClass);
+        }
+        System.out.println("@Var: ReadingXML property: " + propertyName + " with value: " + value);
+        PreviewProperty property = createLegendProperty(item, propertyIndex, value);
+        return property;
     }
 
 }

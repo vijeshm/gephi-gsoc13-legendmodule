@@ -41,7 +41,6 @@ public class LegendProperty {
     public static final int DESCRIPTION_FONT_COLOR = 18;
     public static final int DESCRIPTION_ALIGNMENT = 19;
     
-    public static final String DYNAMIC_CATEGORY = "dynamic";
 
     
     

@@ -84,7 +84,7 @@ public class LegendManager{
         PreviewProperties previewProperties = previewModel.getProperties();
 
         // clear old properties
-        for (PreviewProperty property : previewProperties.getProperties(LegendProperty.DYNAMIC_CATEGORY)) {
+        for (PreviewProperty property : previewProperties.getProperties(PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY)) {
             previewProperties.removeProperty(property);
         }
 

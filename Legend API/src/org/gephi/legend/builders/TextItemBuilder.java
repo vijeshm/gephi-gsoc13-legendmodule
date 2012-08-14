@@ -19,6 +19,7 @@ import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.items.TextItem;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.properties.TextProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -40,7 +41,8 @@ import org.openide.util.lookup.ServiceProviders;
 public class TextItemBuilder extends LegendItemBuilder {
 
     @Override
-    protected void setDefaultValues() {
+    protected boolean setDefaultValues() {
+        return false;
     }
 
     @Override
@@ -84,7 +86,7 @@ public class TextItemBuilder extends LegendItemBuilder {
                         String.class,
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -95,7 +97,7 @@ public class TextItemBuilder extends LegendItemBuilder {
                         Font.class,
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -106,7 +108,7 @@ public class TextItemBuilder extends LegendItemBuilder {
                         Color.class,
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
 
@@ -117,7 +119,7 @@ public class TextItemBuilder extends LegendItemBuilder {
                         Alignment.class,
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.displayName"),
                         NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.description"),
-                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
         }
@@ -147,25 +149,25 @@ public class TextItemBuilder extends LegendItemBuilder {
 //                                           String.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(item.getData(TextItem.BODY)),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(item.getData(TextItem.BODY)),
 //            PreviewProperty.createProperty(this,
 //                                           textProperties.get(TextProperty.TEXT_BODY_FONT),
 //                                           Font.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFont),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBodyFont),
 //            PreviewProperty.createProperty(this,
 //                                           textProperties.get(TextProperty.TEXT_BODY_FONT_COLOR),
 //                                           Color.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontColor),
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBodyFontColor),
 //            PreviewProperty.createProperty(this,
 //                                           textProperties.get(TextProperty.TEXT_BODY_FONT_ALIGNMENT),
 //                                           Alignment.class,
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.displayName"),
 //                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.description"),
-//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultBodyFontAlignment)
+//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBodyFontAlignment)
 //        };
 //
 //
@@ -188,7 +190,7 @@ public class TextItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected void writeDataToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    protected void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
     }
 
     @Override
@@ -196,43 +198,13 @@ public class TextItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public PreviewProperty readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        String propertyName = reader.getAttributeValue(null, XML_NAME);
-        int propertyIndex = TextProperty.getInstance().getProperty(propertyName);
-        String valueString = reader.getElementText();
-        Class valueClass = defaultValues[propertyIndex].getClass();
-        System.out.println("@Var: valueClass: " + valueClass);
-        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
-        if (value == null) {
-            value = readValueFromText(valueString, valueClass);
-        }
-        System.out.println("@Var: reading propertyType: " + propertyName + " with value: " + value);
-        PreviewProperty property = createLegendProperty(item, propertyIndex, value);
-        return property;
-    }
+    protected void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
 
-    @Override
-    protected void writeItemOwnPropertiesToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        writer.writeStartElement(XML_OWN_PROPERTY);
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
-            String propertyName = property.getName();
-            Object propertyValue = property.getValue();
-            if (propertyValue != null) {
-                String text = null;
-                text = PreviewProperties.getValueAsText(propertyValue);
-                if(text == null){
-                    text = writeValueAsText(propertyValue);
-                }
-                writer.writeStartElement(XML_PROPERTY);
-                String name = LegendManager.getPropertyFromPreviewProperty(property);
-                writer.writeAttribute(XML_NAME, name);
-                writer.writeCharacters(text);
-                writer.writeEndElement();
-                System.out.println("@Saving: : " + XML_PROPERTY + " <> " + " name: " + name + " <> " + " value: " + text);
-            }
+            writeXMLFromSingleProperty(writer, property);
         }
-        writer.writeEndElement();
+
     }
 
     // DEFAULT VALUES
@@ -246,4 +218,56 @@ public class TextItemBuilder extends LegendItemBuilder {
         defaultBodyFontColor,
         defaultBodyFontAlignment
     };
+
+    @Override
+    protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+
+        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+
+        // own properties
+        
+        boolean end = false;
+        while (reader.hasNext() && !end) {
+            int type = reader.next();
+            switch (type) {
+                case XMLStreamReader.START_ELEMENT: {
+                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
+                    properties.add(property);
+                    break;
+                }
+                case XMLStreamReader.CHARACTERS: {
+                    break;
+                }
+                case XMLStreamReader.END_ELEMENT: {
+                    end = true;
+                    break;
+                }
+            }
+        }
+
+        return properties;
+    }
+
+    @Override
+    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        reader.nextTag();
+        return new ArrayList<PreviewProperty>();
+    }
+
+    @Override
+    protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
+        String propertyName = reader.getAttributeValue(null, XML_NAME);
+        String valueString = reader.getElementText();
+        int propertyIndex = TextProperty.getInstance().getProperty(propertyName);
+        Class valueClass = defaultValues[propertyIndex].getClass();
+        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
+        if (value == null) {
+            value = readValueFromText(valueString, valueClass);
+        }
+        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+value);
+        PreviewProperty property = createLegendProperty(item, propertyIndex, value);
+        return property;
+    }
+
+
 }
