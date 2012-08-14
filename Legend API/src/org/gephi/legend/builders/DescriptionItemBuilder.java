@@ -6,8 +6,12 @@ package org.gephi.legend.builders;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomDescriptionItemBuilder;
@@ -30,6 +34,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import org.gephi.legend.builders.description.elements.CustomValue;
+import org.gephi.legend.properties.ImageProperty;
 
 /**
  *
@@ -46,71 +51,181 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        DescriptionItem item = new DescriptionItem(graph);
-        return item;
+    public Item createNewLegendItem(Graph graph) {
+        return new DescriptionItem(graph);
     }
 
     @Override
-    protected PreviewProperty[] createLegendItemProperties(Item item) {
+    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+        Item item = createNewLegendItem(graph);
+        item.setData(LegendItem.LEGEND_ITEM, item);
+        return item;
+    }
 
+    private PreviewProperty createLegendProperty(Item item, int property, Object value) {
+        PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        String propertyString = LegendManager.getProperty(DescriptionProperty.OWN_PROPERTIES, itemIndex, property);
 
-        ArrayList<String> legendProperties = LegendManager.getProperties(DescriptionProperty.OWN_PROPERTIES, itemIndex);
+        switch (property) {
+            case DescriptionProperty.DESCRIPTION_KEY_FONT: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Font.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
 
-        PreviewProperty[] properties = {
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT),
-                                           Font.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyFont),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_COLOR),
-                                           Color.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyFontColor),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_ALIGNMENT),
-                                           Alignment.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyAlignment),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT),
-                                           Font.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueFont),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_COLOR),
-                                           Color.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueFontColor),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_ALIGNMENT),
-                                           Alignment.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueAlignment),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_IS_FLOW_LAYOUT),
-                                           Boolean.class,
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
-                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
-            PreviewProperty.createProperty(this,
-                                           legendProperties.get(DescriptionProperty.DESCRIPTION_TEMP),
-                                           DescriptionItemElement.class,
-                                           "temp",
-                                           "temp",
-                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionElement)
-        };
+            case DescriptionProperty.DESCRIPTION_KEY_FONT_COLOR: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Color.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
 
+            case DescriptionProperty.DESCRIPTION_KEY_FONT_ALIGNMENT: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Alignment.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
 
-        return properties;
+            case DescriptionProperty.DESCRIPTION_VALUE_FONT: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Font.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
+
+            case DescriptionProperty.DESCRIPTION_VALUE_FONT_COLOR: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Color.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
+
+            case DescriptionProperty.DESCRIPTION_VALUE_FONT_ALIGNMENT: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Alignment.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
+
+            case DescriptionProperty.DESCRIPTION_IS_FLOW_LAYOUT: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Boolean.class,
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
+
+            case DescriptionProperty.DESCRIPTION_TEMP: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        DescriptionItemElement.class,
+                        "temp",
+                        "temp",
+                        PreviewProperty.CATEGORY_LEGENDS).setValue(value);
+                break;
+            }
+
+        }
+
+        return previewProperty;
+    }
+
+    @Override
+    protected PreviewProperty[] createLegendOwnProperties(Item item) {
+
+        int[] properties = DescriptionProperty.LIST_OF_PROPERTIES;
+
+        PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
+        for (int i = 0; i < defaultValues.length; i++) {
+            System.out.println("@Var: i: " + i);
+            previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
+        }
+
+        return previewProperties;
+
+//        PreviewProperty[] properties = {
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT),
+//                                           Font.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyFont),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_COLOR),
+//                                           Color.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.color.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyFontColor),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_KEY_FONT_ALIGNMENT),
+//                                           Alignment.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.font.alignment.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultKeyAlignment),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT),
+//                                           Font.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueFont),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_COLOR),
+//                                           Color.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.color.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueFontColor),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_VALUE_FONT_ALIGNMENT),
+//                                           Alignment.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.font.alignment.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultValueAlignment),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_IS_FLOW_LAYOUT),
+//                                           Boolean.class,
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.displayName"),
+//                                           NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.isFlowLayout.description"),
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultIsFlowLayout),
+//            PreviewProperty.createProperty(this,
+//                                           legendProperties.get(DescriptionProperty.DESCRIPTION_TEMP),
+//                                           DescriptionItemElement.class,
+//                                           "temp",
+//                                           "temp",
+//                                           PreviewProperty.CATEGORY_LEGENDS).setValue(defaultDescriptionElement),};
+//
+//
+//        return properties;
     }
 //
 //    public static boolean updatePreviewProperty(Item item, Integer numOfProperties) {
@@ -173,14 +288,14 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
                     String.class,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
-                    LegendProperty.DYNAMIC).setValue(key);
+                    LegendProperty.DYNAMIC_CATEGORY).setValue(key);
             newDescriptionProperties[2 * i + 1] = PreviewProperty.createProperty(
                     item,
                     valueProperty,
                     DescriptionItemElement.class,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
                     NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
-                    LegendProperty.DYNAMIC).setValue(value);
+                    LegendProperty.DYNAMIC_CATEGORY).setValue(value);
         }
 
         // appending
@@ -200,6 +315,11 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
     public String getType() {
+        return DescriptionItem.LEGEND_TYPE;
+    }
+
+    @Override
+    public String getTitle() {
         return NbBundle.getMessage(LegendManager.class, "DescriptionItem.name");
     }
 
@@ -212,6 +332,14 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     private Boolean defaultIsFlowLayout = true;
 //    public static DescriptionItemElementValue defaultDescriptionItemElementValue = new CustomValue();
     public static DescriptionItemElement defaultDescriptionElement = DescriptionItemElement.getDefaultGenerator();
+    private final Object[] defaultValues = {
+        defaultKeyFont,
+        defaultKeyFontColor,
+        defaultKeyAlignment,
+        defaultValueFont,
+        defaultValueFontColor,
+        defaultValueAlignment
+    };
 
     @Override
     protected boolean isBuilderForItem(Item item) {
@@ -231,6 +359,26 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
             availableBuilders.add((CustomLegendItemBuilder) customBuilder);
         }
         return availableBuilders;
+    }
+
+    @Override
+    public void writeDataToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public PreviewProperty readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void writeItemOwnPropertiesToXML(XMLStreamWriter writer, Item item) throws XMLStreamException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

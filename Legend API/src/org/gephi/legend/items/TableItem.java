@@ -21,42 +21,75 @@ public class TableItem extends AbstractItem implements LegendItem {
     public static final String HORIZONTAL_LABELS = "horizontal labels";
     public static final String VERTICAL_LABELS = "vertical labels";
     public static final String LABELS_IDS = "labels ids";
+    public static final String NUMBER_OF_LABELS = "number of labels";
     // colors
     public static final String COLOR_VALUES = "color values";
     public static final String COLOR_VERTICAL = "color vertical";
     public static final String COLOR_HORIZONTAL = "color horizontal";
 
-    
-    public enum VerticalPosition {
+    public enum Labels {
 
-        UP(NbBundle.getMessage(LegendManager.class, "TableItem.position.up")),
-        BOTTOM(NbBundle.getMessage(LegendManager.class, "TableItem.position.bottom"));
-        private final String position;
+        HORIZONTAL("horizontal"),
+        VERTICAL("vertical");
+        private final String labels;
 
-        private VerticalPosition(String position) {
-            this.position = position;
+        private Labels(String labels) {
+            this.labels = labels;
         }
 
         @Override
         public String toString() {
-            return this.position;
+            return this.labels;
         }
 
     }
-    
-    public enum HorizontalPosition {
 
-        RIGHT(NbBundle.getMessage(LegendManager.class, "TableItem.position.right")),
-        LEFT(NbBundle.getMessage(LegendManager.class, "TableItem.position.left"));
-        private final String position;
+    public enum VerticalPosition {
 
-        private HorizontalPosition(String direction) {
-            this.position = direction;
+        UP(0),
+        BOTTOM(1);
+        private final Integer value;
+        private final String[] labels = {
+            NbBundle.getMessage(LegendManager.class, "TableItem.position.up"),
+            NbBundle.getMessage(LegendManager.class, "TableItem.position.bottom")
+        };
+
+        private VerticalPosition(Integer value) {
+            this.value = value;
         }
 
         @Override
         public String toString() {
-            return this.position;
+            return labels[value];
+        }
+
+        public String getValue() {
+            return value.toString();
+        }
+
+    }
+
+    public enum HorizontalPosition {
+
+        RIGHT(0),
+        LEFT(1);
+        private final Integer value;
+        private final String[] labels = {
+            NbBundle.getMessage(LegendManager.class, "TableItem.position.right"),
+            NbBundle.getMessage(LegendManager.class, "TableItem.position.left")
+        };
+
+        private HorizontalPosition(Integer value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return labels[value];
+        }
+
+        public String getValue() {
+            return value.toString();
         }
 
     }
@@ -64,14 +97,31 @@ public class TableItem extends AbstractItem implements LegendItem {
     public enum VerticalTextDirection {
 
         // anti clockwise
-        UP(-90d),
-        DOWN(-90d),
-        HORIZONTAL(0),
-        DIAGONAL(-45d);
+        UP(0, -90d),
+        HORIZONTAL(1, 0),
+        DIAGONAL(2, -45d),
+        DOWN(3, -90d);
         private final double rotationAngle;
+        private final Integer value;
+        private final String[] labels = {
+            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.up"),
+            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.horizontal"),
+            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.diagonal"),
+            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.down")
+        };
 
-        private VerticalTextDirection(double rotationAngle) {
+        private VerticalTextDirection(Integer value, double rotationAngle) {
             this.rotationAngle = rotationAngle;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return labels[value];
+        }
+
+        public String getValue() {
+            return value.toString();
         }
 
         public double rotationAngle() {
@@ -93,4 +143,5 @@ public class TableItem extends AbstractItem implements LegendItem {
     public PreviewProperty[] getDynamicPreviewProperties() {
         return new PreviewProperty[0];
     }
+
 }

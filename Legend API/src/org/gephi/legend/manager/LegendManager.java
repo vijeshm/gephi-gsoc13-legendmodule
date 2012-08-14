@@ -5,8 +5,15 @@
 package org.gephi.legend.manager;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import org.gephi.legend.builders.LegendItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
@@ -16,13 +23,15 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
+import org.gephi.project.spi.WorkspacePersistenceProvider;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author eduBecKs
  */
-public class LegendManager {
+public class LegendManager{
 
     private Integer activeLegendIndex;
     private Integer currentIndex;
@@ -30,21 +39,21 @@ public class LegendManager {
     private ArrayList<Boolean> isActive;
     private ArrayList<String> items;
     private ArrayList<Item> legendItems;
-    // reference to combobox
     public static final String LEGEND_PROPERTIES = "legend properties";
     public static final String INDEX = "index";
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
-
     
-    public LegendManager(){
+
+    public LegendManager() {
         this.currentIndex = 0;
         this.firstActiveLegend = 0;
         this.items = new ArrayList<String>();
         this.legendItems = new ArrayList<Item>();
         this.isActive = new ArrayList<Boolean>();
-        this.activeLegendIndex=-1;
+        this.activeLegendIndex = -1;
+        
     }
 
     public Integer getCurrentIndex() {
@@ -64,22 +73,25 @@ public class LegendManager {
 
     public void refreshDynamicPreviewProperties() {
 
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+        ProjectController projectController =
+                Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
 
 
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewController previewController =
+                Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
         PreviewProperties previewProperties = previewModel.getProperties();
 
         // clear old properties
-        for (PreviewProperty property : previewProperties.getProperties(LegendProperty.DYNAMIC)) {
+        for (PreviewProperty property : previewProperties.getProperties(LegendProperty.DYNAMIC_CATEGORY)) {
             previewProperties.removeProperty(property);
         }
 
         for (int i = 0; i < isActive.size(); i++) {
             if (isActive.get(i)) {
-                PreviewProperty[] properties = (PreviewProperty[]) legendItems.get(i).getData(LegendItem.DYNAMIC_PROPERTIES);
+                PreviewProperty[] properties =
+                        (PreviewProperty[]) legendItems.get(i).getData(LegendItem.DYNAMIC_PROPERTIES);
                 for (PreviewProperty property : properties) {
                     System.out.println("@Var: adding property: " + property.getName());
                     //previewProperties.addProperty(property);
@@ -88,10 +100,6 @@ public class LegendManager {
             }
         }
     }
-
-    
-
-
 
     public void addItem(Item item) {
 
@@ -123,9 +131,9 @@ public class LegendManager {
     public Integer getActiveLegend() {
         return activeLegendIndex;
     }
-    
-    public Item getActiveLegendItem(){
-        if(activeLegendIndex>=0){
+
+    public Item getActiveLegendItem() {
+        if (activeLegendIndex >= 0) {
             return legendItems.get(activeLegendIndex);
         }
         return null;
@@ -143,6 +151,21 @@ public class LegendManager {
             }
         }
         return activeItems;
+    }
+
+    public static String getPropertyFromPreviewProperty(PreviewProperty property) {
+//        Pattern pattern = Pattern.compile("legend.item\\d+.(.*)");
+        String propertyString = property.getName();
+        String name = propertyString.substring(propertyString.indexOf('.', 10));
+        System.out.println("@Var: name: " + name);
+        return name;
+
+//        System.out.println("@Var: propertyString: "+propertyString);
+//        Matcher matcher = pattern.matcher(propertyString);
+//        System.out.println("@Var: matcher: "+matcher.group());
+//        System.out.println("@Var: matcher: "+matcher.group(1));
+//        return matcher.group(1);
+
     }
 
     public static boolean getItemIndexFromProperty(PreviewProperty property, Integer index) {
@@ -208,4 +231,33 @@ public class LegendManager {
         return property;
     }
 
+ 
+
+
+ 
+
+//
+//    private void readXML(XMLStreamReader reader, Item item) throws XMLStreamException {
+//        boolean end = false;
+//        while (reader.hasNext() && !end) {
+//            int type = reader.next();
+//            switch (type) {
+//                case XMLStreamReader.START_ELEMENT: {
+//                    String legendType = reader.getLocalName();
+//                    LegendItemBuilder builder = builders.get(legendType);
+//                    builder.readXMLToData(reader, item);
+//
+//                    break;
+//                }
+//                case XMLStreamReader.CHARACTERS: {
+//                    break;
+//                }
+//                case XMLStreamReader.END_ELEMENT: {
+//                    break;
+//                }
+//            }
+//        }
+//    }
+
+    
 }

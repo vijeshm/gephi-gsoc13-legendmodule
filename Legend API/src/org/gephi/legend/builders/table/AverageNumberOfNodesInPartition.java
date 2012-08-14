@@ -14,6 +14,7 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.items.TableItem;
 import org.gephi.partition.api.Part;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.api.PartitionModel;
@@ -44,7 +45,7 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
 
     @Override
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
@@ -68,8 +69,8 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
                 labelsMap.put(label.toString(), index++);
                 horizontalLabels.add(label);
                 verticalLabels.add(label);
-                labels.add(label);
             }
+            labels.add(TableItem.Labels.HORIZONTAL);
             
 
 

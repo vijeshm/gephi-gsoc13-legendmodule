@@ -46,8 +46,6 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         System.out.println("@Var: activeLegendItem: "+activeLegendItem);
         
         // regular properties
-        
-        
         PreviewProperty[] properties = activeLegendItem.getData(LegendItem.PROPERTIES);
         String label = properties[0].getValue();
         System.out.println("@Var: label: "+label);
@@ -55,6 +53,14 @@ public class LegendNode extends AbstractNode implements PropertyChangeListener {
         itemSet.setDisplayName(label);
         itemSet.setName(label);
         for (PreviewProperty property : properties) {
+            System.out.println("@Var: createSheet property: "+property.getName());
+            Node.Property nodeProperty = new PreviewPropertyWrapper(property, previewProperties);
+            itemSet.put(nodeProperty);
+        }
+        
+        // own properties
+        PreviewProperty[] ownProperties = activeLegendItem.getData(LegendItem.OWN_PROPERTIES);
+        for (PreviewProperty property : ownProperties) {
             System.out.println("@Var: createSheet property: "+property.getName());
             Node.Property nodeProperty = new PreviewPropertyWrapper(property, previewProperties);
             itemSet.put(nodeProperty);

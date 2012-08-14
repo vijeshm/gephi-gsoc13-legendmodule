@@ -7,6 +7,7 @@ package org.gephi.legend.api;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Map;
+import org.gephi.legend.items.TableItem;
 
 /**
  *
@@ -25,6 +26,6 @@ public interface CustomTableItemBuilder {
      * @param verticalColors colors used to represent the vertical colors
      * @param valueColors table colors representing the matrix
      */
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
+    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
 
 }

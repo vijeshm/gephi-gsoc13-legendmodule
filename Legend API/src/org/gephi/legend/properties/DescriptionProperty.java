@@ -12,9 +12,9 @@ public class DescriptionProperty {
 
     public static final int DESCRIPTION_KEY_FONT = 0;
     public static final int DESCRIPTION_KEY_FONT_COLOR = 1;
-    public static final int DESCRIPTION_VALUE_FONT = 2;
-    public static final int DESCRIPTION_VALUE_FONT_COLOR = 3;
-    public static final int DESCRIPTION_KEY_FONT_ALIGNMENT = 4;
+    public static final int DESCRIPTION_KEY_FONT_ALIGNMENT = 2;
+    public static final int DESCRIPTION_VALUE_FONT = 3;
+    public static final int DESCRIPTION_VALUE_FONT_COLOR = 4;
     public static final int DESCRIPTION_VALUE_FONT_ALIGNMENT = 5;
     public static final int DESCRIPTION_IS_FLOW_LAYOUT = 6;
     public static final int DESCRIPTION_DATA = 7;
@@ -25,9 +25,9 @@ public class DescriptionProperty {
     public static final String[] OWN_PROPERTIES = {
         ".key.font",
         ".key.font.color",
+        ".key.font.alignment",
         ".value.font",
         ".value.font.color",
-        ".key.font.alignment",
         ".value.font.alignment",
         ".isFlowLayout",
         ".data",
@@ -35,5 +35,16 @@ public class DescriptionProperty {
         ".key",
         ".value",
         ".temp"
+    };
+    
+    
+    public static final int[] LIST_OF_PROPERTIES = {
+        DESCRIPTION_KEY_FONT,
+        DESCRIPTION_KEY_FONT_COLOR,
+        DESCRIPTION_KEY_FONT_ALIGNMENT,
+        DESCRIPTION_VALUE_FONT,
+        DESCRIPTION_VALUE_FONT_COLOR,
+        DESCRIPTION_VALUE_FONT_ALIGNMENT,
+        DESCRIPTION_IS_FLOW_LAYOUT
     };
 }

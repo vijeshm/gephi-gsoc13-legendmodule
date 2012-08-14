@@ -166,6 +166,7 @@ public class GephiReader implements Cancellable {
                     try {
                         pp.readXML(reader, workspace);
                     } catch (UnsupportedOperationException e) {
+                        System.out.println("@Var: e: "+e);
                     }
                 }
             } else if (eventType.equals(XMLStreamReader.END_ELEMENT)) {

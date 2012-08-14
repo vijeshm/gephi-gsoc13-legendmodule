@@ -16,6 +16,7 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.items.TableItem;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
@@ -40,7 +41,7 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
     }
 
     @Override
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
 
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
@@ -56,10 +57,10 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
         // FILLING HORIZONTAL LABELS AND COLORS
         for (int i = 0; i < topResults; i++) {
             StringBuilder label = new StringBuilder(nodes.get(i).getNodeData().getLabel());
-            labels.add(label);
             horizontalLabels.add(label);
             horizontalColors.add(Color.BLUE);
         }
+        labels.add(TableItem.Labels.HORIZONTAL);
         
         // FILLING VERTICAL LABELS
         StringBuilder value = new StringBuilder("value");

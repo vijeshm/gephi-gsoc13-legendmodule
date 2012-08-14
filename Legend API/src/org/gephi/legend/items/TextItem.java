@@ -4,6 +4,8 @@
  */
 package org.gephi.legend.items;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
 import org.gephi.preview.spi.MouseResponsiveRenderer;
@@ -33,4 +35,5 @@ public class TextItem extends AbstractItem implements LegendItem {
         return new PreviewProperty[0];
     }
 
+    
 }

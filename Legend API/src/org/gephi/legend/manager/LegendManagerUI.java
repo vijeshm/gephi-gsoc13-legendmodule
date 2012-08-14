@@ -8,10 +8,15 @@ import java.awt.*;
 import java.beans.PropertyEditorManager;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
@@ -25,20 +30,24 @@ import org.gephi.legend.builders.*;
 import org.gephi.legend.items.*;
 import org.gephi.legend.items.propertyeditors.DescriptionItemElementPropertyEditor;
 import org.gephi.preview.api.*;
+import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
+import org.gephi.project.spi.WorkspacePersistenceProvider;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author edubecks
  */
 @ServiceProvider(service = PreviewUI.class, position = 404)
-public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
+public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
+{
 
     /**
      * Creates new form LegendManagerUI
@@ -47,21 +56,11 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         initComponents();
 
         registerEditors();
-        refreshAvailableLegendItemBuilders();
+        registerLegendBuilders();
 
 
         numberOfItemsLabel.setVisible(false);
         numberOfItemsTextField.setVisible(false);
-
-    }
-
-    public void refreshAvailableLegendItemBuilders() {
-        Collection<? extends LegendItemBuilder> legendItemBuilders = Lookup.getDefault().lookupAll(LegendItemBuilder.class);
-
-        legendItemBuildersComboBox.removeAllItems();
-        for (LegendItemBuilder legendItemBuilder : legendItemBuilders) {
-            legendItemBuildersComboBox.addItem(legendItemBuilder);
-        }
 
     }
 
@@ -235,14 +234,14 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
     }
 
+    
+
     private void addLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLegendButtonActionPerformed
         Graph graph = null;
         AttributeModel attributeModel = null;
 
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
-
-
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
 
@@ -278,21 +277,13 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
             item = builder.createCustomItem(newItemIndex, graph, attributeModel, customBuilder);
 
-
-            legendManager.addItem(item);
-            Item activeLegendItem = legendManager.getActiveLegendItem();
+            // adding item to legend manager
+            LegendController.getInstance().addItemToLegendManager(workspace, item);
             refreshActiveLegendsComboBox();
-            PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
-            for (PreviewProperty property : legendProperties) {
-                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
-            }
-            PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
-            for (PreviewProperty property : dynamicProperties) {
-                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
-            }
+
 
             // update property sheet
-            refreshPropertySheet(activeLegendItem);
+            refreshPropertySheet(item);
         }
         else {
             JOptionPane.showMessageDialog(this, customBuilder.stepsNeededToBuild(),
@@ -456,4 +447,21 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         PropertyEditorManager.registerEditor(DescriptionItemElement.class, DescriptionItemElementPropertyEditor.class);
     }
 
+    private void registerLegendBuilders() {
+        Collection<? extends LegendItemBuilder> availablebuilders = LegendController.getInstance().getAvailablebuilders();
+        // cleaning combobox
+        legendItemBuildersComboBox.removeAllItems();
+
+        // registering builders
+        for (LegendItemBuilder legendItemBuilder : availablebuilders) {
+            legendItemBuildersComboBox.addItem(legendItemBuilder);
+        }
+    }
+    
+    
+
+    
+
+    
+    
 }

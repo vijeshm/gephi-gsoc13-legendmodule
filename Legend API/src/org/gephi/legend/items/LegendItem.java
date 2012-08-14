@@ -4,6 +4,8 @@
  */
 package org.gephi.legend.items;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.NbBundle;
@@ -14,12 +16,16 @@ import org.openide.util.NbBundle;
  */
 public interface LegendItem {
 
+    // DATA
+    public static final String LEGEND_ITEM = "legend item";
+    public static final String DATA = "data";
     //INDEX
     public static final String ITEM_INDEX = "item index";
     //LOCATION
     public static final String ORIGIN = "origin";
     //INDEX
     public static final String PROPERTIES = "properties";
+    public static final String OWN_PROPERTIES = "own properties";
     // TYPE 
     public static final String TYPE = "Legend Item";
     // DESCRIPTION
@@ -39,63 +45,96 @@ public interface LegendItem {
 
     /**
      * If the type of Legend has dynamic PreviewProperty it returns it
+     *
      * @return an array of the dynamic PreviewProperty
      */
     public PreviewProperty[] getDynamicPreviewProperties();
 
     public enum Direction {
 
-        UP(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.up")),
-        DOWN(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.down")),
-        RIGHT(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.right")),
-        LEFT(NbBundle.getMessage(LegendManager.class, "LegendItem.direction.left"));
-        private final String direction;
+        UP(0),
+        DOWN(1),
+        RIGHT(2),
+        LEFT(3);
+        private final Integer value;
+        private final String[] labels = {
+            NbBundle.getMessage(LegendManager.class, "LegendItem.direction.up"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.direction.down"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.direction.right"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.direction.left")
+        };
 
-        private Direction(String direction) {
-            this.direction = direction;
+        private Direction(Integer value) {
+            this.value = value;
         }
 
         @Override
         public String toString() {
-            return this.direction;
+            return labels[value];
+        }
+        
+        public String getValue() {
+            return value.toString();
         }
 
     }
 
     public enum Shape {
 
-        RECTANGLE(NbBundle.getMessage(LegendManager.class, "LegendItem.shape.rectangle")),
-        CIRCLE(NbBundle.getMessage(LegendManager.class, "LegendItem.shape.circle")),
-        TRIANGLE(NbBundle.getMessage(LegendManager.class, "LegendItem.shape.triangle"));
-        private final String shape;
+        RECTANGLE(0),
+        CIRCLE(1),
+        TRIANGLE(2);
+        private final Integer value;
+        private final String[] labels = {
+            NbBundle.getMessage(LegendManager.class, "LegendItem.shape.rectangle"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.shape.circle"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.shape.triangle")
+        };
 
-        private Shape(String shape) {
-            this.shape = shape;
+        private Shape(Integer value) {
+            this.value = value;
         }
 
         @Override
         public String toString() {
-            return this.shape;
+            return labels[value];
+        }
+        
+        public String getValue() {
+            return value.toString();
         }
 
     }
 
     public enum Alignment {
 
-        LEFT(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.left")),
-        RIGHT(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.right")),
-        CENTER(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.center")),
-        JUSTIFIED(NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.justified"));
-        private final String alignment;
+        LEFT(0),
+        RIGHT(1),
+        CENTER(2),
+        JUSTIFIED(3);
+        private final String[] labels = {
+            NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.left"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.right"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.center"),
+            NbBundle.getMessage(LegendManager.class, "LegendItem.text.alignment.justified")
+        };
+        private final Integer value;
 
-        private Alignment(String alignment) {
-            this.alignment = alignment;
+        private Alignment(Integer value) {
+            this.value = value;
         }
 
         @Override
         public String toString() {
-            return this.alignment;
+            return labels[value];
+        }
+
+        public String getValue() {
+            return value.toString();
         }
 
     }
+
+    public String getType();
+
 }

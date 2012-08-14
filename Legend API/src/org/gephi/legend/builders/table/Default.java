@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Map;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.items.TableItem;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -31,14 +32,14 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
 
 
     @Override
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         // LABELS ID
-        StringBuilder label1 = new StringBuilder("Label 1");
-        StringBuilder label2 = new StringBuilder("Label 2");
-        labels.add(label1);
-        labels.add(label2);
+        labels.add(TableItem.Labels.VERTICAL);
+        
         
         // VERTICAL LABELS
+        StringBuilder label1 = new StringBuilder("Label 1");
+        StringBuilder label2 = new StringBuilder("Label 2");
         verticalLabels.add(label1);
         verticalLabels.add(label2);
         

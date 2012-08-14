@@ -322,47 +322,6 @@ public class TableItemRenderer extends LegendItemRenderer {
         int horizontalLabelsHeight = tableHeight;
 
 
-//
-//
-//        int tempTableWidth = (int) (width - horizontalExtraMargin - minimumMargin - horizontalLabelWidth - maxHorizontalTextWidth * Math.abs(Math.cos(verticalTextDirection.rotationAngle())));
-//        System.out.println("@Var: tempTableWidth: " + tempTableWidth);
-//        int tempTableHeight = (int) (height - verticalExtraMargin - minimumMargin - verticalLabelHeight);
-//        System.out.println("@Var: tempTableHeight: " + tempTableHeight);
-//
-//
-//
-//
-//
-//
-//        if (verticalTextDirection == TableItem.VerticalTextDirection.HORIZONTAL) {
-//            cellSizeWidth = maxVerticalTextWidth;
-//        }
-//        else {
-//            cellSizeWidth = (int) (Math.floor(tempTableWidth / verticalLabels.size()));
-//        }
-
-
-
-//        
-//        System.out.println("@Var: cellSizeWidth: " + cellSizeWidth);
-//        cellSizeHeight = (int) (Math.floor(tempTableHeight / horizontalLabels.size()));
-//        System.out.println("@Var: cellSizeHeight: " + cellSizeHeight);
-
-//
-//
-//        Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
-//
-//        System.out.println("@Var: horizontalTextWidth: " + horizontalLabelsWidth);
-//        Integer horizontalTextHeight = cellSizeHeight * labels.size();
-//        System.out.println("@Var: horizontalTextHeight: " + horizontalTextHeight);
-//        System.out.println("@Var: verticalTextHeight: " + verticalLabelsHeight);
-//        Integer verticalTextWidth = cellSizeWidth * labels.size();
-//        System.out.println("@Var: verticalTextWidth: " + verticalTextWidth);
-
-
-        // drawing table
-        AffineTransform arrangeTranslation = null;
-
 
 
         // DRAWING VERTICAL TEXT
@@ -455,15 +414,17 @@ public class TableItemRenderer extends LegendItemRenderer {
 
 
         // READING LABELS
-        labels = item.getData(TableItem.LABELS_IDS);
+        ArrayList<TableItem.Labels> labelsGroup = item.getData(TableItem.LABELS_IDS);
+        TableItem.Labels labelsIDs = labelsGroup.get(0);
+        horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
+        verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
+        labels = (labelsIDs ==TableItem.Labels.HORIZONTAL)? horizontalLabels : verticalLabels;
         for (int i = 0; i < labels.size(); i++) {
             StringBuilder label = labels.get(i);
             String newLabel = properties.getStringValue(TableProperty.getLabelProperty(itemIndex, i));
             label.replace(0, newLabel.length(), newLabel);
         }
 
-        horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
-        verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
 
 
         //properties
