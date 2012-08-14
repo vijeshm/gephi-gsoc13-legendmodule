@@ -71,7 +71,9 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+    protected Item buildCustomItem(CustomLegendItemBuilder builder,
+                                   Graph graph,
+                                   AttributeModel attributeModel) {
 
 
         Item item = createNewLegendItem(graph);
@@ -89,7 +91,14 @@ public class TableItemBuilder extends LegendItemBuilder {
 
         // retrieving data
         CustomTableItemBuilder customTableBuilder = (CustomTableItemBuilder) builder;
-        customTableBuilder.retrieveData(labels, horizontalLabels, verticalLabels, values, horizontalColors, verticalColors, valueColors);
+        customTableBuilder.retrieveData(
+                labels,
+                horizontalLabels,
+                verticalLabels,
+                values,
+                horizontalColors,
+                verticalColors,
+                valueColors);
         System.out.println("@Var: ------------------>    labels: " + labels);
 
         // setting data
@@ -108,7 +117,10 @@ public class TableItemBuilder extends LegendItemBuilder {
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        String propertyString = LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, property);
+        String propertyString = LegendManager.getProperty(
+                TableProperty.OWN_PROPERTIES, 
+                itemIndex, 
+                property);
 
         switch (property) {
             case TableProperty.TABLE_VERTICAL_EXTRA_MARGIN: {

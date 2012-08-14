@@ -24,10 +24,10 @@ public class LegendProperty {
     public static final int WIDTH = 4;
     public static final int HEIGHT = 5;
     // BACKGROUND
-    public static final int BACKGROUND_COLOR = 6;
-    public static final int BACKGROUND_BORDER_COLOR = 7;
-    public static final int BACKGROUND_BORDER_LINE_THICK = 8;
-    public static final int BACKGROUND_IS_DISPLAYING = 9;
+    public static final int BACKGROUND_IS_DISPLAYING = 6;
+    public static final int BACKGROUND_COLOR = 7;
+    public static final int BACKGROUND_BORDER_COLOR = 8;
+    public static final int BACKGROUND_BORDER_LINE_THICK = 9;
     //TITLE
     public static final int TITLE_IS_DISPLAYING = 10;
     public static final int TITLE = 11;
@@ -55,10 +55,10 @@ public class LegendProperty {
         ".width",                               // 4
         ".height",                              // 5
         // BACKGROUND
-        ".background.color",                    // 6
-        ".background.border.color",             // 7
-        ".background.border.lineThick",         // 8
-        ".background.isDisplaying",             // 9
+        ".background.isDisplaying",             // 6
+        ".background.color",                    // 7
+        ".background.border.color",             // 8
+        ".background.border.lineThick",         // 9
         //TITLE
         ".title.isDisplaying",                  // 10
         ".title",                               // 11 

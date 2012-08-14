@@ -115,11 +115,6 @@ public class TestPersistence {
 
 
 
-
-
-
-
-
             // attribute ???
             AttributeController attributeController = Lookup.getDefault().lookup(AttributeController.class);
             AttributeModel attributeModel = null;
@@ -160,15 +155,13 @@ public class TestPersistence {
 
 
 
-            OutputStream fos = new FileOutputStream(new File("/Users/edubecks/Desktop/Untitled.png"));
-            Writer writer = new OutputStreamWriter(fos, "UTF-8");
             StringWriter stringWriter = new StringWriter();
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
             XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
             LegendController.getInstance().writeXML(xmlStreamWriter, workspace);
             
             
-            System.out.println("@Var: stringWriter: "+stringWriter);
+            System.out.println("@Var: stringWriter: "+stringWriter+"\n\n\n\n");
             
             
             XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
@@ -176,10 +169,12 @@ public class TestPersistence {
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(stringReader);
             LegendController.getInstance().readXMLToLegendManager(reader, workspace);
             
+            
 
 
 
 
+            
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
         }

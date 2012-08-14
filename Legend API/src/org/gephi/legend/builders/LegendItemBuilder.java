@@ -356,8 +356,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     public PreviewProperty[] createLegendProperties(Item item) {
 
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-
         setDefaultValues();
 
 //        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, itemIndex);
@@ -571,7 +569,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             if (propertyValue != null) {
                 String text = PreviewProperties.getValueAsText(propertyValue);
                 if (text == null) {
-                    text = getValueAsText(propertyValue);
+                    text = writeValueAsText(propertyValue);
                 }
                 writer.writeStartElement(XML_PROPERTY);
                 String name = LegendManager.getPropertyFromPreviewProperty(property);
@@ -596,7 +594,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             if (propertyValue != null) {
                 String text = PreviewProperties.getValueAsText(propertyValue);
                 if (text == null) {
-                    text = getValueAsText(propertyValue);
+                    text = writeValueAsText(propertyValue);
                 }
                 writer.writeStartElement(XML_PROPERTY);
                 String name = LegendManager.getPropertyFromPreviewProperty(property);
@@ -626,7 +624,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         int propertyIndex = LegendProperty.getInstance().getProperty(propertyName);
         String valueString = reader.getElementText();
+        System.out.println("@Var: valueString: " + valueString);
         Class valueClass = defaultValues[propertyIndex].getClass();
+        System.out.println("@Var: valueClass: " + valueClass);
         Object value = PreviewProperties.readValueFromText(valueString, valueClass);
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
@@ -636,7 +636,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return property;
     }
 
-    private Object readValueFromText(String valueStr, Class valueClass) {
+    protected Object readValueFromText(String valueStr, Class valueClass) {
         Object value = null;
         if (valueClass.equals(LegendItem.Alignment.class)) {
             value = availableAlignments[Integer.parseInt(valueStr)];
@@ -646,6 +646,12 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         }
         else if (valueClass.equals(LegendItem.Direction.class)) {
             value = availableDirections[Integer.parseInt(valueStr)];
+        }
+        else if (valueClass.equals(Boolean.class)) {
+            value = Boolean.parseBoolean(valueStr);
+        }
+        else if (valueClass.equals(Integer.class)) {
+            value = Integer.parseInt(valueStr);
         }
         return value;
     }
@@ -755,13 +761,16 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
 
 
+        PreviewProperty[] legendPropertiesArray = legendProperties.toArray(new PreviewProperty[legendProperties.size()]);
+        PreviewProperty[] ownPropertiesArray = ownProperties.toArray(new PreviewProperty[ownProperties.size()]);
+        PreviewProperty[] dynamicPropertiesArray = dynamicProperties.toArray(new PreviewProperty[dynamicProperties.size()]);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
-        item.setData(LegendItem.PROPERTIES, legendProperties.toArray());
-        item.setData(LegendItem.OWN_PROPERTIES, ownProperties.toArray());
+        item.setData(LegendItem.PROPERTIES, legendPropertiesArray);
+        item.setData(LegendItem.OWN_PROPERTIES, ownPropertiesArray);
         item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);
         boolean hasDynamicProperties = (dynamicProperties.size() > 0);
         item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties);
-        item.setData(LegendItem.DYNAMIC_PROPERTIES, dynamicProperties.toArray());
+        item.setData(LegendItem.DYNAMIC_PROPERTIES, dynamicPropertiesArray);
         item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
         item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
         item.setData(LegendItem.CURRENT_TRANSFORMATION, "");
@@ -769,7 +778,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return item;
     }
 
-    protected String getValueAsText(Object propertyValue) {
+    protected String writeValueAsText(Object propertyValue) {
+        System.out.println("@Var: interpreting propertyValue: " + propertyValue.getClass());
+
         String text = null;
         if (propertyValue instanceof LegendItem.Alignment) {
             LegendItem.Alignment propertyValueAlignment = (LegendItem.Alignment) propertyValue;
@@ -783,7 +794,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             LegendItem.Shape propertyValueAlignment = (LegendItem.Shape) propertyValue;
             text = propertyValueAlignment.getValue();
         }
-
+        else {
+            text = propertyValue.toString();
+        }
         return text;
     }
 

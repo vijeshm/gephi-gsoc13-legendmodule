@@ -14,13 +14,11 @@ import javax.xml.stream.XMLStreamWriter;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
-import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.CustomTextItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.items.TextItem;
-import org.gephi.legend.properties.LegendProperty;
 import org.gephi.legend.properties.TextProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -202,7 +200,12 @@ public class TextItemBuilder extends LegendItemBuilder {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         int propertyIndex = TextProperty.getInstance().getProperty(propertyName);
         String valueString = reader.getElementText();
-        Object value = PreviewProperties.readValueFromText(valueString, defaultValues[propertyIndex].getClass());
+        Class valueClass = defaultValues[propertyIndex].getClass();
+        System.out.println("@Var: valueClass: " + valueClass);
+        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
+        if (value == null) {
+            value = readValueFromText(valueString, valueClass);
+        }
         System.out.println("@Var: reading propertyType: " + propertyName + " with value: " + value);
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
@@ -219,7 +222,7 @@ public class TextItemBuilder extends LegendItemBuilder {
                 String text = null;
                 text = PreviewProperties.getValueAsText(propertyValue);
                 if(text == null){
-                    text = getValueAsText(propertyValue);
+                    text = writeValueAsText(propertyValue);
                 }
                 writer.writeStartElement(XML_PROPERTY);
                 String name = LegendManager.getPropertyFromPreviewProperty(property);
