@@ -17,6 +17,7 @@ import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.items.DescriptionItem;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
+import org.gephi.legend.items.TableItem;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
@@ -770,16 +771,28 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
         String text = null;
         if (propertyValue instanceof LegendItem.Alignment) {
-            LegendItem.Alignment propertyValueAlignment = (LegendItem.Alignment) propertyValue;
-            text = propertyValueAlignment.getValue();
+            LegendItem.Alignment propertyValueString = (LegendItem.Alignment) propertyValue;
+            text = propertyValueString.getValue();
         }
         else if (propertyValue instanceof LegendItem.Direction) {
-            LegendItem.Direction propertyValueAlignment = (LegendItem.Direction) propertyValue;
-            text = propertyValueAlignment.getValue();
+            LegendItem.Direction propertyValueString = (LegendItem.Direction) propertyValue;
+            text = propertyValueString.getValue();
         }
         else if (propertyValue instanceof LegendItem.Shape) {
-            LegendItem.Shape propertyValueAlignment = (LegendItem.Shape) propertyValue;
-            text = propertyValueAlignment.getValue();
+            LegendItem.Shape propertyValueString = (LegendItem.Shape) propertyValue;
+            text = propertyValueString.getValue();
+        }
+        else if (propertyValue instanceof TableItem.HorizontalPosition) {
+            TableItem.HorizontalPosition propertyValueString = (TableItem.HorizontalPosition) propertyValue;
+            text = propertyValueString.getValue();
+        }
+        else if (propertyValue instanceof TableItem.VerticalPosition) {
+            TableItem.VerticalPosition propertyValueString = (TableItem.VerticalPosition) propertyValue;
+            text = propertyValueString.getValue();
+        }
+        else if (propertyValue instanceof TableItem.VerticalTextDirection) {
+            TableItem.VerticalTextDirection propertyValueString = (TableItem.VerticalTextDirection) propertyValue;
+            text = propertyValueString.getValue();
         }
         else {
             text = propertyValue.toString();

@@ -94,8 +94,13 @@ public class TableItemBuilder extends LegendItemBuilder {
                 verticalColors,
                 valueColors);
         System.out.println("@Var: ------------------>    labels: " + labels);
+        
+        Integer numberOfRows = values.size();
+        Integer numberOfColumns = values.get(0).size();
 
         // setting data
+        item.setData(TableItem.NUMBER_OF_ROWS, numberOfRows);
+        item.setData(TableItem.NUMBER_OF_COLUMNS, numberOfColumns);
         item.setData(TableItem.HORIZONTAL_LABELS, horizontalLabels);
         item.setData(TableItem.VERTICAL_LABELS, verticalLabels);
         item.setData(TableItem.LABELS_IDS, labels);
@@ -311,11 +316,14 @@ public class TableItemBuilder extends LegendItemBuilder {
 //        }
         
         // creating one property for each label
+        
+        
         ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
         TableItem.Labels labelsIDs = labels.get(0);
         ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
         ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
         ArrayList<StringBuilder> labelsGroup = (labelsIDs == TableItem.Labels.HORIZONTAL) ? horizontalLabels : verticalLabels;
+        item.setData(TableItem.NUMBER_OF_LABELS, labelsGroup.size());
         PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
         for (int i = 0; i < labelProperties.length; i++) {
             labelProperties[i] = createLegendLabelProperty(item, i, labelsGroup.get(i).toString());
@@ -434,9 +442,27 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
+        
+        
 
         String name = null;
         String text = null;
+        
+        // number of rows
+        name = TableItem.NUMBER_OF_ROWS;
+        text = item.getData(TableItem.NUMBER_OF_ROWS).toString();
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+        
+        // number of columns
+        name = TableItem.NUMBER_OF_COLUMNS;
+        text = item.getData(TableItem.NUMBER_OF_COLUMNS).toString();
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
 
         // labels
         ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
@@ -607,6 +633,21 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+        
+        // write number of items
+        Integer numberOfGroups = item.getData(TableItem.NUMBER_OF_LABELS);
+        String name = TableItem.NUMBER_OF_LABELS;
+        String text = numberOfGroups.toString();
+        writer.writeStartElement(LegendItem.DATA);
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
+        PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        for (PreviewProperty property : ownProperties) {
+            writeXMLFromSingleProperty(writer, property);
+        }
+       
     }
 
     @Override
@@ -616,7 +657,8 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        reader.nextTag();
+        return new ArrayList<PreviewProperty>();
     }
 
     @Override
