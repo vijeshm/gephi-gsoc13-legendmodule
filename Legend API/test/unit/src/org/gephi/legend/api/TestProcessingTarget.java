@@ -4,8 +4,6 @@
  */
 package org.gephi.legend.api;
 
-import org.gephi.legend.items.LegendItem;
-import org.gephi.legend.manager.LegendManager;
 import java.io.*;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
@@ -23,6 +21,8 @@ import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;

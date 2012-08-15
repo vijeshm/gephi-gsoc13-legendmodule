@@ -1,9 +1,9 @@
 package org.gephi.legend.mouse;
 
 import org.gephi.legend.items.LegendItem;
-import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
-import static org.gephi.legend.items.LegendItem.LEGEND_MIN_WIDTH;
 import static org.gephi.legend.items.LegendItem.LEGEND_MIN_HEIGHT;
+import static org.gephi.legend.items.LegendItem.LEGEND_MIN_WIDTH;
+import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;

@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import org.gephi.legend.api.CustomGroupsItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
-import org.gephi.partition.api.NodePartition;
 import org.gephi.partition.api.Part;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.api.PartitionModel;

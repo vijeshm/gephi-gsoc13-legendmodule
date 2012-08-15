@@ -4,7 +4,6 @@
  */
 package org.gephi.legend.items;
 
-import java.awt.Color;
 import org.gephi.legend.api.DescriptionItemElementValue;
 import org.gephi.legend.builders.description.elements.CustomValue;
 

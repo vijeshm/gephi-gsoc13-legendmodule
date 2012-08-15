@@ -5,7 +5,6 @@
 package org.gephi.legend.builders.text;
 
 import org.gephi.legend.api.CustomLegendItemBuilder;
-import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.CustomTextItemBuilder;
 import org.openide.util.lookup.ServiceProvider;
 

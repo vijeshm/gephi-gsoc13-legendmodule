@@ -4,8 +4,6 @@
  */
 package org.gephi.legend.builders;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,17 +14,14 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomImageItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
-import org.gephi.legend.api.CustomTableItemBuilder;
+import org.gephi.legend.items.ImageItem;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.manager.LegendManager;
-import org.gephi.preview.api.Item;
-import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.legend.items.ImageItem;
 import org.gephi.legend.properties.ImageProperty;
-import org.gephi.legend.properties.LegendProperty;
-import org.gephi.legend.properties.TextProperty;
+import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;

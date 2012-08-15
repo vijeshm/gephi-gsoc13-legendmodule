@@ -8,18 +8,18 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.gephi.legend.items.LegendItem;
-import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.builders.GroupsItemBuilder;
+import org.gephi.legend.items.GroupsItem;
+import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.items.LegendItem.Direction;
+import org.gephi.legend.items.LegendItem.Shape;
+import org.gephi.legend.manager.LegendManager;
+import org.gephi.legend.properties.GroupsProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.spi.ItemBuilder;
-import org.openide.util.NbBundle;
-import org.gephi.legend.items.GroupsItem;
-import org.gephi.legend.properties.GroupsProperty;
-import org.gephi.legend.items.LegendItem.Shape;
-import org.gephi.legend.items.LegendItem.Direction;
 import org.gephi.preview.spi.Renderer;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

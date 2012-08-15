@@ -9,7 +9,6 @@ import java.beans.PropertyEditorSupport;
 import org.gephi.legend.api.DescriptionItemElementValue;
 import org.gephi.legend.builders.description.elements.CustomValue;
 import org.gephi.legend.items.DescriptionItemElement;
-import org.gephi.legend.items.DescriptionItem;
 
 /**
  *

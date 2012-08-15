@@ -12,9 +12,9 @@ import org.gephi.preview.api.*;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.nodes.Node;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 
 /**

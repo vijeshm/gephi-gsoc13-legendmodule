@@ -6,7 +6,6 @@ package org.gephi.legend.builders;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
@@ -16,27 +15,23 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomDescriptionItemBuilder;
 import org.gephi.legend.api.CustomLegendItemBuilder;
-import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.api.DescriptionItemElementValue;
+import org.gephi.legend.builders.description.elements.CustomValue;
+import org.gephi.legend.items.DescriptionItem;
+import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.items.DescriptionItem;
-//import org.gephi.legend.items.DescriptionItem.DescriptionItemElement;
-import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.properties.DescriptionProperty;
-import org.gephi.legend.properties.LegendProperty;
+import org.gephi.legend.properties.TextProperty;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
-import org.gephi.legend.builders.description.elements.CustomValue;
-import org.gephi.legend.properties.ImageProperty;
-import org.gephi.legend.properties.TextProperty;
-import org.gephi.preview.api.PreviewProperties;
 
 /**
  *
@@ -374,7 +369,6 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-
     @Override
     public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -390,8 +384,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    
-        @Override
+    @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         String valueString = reader.getElementText();
@@ -404,4 +397,5 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
+
 }

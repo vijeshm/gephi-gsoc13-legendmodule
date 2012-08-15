@@ -95,7 +95,6 @@ public class TestPartition {
             partitionController.transform(partitionModel.getSelectedPartition(), partitionModel.getSelectedTransformer());
             
             
-            PartitionData partitionData = new PartitionData();
             
 //            System.out.println("@Var: partitionModel.getSelectedPartition(): " + partitionModel.getSelectedPartition());
 //
