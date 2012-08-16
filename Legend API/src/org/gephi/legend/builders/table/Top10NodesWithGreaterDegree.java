@@ -99,7 +99,7 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
         
         @Override
         public int compare(Node n1, Node n2) {
-            return graph.getDegree(n1) - graph.getDegree(n2);
+            return graph.getDegree(n2) - graph.getDegree(n1);
         }
 
     }

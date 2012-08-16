@@ -16,6 +16,7 @@ import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.items.TableItem;
 import org.gephi.partition.api.Part;
+import org.gephi.partition.api.Partition;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.api.PartitionModel;
 import org.gephi.project.api.ProjectController;
@@ -57,14 +58,15 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
 
         if (partitionModel.getSelectedPartition() != null) {
+            Partition selectedPartition = partitionModel.getSelectedPartition();
 
-            float[][] valuesTemp = new float[partitionModel.getSelectedPartition().getPartsCount()][partitionModel.getSelectedPartition().getPartsCount()];
+            float[][] valuesTemp = new float[selectedPartition.getPartsCount()][selectedPartition.getPartsCount()];
 
             HashMap<String, Integer> labelsMap = new HashMap<String, Integer>();
 
             // FILLING LABELS
             int index = 0;
-            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
+            for (Part<Node> part : selectedPartition.getParts()) {
                 StringBuilder label = new StringBuilder(part.getDisplayName());
                 labelsMap.put(label.toString(), index++);
                 horizontalLabels.add(label);
@@ -75,16 +77,10 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
 
             // FILLING VALUES
-            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
-                Node[] nodes = part.getObjects();
-                for (Node node : nodes) {
-                    for (Edge edge : graph.getEdges(node).toArray()) {
-                        Node anotherNode = (node.equals(edge.getSource())) ? edge.getTarget() : edge.getSource();
-                        Part anotherPart = partitionModel.getSelectedPartition().getPart(anotherNode);
-                        valuesTemp[labelsMap.get(part.getDisplayName())][labelsMap.get(anotherPart.getDisplayName())]++;
-                    }
-                }
-
+            for (Edge edge : graph.getEdges().toArray()) {
+                Part sourcePart = selectedPartition.getPart(edge.getSource());
+                Part targetPart = selectedPartition.getPart(edge.getTarget());
+                valuesTemp[labelsMap.get(sourcePart.getDisplayName())][labelsMap.get(targetPart.getDisplayName())]++;
             }
 
             for (int i = 0; i < valuesTemp.length; i++) {
@@ -97,7 +93,7 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
             
             
             // FILLING COLORS
-            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
+            for (Part<Node> part : selectedPartition.getParts()) {
                 Color color = part.getColor();
                 verticalColors.add(color);
                 horizontalColors.add(color);
