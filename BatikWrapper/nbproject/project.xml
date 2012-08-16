@@ -56,6 +56,9 @@
                 <package>org.apache.batik.script</package>
                 <package>org.apache.batik.script.rhino</package>
                 <package>org.apache.batik.script.rhino.svg12</package>
+                <package>org.apache.batik.svggen</package>
+                <package>org.apache.batik.svggen.font</package>
+                <package>org.apache.batik.svggen.font.table</package>
                 <package>org.apache.batik.transcoder</package>
                 <package>org.apache.batik.transcoder.image</package>
                 <package>org.apache.batik.transcoder.image.resources</package>
@@ -121,8 +124,16 @@
                 <binary-origin>release/modules/ext/xml-apis-ext.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/batik-dom.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-dom.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/pdf-transcoder.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/pdf-transcoder.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-gvt.jar</runtime-relative-path>
@@ -159,10 +170,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/batik-bridge.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-bridge.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/pdf-transcoder.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/pdf-transcoder.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

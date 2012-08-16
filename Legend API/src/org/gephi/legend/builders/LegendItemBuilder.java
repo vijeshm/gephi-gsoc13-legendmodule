@@ -733,8 +733,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     private final Object[] availableDirections = {
         LegendItem.Direction.UP,
         LegendItem.Direction.DOWN,
-        LegendItem.Direction.LEFT,
-        LegendItem.Direction.RIGHT
+        LegendItem.Direction.RIGHT,
+        LegendItem.Direction.LEFT
     };
     
     // table

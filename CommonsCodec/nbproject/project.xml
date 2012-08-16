@@ -11,11 +11,12 @@
                 <package>org.apache.commons.codec.binary</package>
                 <package>org.apache.commons.codec.digest</package>
                 <package>org.apache.commons.codec.language</package>
+                <package>org.apache.commons.codec.language.bm</package>
                 <package>org.apache.commons.codec.net</package>
             </public-packages>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-codec-1.4.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-codec-1.4.jar</binary-origin>
+                <runtime-relative-path>ext/commons-codec-1.6.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-codec-1.6.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

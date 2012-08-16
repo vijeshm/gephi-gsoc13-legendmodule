@@ -83,11 +83,6 @@ public class LegendController {
 
             if (previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
 
-                // testing
-                StringWriter stringWriter = new StringWriter();
-                XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
-                XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
-
                 LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
                 ArrayList<Item> legendItems = legendManager.getLegendItems();
 
@@ -99,12 +94,6 @@ public class LegendController {
                     writer.writeStartElement(XML_LEGEND_ITEM);
                     builder.writeXMLFromItem(writer, item);
                     writer.writeEndElement();
-
-                    //debug
-
-                    xmlStreamWriter.writeStartElement(XML_LEGEND_ITEM);
-                    builder.writeXMLFromItem(xmlStreamWriter, item);
-                    xmlStreamWriter.writeEndElement();
                 }
                 writer.writeEndElement();
 
