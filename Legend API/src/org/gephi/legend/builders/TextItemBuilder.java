@@ -131,46 +131,12 @@ public class TextItemBuilder extends LegendItemBuilder {
 
         int[] properties = TextProperty.LIST_OF_PROPERTIES;
 
-        System.out.println("@Var: properties: " + properties.length);
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
         for (int i = 0; i < defaultValues.length; i++) {
-            System.out.println("@Var: i: " + i);
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
 
         return previewProperties;
-//
-//        ArrayList<String> textProperties = LegendManager.getProperties(TextProperty.OWN_PROPERTIES, itemIndex);
-//
-//        PreviewProperty[] properties = {
-//            PreviewProperty.createProperty(this,
-//                                           textProperties.get(TextProperty.TEXT_BODY),
-//                                           String.class,
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.displayName"),
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.description"),
-//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(item.getData(TextItem.BODY)),
-//            PreviewProperty.createProperty(this,
-//                                           textProperties.get(TextProperty.TEXT_BODY_FONT),
-//                                           Font.class,
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.displayName"),
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.description"),
-//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBodyFont),
-//            PreviewProperty.createProperty(this,
-//                                           textProperties.get(TextProperty.TEXT_BODY_FONT_COLOR),
-//                                           Color.class,
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.displayName"),
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.font.color.description"),
-//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBodyFontColor),
-//            PreviewProperty.createProperty(this,
-//                                           textProperties.get(TextProperty.TEXT_BODY_FONT_ALIGNMENT),
-//                                           Alignment.class,
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.displayName"),
-//                                           NbBundle.getMessage(LegendManager.class, "TextItem.property.body.alignment.description"),
-//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBodyFontAlignment)
-//        };
-//
-//
-//        return properties;
     }
 
     @Override
@@ -206,25 +172,13 @@ public class TextItemBuilder extends LegendItemBuilder {
 
     }
 
-    // DEFAULT VALUES
-    protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
-    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
-    protected final Color defaultBodyFontColor = Color.BLUE;
-    protected final Alignment defaultBodyFontAlignment = Alignment.JUSTIFIED;
-    private final Object[] defaultValues = {
-        defaultBody,
-        defaultBodyFont,
-        defaultBodyFontColor,
-        defaultBodyFontAlignment
-    };
-
     @Override
     protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
 
         ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
 
         // own properties
-        
+
         boolean end = false;
         while (reader.hasNext() && !end) {
             int type = reader.next();
@@ -263,7 +217,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
         }
-        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+value);
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
@@ -272,7 +225,15 @@ public class TextItemBuilder extends LegendItemBuilder {
     protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
     }
 
-    
-    
-
+    // DEFAULT VALUES
+    protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
+    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
+    protected final Color defaultBodyFontColor = Color.BLUE;
+    protected final Alignment defaultBodyFontAlignment = Alignment.JUSTIFIED;
+    private final Object[] defaultValues = {
+        defaultBody,
+        defaultBodyFont,
+        defaultBodyFontColor,
+        defaultBodyFontAlignment
+    };
 }

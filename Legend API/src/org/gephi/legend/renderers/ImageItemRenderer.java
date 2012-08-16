@@ -34,8 +34,7 @@ import org.w3c.dom.Element;
 public class ImageItemRenderer extends LegendItemRenderer {
 
     @Override
-    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        System.out.println("@Var: origin: " + origin);
+    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
 //        graphics2D.setTransform(origin);
         try {
             if (imageFile.exists()) {
@@ -66,10 +65,8 @@ public class ImageItemRenderer extends LegendItemRenderer {
                         ImageIO.write(after, "png", baos);
                         baos.flush();
                         String encodedImage = Base64.encodeBase64String(baos.toByteArray());
-                        System.out.println("@Var: encodedImage: " + encodedImage);
                         baos.close(); // should be inside a finally block
                         Document svgDocument = svgGeneratorContext.getDOMFactory();
-                        System.out.println("@Var: domFactory: " + svgDocument);
 
                         Element imageBase64 = svgDocument.createElementNS("http://www.w3.org/2000/svg", "image");
                         imageBase64.setAttribute("width", "" + after.getWidth());
@@ -95,14 +92,13 @@ public class ImageItemRenderer extends LegendItemRenderer {
                 }
             }
         } catch (Exception e) {
-            System.out.println("@Var: e: " + e);
 
 
         }
     }
 
     @Override
-    public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
+    protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 

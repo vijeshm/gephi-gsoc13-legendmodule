@@ -31,7 +31,7 @@ public class TextItemRenderer extends LegendItemRenderer {
     }
 
     @Override
-    public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
+    protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
@@ -52,7 +52,7 @@ public class TextItemRenderer extends LegendItemRenderer {
     }
 
     @Override
-    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
         if (!body.isEmpty()) {
             graphics2D.setTransform(origin);
             boolean computeSpace = true;

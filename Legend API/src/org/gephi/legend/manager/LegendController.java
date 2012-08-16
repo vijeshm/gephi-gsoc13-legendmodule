@@ -30,7 +30,6 @@ import org.openide.util.Lookup;
 public class LegendController {
 
     private Collection<? extends LegendItemBuilder> registerLegendBuilders() {
-        // cleaning combobox
         builders = new HashMap<String, LegendItemBuilder>();
 
         // retrieving available builders
@@ -55,7 +54,6 @@ public class LegendController {
 
 
         legendManager.addItem(item);
-//            Item activeLegendItem = legendManager.getActiveLegendItem();
 
         // LEGEND PROPERTIES
         PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
@@ -110,7 +108,6 @@ public class LegendController {
                 }
                 writer.writeEndElement();
 
-                System.out.println("@Var: stringWriter: " + stringWriter);
             }
         } catch (XMLStreamException ex) {
             throw new RuntimeException(ex);
@@ -127,8 +124,6 @@ public class LegendController {
             LegendManager legendManager = new LegendManager();
             previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, legendManager);
 
-            System.out.printf("__HERE __ trying to read from controller \n");
-
 
             int newItemIndex = 0;
             boolean end = false;
@@ -138,20 +133,17 @@ public class LegendController {
 
                 int type = reader.next();
                 String legendItem = reader.getLocalName();
-                System.out.println("\n\n\n\n@Var: reading XML legendItem: " + legendItem);
                 switch (type) {
                     case XMLStreamReader.START_ELEMENT: {
 
                         if (legendItem.equals(XML_LEGEND_ITEM)) {
                             reader.next();
                             String legendType = reader.getElementText();
-                            System.out.println("@Var: reading XML legendType: " + legendType);
                             LegendItemBuilder builder = builders.get(legendType);
                             Item item = builder.readXMLToItem(reader, newItemIndex);
 
                             // adding item
                             addItemToLegendManager(workspace, item);
-                            
                             
                             // finish reading item
                             reader.next();
@@ -170,12 +162,6 @@ public class LegendController {
                     }
                 }
 
-//                reader.next();
-//                System.out.println("@Var: reader.getLocalName(): " + reader.getLocalName());
-//                reader.next();
-//                System.out.println("@Var: reader.getLocalName(): " + reader.getLocalName());
-//                reader.next();
-//                System.out.println("@Var: reader.getLocalName(): " + reader.getLocalName());
 
             }
         } catch (XMLStreamException ex) {
@@ -189,6 +175,14 @@ public class LegendController {
     private Map<String, LegendItemBuilder> builders;
     private Collection<? extends LegendItemBuilder> availablebuilders;
 
+    /*
+     * returns a Collection of the available Legend Item Builders in the system
+     * Default list:
+     * TableItem Builder
+     * ImageItem Builder
+     * GroupsItem Builder
+     * Descriptiontem Builder
+     */
     public Collection<? extends LegendItemBuilder> getAvailablebuilders() {
         return availablebuilders;
     }

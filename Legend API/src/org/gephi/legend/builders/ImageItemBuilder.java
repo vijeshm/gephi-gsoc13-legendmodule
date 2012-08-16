@@ -72,12 +72,13 @@ public class ImageItemBuilder extends LegendItemBuilder {
 
         switch (property) {
             case ImageProperty.IMAGE_URL: {
-                previewProperty = PreviewProperty.createProperty(this,
-                                                                 propertyString,
-                                                                 File.class,
-                                                                 NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.displayName"),
-                                                                 NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.description"),
-                                                                 PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        File.class,
+                        NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.description"),
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
         }
@@ -92,35 +93,12 @@ public class ImageItemBuilder extends LegendItemBuilder {
 
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
         for (int i = 0; i < defaultValues.length; i++) {
-            System.out.println("@Var: i: " + i);
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
 
         return previewProperties;
 
-
-//        
-//        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-//
-//        ArrayList<String> imageProperties = LegendManager.getProperties(ImageProperty.OWN_PROPERTIES, itemIndex);
-//
-//        PreviewProperty[] properties = {
-//            PreviewProperty.createProperty(this,
-//                                           imageProperties.get(ImageProperty.IMAGE_URL),
-//                                           File.class,
-//                                           NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.displayName"),
-//                                           NbBundle.getMessage(LegendManager.class, "ImageItem.property.imageURL.description"),
-//                                           PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultImageFile)
-//        };
-//
-//
-//        return properties;
     }
-
-    private File defaultImageFile = new File("/Volumes/edubecks/edubecks/Dropbox/imagenes/inception.jpg");
-    private final Object[] defaultValues = {
-        defaultImageFile
-    };
 
     @Override
     protected Boolean hasDynamicProperties() {
@@ -201,13 +179,16 @@ public class ImageItemBuilder extends LegendItemBuilder {
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
         }
-        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+value);
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
 
-    
     @Override
     protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
     }
+
+    private File defaultImageFile = new File("/Volumes/edubecks/edubecks/Dropbox/imagenes/inception.jpg");
+    private final Object[] defaultValues = {
+        defaultImageFile
+    };
 }

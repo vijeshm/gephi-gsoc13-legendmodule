@@ -51,7 +51,6 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
 
         List<Node> nodes = Arrays.asList(graph.getNodes().toArray());
         Collections.sort(nodes, new NodeSort(graph));
-        System.out.println("@Var: SORTING nodes: "+nodes);
         
         int topResults = 10;
         // FILLING HORIZONTAL LABELS AND COLORS

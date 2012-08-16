@@ -265,7 +265,7 @@ public class TableItemRenderer extends LegendItemRenderer {
     }
 
     @Override
-    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
 
         graphics2D.setTransform(origin);
         graphics2D.setFont(font);
@@ -302,9 +302,7 @@ public class TableItemRenderer extends LegendItemRenderer {
             }
             case DIAGONAL: {
                 verticalLabelsHeight = maxVerticalTextWidth + 2 * MINIMUM_MARGIN;
-                System.out.println("@Var: verticalLabelsHeight: " + verticalLabelsHeight);
 //                verticalLabelsHeight = (int)(verticalLabelsHeight *  - Math.sin(verticalTextDirection.rotationAngle()));
-                System.out.println("@Var: verticalLabelsHeight: " + verticalLabelsHeight);
                 tableHeight = height - verticalLabelsHeight;
                 tableWidth = width - horizontalLabelsWidth - (int) Math.cos(verticalLabelsHeight);
                 break;
@@ -390,19 +388,17 @@ public class TableItemRenderer extends LegendItemRenderer {
     }
 
     @Override
-    public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
+    protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         tableValuesArrayList = item.getData(TableItem.TABLE_VALUES);
-        System.out.println("@Var: tableValuesArrayList: " + tableValuesArrayList);
 
         // READING VALUES
         tableValues = new Float[tableValuesArrayList.size()][tableValuesArrayList.get(0).size()];
         for (int i = 0; i < tableValuesArrayList.size(); i++) {
             for (int j = 0; j < tableValuesArrayList.get(i).size(); j++) {
                 tableValues[i][j] = tableValuesArrayList.get(i).get(j);
-                System.out.println("@Var: tableValues: " + tableValues[i][j]);
             }
         }
 

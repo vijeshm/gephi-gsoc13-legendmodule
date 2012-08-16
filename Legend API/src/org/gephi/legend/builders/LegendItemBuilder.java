@@ -98,7 +98,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     public abstract Item createNewLegendItem(Graph graph);
 
     public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
-        System.out.println("@Var: creating createCustomItem: ");
         Item item = buildCustomItem(builder, graph, attributeModel);
         createDefaultProperties(newItemIndex, item);
         return item;
@@ -358,13 +357,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     public PreviewProperty[] createLegendProperties(Item item) {
 
-        System.out.printf("__HERE __\n" + defaultTitleIsDisplaying);
         if(setDefaultValues()){
             updateDefaultValues();
         }
-        System.out.printf("__HERE __\n" + defaultTitleIsDisplaying);
-
-//        ArrayList<String> legendProperties = LegendManager.getProperties(LegendProperty.LEGEND_PROPERTIES, itemIndex);
 
         int[] properties = LegendProperty.LIST_OF_PROPERTIES;
 
@@ -378,129 +373,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         }
 
         return previewProperties;
-//
-//        return new PreviewProperty[]{
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.LABEL),
-//                                                   String.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultLabel + itemIndex),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.IS_DISPLAYING),
-//                                                   Boolean.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.isDisplaying.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.isDisplaying.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultIsDisplaying),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.USER_ORIGIN_X),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originX.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultOriginX),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.USER_ORIGIN_Y),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.originY.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultOriginY),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.WIDTH),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.width.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.width.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultWidth),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.HEIGHT),
-//                                                   Float.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.height.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultHeight),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.BACKGROUND_IS_DISPLAYING),
-//                                                   Boolean.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.isDisplaying.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.isDisplaying.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBackgroundIsDisplaying),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.BACKGROUND_COLOR),
-//                                                   Color.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.color.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.color.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBackgroundColor),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.BACKGROUND_BORDER_COLOR),
-//                                                   Color.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.color.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.color.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBackgroundBorderColor),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.BACKGROUND_BORDER_LINE_THICK),
-//                                                   Integer.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.lineThick.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.background.border.lineThick.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultBackgroundBorderLineThick),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_IS_DISPLAYING),
-//                                                   Boolean.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.isDisplaying.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.isDisplaying.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultTitleIsDisplaying),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE),
-//                                                   String.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultTitle),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_FONT),
-//                                                   Font.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.font.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.font.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultTitleFont),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_FONT_COLOR),
-//                                                   Color.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.font.color.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.font.color.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultTitleFontColor),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.TITLE_ALIGNMENT),
-//                                                   Alignment.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.alignment.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.title.alignment.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultTitleAlignment),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_IS_DISPLAYING),
-//                                                   Boolean.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.isDisplaying.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.isDisplaying.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultTitleIsDisplaying),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION),
-//                                                   String.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultDescription),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_FONT),
-//                                                   Font.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.font.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.font.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultDescriptionFont),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_FONT_COLOR),
-//                                                   Color.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.font.color.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.font.color.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultDescriptionFontColor),
-//                    PreviewProperty.createProperty(this,
-//                                                   legendProperties.get(LegendProperty.DESCRIPTION_ALIGNMENT),
-//                                                   Alignment.class,
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.alignment.displayName"),
-//                                                   NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.alignment.description"),
-//                                                   PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(defaultDescriptionAlignment)
-//                };
     }
 
     public PreviewProperty[] getLegendProperties(Item item) {
@@ -520,10 +392,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 //        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 //        Integer currentNumOfPropertiews = item.getData(DescriptionItem.NUMBER_OF_ITEMS);
 //        int currentNumOfProperties = ((PreviewProperty[]) (item.getData(LegendItem.DYNAMIC_PROPERTIES))).length;
-        System.out.println("@Var: currentNumOfProperties: " + item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES));
         int currentNumOfProperties = ((Integer) (item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES))).intValue();
-        System.out.println("@Var: currentNumOfPropertiews: " + currentNumOfProperties);
-        System.out.println("@Var: numOfProperties: " + numOfProperties);
         // number of items didn't change
         if (numOfProperties == currentNumOfProperties) {
             return false;
@@ -574,7 +443,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             writer.writeAttribute(XML_NAME, name);
             writer.writeCharacters(text);
             writer.writeEndElement();
-            System.out.println("@Saving: : " + XML_LEGEND_PROPERTY + " <> " + " name: " + name + " <> " + " value: " + text);
         }
     }
 
@@ -620,14 +488,12 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     protected PreviewProperty readXMLToSingleLegendProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         String valueString = reader.getElementText();
-        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+valueString);
         int propertyIndex = LegendProperty.getInstance().getProperty(propertyName);
         Class valueClass = defaultValuesArrayList.get(propertyIndex).getClass();
         Object value = PreviewProperties.readValueFromText(valueString, valueClass);
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
         }
-        System.out.println("@Var: ReadingXML property: "+propertyName+" with value: "+value);
         
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
@@ -708,66 +574,32 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
         // opening legend properties
         reader.nextTag();
-        System.out.println("@Var: reader: "+reader.getLocalName());
-        System.out.println("@Var: legend properties: ");
         ArrayList<PreviewProperty> legendProperties = readXMLToLegendProperties(reader, item);
 
         // opening own properties
         reader.nextTag();
-        System.out.println("@Var: reader: "+reader.getLocalName());
-        System.out.println("@Var: own properties: ");
         ArrayList<PreviewProperty> ownProperties = readXMLToOwnProperties(reader, item);
 
         // opening dynamic properties
         reader.nextTag();
-        System.out.println("@Var: reader: "+reader.getLocalName());
-        System.out.println("@Var: dynamic properties: ");
         ArrayList<PreviewProperty> dynamicProperties = readXMLToDynamicProperties(reader, item);
         // closing dynamic properties
 
         // data
 //        reader.nextTag();
-//        System.out.println("@Var: reader: "+reader.getLocalName());
         reader.nextTag();
-        System.out.println("@Var: reader: "+reader.getLocalName());
-        System.out.println("@Var: data: ");
         readXMLToData(reader, item);
         
         // finish reading
         reader.next();
         
 
-//        // dynamic properties
-//        System.out.println("@Var: dynamic properties: ");
-//        boolean end = false;
-//        while (reader.hasNext() && !end) {
-//            int type = reader.next();
-//            switch (type) {
-//                case XMLStreamReader.START_ELEMENT: {
-////                    String propertyType = reader.getLocalName();
-////                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
-////                    legendProperties.add(property);
-//                    break;
-//                }
-//                case XMLStreamReader.CHARACTERS: {
-//                    break;
-//                }
-//                case XMLStreamReader.END_ELEMENT: {
-//                    end = true;
-//                    break;
-//                }
-//            }
-//        }
-
-
-
-
 
         PreviewProperty[] legendPropertiesArray = legendProperties.toArray(new PreviewProperty[legendProperties.size()]);
         PreviewProperty[] ownPropertiesArray = ownProperties.toArray(new PreviewProperty[ownProperties.size()]);
         PreviewProperty[] dynamicPropertiesArray = dynamicProperties.toArray(new PreviewProperty[dynamicProperties.size()]);
         
-        
+        // setting data
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, legendPropertiesArray);
         item.setData(LegendItem.OWN_PROPERTIES, ownPropertiesArray);
@@ -782,7 +614,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     protected String writeValueAsText(Object propertyValue) {
-        System.out.println("@Var: interpreting propertyValue: " + propertyValue.getClass());
 
         String text = null;
         if (propertyValue instanceof LegendItem.Alignment) {
@@ -829,7 +660,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     private static final String XML_DATA = "itemdata";
     //DEFAULT VALUES 
     // BACKGROUND AND BORDER
-    protected Boolean defaultBackgroundIsDisplaying = Boolean.TRUE;
+    protected Boolean defaultBackgroundIsDisplaying = Boolean.FALSE;
     protected Color defaultBackgroundColor = Color.WHITE;
     protected Color defaultBackgroundBorderColor = Color.BLACK;
     protected Integer defaultBackgroundBorderLineThick = 1;

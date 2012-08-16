@@ -183,9 +183,4 @@ public class TestProcessingTarget {
         return item;
     }
 
-    public void testTable(Item item, PreviewProperties properties) {
-        TableItemRenderer tableItemRenderer = new TableItemRenderer();
-        tableItemRenderer.readOwnPropertiesAndValues(item, properties);
-    }
-
 }

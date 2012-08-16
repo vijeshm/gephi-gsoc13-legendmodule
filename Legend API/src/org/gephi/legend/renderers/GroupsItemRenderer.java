@@ -30,7 +30,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class GroupsItemRenderer extends LegendItemRenderer {
 
     @Override
-    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
 
         if (labels.isEmpty()) {
             return;
@@ -38,13 +38,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 
         graphics2D.setTransform(origin);
 
-        System.out.println("@Var: height: " + height);
-        System.out.println("@Var: width: " + width);
         int numGroups = labels.size();
-        System.out.println("@Var: numGroups: " + numGroups);
         int numRows = (int) Math.ceil((double) numGroups / numColumns);
-        System.out.println("@Var: numColumns: " + numColumns);
-        System.out.println("@Var: numRows: " + numRows);
 
         // max label length
         graphics2D.setFont(labelFont);
@@ -54,8 +49,6 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         int elementHeight = (height - (numRows - 1) * paddingBetweenElements) / numRows;
         int elementWidth = (width - (numColumns - 1) * paddingBetweenElements) / numColumns;
 //        int elementWidth = width / numColumns - paddingBetweenElements;
-        System.out.println("@Var: elemendWidth: " + elementWidth);
-        System.out.println("@Var: elemendHeight: " + elementHeight);
 
         int maxLabelWidth = Integer.MIN_VALUE;
         int maxLabelHeight = Integer.MIN_VALUE;
@@ -72,8 +65,6 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         }
 
 
-        System.out.println("@Var: maxLabelHeight: " + maxLabelHeight);
-        System.out.println("@Var: maxLabelWidth: " + maxLabelWidth);
 
 
         int shapeWidth = 0, shapeHeight = 0, labelHeight = 0, labelWidth = 0;
@@ -144,12 +135,12 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         }
     }
 
-    public void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height, float scale) {
+    private void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height, float scale) {
 
         int shapeWidth = (int) (width * scale);
         int shapeHeight = (int) (height * scale);
-        x = (int) (x + (width - shapeWidth) / 2);
-        y = (int) (y + (height - shapeHeight) / 2);
+        x = (x + (width - shapeWidth) / 2);
+        y = (y + (height - shapeHeight) / 2);
         graphics2D.setColor(color);
         switch (shape) {
             case RECTANGLE: {
@@ -170,7 +161,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
     }
 
     @Override
-    public void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
+    protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 

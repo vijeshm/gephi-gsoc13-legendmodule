@@ -19,13 +19,11 @@ public class LegendPersistenceProvider implements WorkspacePersistenceProvider{
 
     @Override
     public void writeXML(XMLStreamWriter writer, Workspace workspace) {
-        System.out.printf("__HERE __ trying to write from LegendPersistenceProvider UI \n");
         LegendController.getInstance().writeXML(writer, workspace);
     }
 
     @Override
     public void readXML(XMLStreamReader reader, Workspace workspace) {
-        System.out.printf("__HERE __ trying to read from LegendPersistenceProvider UI \n");
         LegendController.getInstance().readXMLToLegendManager(reader, workspace);
     }
 

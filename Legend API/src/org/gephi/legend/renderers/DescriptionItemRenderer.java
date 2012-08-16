@@ -33,7 +33,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class DescriptionItemRenderer extends LegendItemRenderer {
 
     @Override
-    public void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
 
         if (numElements > 0) {
             graphics2D.setTransform(origin);
@@ -70,10 +70,9 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
     }
 
     @Override
-    public void readOwnPropertiesAndValues(Item item, PreviewProperties previewProperties) {
+    protected void readOwnPropertiesAndValues(Item item, PreviewProperties previewProperties) {
         if (item != null) {
 
-            PreviewProperty[] itemProperties = item.getData(LegendItem.PROPERTIES);
 
             Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
@@ -92,21 +91,13 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
             // reading keys
             Integer numberOfItems = item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES);
             
-            
-            System.out.println("@Var: numberOfItems: " + numberOfItems);
-//            if (DescriptionItemBuilder.updatePreviewProperty(item, numberOfItems)) {
-//                System.out.printf("Refresh property sheet\n");
-//                LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-////                legendManager.refreshActiveLegendsComboBox();
-//            }
+
             keys = new ArrayList<String>();
             values = new ArrayList<String>();
             for (int i = 0; i < numberOfItems; i++) {
                 String key = previewProperties.getStringValue(LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, i));
-                System.out.println("@Var: key: " + key);
                 DescriptionItemElement descriptionItemElement = previewProperties.getValue(LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, i));
                 String value = descriptionItemElement.getValue();
-                System.out.println("@Var: value: " + value);
                 keys.add(key);
                 values.add(value);
             }

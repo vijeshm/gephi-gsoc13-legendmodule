@@ -78,13 +78,12 @@ public class LegendManager{
             previewProperties.removeProperty(property);
         }
 
+        // updating and adding new properties
         for (int i = 0; i < isActive.size(); i++) {
             if (isActive.get(i)) {
                 PreviewProperty[] properties =
                         (PreviewProperty[]) legendItems.get(i).getData(LegendItem.DYNAMIC_PROPERTIES);
                 for (PreviewProperty property : properties) {
-                    System.out.println("@Var: adding property: " + property.getName());
-                    //previewProperties.addProperty(property);
                     previewProperties.putValue(property.getName(), property.getValue());
                 }
             }
@@ -94,8 +93,6 @@ public class LegendManager{
     public void addItem(Item item) {
 
         activeLegendIndex = currentIndex;
-        System.out.println("@Var: creating item activeLegend: " + activeLegendIndex);
-        System.out.println("@Var: item: " + item);
 
         items.add(LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex);
         isActive.add(Boolean.TRUE);
@@ -144,16 +141,12 @@ public class LegendManager{
     }
 
     public static String getPropertyFromPreviewProperty(PreviewProperty property) {
-//        Pattern pattern = Pattern.compile("legend.item\\d+.(.*)");
         String propertyString = property.getName();
         String name = propertyString.substring(propertyString.indexOf('.', 10));
-        System.out.println("@Var: name: " + name);
         return name;
 
-//        System.out.println("@Var: propertyString: "+propertyString);
+//        Pattern pattern = Pattern.compile("legend.item\\d+.(.*)");
 //        Matcher matcher = pattern.matcher(propertyString);
-//        System.out.println("@Var: matcher: "+matcher.group());
-//        System.out.println("@Var: matcher: "+matcher.group(1));
 //        return matcher.group(1);
 
     }
@@ -221,33 +214,4 @@ public class LegendManager{
         return property;
     }
 
- 
-
-
- 
-
-//
-//    private void readXML(XMLStreamReader reader, Item item) throws XMLStreamException {
-//        boolean end = false;
-//        while (reader.hasNext() && !end) {
-//            int type = reader.next();
-//            switch (type) {
-//                case XMLStreamReader.START_ELEMENT: {
-//                    String legendType = reader.getLocalName();
-//                    LegendItemBuilder builder = builders.get(legendType);
-//                    builder.readXMLToData(reader, item);
-//
-//                    break;
-//                }
-//                case XMLStreamReader.CHARACTERS: {
-//                    break;
-//                }
-//                case XMLStreamReader.END_ELEMENT: {
-//                    break;
-//                }
-//            }
-//        }
-//    }
-
-    
 }
