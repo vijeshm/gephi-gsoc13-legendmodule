@@ -11,6 +11,7 @@ package org.gephi.legend.renderers;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Locale;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
@@ -55,7 +56,7 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         //font
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setColor(fontColor);
         graphics2D.setFont(font);
 
@@ -84,8 +85,8 @@ public class TableItemRenderer extends LegendItemRenderer {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          MINIMUM_MARGIN,
-                                          i * cellSizeWidth + fontHeight + centerDistance);
+                            MINIMUM_MARGIN,
+                            i * cellSizeWidth + fontHeight + centerDistance);
 
                 }
 
@@ -103,8 +104,8 @@ public class TableItemRenderer extends LegendItemRenderer {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          height - metrics.stringWidth(label) - MINIMUM_MARGIN,
-                                          i * cellSizeWidth + fontHeight + centerDistance);
+                            height - metrics.stringWidth(label) - MINIMUM_MARGIN,
+                            i * cellSizeWidth + fontHeight + centerDistance);
 
                 }
 
@@ -130,8 +131,8 @@ public class TableItemRenderer extends LegendItemRenderer {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
-                                          (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
+                            MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
+                            (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
                 }
 
                 break;
@@ -181,7 +182,7 @@ public class TableItemRenderer extends LegendItemRenderer {
             String label = horizontalLabels.get(i).toString();
             graphics.setColor(horizontalColors.get(i));
 
-            legendDrawText(graphics, label, font, fontColor, 0,  (i * cellSizeHeight), width - MINIMUM_MARGIN, cellSizeHeight, horizontalTextAlignment);
+            legendDrawText(graphics, label, font, fontColor, 0, (i * cellSizeHeight), width - MINIMUM_MARGIN, cellSizeHeight, horizontalTextAlignment);
 //
 //            switch (horizontalTextAlignment) {
 //                case RIGHT: {
@@ -240,13 +241,16 @@ public class TableItemRenderer extends LegendItemRenderer {
                             break;
                         }
                     }
-                }
-                else {
+                } else {
                     x1 = j * cellSizeWidth;
                     y1 = i * cellSizeHeight;
                     y2 = cellSizeHeight;
                     x2 = cellSizeWidth;
-                    legendDrawText(graphics, tableValues[i][j] + "", font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
+                    if(tableValues[i][j] == Math.round(tableValues[i][j])){ //Format as integer if decimal part is 0
+                        legendDrawText(graphics, String.format(Locale.ENGLISH, "%d", tableValues[i][j].intValue()), font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
+                    }else{
+                        legendDrawText(graphics, String.format(Locale.ENGLISH, "%.2f", tableValues[i][j]), font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
+                    }
                 }
 
                 // GRID DISPLAYING
@@ -330,8 +334,7 @@ public class TableItemRenderer extends LegendItemRenderer {
             verticalTextOrigin.translate(0, 0);
             tableOrigin.translate(0, verticalLabelsHeight);
             horizontalTextOrigin.translate(0, verticalLabelsHeight);
-        }
-        else if (verticalTextPosition == TableItem.VerticalPosition.BOTTOM) {
+        } else if (verticalTextPosition == TableItem.VerticalPosition.BOTTOM) {
             verticalTextOrigin.translate(0, tableHeight);
             tableOrigin.translate(0, 0);
             horizontalTextOrigin.translate(0, 0);
@@ -341,8 +344,7 @@ public class TableItemRenderer extends LegendItemRenderer {
             horizontalTextOrigin.translate(0, 0);
             verticalTextOrigin.translate(horizontalLabelsWidth, 0);
             tableOrigin.translate(horizontalLabelsWidth, 0);
-        }
-        else if (horizontalTextPosition == TableItem.HorizontalPosition.RIGHT) {
+        } else if (horizontalTextPosition == TableItem.HorizontalPosition.RIGHT) {
             horizontalTextOrigin.translate(tableWidth, 0);
             verticalTextOrigin.translate(0, 0);
             tableOrigin.translate(0, 0);
@@ -437,12 +439,8 @@ public class TableItemRenderer extends LegendItemRenderer {
         horizontalTextPosition = (TableItem.HorizontalPosition) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_HORIZONTAL_TEXT_POSITION));
         cellColoringDirection = (Direction) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_COLORING_DIRECTION));
         verticalTextDirection = (TableItem.VerticalTextDirection) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_VERTICAL_TEXT_ROTATION));
-
-
-
-
     }
-
+    
     private Font font;
     private Color fontColor;
     private ArrayList<StringBuilder> labels;
