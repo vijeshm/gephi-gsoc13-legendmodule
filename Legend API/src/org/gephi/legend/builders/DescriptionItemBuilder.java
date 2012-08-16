@@ -272,29 +272,33 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
             int dataIndex = begin + i;
             String key = new String(NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex);
-            System.out.println("@Var: key: " + key);
-            String keyProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
-            System.out.println("@Var: appendPreviewProperty key: " + keyProperty);
-            String valueProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
-            System.out.println("@Var: appendPreviewProperty value: " + valueProperty);
-            DescriptionItemElementValue customValue = new CustomValue();
-            DescriptionItemElement value = new DescriptionItemElement(customValue, (NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex));
-            System.out.println("@Var: value: " + value);
-            newDescriptionProperties[2 * i] = PreviewProperty.createProperty(
-                    item,
-                    keyProperty,
-                    String.class,
-                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
-                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
-                    PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY).setValue(key);
-            newDescriptionProperties[2 * i + 1] = PreviewProperty.createProperty(
-                    item,
-                    valueProperty,
-                    DescriptionItemElement.class,
-                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
-                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
-                    PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY).setValue(value);
+            String valueString = (NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex);
+
+
+            newDescriptionProperties[2 * i] = createDescriptionKeyProperty(item, dataIndex, key);
+            newDescriptionProperties[2 * i + 1] = createDescriptionValueProperty(item, dataIndex, valueString);
         }
+//            System.out.println("@Var: key: " + key);
+//            String keyProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
+//            System.out.println("@Var: appendPreviewProperty key: " + keyProperty);
+//            String valueProperty = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
+//            System.out.println("@Var: appendPreviewProperty value: " + valueProperty);
+//            System.out.println("@Var: value: " + value);
+//            newDescriptionProperties[2 * i] = PreviewProperty.createProperty(
+//                    item,
+//                    keyProperty,
+//                    String.class,
+//                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
+//                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
+//                    PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY).setValue(key);
+//            newDescriptionProperties[2 * i + 1] = PreviewProperty.createProperty(
+//                    item,
+//                    valueProperty,
+//                    DescriptionItemElement.class,
+//                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
+//                    NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
+//                    PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY).setValue(value);
+
 
         // appending
         PreviewProperty[] previewProperties = new PreviewProperty[itemProperties.length + newDescriptionProperties.length];
@@ -309,6 +313,42 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
         item.setData(LegendItem.DYNAMIC_PROPERTIES, previewProperties);
 
+    }
+
+    private static PreviewProperty createDescriptionKeyProperty(Item item, int dataIndex, String value) {
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        String propertyString = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_KEY], itemIndex, dataIndex);
+
+        PreviewProperty property = PreviewProperty.createProperty(
+                item,
+                propertyString,
+                String.class,
+                NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.displayName") + " " + dataIndex,
+                NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.key.description") + " " + dataIndex,
+                PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY).setValue(value);
+
+        System.out.println("@Var: ReadingXML property: " + propertyString + " with value: " + value);
+        return property;
+    }
+
+    private static PreviewProperty createDescriptionValueProperty(Item item, int dataIndex, String valueString) {
+        DescriptionItemElementValue customValue = new CustomValue();
+        DescriptionItemElement value = new DescriptionItemElement(customValue, valueString);
+
+
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        String propertyString = LegendManager.getDynamicProperty(DescriptionProperty.OWN_PROPERTIES[DescriptionProperty.DESCRIPTION_VALUE], itemIndex, dataIndex);
+
+        PreviewProperty property = PreviewProperty.createProperty(
+                item,
+                propertyString,
+                DescriptionItemElement.class,
+                NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.displayName") + " " + dataIndex,
+                NbBundle.getMessage(LegendManager.class, "DescriptionItem.property.value.description") + " " + dataIndex,
+                PreviewProperty.CATEGORY_LEGEND_DYNAMIC_PROPERTY).setValue(value);
+
+        System.out.println("@Var: ReadingXML property: " + propertyString + " with value: " + value);
+        return property;
     }
 
     @Override
@@ -361,41 +401,112 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
 
     @Override
     public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        for (PreviewProperty property : ownProperties) {
+            writeXMLFromSingleProperty(writer, property);
+        }
     }
 
     @Override
     protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+
+        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+
+        // own properties
+        boolean end = false;
+        while (reader.hasNext() && !end) {
+            int type = reader.next();
+
+            switch (type) {
+                case XMLStreamReader.START_ELEMENT: {
+                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
+                    properties.add(property);
+                    break;
+                }
+                case XMLStreamReader.CHARACTERS: {
+                    break;
+                }
+                case XMLStreamReader.END_ELEMENT: {
+                    end = true;
+                    break;
+                }
+            }
+        }
+
+        return properties;
     }
 
     @Override
     protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+
+        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+
+        // read number of dynamic properties
+        reader.next();
+        Integer numberOfDynamicProperties = Integer.parseInt(reader.getElementText());
+        item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, numberOfDynamicProperties);
+        System.out.println("@Var: numberOfItems: " + numberOfDynamicProperties);
+        for (int i = 0; i < numberOfDynamicProperties; i++) {
+            // reading key
+            reader.next();
+            String key = reader.getElementText();
+            PreviewProperty keyProperty = createDescriptionKeyProperty(item, i, key);
+            properties.add(keyProperty);
+
+            // reading value
+            reader.next();
+            String value = reader.getElementText();
+            PreviewProperty valueProperty = createDescriptionValueProperty(item, i, value);
+            properties.add(valueProperty);
+        }
+        
+        System.out.println("@Var: dynamic properties: "+properties.size());
+        
+        // finish reading
+        reader.next();
+        return properties;
     }
 
     @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         String valueString = reader.getElementText();
-        int propertyIndex = TextProperty.getInstance().getProperty(propertyName);
+        System.out.println("@Var: ReadingXML property: " + propertyName + " with value: " + valueString);
+        int propertyIndex = DescriptionProperty.getInstance().getProperty(propertyName);
         Class valueClass = defaultValues[propertyIndex].getClass();
         Object value = PreviewProperties.readValueFromText(valueString, valueClass);
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
         }
+        System.out.println("@Var: ReadingXML property: " + propertyName + " with value: " + value);
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
+    }
+
+    @Override
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+        PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+
+        writer.writeStartElement(XML_PROPERTY);
+        String name = LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES;
+        String text = item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES).toString();
+        writer.writeAttribute(XML_NAME, name);
+        writer.writeCharacters(text);
+        writer.writeEndElement();
+
+        for (PreviewProperty property : dynamicProperties) {
+            writeXMLFromSingleProperty(writer, property);
+        }
     }
 
 }

@@ -22,8 +22,10 @@ import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.legend.builders.DescriptionItemBuilder;
 import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
+import org.gephi.legend.builders.LegendItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.items.LegendItem;
@@ -132,7 +134,8 @@ public class TestPersistence {
 
 
             // creating item
-            Item item = addTableItem(itemIndex, graph, attributeModel);
+            Item item = addDescriptionItem(itemIndex, graph, attributeModel, previewController);
+//            Item item = addTableItem(itemIndex, graph, attributeModel);
 //            Item item = addTextItem(itemIndex, graph, attributeModel);
 //            Item item = addImageItem(itemIndex, graph, attributeModel);
 //            Item item = addGroupsItem(itemIndex, graph, attributeModel);
@@ -153,22 +156,22 @@ public class TestPersistence {
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
             XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
             LegendController.getInstance().writeXML(xmlStreamWriter, workspace);
-            
-            
-            System.out.println("@Var: stringWriter: "+stringWriter+"\n\n\n\n");
-            
-            
+
+
+            System.out.println("@Var: stringWriter: " + stringWriter + "\n\n\n\n");
+
+
             XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
             StringReader stringReader = new StringReader(stringWriter.toString());
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(stringReader);
             LegendController.getInstance().readXMLToLegendManager(reader, workspace);
-            
-            
 
 
 
 
-            
+
+
+
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
         }
@@ -195,6 +198,18 @@ public class TestPersistence {
     public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         GroupsItemBuilder builder = new GroupsItemBuilder();
         Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.group.Default());
+        return item;
+    }
+
+    public Item addDescriptionItem(int newItemIndex, Graph graph, AttributeModel attributeModel, PreviewController previewController) {
+        DescriptionItemBuilder builder = new DescriptionItemBuilder();
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.description.Default());
+        if (LegendItemBuilder.updatePreviewProperty(item, 2)) {
+            PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
+            for (PreviewProperty property : dynamicProperties) {
+                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
+            }
+        }
         return item;
     }
 

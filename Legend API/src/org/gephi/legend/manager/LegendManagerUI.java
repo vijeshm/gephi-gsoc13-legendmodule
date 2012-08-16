@@ -33,8 +33,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author edubecks
  */
 @ServiceProvider(service = PreviewUI.class, position = 404)
-public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
-{
+public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
     /**
      * Creates new form LegendManagerUI
@@ -221,8 +220,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
 
     }
 
-    
-
     private void addLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLegendButtonActionPerformed
         Graph graph = null;
         AttributeModel attributeModel = null;
@@ -254,7 +251,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
         LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
 
 
-        Item item = null;
 
         System.out.printf("Building custom type\n");
 
@@ -262,7 +258,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
         CustomLegendItemBuilder customBuilder = (CustomLegendItemBuilder) builderTypeComboBox.getSelectedItem();
         if (customBuilder.isAvailableToBuild()) {
 
-            item = builder.createCustomItem(newItemIndex, graph, attributeModel, customBuilder);
+            Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, customBuilder);
 
             // adding item to legend manager
             LegendController.getInstance().addItemToLegendManager(workspace, item);
@@ -344,7 +340,9 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
             PreviewProperty[] properties = activeLegendItem.getData(LegendItem.DYNAMIC_PROPERTIES);
 
             System.out.println("@Var: properties.length: " + properties.length);
-            numberOfItemsTextField.setText("" + properties.length);
+            if (hasDynamicProperties) {
+                numberOfItemsTextField.setText(activeLegendItem.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES).toString());
+            }
         }
         else {
             refreshPropertySheet(null);
@@ -444,11 +442,5 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI
             legendItemBuildersComboBox.addItem(legendItemBuilder);
         }
     }
-    
-    
 
-    
-
-    
-    
 }

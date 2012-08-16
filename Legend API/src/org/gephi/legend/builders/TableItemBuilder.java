@@ -75,7 +75,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         // labels
         ArrayList<StringBuilder> verticalLabels = new ArrayList<StringBuilder>();
         ArrayList<StringBuilder> horizontalLabels = new ArrayList<StringBuilder>();
-        ArrayList<TableItem.Labels> labels = new ArrayList<TableItem.Labels>();
+        ArrayList<TableItem.LabelSelection> labelsSelectionArrayList = new ArrayList<TableItem.LabelSelection>();
         // values
         ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
         // colors
@@ -86,23 +86,30 @@ public class TableItemBuilder extends LegendItemBuilder {
         // retrieving data
         CustomTableItemBuilder customTableBuilder = (CustomTableItemBuilder) builder;
         customTableBuilder.retrieveData(
-                labels,
+                labelsSelectionArrayList,
                 horizontalLabels,
                 verticalLabels,
                 values,
                 horizontalColors,
                 verticalColors,
                 valueColors);
-        System.out.println("@Var: ------------------>    labels: " + labels);
-        
+        System.out.println("@Var: ------------------>    labels: " + labelsSelectionArrayList);
+
         Integer numberOfRows = values.size();
         Integer numberOfColumns = values.get(0).size();
+
+
+
+        TableItem.LabelSelection labelsSelection = labelsSelectionArrayList.get(0);
+        ArrayList<StringBuilder> labels = (labelsSelection == TableItem.LabelSelection.HORIZONTAL) ? horizontalLabels : verticalLabels;
+
 
         // setting data
         item.setData(TableItem.NUMBER_OF_ROWS, numberOfRows);
         item.setData(TableItem.NUMBER_OF_COLUMNS, numberOfColumns);
         item.setData(TableItem.HORIZONTAL_LABELS, horizontalLabels);
         item.setData(TableItem.VERTICAL_LABELS, verticalLabels);
+        item.setData(TableItem.LABELS_SELECTION, labelsSelection);
         item.setData(TableItem.LABELS_IDS, labels);
         item.setData(TableItem.TABLE_VALUES, values);
         item.setData(TableItem.COLOR_VALUES, valueColors);
@@ -299,11 +306,11 @@ public class TableItemBuilder extends LegendItemBuilder {
 
 //
 //        // creating one property for each label
-//        ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
-//        TableItem.Labels labelsIDs = labels.get(0);
+//        ArrayList<TableItem.LabelSelection> labels = item.getData(TableItem.LABELS_IDS);
+//        TableItem.LabelSelection labelsIDs = labels.get(0);
 //        ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
 //        ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
-//        ArrayList<StringBuilder> labelsGroup = (labelsIDs == TableItem.Labels.HORIZONTAL) ? horizontalLabels : verticalLabels;
+//        ArrayList<StringBuilder> labelsGroup = (labelsIDs == TableItem.LabelSelection.HORIZONTAL) ? horizontalLabels : verticalLabels;
 //        item.setData(TableItem.NUMBER_OF_LABELS, labelsGroup);
 //        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
 //        for (int i = 0; i < labelProperties.length; i++) {
@@ -314,15 +321,15 @@ public class TableItemBuilder extends LegendItemBuilder {
 //                                                                NbBundle.getMessage(LegendManager.class, "TableItem.property.labels.description") + " " + i,
 //                                                                PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(labelsGroup.get(i).toString());
 //        }
-        
+
         // creating one property for each label
-        
-        
-        ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
-        TableItem.Labels labelsIDs = labels.get(0);
-        ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
-        ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
-        ArrayList<StringBuilder> labelsGroup = (labelsIDs == TableItem.Labels.HORIZONTAL) ? horizontalLabels : verticalLabels;
+
+//
+//        ArrayList<TableItem.LabelSelection> labels = item.getData(TableItem.LABELS_IDS);
+//        TableItem.LabelSelection labelsIDs = labels.get(0);
+//        ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
+//        ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
+        ArrayList<StringBuilder> labelsGroup = item.getData(TableItem.LABELS_IDS);
         item.setData(TableItem.NUMBER_OF_LABELS, labelsGroup.size());
         PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
         for (int i = 0; i < labelProperties.length; i++) {
@@ -442,12 +449,12 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        
-        
+
+
 
         String name = null;
         String text = null;
-        
+
         // number of rows
         name = TableItem.NUMBER_OF_ROWS;
         text = item.getData(TableItem.NUMBER_OF_ROWS).toString();
@@ -455,7 +462,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
         writer.writeEndElement();
-        
+
         // number of columns
         name = TableItem.NUMBER_OF_COLUMNS;
         text = item.getData(TableItem.NUMBER_OF_COLUMNS).toString();
@@ -465,13 +472,14 @@ public class TableItemBuilder extends LegendItemBuilder {
         writer.writeEndElement();
 
         // labels
-        ArrayList<TableItem.Labels> labels = item.getData(TableItem.LABELS_IDS);
-        ArrayList<String> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
-        ArrayList<String> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
-        TableItem.Labels labelIds = labels.get(0);
-        Integer numItems = (labelIds == TableItem.Labels.HORIZONTAL) ? horizontalLabels.size() : verticalLabels.size();
-        name = TableItem.LABELS_IDS;
-        text = labelIds.toString();
+        TableItem.LabelSelection labelSelection = item.getData(TableItem.LABELS_SELECTION);
+        ArrayList<StringBuilder> horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
+        ArrayList<StringBuilder> verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
+        ArrayList<StringBuilder> labels = item.getData(TableItem.LABELS_IDS);
+        
+        Integer numItems = labels.size();
+        name = TableItem.LABELS_SELECTION;
+        text = labelSelection.toString();
         writer.writeStartElement(LegendItem.DATA);
         writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
@@ -569,26 +577,104 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-        boolean end = false;
-        while (reader.hasNext() && !end) {
-            int type = reader.next();
-            switch (type) {
-                case XMLStreamReader.START_ELEMENT: {
-                    String name = reader.getLocalName();
-                    if (name.equals(TableItem.HORIZONTAL_LABELS)) {
-                    }
-                    break;
-                }
-                case XMLStreamReader.CHARACTERS: {
 
-                    break;
-                }
-                case XMLStreamReader.END_ELEMENT: {
-                    break;
-                }
-            }
+        // number of rows
+        reader.next();
+        Integer numberOfRows = Integer.parseInt(reader.getElementText());
 
+        //number of columns
+        reader.next();
+        Integer numberOfColumns = Integer.parseInt(reader.getElementText());
+
+        //Labels id
+        reader.next();
+        TableItem.LabelSelection labelSelection = TableItem.LabelSelection.valueOf(reader.getElementText());
+        System.out.println("@Var: labels: " + labelSelection);
+
+        // reading labels
+        reader.next();
+        String horizontalLabelsString = reader.getElementText();
+        String[] labelsArray = horizontalLabelsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<StringBuilder> horizontalLabels = new ArrayList<StringBuilder>();
+        for (int i = 0; i < numberOfRows; i++) {
+            horizontalLabels.add(new StringBuilder(labelsArray[i]));
         }
+        System.out.println("@Var: labels: " + horizontalLabels);
+
+        // reading labels
+        reader.next();
+        String verticalLabelsString = reader.getElementText();
+        String[] verticalLabelsArray = verticalLabelsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<StringBuilder> verticalLabels = new ArrayList<StringBuilder>();
+        for (int i = 0; i < numberOfColumns; i++) {
+            verticalLabels.add(new StringBuilder(verticalLabelsArray[i]));
+        }
+        System.out.println("@Var: labels: " + verticalLabels);
+
+        // reading values
+        reader.next();
+        String valuesString = reader.getElementText();
+        String[] valuesArray = valuesString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
+        for (int i = 0; i < numberOfRows; i++) {
+            ArrayList<Float> row = new ArrayList<Float>();
+            for (int j = 0; j < numberOfColumns; j++) {
+                row.add(Float.parseFloat(valuesArray[i * numberOfColumns + j]));
+            }
+            values.add(row);
+        }
+
+        // reading colors
+        reader.next();
+        String colorsString = reader.getElementText();
+        String[] colorsArray = colorsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<ArrayList<Color>> colors = new ArrayList<ArrayList<Color>>();
+        for (int i = 0; i < numberOfRows; i++) {
+            ArrayList<Color> row = new ArrayList<Color>();
+            for (int j = 0; j < numberOfColumns; j++) {
+                row.add(new Color(Integer.parseInt(colorsArray[i * numberOfColumns + j])));
+            }
+            colors.add(row);
+        }
+
+
+        // reading horizontal colors
+        reader.next();
+        String horizontalColorsString = reader.getElementText();
+        String[] horizontalColorsArray = horizontalColorsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<Color> horizontalColors = new ArrayList<Color>();
+        for (int i = 0; i < numberOfRows; i++) {
+            horizontalColors.add(new Color(Integer.parseInt(horizontalColorsArray[i])));
+        }
+
+        // reading vertical colors
+        reader.next();
+        String verticalColorsString = reader.getElementText();
+        String[] verticalColorsArray = verticalColorsString.replace("[", "").replace("]", "").split(", ");
+        ArrayList<Color> verticalColors = new ArrayList<Color>();
+        for (int i = 0; i < numberOfColumns; i++) {
+            verticalColors.add(new Color(Integer.parseInt(verticalColorsArray[i])));
+        }
+        System.out.println("@Var: colors: " + verticalColors);
+
+        if (labelSelection == TableItem.LabelSelection.VERTICAL) {
+            verticalLabels = item.getData(TableItem.LABELS_IDS);
+        }
+        else {
+            horizontalLabels = item.getData(TableItem.LABELS_IDS);
+        }
+
+        // setting data
+        item.setData(TableItem.NUMBER_OF_ROWS, numberOfRows);
+        item.setData(TableItem.NUMBER_OF_COLUMNS, numberOfColumns);
+        item.setData(TableItem.HORIZONTAL_LABELS, horizontalLabels);
+        item.setData(TableItem.VERTICAL_LABELS, verticalLabels);
+        item.setData(TableItem.LABELS_SELECTION, labelSelection);
+        item.setData(TableItem.TABLE_VALUES, values);
+        item.setData(TableItem.COLOR_VALUES, colors);
+        item.setData(TableItem.COLOR_HORIZONTAL, horizontalColors);
+        item.setData(TableItem.COLOR_VERTICAL, verticalColors);
+
     }
 
     //default values
@@ -633,11 +719,11 @@ public class TableItemBuilder extends LegendItemBuilder {
 
     @Override
     public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
-        
+
         // write number of items
-        Integer numberOfGroups = item.getData(TableItem.NUMBER_OF_LABELS);
+        Integer numberOfLabels = item.getData(TableItem.NUMBER_OF_LABELS);
         String name = TableItem.NUMBER_OF_LABELS;
-        String text = numberOfGroups.toString();
+        String text = numberOfLabels.toString();
         writer.writeStartElement(LegendItem.DATA);
         writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
@@ -647,12 +733,54 @@ public class TableItemBuilder extends LegendItemBuilder {
         for (PreviewProperty property : ownProperties) {
             writeXMLFromSingleProperty(writer, property);
         }
-       
+
     }
 
     @Override
     protected ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+
+
+        // read number of items
+        reader.next();
+        Integer numberOfItems = Integer.parseInt(reader.getElementText());
+        item.setData(TableItem.NUMBER_OF_LABELS, numberOfItems);
+        System.out.println("@Var: numberOfItems: " + numberOfItems);
+
+        // reading labels
+        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
+        for (int i = 0; i < numberOfItems; i++) {
+            reader.next();
+            StringBuilder valueStringBuilder = new StringBuilder(reader.getElementText());
+            labels.add(valueStringBuilder);
+            PreviewProperty property = createLegendLabelProperty(item, i, valueStringBuilder.toString());
+            properties.add(property);
+        }
+        item.setData(TableItem.LABELS_IDS, labels);
+
+        // own properties
+        boolean end = false;
+        while (reader.hasNext() && !end) {
+            int type = reader.next();
+
+            switch (type) {
+                case XMLStreamReader.START_ELEMENT: {
+                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
+                    properties.add(property);
+                    break;
+                }
+                case XMLStreamReader.CHARACTERS: {
+                    break;
+                }
+                case XMLStreamReader.END_ELEMENT: {
+                    end = true;
+                    break;
+                }
+            }
+        }
+
+        return properties;
     }
 
     @Override
@@ -665,14 +793,20 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         String valueString = reader.getElementText();
+        System.out.println("@Var: ReadingXML property: " + propertyName + " with value: " + valueString);
         int propertyIndex = TableProperty.getInstance().getProperty(propertyName);
         Class valueClass = defaultValues[propertyIndex].getClass();
         Object value = PreviewProperties.readValueFromText(valueString, valueClass);
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
         }
+        System.out.println("@Var: ReadingXML property: " + propertyName + " with value: " + value);
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
+    }
+
+    @Override
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
     }
 
 }

@@ -206,4 +206,8 @@ public class ImageItemBuilder extends LegendItemBuilder {
         return property;
     }
 
+    
+    @Override
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    }
 }

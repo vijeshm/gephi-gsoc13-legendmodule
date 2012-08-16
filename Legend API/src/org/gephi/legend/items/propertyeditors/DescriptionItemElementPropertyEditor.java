@@ -31,10 +31,7 @@ public class DescriptionItemElementPropertyEditor extends PropertyEditorSupport 
     @Override
     public String getAsText() {
         DescriptionItemElement descriptionItemElement = (DescriptionItemElement) getValue();
-        if (descriptionItemElement != null) {
-            return descriptionItemElement.getValue();
-        }
-        return "";
+        return descriptionItemElement.getValue();
     }
 
     @Override

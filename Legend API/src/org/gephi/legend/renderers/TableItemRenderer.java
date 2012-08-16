@@ -131,7 +131,7 @@ public class TableItemRenderer extends LegendItemRenderer {
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
                                           MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
-                                          (int) (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
+                                          (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
                 }
 
                 break;
@@ -181,7 +181,7 @@ public class TableItemRenderer extends LegendItemRenderer {
             String label = horizontalLabels.get(i).toString();
             graphics.setColor(horizontalColors.get(i));
 
-            legendDrawText(graphics, label, font, fontColor, 0, (int) (i * cellSizeHeight), width - MINIMUM_MARGIN, cellSizeHeight, horizontalTextAlignment);
+            legendDrawText(graphics, label, font, fontColor, 0,  (i * cellSizeHeight), width - MINIMUM_MARGIN, cellSizeHeight, horizontalTextAlignment);
 //
 //            switch (horizontalTextAlignment) {
 //                case RIGHT: {
@@ -413,11 +413,9 @@ public class TableItemRenderer extends LegendItemRenderer {
 
 
         // READING LABELS
-        ArrayList<TableItem.Labels> labelsGroup = item.getData(TableItem.LABELS_IDS);
-        TableItem.Labels labelsIDs = labelsGroup.get(0);
+        labels = item.getData(TableItem.LABELS_IDS);
         horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
         verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
-        labels = (labelsIDs ==TableItem.Labels.HORIZONTAL)? horizontalLabels : verticalLabels;
         for (int i = 0; i < labels.size(); i++) {
             StringBuilder label = labels.get(i);
             String newLabel = properties.getStringValue(TableProperty.getLabelProperty(itemIndex, i));

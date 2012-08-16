@@ -408,7 +408,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         
         item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
         item.setData(GroupsItem.COLORS, colors);
-        item.setData(GroupsItem.LABELS_IDS, labels);
+//        item.setData(GroupsItem.LABELS_IDS, labels);
         item.setData(GroupsItem.VALUES, values);
         
 
@@ -448,12 +448,15 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         System.out.println("@Var: numberOfItems: " + numberOfItems);
 
         // reading labels
+        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
         for (int i = 0; i < numberOfItems; i++) {
             reader.next();
-            String valueString = reader.getElementText();
-            PreviewProperty property = createLegendLabelProperty(item, i, valueString);
+            StringBuilder valueStringBuilder = new StringBuilder(reader.getElementText());
+            labels.add(valueStringBuilder);
+            PreviewProperty property = createLegendLabelProperty(item, i, valueStringBuilder.toString());
             properties.add(property);
         }
+        item.setData(GroupsItem.LABELS_IDS, labels);
 
         // own properties
         boolean end = false;
@@ -502,5 +505,11 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
+
+    @Override
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    }
+    
+    
 
 }

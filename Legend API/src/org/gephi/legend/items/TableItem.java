@@ -21,6 +21,7 @@ public class TableItem extends AbstractItem implements LegendItem {
     public static final String HORIZONTAL_LABELS = "horizontal labels";
     public static final String VERTICAL_LABELS = "vertical labels";
     public static final String LABELS_IDS = "labels ids";
+    public static final String LABELS_SELECTION = "labels selection";
     public static final String NUMBER_OF_LABELS = "number of labels";
     public static final String NUMBER_OF_ROWS = "number of rows";
     public static final String NUMBER_OF_COLUMNS = "number of columns";
@@ -29,19 +30,14 @@ public class TableItem extends AbstractItem implements LegendItem {
     public static final String COLOR_VERTICAL = "color vertical";
     public static final String COLOR_HORIZONTAL = "color horizontal";
 
-    public enum Labels {
+    public enum LabelSelection {
 
-        HORIZONTAL(0),
-        VERTICAL(1);
-        private final Integer value;
+        HORIZONTAL("horizontal"),
+        VERTICAL("vertical");
+        private final String value;
 
-        private Labels(Integer value) {
+        private LabelSelection(String value) {
             this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value.toString();
         }
 
     }

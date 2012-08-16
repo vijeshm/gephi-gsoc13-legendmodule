@@ -41,7 +41,7 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
     }
 
     @Override
-    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
 
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
@@ -60,7 +60,7 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
             horizontalLabels.add(label);
             horizontalColors.add(Color.BLUE);
         }
-        labels.add(TableItem.Labels.HORIZONTAL);
+        labels.add(TableItem.LabelSelection.HORIZONTAL);
         
         // FILLING VERTICAL LABELS
         StringBuilder value = new StringBuilder("value");

@@ -4,6 +4,9 @@
  */
 package org.gephi.legend.properties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author edubecks
@@ -36,8 +39,6 @@ public class DescriptionProperty {
         ".value",
         ".temp"
     };
-    
-    
     public static final int[] LIST_OF_PROPERTIES = {
         DESCRIPTION_KEY_FONT,
         DESCRIPTION_KEY_FONT_COLOR,
@@ -47,4 +48,22 @@ public class DescriptionProperty {
         DESCRIPTION_VALUE_FONT_ALIGNMENT,
         DESCRIPTION_IS_FLOW_LAYOUT
     };
+    private static DescriptionProperty instance = new DescriptionProperty();
+    private Map<String, Integer> propertyIndex;
+
+    public int getProperty(String propertyName) {
+        return propertyIndex.get(propertyName);
+    }
+
+    private DescriptionProperty() {
+        propertyIndex = new HashMap<String, Integer> ();
+        for (int i = 0; i < OWN_PROPERTIES.length; i++) {
+            propertyIndex.put(OWN_PROPERTIES[i], i);
+        }
+    }
+
+    public static DescriptionProperty getInstance() {
+        return instance;
+    }
+
 }

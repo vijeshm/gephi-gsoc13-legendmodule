@@ -45,7 +45,7 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
 
     @Override
-    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
@@ -70,7 +70,7 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
                 horizontalLabels.add(label);
                 verticalLabels.add(label);
             }
-            labels.add(TableItem.Labels.HORIZONTAL);
+            labels.add(TableItem.LabelSelection.HORIZONTAL);
             
 
 

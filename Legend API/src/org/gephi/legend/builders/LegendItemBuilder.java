@@ -15,6 +15,7 @@ import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.items.DescriptionItem;
+import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.items.TableItem;
@@ -99,12 +100,12 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
         System.out.println("@Var: creating createCustomItem: ");
         Item item = buildCustomItem(builder, graph, attributeModel);
-        createDefaultPropertiers(newItemIndex, item);
+        createDefaultProperties(newItemIndex, item);
         return item;
 
     }
 
-    private void createDefaultPropertiers(Integer newItemIndex, Item item) {
+    private void createDefaultProperties(Integer newItemIndex, Item item) {
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, createLegendProperties(item));
         item.setData(LegendItem.OWN_PROPERTIES, createLegendOwnProperties(item));
@@ -156,7 +157,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
                         String.class,
                         NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.displayName"),
                         NbBundle.getMessage(LegendManager.class, "LegendItem.property.label.description"),
-                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value + " " + itemIndex);
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
             case LegendProperty.IS_DISPLAYING: {
@@ -368,7 +369,11 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         int[] properties = LegendProperty.LIST_OF_PROPERTIES;
 
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValuesArrayList.size()];
-        for (int i = 0; i < previewProperties.length; i++) {
+        
+        // creating label
+        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        previewProperties[0]= createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex);
+        for (int i = 1; i < previewProperties.length; i++) {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
         }
 
@@ -555,6 +560,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     protected abstract void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException;
 
+    protected abstract void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException;
+
     protected void writeXMLFromSingleProperty(XMLStreamWriter writer, PreviewProperty property) throws XMLStreamException {
         Object propertyValue = property.getValue();
         if (propertyValue != null) {
@@ -593,10 +600,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
         // dynamic properties
         writer.writeStartElement(XML_DYNAMIC_PROPERTY);
-        PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
-        for (PreviewProperty property : dynamicProperties) {
-            writeXMLFromSingleProperty(writer, property);
-        }
+        writeXMLFromDynamicProperties(writer, item);
         writer.writeEndElement();
 
 
@@ -649,6 +653,16 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         else if (valueClass.equals(File.class)) {
             value = new File(valueStr);
         }
+        else if (valueClass.equals(TableItem.VerticalPosition.class)) {
+            value = availableTableVerticalPositions[Integer.parseInt(valueStr)];
+        }
+        else if (valueClass.equals(TableItem.HorizontalPosition.class)) {
+            value = availableTableHorizontalPositions[Integer.parseInt(valueStr)];
+        }
+        else if (valueClass.equals(TableItem.VerticalTextDirection.class)) {
+            value = availableTableVerticalTextDirections[Integer.parseInt(valueStr)];
+        }
+        
         return value;
     }
 
@@ -752,12 +766,13 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         PreviewProperty[] legendPropertiesArray = legendProperties.toArray(new PreviewProperty[legendProperties.size()]);
         PreviewProperty[] ownPropertiesArray = ownProperties.toArray(new PreviewProperty[ownProperties.size()]);
         PreviewProperty[] dynamicPropertiesArray = dynamicProperties.toArray(new PreviewProperty[dynamicProperties.size()]);
+        
+        
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, legendPropertiesArray);
         item.setData(LegendItem.OWN_PROPERTIES, ownPropertiesArray);
-        item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);
-        boolean hasDynamicProperties = (dynamicProperties.size() > 0);
-        item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties);
+        
+        item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, dynamicPropertiesArray);
         item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
         item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
@@ -792,6 +807,10 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         }
         else if (propertyValue instanceof TableItem.VerticalTextDirection) {
             TableItem.VerticalTextDirection propertyValueString = (TableItem.VerticalTextDirection) propertyValue;
+            text = propertyValueString.getValue();
+        }
+        else if (propertyValue instanceof DescriptionItemElement) {
+            DescriptionItemElement propertyValueString = (DescriptionItemElement) propertyValue;
             text = propertyValueString.getValue();
         }
         else {
@@ -885,5 +904,23 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         LegendItem.Direction.DOWN,
         LegendItem.Direction.LEFT,
         LegendItem.Direction.RIGHT
+    };
+    
+    // table
+    private final Object[] availableTableVerticalPositions = {
+        TableItem.VerticalPosition.UP,
+        TableItem.VerticalPosition.BOTTOM
+    };
+    
+    private final Object[] availableTableHorizontalPositions = {
+        TableItem.HorizontalPosition.RIGHT,
+        TableItem.HorizontalPosition.LEFT
+    };
+    
+    private final Object[] availableTableVerticalTextDirections = {
+        TableItem.VerticalTextDirection.UP,
+        TableItem.VerticalTextDirection.HORIZONTAL,
+        TableItem.VerticalTextDirection.DIAGONAL,
+        TableItem.VerticalTextDirection.DOWN
     };
 }

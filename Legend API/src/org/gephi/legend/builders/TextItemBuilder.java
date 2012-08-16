@@ -268,5 +268,11 @@ public class TextItemBuilder extends LegendItemBuilder {
         return property;
     }
 
+    @Override
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    }
+
+    
+    
 
 }

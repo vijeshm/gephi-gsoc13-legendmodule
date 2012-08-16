@@ -30,19 +30,22 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
 
 
     @Override
-    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         // LABELS ID
-        labels.add(TableItem.Labels.VERTICAL);
+        labels.add(TableItem.LabelSelection.VERTICAL);
         
         
         // VERTICAL LABELS
         StringBuilder label1 = new StringBuilder("Label 1");
         StringBuilder label2 = new StringBuilder("Label 2");
+        StringBuilder label3 = new StringBuilder("Label 3");
         verticalLabels.add(label1);
         verticalLabels.add(label2);
+        verticalLabels.add(label3);
         
         // VERTICAL COLORS
         Color color1 = Color.BLACK;
+        verticalColors.add(color1);
         verticalColors.add(color1);
         verticalColors.add(color1);
         
@@ -61,12 +64,14 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
         ArrayList<Float> row = new ArrayList<Float>();
         row.add(1f);
         row.add(0.5f);
+        row.add(0.85f);
         values.add(row);
         values.add(row);
         
         // VALUES COLOR
         Color color3 = Color.GREEN;
         ArrayList<Color> colorsRow = new ArrayList<Color>();
+        colorsRow.add(color3);
         colorsRow.add(color3);
         colorsRow.add(color3);
         valueColors.add(colorsRow);

@@ -25,6 +25,6 @@ public interface CustomTableItemBuilder {
      * @param verticalColors colors used to represent the vertical colors
      * @param valueColors table colors representing the matrix
      */
-    public void retrieveData(ArrayList<TableItem.Labels> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
 
 }
