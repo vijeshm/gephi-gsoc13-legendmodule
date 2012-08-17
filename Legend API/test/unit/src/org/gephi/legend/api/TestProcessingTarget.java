@@ -21,7 +21,6 @@ import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
-import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.manager.LegendController;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.preview.api.*;
@@ -114,7 +113,7 @@ public class TestProcessingTarget {
 
 
 
-            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
+            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager(workspace));
 
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
             Integer itemIndex = legendManager.getCurrentIndex();

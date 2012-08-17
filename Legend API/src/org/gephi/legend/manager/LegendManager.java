@@ -13,7 +13,6 @@ import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
-import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 
@@ -21,7 +20,7 @@ import org.openide.util.Lookup;
  *
  * @author eduBecKs
  */
-public class LegendManager{
+public class LegendManager {
 
     private Integer activeLegendIndex;
     private Integer currentIndex;
@@ -34,18 +33,23 @@ public class LegendManager{
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
-    
+    private final Workspace workspace;
 
-    public LegendManager() {
+    public LegendManager(Workspace workspace) {
+        this.workspace = workspace;
         this.currentIndex = 0;
         this.firstActiveLegend = 0;
         this.items = new ArrayList<String>();
         this.legendItems = new ArrayList<Item>();
         this.isActive = new ArrayList<Boolean>();
         this.activeLegendIndex = -1;
-        
+
     }
 
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+    
     public Integer getCurrentIndex() {
         return currentIndex;
     }
@@ -62,15 +66,9 @@ public class LegendManager{
     }
 
     public void refreshDynamicPreviewProperties() {
-
-        ProjectController projectController =
-                Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = projectController.getCurrentWorkspace();
-
-
         PreviewController previewController =
                 Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel(workspace);
+        PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
 
         // clear old properties
@@ -105,8 +103,7 @@ public class LegendManager{
         isActive.set(index, Boolean.FALSE);
         if (hasActiveLegends()) {
             activeLegendIndex = firstActiveLegend;
-        }
-        else {
+        } else {
             activeLegendIndex = -1;
         }
     }
@@ -185,8 +182,8 @@ public class LegendManager{
         ArrayList<String> properties = new ArrayList<String>();
         for (String property : PROPERTIES) {
             String newProperty = (LEGEND_DESCRIPTION
-                                  + ITEM_DESCRIPTION + itemIndex
-                                  + property);
+                    + ITEM_DESCRIPTION + itemIndex
+                    + property);
             properties.add(newProperty);
         }
         return properties;
@@ -200,8 +197,8 @@ public class LegendManager{
         ArrayList<String> properties = new ArrayList<String>();
         for (String property : legendProperties) {
             String newProperty = (LEGEND_DESCRIPTION
-                                  + ITEM_DESCRIPTION + itemIndex
-                                  + property);
+                    + ITEM_DESCRIPTION + itemIndex
+                    + property);
             properties.add(newProperty);
         }
         return properties;
@@ -209,9 +206,8 @@ public class LegendManager{
 
     public static String getProperty(String[] PROPERTIES, int itemIndex, int legendProperty) {
         String property = (LEGEND_DESCRIPTION
-                           + ITEM_DESCRIPTION + itemIndex
-                           + PROPERTIES[legendProperty]);
+                + ITEM_DESCRIPTION + itemIndex
+                + PROPERTIES[legendProperty]);
         return property;
     }
-
 }

@@ -19,12 +19,11 @@ import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
 import org.gephi.legend.items.TableItem;
+import org.gephi.legend.manager.LegendController;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -38,16 +37,10 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * Function used to override default values of
      * <code>properties</code> Possible values to be overriden:<br />
      *
-     * LABEL: <ul> <li> defaultLabel </li> </ul> IS_DISPLAYING: <ul> <li>
-     * defaultIsDisplaying </li> </ul> ORIGIN <ul> <li> defaultOriginX </li>
-     * <li> defaultOriginY </li> </ul> WIDTH <ul> <li> defaultWidth </li> <li>
-     * defaultHeight </li> </ul> TITLE: <ul> <li> defaultTitleIsDisplaying </li>
-     * <li> defaultTitle </li> <li> defaultTitleFont </li> <li>
-     * defaultTitleAlignment </li> <li> defaultTitleFontColor </li> </ul>
-     * DESCRIPTION: <ul> <li> defaultDescription </li> <li>
-     * defaultDescriptionIsDisplaying </li> <li> defaultDescriptionFontColor
-     * </li> <li> defaultDescriptionAlignment </li> <li> defaultDescriptionFont
-     * </li> </ul>
+     * LABEL: <ul> <li> defaultLabel </li> </ul> IS_DISPLAYING: <ul> <li> defaultIsDisplaying </li> </ul> ORIGIN <ul> <li> defaultOriginX </li> <li> defaultOriginY </li> </ul> WIDTH <ul> <li>
+     * defaultWidth </li> <li> defaultHeight </li> </ul> TITLE: <ul> <li> defaultTitleIsDisplaying </li> <li> defaultTitle </li> <li> defaultTitleFont </li> <li> defaultTitleAlignment </li> <li>
+     * defaultTitleFontColor </li> </ul> DESCRIPTION: <ul> <li> defaultDescription </li> <li> defaultDescriptionIsDisplaying </li> <li> defaultDescriptionFontColor </li> <li>
+     * defaultDescriptionAlignment </li> <li> defaultDescriptionFont </li> </ul>
      */
     protected abstract boolean setDefaultValues();
 
@@ -57,8 +50,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * <code>Item</code>.
      *
      * @param item the item to be tested
-     * @return <code>true</code> if <code>item</code> was built by this *
-     * builder, <code>false</code> otherwise
+     * @return <code>true</code> if <code>item</code> was built by this * builder, <code>false</code> otherwise
      */
     protected abstract boolean isBuilderForItem(Item item);
 
@@ -75,28 +67,23 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     /**
      * Used to determine if the
-     * <code>item</code> has dynamic properties to be displayed in the
-     * PropertySheet Editor
+     * <code>item</code> has dynamic properties to be displayed in the PropertySheet Editor
      *
-     * @return <code>true</code> if <code>item</code> has dynamic * *
-     * properties, <code>false</code> otherwise
+     * @return <code>true</code> if <code>item</code> has dynamic * * properties, <code>false</code> otherwise
      */
     protected abstract Boolean hasDynamicProperties();
 
     /**
-     * Function used to create the specific PreviewProperty for each type of
-     * LegendItem
+     * Function used to create the specific PreviewProperty for each type of LegendItem
      *
      * @param item
-     * @return an array of PreviewProperty to be appended to the general
-     * LegendItem's PreviewProperty
+     * @return an array of PreviewProperty to be appended to the general LegendItem's PreviewProperty
      */
     protected abstract PreviewProperty[] createLegendOwnProperties(Item item);
 
     /**
      *
-     * @return a list of all the available builders for an specific type of
-     * builder
+     * @return a list of all the available builders for an specific type of builder
      */
     public abstract ArrayList<CustomLegendItemBuilder> getAvailableBuilders();
 
@@ -136,26 +123,16 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     @Override
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
+        LegendManager legendManager = LegendController.getInstance().getLegendManager();
 
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        Workspace workspace = projectController.getCurrentWorkspace();
-        PreviewModel previewModel = previewController.getModel(workspace);
-        PreviewProperties previewProperties = previewModel.getProperties();
-        if (previewProperties.hasProperty(LegendManager.LEGEND_PROPERTIES)) {
-
-            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
-            ArrayList<Item> legendItems = legendManager.getLegendItems();
-            ArrayList<Item> items = new ArrayList<Item>();
-            for (Item item : legendItems) {
-                if (isBuilderForItem(item)) {
-                    items.add(item);
-                }
-
+        ArrayList<Item> legendItems = legendManager.getLegendItems();
+        ArrayList<Item> items = new ArrayList<Item>();
+        for (Item item : legendItems) {
+            if (isBuilderForItem(item)) {
+                items.add(item);
             }
-            return items.toArray(new Item[items.size()]);
         }
-        return new Item[0];
+        return items.toArray(new Item[items.size()]);
     }
 
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
@@ -414,8 +391,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         // number of items didn't change
         if (numOfProperties == currentNumOfProperties) {
             return false;
-        }
-        // adding properties
+        } // adding properties
         else if (numOfProperties > currentNumOfProperties) {
             int newProperties = numOfProperties - currentNumOfProperties;
 
@@ -423,8 +399,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
             if (item instanceof DescriptionItem) {
                 DescriptionItemBuilder.addPreviewProperty(item, currentNumOfProperties, newProperties);
             }
-        }
-        // removing properties
+        } // removing properties
         else {
             int removeProperties = currentNumOfProperties - numOfProperties;
             //bug
@@ -442,51 +417,47 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     /**
-     * Provides an user friendly name for the builder. This name will appear in
-     * the legend manager UI.
+     * Provides an user friendly name for the builder. This name will appear in the legend manager UI.
      *
      * @return User friendly builder name, not null
      */
     public abstract String getTitle();
 
     /**
-     * Function that takes the data corresponding to each type of item and uses
-     * the writer to save the data in it. It saves the data inside an
+     * Function that takes the data corresponding to each type of item and uses the writer to save the data in it. It saves the data inside an
      * <code>itemdata</code> node.
      *
      * @param writer the XMLStreamWriter to write to
      * @param item the item to be saved
+     * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    protected abstract void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException;
+    protected abstract void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException;
 
     /**
-     * Function that takes the specific properties of each item and uses the
-     * writer to save the properties in it. It saves the properties inside an
+     * Function that takes the specific properties of each item and uses the writer to save the properties in it. It saves the properties inside an
      * <code>itemproperty</code> tag
      *
      * @param writer the XMLStreamWriter to write to
      * @param item the item to be saved
+     * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    protected abstract void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException;
+    protected abstract void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException;
 
     /**
-     * Function that takes the dynamic properties (if any) of each item and uses
-     * the writer to save the properties in it. It saves the properties inside
-     * an
+     * Function that takes the dynamic properties (if any) of each item and uses the writer to save the properties in it. It saves the properties inside an
      * <code>dynamicproperty</code> tag
      *
      * @param writer the XMLStreamWriter to write to
      * @param item the item to be saved
+     * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    protected abstract void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException;
+    protected abstract void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException;
 
     /**
-     * Function that automatically saves a property using its PropertyName and
-     * the Value attached to it. Only works if property has a known value type.
-     * Known types:
+     * Function that automatically saves a property using its PropertyName and the Value attached to it. Only works if property has a known value type. Known types:
      * <code>Integer</code>,
      * <code> Float</code>,
      * <code> String</code>,
@@ -497,10 +468,13 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      *
      * @param writer the XMLStreamWriter to write to
      * @param property property to be saved
+     * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    protected void writeXMLFromSingleProperty(XMLStreamWriter writer, PreviewProperty property) throws XMLStreamException {
-        Object propertyValue = property.getValue();
+    protected void writeXMLFromSingleProperty(XMLStreamWriter writer, PreviewProperty property, PreviewProperties previewProperties) throws XMLStreamException {
+        //Better read from previewProperties instead of just the property, because LegendMouseListener puts origin x and y in previewProperties.
+        Object propertyValue = previewProperties.getValue(property.getName());
+
         if (propertyValue != null) {
             String text = PreviewProperties.getValueAsText(propertyValue);
             if (text == null) {
@@ -515,15 +489,14 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     /**
-     * Function that takes an item and saves its data, legend properties,
-     * specific item properties, dynamic properties and data using the specified
-     * writer.
+     * Function that takes an item and saves its data, legend properties, specific item properties, dynamic properties and data using the specified writer.
      *
      * @param writer the XMLStreamWriter to write to
      * @param item the item to be saved
+     * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    public void writeXMLFromItem(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromItem(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
         // legend type
         writer.writeStartElement(XML_LEGEND_TYPE);
@@ -534,33 +507,29 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         writer.writeStartElement(XML_LEGEND_PROPERTY);
         PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
         for (PreviewProperty property : legendProperties) {
-            writeXMLFromSingleProperty(writer, property);
+            writeXMLFromSingleProperty(writer, property, previewProperties);
         }
         writer.writeEndElement();
 
         // own properties
         writer.writeStartElement(XML_OWN_PROPERTY);
-        writeXMLFromItemOwnProperties(writer, item);
+        writeXMLFromItemOwnProperties(writer, item, previewProperties);
         writer.writeEndElement();
 
         // dynamic properties
         writer.writeStartElement(XML_DYNAMIC_PROPERTY);
-        writeXMLFromDynamicProperties(writer, item);
+        writeXMLFromDynamicProperties(writer, item, previewProperties);
         writer.writeEndElement();
 
 
         // data
         writer.writeStartElement(XML_DATA);
-        writeXMLFromData(writer, item);
+        writeXMLFromData(writer, item, previewProperties);
         writer.writeEndElement();
-
-
-
     }
 
     /**
-     * Function that retrieves the data from an XML reader and converts it to
-     * data for each kind of item
+     * Function that retrieves the data from an XML reader and converts it to data for each kind of item
      *
      * @param reader the XML reader to read the data from
      * @param item the item where the data would be stored
@@ -569,9 +538,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     public abstract void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException;
 
     /**
-     * Function that retrieves the property (propertyName and value) from an XML
-     * reader and converts it to single specific kind of property corresponding
-     * to an Item.
+     * Function that retrieves the property (propertyName and value) from an XML reader and converts it to single specific kind of property corresponding to an Item.
      *
      * @param reader the XML reader to read the data from
      * @param item the item where the data would be stores
@@ -595,8 +562,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     /**
-     * Function that takes some value in a String form and converts it to the
-     * specified class type
+     * Function that takes some value in a String form and converts it to the specified class type
      *
      * @param valueString the value in a String form
      * @param valueClass the class type to convert the value
@@ -606,29 +572,21 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Object value = null;
         if (valueClass.equals(LegendItem.Alignment.class)) {
             value = availableAlignments[Integer.parseInt(valueString)];
-        }
-        else if (valueClass.equals(LegendItem.Shape.class)) {
+        } else if (valueClass.equals(LegendItem.Shape.class)) {
             value = availableShapes[Integer.parseInt(valueString)];
-        }
-        else if (valueClass.equals(LegendItem.Direction.class)) {
+        } else if (valueClass.equals(LegendItem.Direction.class)) {
             value = availableDirections[Integer.parseInt(valueString)];
-        }
-        else if (valueClass.equals(Boolean.class)) {
+        } else if (valueClass.equals(Boolean.class)) {
             value = Boolean.parseBoolean(valueString);
-        }
-        else if (valueClass.equals(Integer.class)) {
+        } else if (valueClass.equals(Integer.class)) {
             value = Integer.parseInt(valueString);
-        }
-        else if (valueClass.equals(File.class)) {
+        } else if (valueClass.equals(File.class)) {
             value = new File(valueString);
-        }
-        else if (valueClass.equals(TableItem.VerticalPosition.class)) {
+        } else if (valueClass.equals(TableItem.VerticalPosition.class)) {
             value = availableTableVerticalPositions[Integer.parseInt(valueString)];
-        }
-        else if (valueClass.equals(TableItem.HorizontalPosition.class)) {
+        } else if (valueClass.equals(TableItem.HorizontalPosition.class)) {
             value = availableTableHorizontalPositions[Integer.parseInt(valueString)];
-        }
-        else if (valueClass.equals(TableItem.VerticalTextDirection.class)) {
+        } else if (valueClass.equals(TableItem.VerticalTextDirection.class)) {
             value = availableTableVerticalTextDirections[Integer.parseInt(valueString)];
         }
 
@@ -636,8 +594,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     /**
-     * Function that retrieves the properties (propertyName and value) from an
-     * XML reader and converts it to list of properties. Normally using the
+     * Function that retrieves the properties (propertyName and value) from an XML reader and converts it to list of properties. Normally using the
      * <code>readXMLToSingleOwnProperty</code> for each property.
      *
      * @param reader the XML reader to read the data from
@@ -648,8 +605,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     protected abstract ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException;
 
     /**
-     * Function that retrieves the dynamic properties (if any) from an XML
-     * reader and converts it to list of properties. Normally using the
+     * Function that retrieves the dynamic properties (if any) from an XML reader and converts it to list of properties. Normally using the
      * <code>readXMLToSingleOwnProperty</code> for each property.
      *
      * @param reader the XML reader to read the data from
@@ -693,9 +649,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     }
 
     /**
-     * Function that reads the legend properties,
-     * specific item properties, dynamic properties and data and converts it to an Item using the specified
-     * reader.
+     * Function that reads the legend properties, specific item properties, dynamic properties and data and converts it to an Item using the specified reader.
+     *
      * @param reader the XML reader to read the data from
      * @param newItemIndex used to create the Item
      * @return
@@ -750,11 +705,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     /**
      * Converts the propertyValue of a known type to an String object
-     * @param propertyValue
-     * Known types: 
-     * <code> LegendItem.Alignment</code>,
-     * <code> LegendItem.Shape</code> and
-     * <code> LegendItem.Direction</code>
+     *
+     * @param propertyValue Known types: <code> LegendItem.Alignment</code>, <code> LegendItem.Shape</code> and <code> LegendItem.Direction</code>
      * @return
      */
     protected String writeValueAsText(Object propertyValue) {
@@ -763,37 +715,29 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         if (propertyValue instanceof LegendItem.Alignment) {
             LegendItem.Alignment propertyValueString = (LegendItem.Alignment) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else if (propertyValue instanceof LegendItem.Direction) {
+        } else if (propertyValue instanceof LegendItem.Direction) {
             LegendItem.Direction propertyValueString = (LegendItem.Direction) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else if (propertyValue instanceof LegendItem.Shape) {
+        } else if (propertyValue instanceof LegendItem.Shape) {
             LegendItem.Shape propertyValueString = (LegendItem.Shape) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else if (propertyValue instanceof TableItem.HorizontalPosition) {
+        } else if (propertyValue instanceof TableItem.HorizontalPosition) {
             TableItem.HorizontalPosition propertyValueString = (TableItem.HorizontalPosition) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else if (propertyValue instanceof TableItem.VerticalPosition) {
+        } else if (propertyValue instanceof TableItem.VerticalPosition) {
             TableItem.VerticalPosition propertyValueString = (TableItem.VerticalPosition) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else if (propertyValue instanceof TableItem.VerticalTextDirection) {
+        } else if (propertyValue instanceof TableItem.VerticalTextDirection) {
             TableItem.VerticalTextDirection propertyValueString = (TableItem.VerticalTextDirection) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else if (propertyValue instanceof DescriptionItemElement) {
+        } else if (propertyValue instanceof DescriptionItemElement) {
             DescriptionItemElement propertyValueString = (DescriptionItemElement) propertyValue;
             text = propertyValueString.getValue();
-        }
-        else {
+        } else {
             text = propertyValue.toString();
         }
         return text;
     }
-
     // xml 
     protected static final String XML_PROPERTY = "property";
     private static final String XML_LEGEND_TYPE = "legendtype";
@@ -860,7 +804,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         defaultValuesArrayList.add(this.defaultDescriptionFontColor);
         defaultValuesArrayList.add(this.defaultDescriptionAlignment);
     }
-
     private final Object[] availableAlignments = {
         LegendItem.Alignment.LEFT,
         LegendItem.Alignment.RIGHT,

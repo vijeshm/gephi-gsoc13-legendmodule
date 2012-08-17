@@ -11,7 +11,6 @@ package org.gephi.legend.api.renderers;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.Locale;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;

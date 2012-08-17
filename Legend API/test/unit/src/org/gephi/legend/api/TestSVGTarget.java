@@ -116,7 +116,7 @@ public class TestSVGTarget {
 
 
 
-            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
+            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager(workspace));
 
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
             Integer newItemIndex = legendManager.getCurrentIndex();

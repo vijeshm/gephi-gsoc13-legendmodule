@@ -276,7 +276,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
     @Override
@@ -284,10 +284,10 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
-            writeXMLFromSingleProperty(writer, property);
+            writeXMLFromSingleProperty(writer, property, previewProperties);
         }
     }
 
@@ -366,7 +366,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
         PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
 
         writer.writeStartElement(XML_PROPERTY);
@@ -377,7 +377,7 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
         writer.writeEndElement();
 
         for (PreviewProperty property : dynamicProperties) {
-            writeXMLFromSingleProperty(writer, property);
+            writeXMLFromSingleProperty(writer, property, previewProperties);
         }
     }
     

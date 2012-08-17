@@ -4,15 +4,10 @@
  */
 package org.gephi.legend.builders.description.elements;
 
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
-import org.gephi.graph.api.Node;
 import org.gephi.legend.api.DescriptionItemElementValue;
 import org.gephi.partition.api.Part;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.api.PartitionModel;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;

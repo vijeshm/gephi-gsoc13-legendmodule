@@ -8,10 +8,6 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.Node;
 import org.gephi.legend.api.DescriptionItemElementValue;
-import org.gephi.partition.api.PartitionController;
-import org.gephi.partition.api.PartitionModel;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -25,10 +21,8 @@ public class NodeWithMostConnections extends DescriptionItemElementValue {
 
     @Override
     public String getValue() {
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
-        Graph graph = graphController.getModel(workspace).getGraph();
+        Graph graph = graphController.getModel().getGraph();
         Node nodeWithMostConnections = null;
         int maxConnections = Integer.MIN_VALUE;
         for (Node node : graph.getNodes().toArray()) {

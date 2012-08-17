@@ -17,8 +17,6 @@ import org.gephi.graph.api.Node;
 import org.gephi.legend.api.CustomLegendItemBuilder;
 import org.gephi.legend.api.CustomTableItemBuilder;
 import org.gephi.legend.items.TableItem;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -42,11 +40,8 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
 
     @Override
     public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
-
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
-        GraphModel model = graphController.getModel(workspace);
+        GraphModel model = graphController.getModel();
         Graph graph = model.getGraph();
 
         List<Node> nodes = Arrays.asList(graph.getNodes().toArray());

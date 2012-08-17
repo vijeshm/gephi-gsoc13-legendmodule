@@ -15,11 +15,11 @@ import org.gephi.legend.items.DescriptionItem;
 import org.gephi.legend.items.DescriptionItemElement;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
+import org.gephi.legend.manager.LegendController;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.DescriptionProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
-import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
@@ -72,11 +72,7 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties previewProperties) {
         if (item != null) {
-
-
             Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-
-
 
             keyFont = previewProperties.getFontValue(LegendManager.getProperty(DescriptionProperty.OWN_PROPERTIES, itemIndex, DescriptionProperty.DESCRIPTION_KEY_FONT));
             keyFontColor = previewProperties.getColorValue(LegendManager.getProperty(DescriptionProperty.OWN_PROPERTIES, itemIndex, DescriptionProperty.DESCRIPTION_KEY_FONT_COLOR));
@@ -102,7 +98,7 @@ public class DescriptionItemRenderer extends LegendItemRenderer {
                 values.add(value);
             }
             numElements = keys.size();
-            LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+            LegendManager legendManager = LegendController.getInstance().getLegendManager();
             legendManager.refreshDynamicPreviewProperties();
         }
     }
