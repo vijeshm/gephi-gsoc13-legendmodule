@@ -11,6 +11,7 @@ package org.gephi.legend.api.renderers;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Locale;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.items.LegendItem.Alignment;
@@ -55,7 +56,7 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         //font
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setColor(fontColor);
         graphics2D.setFont(font);
 
@@ -84,8 +85,8 @@ public class TableItemRenderer extends LegendItemRenderer {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          MINIMUM_MARGIN,
-                                          i * cellSizeWidth + fontHeight + centerDistance);
+                            MINIMUM_MARGIN,
+                            i * cellSizeWidth + fontHeight + centerDistance);
 
                 }
 
@@ -103,8 +104,8 @@ public class TableItemRenderer extends LegendItemRenderer {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          height - metrics.stringWidth(label) - MINIMUM_MARGIN,
-                                          i * cellSizeWidth + fontHeight + centerDistance);
+                            height - metrics.stringWidth(label) - MINIMUM_MARGIN,
+                            i * cellSizeWidth + fontHeight + centerDistance);
 
                 }
 
@@ -130,8 +131,8 @@ public class TableItemRenderer extends LegendItemRenderer {
                     String label = verticalLabels.get(i).toString();
                     graphics2D.setColor(verticalColors.get(i));
                     graphics2D.drawString(label,
-                                          MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
-                                          (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
+                            MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
+                            (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
                 }
 
                 break;
@@ -418,12 +419,8 @@ public class TableItemRenderer extends LegendItemRenderer {
         horizontalTextPosition = (TableItem.HorizontalPosition) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_HORIZONTAL_TEXT_POSITION));
         cellColoringDirection = (Direction) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_COLORING_DIRECTION));
         verticalTextDirection = (TableItem.VerticalTextDirection) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_VERTICAL_TEXT_ROTATION));
-
-
-
-
     }
-
+    
     private Font font;
     private Color fontColor;
     private ArrayList<StringBuilder> labels;
