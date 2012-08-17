@@ -19,7 +19,7 @@ public class Default extends CustomLegendItemBuilder implements CustomGroupsItem
 
     @Override
     public String getDescription() {
-        return "Sample Groups";
+        return DEFAULT_DESCRIPTION;
     }
 
     @Override
@@ -38,24 +38,40 @@ public class Default extends CustomLegendItemBuilder implements CustomGroupsItem
     }
 
     @Override
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<Color> colors, ArrayList<Float> values) {
+    public void retrieveData(ArrayList<String> labels, ArrayList<Color> colors, ArrayList<Float> values) {
+//        StringBuilder group1 = new StringBuilder("group 1");
+//        StringBuilder group2 = new StringBuilder("group 2");
+        
+        
         // FILLING LABELS
-        StringBuilder group1 = new StringBuilder("group 1");
-        StringBuilder group2 = new StringBuilder("group 2");
+        String group1 = "group 1";
+        String group2 = "group 2";
+        String group3 = "group 3";
+        String group4 = "group 4";
         labels.add(group1);
         labels.add(group2);
+        labels.add(group3);
+        labels.add(group4);
         
         // FILLING COLORS
         Color color1 = Color.RED;
         Color color2 = Color.BLUE;
+        Color color3 = Color.YELLOW;
+        Color color4 = Color.GREEN;
         colors.add(color1);
         colors.add(color2);
+        colors.add(color3);
+        colors.add(color4);
         
         // FILLING VALUES
         Float value1=0.8f;
         Float value2=0.4f;
+        Float value3=0.33f;
+        Float value4=0.99f;
         values.add(value1);
         values.add(value2);
+        values.add(value3);
+        values.add(value4);
     }
     
 }

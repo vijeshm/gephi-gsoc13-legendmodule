@@ -10,6 +10,4 @@ package org.gephi.legend.api;
  */
 public interface CustomTextItemBuilder {
     
-    public String getText();
-    
 }

@@ -93,10 +93,28 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      */
     protected abstract PreviewProperty[] createLegendOwnProperties(Item item);
 
+    /**
+     *
+     * @return a list of all the available builders for an specific type of
+     * builder
+     */
     public abstract ArrayList<CustomLegendItemBuilder> getAvailableBuilders();
 
+    /**
+     * @param graph
+     * @return a new instance of an Item Ex:
+     */
     public abstract Item createNewLegendItem(Graph graph);
 
+    /**
+     * This function creates an Item using
+     *
+     * @param newItemIndex
+     * @param graph
+     * @param attributeModel
+     * @param builder
+     * @return
+     */
     public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
         Item item = buildCustomItem(builder, graph, attributeModel);
         createDefaultProperties(newItemIndex, item);
@@ -355,19 +373,19 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     }
 
-    public PreviewProperty[] createLegendProperties(Item item) {
+    private PreviewProperty[] createLegendProperties(Item item) {
 
-        if(setDefaultValues()){
+        if (setDefaultValues()) {
             updateDefaultValues();
         }
 
         int[] properties = LegendProperty.LIST_OF_PROPERTIES;
 
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValuesArrayList.size()];
-        
+
         // creating label
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        previewProperties[0]= createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex);
+        previewProperties[0] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex);
         for (int i = 1; i < previewProperties.length; i++) {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
         }
@@ -375,7 +393,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return previewProperties;
     }
 
-    public PreviewProperty[] getLegendProperties(Item item) {
+    private PreviewProperty[] getLegendProperties(Item item) {
 
         PreviewProperty[] legendProperties = createLegendProperties(item);
         PreviewProperty[] properties = createLegendOwnProperties(item);
@@ -423,14 +441,64 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return getTitle();
     }
 
+    /**
+     * Provides an user friendly name for the builder. This name will appear in
+     * the legend manager UI.
+     *
+     * @return User friendly builder name, not null
+     */
     public abstract String getTitle();
 
+    /**
+     * Function that takes the data corresponding to each type of item and uses
+     * the writer to save the data in it. It saves the data inside an
+     * <code>itemdata</code> node.
+     *
+     * @param writer the XMLStreamWriter to write to
+     * @param item the item to be saved
+     * @throws XMLStreamException
+     */
     protected abstract void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException;
 
+    /**
+     * Function that takes the specific properties of each item and uses the
+     * writer to save the properties in it. It saves the properties inside an
+     * <code>itemproperty</code> tag
+     *
+     * @param writer the XMLStreamWriter to write to
+     * @param item the item to be saved
+     * @throws XMLStreamException
+     */
     protected abstract void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException;
 
+    /**
+     * Function that takes the dynamic properties (if any) of each item and uses
+     * the writer to save the properties in it. It saves the properties inside
+     * an
+     * <code>dynamicproperty</code> tag
+     *
+     * @param writer the XMLStreamWriter to write to
+     * @param item the item to be saved
+     * @throws XMLStreamException
+     */
     protected abstract void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException;
 
+    /**
+     * Function that automatically saves a property using its PropertyName and
+     * the Value attached to it. Only works if property has a known value type.
+     * Known types:
+     * <code>Integer</code>,
+     * <code> Float</code>,
+     * <code> String</code>,
+     * <code> Color</code>,
+     * <code> LegendItem.Alignment</code>,
+     * <code> LegendItem.Shape</code> and
+     * <code> LegendItem.Direction</code>
+     *
+     * @param writer the XMLStreamWriter to write to
+     * @param property property to be saved
+     * @throws XMLStreamException
+     */
     protected void writeXMLFromSingleProperty(XMLStreamWriter writer, PreviewProperty property) throws XMLStreamException {
         Object propertyValue = property.getValue();
         if (propertyValue != null) {
@@ -446,6 +514,15 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         }
     }
 
+    /**
+     * Function that takes an item and saves its data, legend properties,
+     * specific item properties, dynamic properties and data using the specified
+     * writer.
+     *
+     * @param writer the XMLStreamWriter to write to
+     * @param item the item to be saved
+     * @throws XMLStreamException
+     */
     public void writeXMLFromItem(XMLStreamWriter writer, Item item) throws XMLStreamException {
 
         // legend type
@@ -481,11 +558,29 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     }
 
+    /**
+     * Function that retrieves the data from an XML reader and converts it to
+     * data for each kind of item
+     *
+     * @param reader the XML reader to read the data from
+     * @param item the item where the data would be stored
+     * @throws XMLStreamException
+     */
     public abstract void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException;
 
+    /**
+     * Function that retrieves the property (propertyName and value) from an XML
+     * reader and converts it to single specific kind of property corresponding
+     * to an Item.
+     *
+     * @param reader the XML reader to read the data from
+     * @param item the item where the data would be stores
+     * @return a PreviewProperty to be added to the specific Item properties
+     * @throws XMLStreamException
+     */
     protected abstract PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException;
 
-    protected PreviewProperty readXMLToSingleLegendProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
+    private PreviewProperty readXMLToSingleLegendProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         String valueString = reader.getElementText();
         int propertyIndex = LegendProperty.getInstance().getProperty(propertyName);
@@ -494,47 +589,78 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         if (value == null) {
             value = readValueFromText(valueString, valueClass);
         }
-        
+
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
 
-    protected Object readValueFromText(String valueStr, Class valueClass) {
+    /**
+     * Function that takes some value in a String form and converts it to the
+     * specified class type
+     *
+     * @param valueString the value in a String form
+     * @param valueClass the class type to convert the value
+     * @return
+     */
+    protected Object readValueFromText(String valueString, Class valueClass) {
         Object value = null;
         if (valueClass.equals(LegendItem.Alignment.class)) {
-            value = availableAlignments[Integer.parseInt(valueStr)];
+            value = availableAlignments[Integer.parseInt(valueString)];
         }
         else if (valueClass.equals(LegendItem.Shape.class)) {
-            value = availableShapes[Integer.parseInt(valueStr)];
+            value = availableShapes[Integer.parseInt(valueString)];
         }
         else if (valueClass.equals(LegendItem.Direction.class)) {
-            value = availableDirections[Integer.parseInt(valueStr)];
+            value = availableDirections[Integer.parseInt(valueString)];
         }
         else if (valueClass.equals(Boolean.class)) {
-            value = Boolean.parseBoolean(valueStr);
+            value = Boolean.parseBoolean(valueString);
         }
         else if (valueClass.equals(Integer.class)) {
-            value = Integer.parseInt(valueStr);
+            value = Integer.parseInt(valueString);
         }
         else if (valueClass.equals(File.class)) {
-            value = new File(valueStr);
+            value = new File(valueString);
         }
         else if (valueClass.equals(TableItem.VerticalPosition.class)) {
-            value = availableTableVerticalPositions[Integer.parseInt(valueStr)];
+            value = availableTableVerticalPositions[Integer.parseInt(valueString)];
         }
         else if (valueClass.equals(TableItem.HorizontalPosition.class)) {
-            value = availableTableHorizontalPositions[Integer.parseInt(valueStr)];
+            value = availableTableHorizontalPositions[Integer.parseInt(valueString)];
         }
         else if (valueClass.equals(TableItem.VerticalTextDirection.class)) {
-            value = availableTableVerticalTextDirections[Integer.parseInt(valueStr)];
+            value = availableTableVerticalTextDirections[Integer.parseInt(valueString)];
         }
-        
+
         return value;
     }
 
+    /**
+     * Function that retrieves the properties (propertyName and value) from an
+     * XML reader and converts it to list of properties. Normally using the
+     * <code>readXMLToSingleOwnProperty</code> for each property.
+     *
+     * @param reader the XML reader to read the data from
+     * @param item the item where the data would be stored
+     * @return
+     * @throws XMLStreamException
+     */
     protected abstract ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException;
 
-    protected abstract ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException;
+    /**
+     * Function that retrieves the dynamic properties (if any) from an XML
+     * reader and converts it to list of properties. Normally using the
+     * <code>readXMLToSingleOwnProperty</code> for each property.
+     *
+     * @param reader the XML reader to read the data from
+     * @param item the item where the data would be stored
+     * @return
+     * @throws XMLStreamException
+     */
+    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        reader.nextTag();
+        return new ArrayList<PreviewProperty>();
+    }
 
     private ArrayList<PreviewProperty> readXMLToLegendProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
 
@@ -566,6 +692,15 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
     }
 
+    /**
+     * Function that reads the legend properties,
+     * specific item properties, dynamic properties and data and converts it to an Item using the specified
+     * reader.
+     * @param reader the XML reader to read the data from
+     * @param newItemIndex used to create the Item
+     * @return
+     * @throws XMLStreamException
+     */
     public Item readXMLToItem(XMLStreamReader reader, Integer newItemIndex) throws XMLStreamException {
 
 
@@ -589,21 +724,21 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 //        reader.nextTag();
         reader.nextTag();
         readXMLToData(reader, item);
-        
+
         // finish reading
         reader.next();
-        
+
 
 
         PreviewProperty[] legendPropertiesArray = legendProperties.toArray(new PreviewProperty[legendProperties.size()]);
         PreviewProperty[] ownPropertiesArray = ownProperties.toArray(new PreviewProperty[ownProperties.size()]);
         PreviewProperty[] dynamicPropertiesArray = dynamicProperties.toArray(new PreviewProperty[dynamicProperties.size()]);
-        
+
         // setting data
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.PROPERTIES, legendPropertiesArray);
         item.setData(LegendItem.OWN_PROPERTIES, ownPropertiesArray);
-        
+
         item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, dynamicPropertiesArray);
         item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
@@ -613,6 +748,15 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         return item;
     }
 
+    /**
+     * Converts the propertyValue of a known type to an String object
+     * @param propertyValue
+     * Known types: 
+     * <code> LegendItem.Alignment</code>,
+     * <code> LegendItem.Shape</code> and
+     * <code> LegendItem.Direction</code>
+     * @return
+     */
     protected String writeValueAsText(Object propertyValue) {
 
         String text = null;
@@ -692,8 +836,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     public LegendItemBuilder() {
         updateDefaultValues();
     }
-    
-    
 
     public void updateDefaultValues() {
         this.defaultValuesArrayList = new ArrayList<Object>();
@@ -736,18 +878,15 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         LegendItem.Direction.LEFT,
         LegendItem.Direction.RIGHT
     };
-    
     // table
     private final Object[] availableTableVerticalPositions = {
         TableItem.VerticalPosition.UP,
         TableItem.VerticalPosition.BOTTOM
     };
-    
     private final Object[] availableTableHorizontalPositions = {
         TableItem.HorizontalPosition.RIGHT,
         TableItem.HorizontalPosition.LEFT
     };
-    
     private final Object[] availableTableVerticalTextDirections = {
         TableItem.VerticalTextDirection.UP,
         TableItem.VerticalTextDirection.HORIZONTAL,

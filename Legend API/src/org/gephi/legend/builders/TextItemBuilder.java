@@ -68,7 +68,6 @@ public class TextItemBuilder extends LegendItemBuilder {
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
         CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
         Item item = createNewLegendItem(graph);
-        item.setData(TextItem.BODY, customBuilder.getText());
         return item;
     }
 
@@ -127,7 +126,6 @@ public class TextItemBuilder extends LegendItemBuilder {
 
     @Override
     protected PreviewProperty[] createLegendOwnProperties(Item item) {
-
 
         int[] properties = TextProperty.LIST_OF_PROPERTIES;
 

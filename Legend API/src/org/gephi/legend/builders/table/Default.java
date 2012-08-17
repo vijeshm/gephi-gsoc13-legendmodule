@@ -20,25 +20,28 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return DEFAULT_DESCRIPTION;
     }
 
     @Override
     public String getTitle() {
-        return "Sample";
+        return DEFAULT_TITLE;
     }
 
 
     @Override
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         // LABELS ID
         labels.add(TableItem.LabelSelection.VERTICAL);
         
         
         // VERTICAL LABELS
-        StringBuilder label1 = new StringBuilder("Label 1");
-        StringBuilder label2 = new StringBuilder("Label 2");
-        StringBuilder label3 = new StringBuilder("Label 3");
+//        StringBuilder label1 = new StringBuilder("Label 1");
+//        StringBuilder label2 = new StringBuilder("Label 2");
+//        StringBuilder label3 = new StringBuilder("Label 3");
+        String label1 =  "Label 1";
+        String label2 =  "Label 2";
+        String label3 =  "Label 3";
         verticalLabels.add(label1);
         verticalLabels.add(label2);
         verticalLabels.add(label3);
@@ -50,8 +53,10 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
         verticalColors.add(color1);
         
         // HORIZONTAL LABELS
-        StringBuilder value1 = new StringBuilder("Value Uno Dos");
-        StringBuilder value2 = new StringBuilder("Value.... ...............");
+//        StringBuilder value1 = new StringBuilder("Value Uno Dos");
+//        StringBuilder value2 = new StringBuilder("Value.... ...............");
+        String value1 = "Value Uno Dos";
+        String value2 = "Value ................";
         horizontalLabels.add(value1);
         horizontalLabels.add(value2);
         

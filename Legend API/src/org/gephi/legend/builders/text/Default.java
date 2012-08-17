@@ -17,7 +17,7 @@ public class Default extends CustomLegendItemBuilder implements CustomTextItemBu
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return DEFAULT_DESCRIPTION;
     }
 
     @Override
@@ -25,11 +25,6 @@ public class Default extends CustomLegendItemBuilder implements CustomTextItemBu
         return DEFAULT_TITLE;
     }
 
-
-    @Override
-    public String getText() {
-        return "Random Text";
-    }
 
     @Override
     public boolean isAvailableToBuild() {

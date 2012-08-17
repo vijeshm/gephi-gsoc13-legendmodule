@@ -20,6 +20,6 @@ public interface CustomGroupsItemBuilder {
      * @param colors
      * @param values 
      */
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<Color> colors, ArrayList<Float> values);
+    public void retrieveData(ArrayList<String> labels, ArrayList<Color> colors, ArrayList<Float> values);
 
 }

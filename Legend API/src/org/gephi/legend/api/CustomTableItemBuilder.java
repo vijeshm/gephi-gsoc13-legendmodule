@@ -17,7 +17,9 @@ public interface CustomTableItemBuilder {
     /**
      * This function receives the objects that need to be filled in order to
      * build the item
-     * @param labels list of labels
+     * @param labels an arraylist of a single value containing the selection of
+     * labels: <code>TableItem.LabelSelection.VERTICAL</code> or 
+     * <code>TableItem.LabelSelection.HORIZONTAL</code>
      * @param horizontalLabels list of labels that will be displayed at the sides
      * @param verticalLabels list of labels that will be displayed at top or bottom
      * @param values table values representing the matrix
@@ -25,6 +27,6 @@ public interface CustomTableItemBuilder {
      * @param verticalColors colors used to represent the vertical colors
      * @param valueColors table colors representing the matrix
      */
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors);
 
 }

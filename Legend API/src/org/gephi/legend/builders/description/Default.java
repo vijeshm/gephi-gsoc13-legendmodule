@@ -17,7 +17,7 @@ public class Default extends CustomLegendItemBuilder implements CustomDescriptio
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return DEFAULT_DESCRIPTION;
     }
 
     @Override

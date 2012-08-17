@@ -215,16 +215,22 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         Item item = createNewLegendItem(graph);
 
 
-        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
         ArrayList<Color> colors = new ArrayList<Color>();
         ArrayList<Float> values = new ArrayList<Float>();
 
         CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder) builder;
+        ArrayList<String> labels = new ArrayList<String>();
         customGroupsBuilder.retrieveData(labels, colors, values);
 
+        ArrayList<StringBuilder> labelsStringBuilder = new ArrayList<StringBuilder>();
+        for (String label : labels) {
+            labelsStringBuilder.add(new StringBuilder(label));
+        }
+        
+        
         item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
         item.setData(GroupsItem.COLORS, colors);
-        item.setData(GroupsItem.LABELS_IDS, labels);
+        item.setData(GroupsItem.LABELS_IDS, labelsStringBuilder);
         item.setData(GroupsItem.VALUES, values);
         return item;
 
@@ -433,7 +439,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     private Integer defaultPaddingBetweenTextAndShape = 5;
     private Integer defaultPaddingBetweenElements = 5;
     private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
-    private Boolean defaultIsScalingShapes = Boolean.FALSE;
+    private Boolean defaultIsScalingShapes = Boolean.TRUE;
     private final Object[] defaultValues = {
         defaultNumColumns,
         defaultShape,

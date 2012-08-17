@@ -8,8 +8,11 @@ import java.awt.*;
 import java.beans.PropertyEditorManager;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.gephi.data.attributes.api.AttributeModel;
@@ -40,6 +43,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
      */
     public LegendManagerUI() {
         initComponents();
+        tooltipRenderer = new ComboboxToolTipRenderer();
+        builderTypeComboBox.setRenderer(tooltipRenderer);
 
         registerEditors();
         registerLegendBuilders();
@@ -359,14 +364,20 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     }//GEN-LAST:event_numberOfItemsTextFieldActionPerformed
 
     private void legendItemBuildersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_legendItemBuildersComboBoxActionPerformed
+        
+        // clean combobox
+        System.out.println("@Var: tooltipRenderer: "+tooltipRenderer);
         builderTypeComboBox.removeAllItems();
+        ArrayList<String> tooltips = new ArrayList<String>();
 
         LegendItemBuilder builder = (LegendItemBuilder) legendItemBuildersComboBox.getSelectedItem();
         ArrayList<CustomLegendItemBuilder> availableBuilders = builder.getAvailableBuilders();
         for (CustomLegendItemBuilder availableBuilder : availableBuilders) {
             builderTypeComboBox.addItem(availableBuilder);
+            tooltips.add(availableBuilder.getDescription());
         }
 
+        tooltipRenderer.setTooltips(tooltips);
 
     }//GEN-LAST:event_legendItemBuildersComboBoxActionPerformed
 
@@ -422,4 +433,28 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         }
     }
 
+    public class ComboboxToolTipRenderer extends DefaultListCellRenderer {
+
+        private ArrayList<String> tooltips;
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value,
+                                                      int index, boolean isSelected, boolean cellHasFocus) {
+
+            JComponent comp = (JComponent) super.getListCellRendererComponent(list,
+                                                                              value, index, isSelected, cellHasFocus);
+
+            if (-1 < index && null != value && null != tooltips) {
+                list.setToolTipText(tooltips.get(index));
+            }
+            return comp;
+        }
+
+        public void setTooltips(ArrayList<String> tooltips) {
+            this.tooltips = tooltips;
+        }
+
+    }
+    
+    private ComboboxToolTipRenderer tooltipRenderer;
 }

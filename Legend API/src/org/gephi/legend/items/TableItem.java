@@ -33,7 +33,8 @@ public class TableItem extends AbstractItem implements LegendItem {
     public enum LabelSelection {
 
         HORIZONTAL("horizontal"),
-        VERTICAL("vertical");
+        VERTICAL("vertical"),
+        BOTH("both");
         private final String value;
 
         private LabelSelection(String value) {

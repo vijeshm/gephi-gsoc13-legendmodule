@@ -44,6 +44,11 @@ public class LegendController {
         return legendItemBuilders;
     }
 
+    /**
+     * Add an item 
+     * @param workspace
+     * @param item 
+     */
     public void addItemToLegendManager(Workspace workspace, Item item) {
 
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
@@ -192,6 +197,9 @@ public class LegendController {
         availablebuilders = registerLegendBuilders();
     }
 
+    /*
+     * Returns an Instance of LegendController
+     */
     public static LegendController getInstance() {
         return instance;
     }

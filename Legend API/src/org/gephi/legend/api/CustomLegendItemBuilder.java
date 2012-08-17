@@ -11,14 +11,16 @@ package org.gephi.legend.api;
 public abstract class CustomLegendItemBuilder {
     
     /**
-     * 
-     * @return the Description of the custom Legend builder used
+     * Provides an user friendly description for the builder
+     * This name will appear as a tooltip in the builders list
+     * @return User friendly renderer name, not null
      */
     public abstract String getDescription();
     
     /**
-     * 
-     * @return the title of the custom Legend builder used
+     * Provides an user friendly name for the builder
+     * This name will appear in the builders list at the legend manager UI.
+     * @return User friendly renderer name, not null
      */
     public abstract String getTitle();
     
@@ -43,6 +45,7 @@ public abstract class CustomLegendItemBuilder {
     
     public static final String NONE_NEEDED="";
     public static final String DEFAULT_TITLE="Default";
+    public static final String DEFAULT_DESCRIPTION="Description";
     
     @Override
     public String toString(){

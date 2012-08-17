@@ -50,7 +50,7 @@ public class NumberOfNodesInPartition extends CustomLegendItemBuilder implements
     }
 
     @Override
-    public void retrieveData(ArrayList<StringBuilder> labels, ArrayList<Color> colors, ArrayList<Float> values) {
+    public void retrieveData(ArrayList<String> labels, ArrayList<Color> colors, ArrayList<Float> values) {
         PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
         PartitionModel partitionModel = partitionController.getModel();
         if (partitionModel != null) {
@@ -59,8 +59,8 @@ public class NumberOfNodesInPartition extends CustomLegendItemBuilder implements
 
                 for (Part part : parts) {
                     // APPEND LABEL
-                    StringBuilder label = new StringBuilder(part.getDisplayName());
-                    labels.add(label);
+//                    StringBuilder label = new StringBuilder(part.getDisplayName());
+                    labels.add(part.getDisplayName());
                     
                     // APPEND VALUE
                     values.add((float)part.getObjects().length);

@@ -45,7 +45,7 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
 
     @Override
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<StringBuilder> horizontalLabels, ArrayList<StringBuilder> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
@@ -64,13 +64,14 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
             // FILLING LABELS
             int index = 0;
-            for (Part<Node> part : partitionModel.getSelectedPartition().getParts()) {
-                StringBuilder label = new StringBuilder(part.getDisplayName());
-                labelsMap.put(label.toString(), index++);
+            for (Part part : partitionModel.getSelectedPartition().getParts()) {
+//                StringBuilder label = new StringBuilder(part.getDisplayName());
+                String label = part.getDisplayName();
+                labelsMap.put(label, index++);
                 horizontalLabels.add(label);
                 verticalLabels.add(label);
             }
-            labels.add(TableItem.LabelSelection.HORIZONTAL);
+            labels.add(TableItem.LabelSelection.BOTH);
             
 
 

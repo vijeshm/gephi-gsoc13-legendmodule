@@ -22,8 +22,8 @@ import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
 import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.manager.LegendController;
 import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.renderers.TableItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -95,7 +95,7 @@ public class TestProcessingTarget {
 
 
 
- 
+
             // attribute ???
             AttributeController attributeController = Lookup.getDefault().lookup(AttributeController.class);
             AttributeModel attributeModel = null;
@@ -126,12 +126,7 @@ public class TestProcessingTarget {
 
 
             // add item
-            legendManager.addItem(item);
-
-            PreviewProperty[] legendProperties = item.getData(LegendItem.PROPERTIES);
-            for (PreviewProperty property : legendProperties) {
-                previewController.getModel().getProperties().putValue(property.getName(), property.getValue());
-            }
+            LegendController.getInstance().addItemToLegendManager(workspace, item);
 
 
 
@@ -179,7 +174,7 @@ public class TestProcessingTarget {
 
     public Item addGroupsItem(int newItemIndex, Graph graph, AttributeModel attributeModel) {
         GroupsItemBuilder builder = new GroupsItemBuilder();
-        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.text.Default());
+        Item item = builder.createCustomItem(newItemIndex, graph, attributeModel, new org.gephi.legend.builders.group.Default());
         return item;
     }
 
