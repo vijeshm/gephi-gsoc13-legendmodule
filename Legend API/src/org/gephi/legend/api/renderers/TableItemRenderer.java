@@ -43,7 +43,7 @@ public class TableItemRenderer extends LegendItemRenderer {
         return itemBuilder instanceof TableItemBuilder;
     }
 
-    private void createVerticalText(Graphics2D graphics2D, AffineTransform arrangeTranslation, Integer width, Integer height) {
+    protected void createVerticalText(Graphics2D graphics2D, AffineTransform arrangeTranslation, Integer width, Integer height) {
 
         graphics2D.setTransform(arrangeTranslation);
 
@@ -154,7 +154,7 @@ public class TableItemRenderer extends LegendItemRenderer {
 
     }
 
-    private void createHorizontalText(Graphics2D graphics, AffineTransform arrangeTranslation, Integer width, Integer height) {
+    protected void createHorizontalText(Graphics2D graphics, AffineTransform arrangeTranslation, Integer width, Integer height) {
 
 
 
@@ -184,7 +184,7 @@ public class TableItemRenderer extends LegendItemRenderer {
         }
     }
 
-    private void createTableImage(Graphics2D graphics, AffineTransform arrangeTranslation, int width, int height) {
+    protected void createTableImage(Graphics2D graphics, AffineTransform arrangeTranslation, int width, int height) {
         //drawing background 
 
 
@@ -196,9 +196,9 @@ public class TableItemRenderer extends LegendItemRenderer {
 
 
         graphics.setColor(Color.WHITE);
-        for (int i = 0; i < tableValues.length; i++) {
+        for (int i = 0; i < tableValuesFloat.length; i++) {
 
-            for (int j = 0; j < tableValues[i].length; j++) {
+            for (int j = 0; j < tableValuesFloat[i].length; j++) {
 
                 graphics.setColor(valueColors.get(i).get(j));
 
@@ -208,7 +208,7 @@ public class TableItemRenderer extends LegendItemRenderer {
                     switch (cellColoringDirection) {
                         case UP: {
                             x1 = j * cellSizeWidth;
-                            y2 = (int) (cellSizeHeight * tableValues[i][j]) - 1;
+                            y2 = (int) (cellSizeHeight * tableValuesFloat[i][j]) - 1;
                             y1 = ((i + 1) * cellSizeHeight) - y2;
                             x2 = cellSizeWidth - 1;
                             graphics.fillRect(x1, y1, x2, y2);
@@ -216,7 +216,7 @@ public class TableItemRenderer extends LegendItemRenderer {
                         }
                         case DOWN: {
                             x1 = j * cellSizeWidth;
-                            y2 = (int) (cellSizeHeight * tableValues[i][j]) - 1;
+                            y2 = (int) (cellSizeHeight * tableValuesFloat[i][j]) - 1;
                             y1 = ((i + 1) * cellSizeHeight) - y2;
                             x2 = cellSizeWidth - 1;
                             graphics.fillRect(x1, y1, x2, y2);
@@ -229,7 +229,7 @@ public class TableItemRenderer extends LegendItemRenderer {
                     y1 = i * cellSizeHeight;
                     y2 = cellSizeHeight;
                     x2 = cellSizeWidth;
-                    legendDrawText(graphics, tableValues[i][j] + "", font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
+                    legendDrawText(graphics, tableValuesFloat[i][j] + "", font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
                 }
 
                 // GRID DISPLAYING
@@ -245,6 +245,10 @@ public class TableItemRenderer extends LegendItemRenderer {
             }
         }
 
+    }
+    
+    protected void drawCell(Graphics2D graphics2D, Integer x, Integer y, Integer width, Integer height, String value){
+        legendDrawText(graphics2D, value , font, fontColor, x, y, width, height, Alignment.CENTER);
     }
 
     @Override
@@ -332,7 +336,7 @@ public class TableItemRenderer extends LegendItemRenderer {
         createVerticalText(graphics2D, verticalTextOrigin, verticalLabelsWidth, verticalLabelsHeight);
         createHorizontalText(graphics2D, horizontalTextOrigin, horizontalLabelsWidth, horizontalLabelsHeight);
         if (isCellColoring) {
-            normalizeWithMinValueZero(tableValues);
+            normalizeWithMinValueZero(tableValuesFloat);
         }
         createTableImage(graphics2D, tableOrigin, tableWidth, tableHeight);
     }
@@ -374,13 +378,13 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        tableValuesArrayList = item.getData(TableItem.TABLE_VALUES);
+        tableValuesString = item.getData(TableItem.TABLE_VALUES);
 
-        // READING VALUES
-        tableValues = new Float[tableValuesArrayList.size()][tableValuesArrayList.get(0).size()];
-        for (int i = 0; i < tableValuesArrayList.size(); i++) {
-            for (int j = 0; j < tableValuesArrayList.get(i).size(); j++) {
-                tableValues[i][j] = tableValuesArrayList.get(i).get(j);
+        // READING VALUES AND CONVERTING THEM TO FLOAT
+        tableValuesFloat = new Float[tableValuesString.size()][tableValuesString.get(0).size()];
+        for (int i = 0; i < tableValuesString.size(); i++) {
+            for (int j = 0; j < tableValuesString.get(i).size(); j++) {
+                tableValuesFloat[i][j] = Float.parseFloat(tableValuesString.get(i).get(j));
             }
         }
 
@@ -439,8 +443,8 @@ public class TableItemRenderer extends LegendItemRenderer {
     private Integer verticalExtraMargin;
     private Integer horizontalExtraMargin;
     private final Integer MINIMUM_MARGIN = 3;
-    private ArrayList<ArrayList<Float>> tableValuesArrayList;
-    private Float[][] tableValues;
+    private ArrayList<ArrayList<String>> tableValuesString;
+    private Float[][] tableValuesFloat;
     // Grid
     private Boolean isDisplayingGrid;
     private Color gridColor;

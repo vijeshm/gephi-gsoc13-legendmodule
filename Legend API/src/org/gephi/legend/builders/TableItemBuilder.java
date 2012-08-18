@@ -77,7 +77,7 @@ public class TableItemBuilder extends LegendItemBuilder {
         ArrayList<String> horizontalLabels = new ArrayList<String>();
         ArrayList<TableItem.LabelSelection> labelsSelectionArrayList = new ArrayList<TableItem.LabelSelection>();
         // values
-        ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
+        ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
         // colors
         ArrayList<Color> horizontalColors = new ArrayList<Color>();
         ArrayList<Color> verticalColors = new ArrayList<Color>();
@@ -125,6 +125,7 @@ public class TableItemBuilder extends LegendItemBuilder {
             for (String label : verticalLabels) {
                 StringBuilder labelStringBuilder = new StringBuilder(label);
                 verticalLabelsStringBuilder.add(labelStringBuilder);
+                labels.add(labelStringBuilder);
             }
         }
 
@@ -430,9 +431,11 @@ public class TableItemBuilder extends LegendItemBuilder {
 
 
         // values
-        ArrayList<ArrayList<Float>> values = item.getData(TableItem.TABLE_VALUES);
+        ArrayList<ArrayList<String>> values = item.getData(TableItem.TABLE_VALUES);
         name = TableItem.TABLE_VALUES;
         text = values.toString();
+        System.out.println("@Var: text: " + text);
+
         writer.writeStartElement(LegendItem.DATA);
         writer.writeAttribute(XML_NAME, name);
         writer.writeCharacters(text);
@@ -505,10 +508,10 @@ public class TableItemBuilder extends LegendItemBuilder {
         // reading horizontal labels
         reader.next();
         String horizontalLabelsString = reader.getElementText();
-        String[] labelsArray = horizontalLabelsString.replace("[", "").replace("]", "").split(", ");
+        String[] horizontalLabelsArray = horizontalLabelsString.replace("[", "").replace("]", "").split(", ");
         ArrayList<StringBuilder> horizontalLabels = new ArrayList<StringBuilder>();
         for (int i = 0; i < numberOfRows; i++) {
-            horizontalLabels.add(new StringBuilder(labelsArray[i]));
+            horizontalLabels.add(new StringBuilder(horizontalLabelsArray[i]));
         }
 
         // reading vertical labels
@@ -520,15 +523,31 @@ public class TableItemBuilder extends LegendItemBuilder {
             verticalLabels.add(new StringBuilder(verticalLabelsArray[i]));
         }
 
+
+        ArrayList<StringBuilder> labels = item.getData(TableItem.LABELS_IDS);
+        if (labelSelection == TableItem.LabelSelection.BOTH) {
+            horizontalLabels = labels;
+            verticalLabels = labels;
+        }
+        else if (labelSelection == TableItem.LabelSelection.HORIZONTAL) {
+            horizontalLabels = labels;
+        }
+        else if (labelSelection == TableItem.LabelSelection.VERTICAL) {
+            verticalLabels = labels;
+        }
+
+
+
+
         // reading values
         reader.next();
         String valuesString = reader.getElementText();
         String[] valuesArray = valuesString.replace("[", "").replace("]", "").split(", ");
-        ArrayList<ArrayList<Float>> values = new ArrayList<ArrayList<Float>>();
+        ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
         for (int i = 0; i < numberOfRows; i++) {
-            ArrayList<Float> row = new ArrayList<Float>();
+            ArrayList<String> row = new ArrayList<String>();
             for (int j = 0; j < numberOfColumns; j++) {
-                row.add(Float.parseFloat(valuesArray[i * numberOfColumns + j]));
+                row.add(valuesArray[i * numberOfColumns + j]);
             }
             values.add(row);
         }
@@ -565,14 +584,6 @@ public class TableItemBuilder extends LegendItemBuilder {
             verticalColors.add(new Color(Integer.parseInt(verticalColorsArray[i])));
         }
 
-        if (labelSelection == TableItem.LabelSelection.VERTICAL
-            || labelSelection == TableItem.LabelSelection.BOTH) {
-            verticalLabels = item.getData(TableItem.LABELS_IDS);
-        }
-        else if (labelSelection == TableItem.LabelSelection.HORIZONTAL
-                 || labelSelection == TableItem.LabelSelection.BOTH) {
-            horizontalLabels = item.getData(TableItem.LABELS_IDS);
-        }
 
         // setting data
         item.setData(TableItem.NUMBER_OF_ROWS, numberOfRows);

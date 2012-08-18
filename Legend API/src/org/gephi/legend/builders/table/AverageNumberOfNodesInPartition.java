@@ -29,10 +29,8 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-
-@ServiceProvider(service=CustomTableItemBuilder.class, position=1)
-public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder implements CustomTableItemBuilder{
-
+@ServiceProvider(service = CustomTableItemBuilder.class, position = 1)
+public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder implements CustomTableItemBuilder {
 
     @Override
     public String getDescription() {
@@ -44,9 +42,15 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
         return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.AverageNumberOfNodesInPartition.title");
     }
 
-
     @Override
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels,
+                             ArrayList<String> horizontalLabels,
+                             ArrayList<String> verticalLabels,
+                             ArrayList<ArrayList<String>> values,
+                             ArrayList<Color> horizontalColors,
+                             ArrayList<Color> verticalColors,
+                             ArrayList<ArrayList<Color>> valueColors) {
+        
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
@@ -66,15 +70,14 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
             // FILLING LABELS
             int index = 0;
-            for (Part part : partitionModel.getSelectedPartition().getParts()) {
-//                StringBuilder label = new StringBuilder(part.getDisplayName());
+            for (Part part : selectedPartition.getParts()) {
                 String label = part.getDisplayName();
                 labelsMap.put(label, index++);
                 horizontalLabels.add(label);
                 verticalLabels.add(label);
             }
             labels.add(TableItem.LabelSelection.BOTH);
-            
+
 
 
             // FILLING VALUES
@@ -85,14 +88,14 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
             }
 
             for (int i = 0; i < valuesTemp.length; i++) {
-                ArrayList<Float> row= new ArrayList<Float>();
+                ArrayList<String> row = new ArrayList<String>();
                 for (int j = 0; j < valuesTemp[i].length; j++) {
-                    row.add(valuesTemp[i][j]);
+                    row.add(valuesTemp[i][j]+"");
                 }
                 values.add(row);
             }
-            
-            
+
+
             // FILLING COLORS
             for (Part<Node> part : selectedPartition.getParts()) {
                 Color color = part.getColor();
@@ -126,8 +129,4 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
         return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.AverageNumberOfNodesInPartition.stepsNeeded");
     }
 
-
-
-
-    
 }

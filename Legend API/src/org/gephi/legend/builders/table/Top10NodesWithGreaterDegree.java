@@ -41,7 +41,7 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
     }
 
     @Override
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<String>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
 
         ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
         Workspace workspace = projectController.getCurrentWorkspace();
@@ -70,8 +70,8 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
         
         // FILLING VALUES AND COLORS
         for (int i = 0; i < topResults; i++) {
-            ArrayList<Float> row = new ArrayList<Float>();
-            row.add((float)graph.getDegree(nodes.get(i)));
+            ArrayList<String> row = new ArrayList<String>();
+            row.add(graph.getDegree(nodes.get(i))+"");
             values.add(row);
             ArrayList<Color> colorsRow = new ArrayList<Color>();
             colorsRow.add(Color.BLACK);

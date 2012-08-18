@@ -30,7 +30,7 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
 
 
     @Override
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<Float>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<String>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
         // LABELS ID
         labels.add(TableItem.LabelSelection.VERTICAL);
         
@@ -66,10 +66,10 @@ public class Default extends CustomLegendItemBuilder implements CustomTableItemB
         horizontalColors.add(color2);
         
         // VALUES
-        ArrayList<Float> row = new ArrayList<Float>();
-        row.add(1f);
-        row.add(0.5f);
-        row.add(0.85f);
+        ArrayList<String> row = new ArrayList<String>();
+        row.add(1+"");
+        row.add(0.5+"");
+        row.add(0.85+"");
         values.add(row);
         values.add(row);
         
