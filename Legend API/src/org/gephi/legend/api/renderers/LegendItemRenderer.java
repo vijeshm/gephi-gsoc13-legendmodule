@@ -28,8 +28,6 @@ import org.gephi.preview.api.*;
 import org.gephi.preview.spi.MouseResponsiveRenderer;
 import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.preview.spi.Renderer;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import processing.core.PGraphicsJava2D;
 
@@ -60,14 +58,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
      */
     protected abstract void readOwnPropertiesAndValues(Item item, PreviewProperties properties);
 
-    private void readLocationProperties(Item item, PreviewProperties previewProperties) {
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = pc.getCurrentWorkspace();
-        readLocationProperties(item, previewProperties, workspace);
-
-    }
-
-    private final void readLocationProperties(Item item, PreviewProperties previewProperties, Workspace workspace) {
+    private final void readLocationProperties(Item item, PreviewProperties previewProperties) {
         if (item != null) {
             currentItemIndex = item.getData(LegendItem.ITEM_INDEX);
 
@@ -79,7 +70,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
             // GRAPH DIMENSIONS
             PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-            PreviewModel previewModel = previewController.getModel(workspace);
+            PreviewModel previewModel = previewController.getModel();
             Dimension dimensions = previewModel.getDimensions();
             graphHeight = dimensions.height;
             graphWidth = dimensions.width;
@@ -91,8 +82,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             // LEGEND POSITION
             currentRealOriginX = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_X));
             currentRealOriginY = previewProperties.getFloatValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_Y));
-
-
         }
     }
 

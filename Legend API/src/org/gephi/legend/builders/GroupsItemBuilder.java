@@ -247,7 +247,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
         String name = null;
         String text = null;
@@ -344,7 +344,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
         // write number of items
         Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
@@ -357,7 +357,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
 
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
-            writeXMLFromSingleProperty(writer, property);
+            writeXMLFromSingleProperty(writer, property, previewProperties);
         }
     }
 
@@ -428,7 +428,7 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
     // DEFAULT PROPERTIES

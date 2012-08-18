@@ -4,17 +4,12 @@
  */
 package org.gephi.legend.api;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import javax.imageio.ImageIO;
-import javax.swing.Renderer;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.desktop.welcome.WelcomeTopComponent;
@@ -31,15 +26,12 @@ import org.gephi.legend.builders.GroupsItemBuilder;
 import org.gephi.legend.builders.ImageItemBuilder;
 import org.gephi.legend.builders.TableItemBuilder;
 import org.gephi.legend.builders.TextItemBuilder;
-import org.gephi.legend.items.LegendItem;
 import org.gephi.legend.manager.LegendController;
 import org.gephi.legend.manager.LegendManager;
-import org.gephi.legend.plugins.AnotherGroupsRenderer;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
-import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.ProcessingTarget;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.project.api.ProjectController;
@@ -51,8 +43,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import processing.core.PGraphics;
-import processing.core.PGraphicsJava2D;
 
 /**
  *
@@ -136,7 +126,7 @@ public class TestCustomRenderers {
 
 
 
-            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager());
+            previewProperties.putValue(LegendManager.LEGEND_PROPERTIES, new LegendManager(workspace));
 
             LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
             Integer itemIndex = legendManager.getCurrentIndex();

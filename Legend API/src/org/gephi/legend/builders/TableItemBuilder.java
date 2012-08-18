@@ -373,7 +373,7 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeXMLFromData(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
         String name = null;
         String text = null;
@@ -604,7 +604,7 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
         // write number of items
         Integer numberOfLabels = item.getData(TableItem.NUMBER_OF_LABELS);
@@ -617,7 +617,7 @@ public class TableItemBuilder extends LegendItemBuilder {
 
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
-            writeXMLFromSingleProperty(writer, property);
+            writeXMLFromSingleProperty(writer, property, previewProperties);
         }
 
     }
@@ -689,7 +689,7 @@ public class TableItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item) throws XMLStreamException {
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
     //default values

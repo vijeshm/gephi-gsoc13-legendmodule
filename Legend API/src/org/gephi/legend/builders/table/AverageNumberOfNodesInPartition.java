@@ -19,8 +19,6 @@ import org.gephi.partition.api.Part;
 import org.gephi.partition.api.Partition;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.api.PartitionModel;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -51,10 +49,8 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
                              ArrayList<Color> verticalColors,
                              ArrayList<ArrayList<Color>> valueColors) {
         
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
-        GraphModel model = graphController.getModel(workspace);
+        GraphModel model = graphController.getModel();
         Graph graph = model.getGraph();
         PartitionController partitionController = Lookup.getDefault().lookup(PartitionController.class);
         PartitionModel partitionModel = partitionController.getModel();

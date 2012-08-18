@@ -7,8 +7,6 @@ package org.gephi.legend.builders.description.elements;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.legend.api.DescriptionItemElementValue;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -22,11 +20,9 @@ public class NumberOfNodes extends DescriptionItemElementValue {
 
     @Override
     public String getValue() {
-        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = projectController.getCurrentWorkspace();
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
-        Graph graph = graphController.getModel(workspace).getGraph();
-        return "" + graph.getNodeCount();
+        Graph graph = graphController.getModel().getGraph();
+        return String.valueOf(graph.getNodeCount());
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.gephi.legend.items.LegendItem;
 import static org.gephi.legend.items.LegendItem.LEGEND_MIN_HEIGHT;
 import static org.gephi.legend.items.LegendItem.LEGEND_MIN_WIDTH;
 import static org.gephi.legend.items.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
+import org.gephi.legend.manager.LegendController;
 import org.gephi.legend.manager.LegendManager;
 import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
@@ -60,7 +61,7 @@ public class LegendMouseListener implements PreviewMouseListener {
 
     @Override
     public void mouseClicked(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+        LegendManager legendManager = LegendController.getInstance().getLegendManager();
         boolean someItemStateChanged = false;
         for (Item item : legendManager.getLegendItems()) {
             Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
@@ -87,7 +88,7 @@ public class LegendMouseListener implements PreviewMouseListener {
 
     @Override
     public void mousePressed(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+        LegendManager legendManager = LegendController.getInstance().getLegendManager();
         for (Item item : legendManager.getLegendItems()) {
             Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
             if (!isSelected) {
@@ -160,7 +161,7 @@ public class LegendMouseListener implements PreviewMouseListener {
 
     @Override
     public void mouseDragged(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+        LegendManager legendManager = LegendController.getInstance().getLegendManager();
         for (Item item : legendManager.getLegendItems()) {
             Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
             if (!isSelected) {
@@ -225,24 +226,19 @@ public class LegendMouseListener implements PreviewMouseListener {
                         }
 
                         if (newWidth >= LEGEND_MIN_WIDTH && newHeight >= LEGEND_MIN_HEIGHT) {
-
                             previewProperties.putValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X), newOriginX);
                             previewProperties.putValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y), newOriginY);
                             previewProperties.putValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH), newWidth);
                             previewProperties.putValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT), newHeight);
-
                         }
                     }
                 }
                 else if (currentTransformation.equals(TRANSFORMATION_TRANSLATE_OPERATION)) {
-
                     float newOriginX = event.x - relativeX;
                     float newOriginY = event.y - relativeY;
 
-
                     previewProperties.putValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X), newOriginX);
                     previewProperties.putValue(LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y), newOriginY);
-
                 }
 
                 event.setConsumed(true);
@@ -253,7 +249,7 @@ public class LegendMouseListener implements PreviewMouseListener {
 
     @Override
     public void mouseReleased(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        LegendManager legendManager = previewProperties.getValue(LegendManager.LEGEND_PROPERTIES);
+        LegendManager legendManager = LegendController.getInstance().getLegendManager();
 
         for (Item item : legendManager.getLegendItems()) {
             Boolean isSelected = item.getData(LegendItem.IS_SELECTED);
