@@ -5,6 +5,9 @@
 package org.gephi.legend.items;
 
 import org.gephi.legend.manager.LegendManager;
+import org.gephi.legend.properties.LegendProperty;
+import org.gephi.legend.properties.TextProperty;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
 import org.openide.util.NbBundle;
@@ -96,17 +99,15 @@ public class TableItem extends AbstractItem implements LegendItem {
     public enum VerticalTextDirection {
 
         // anti clockwise
-        UP(0, -90d),
+        VERTICAL(0, -90d),
         HORIZONTAL(1, 0),
-        DIAGONAL(2, -45d),
-        DOWN(3, -90d);
+        DIAGONAL(2, -45d);
         private final double rotationAngle;
         private final Integer value;
         private final String[] labels = {
-            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.up"),
+            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.vertical"),
             NbBundle.getMessage(LegendManager.class, "TableItem.rotation.horizontal"),
-            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.diagonal"),
-            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.down")
+            NbBundle.getMessage(LegendManager.class, "TableItem.rotation.diagonal")
         };
 
         private VerticalTextDirection(Integer value, double rotationAngle) {
@@ -135,7 +136,7 @@ public class TableItem extends AbstractItem implements LegendItem {
 
     @Override
     public String toString() {
-        return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
+        return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
     }
 
     @Override

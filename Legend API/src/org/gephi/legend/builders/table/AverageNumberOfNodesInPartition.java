@@ -27,7 +27,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-@ServiceProvider(service = CustomTableItemBuilder.class, position = 1)
+@ServiceProvider(service = CustomTableItemBuilder.class, position = 2)
 public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder implements CustomTableItemBuilder {
 
     @Override
@@ -42,11 +42,11 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
 
     @Override
     public void retrieveData(ArrayList<TableItem.LabelSelection> labels,
-                             ArrayList<String> horizontalLabels,
-                             ArrayList<String> verticalLabels,
+                             ArrayList<String> rowLabels,
+                             ArrayList<String> columnLabels,
                              ArrayList<ArrayList<String>> values,
-                             ArrayList<Color> horizontalColors,
-                             ArrayList<Color> verticalColors,
+                             ArrayList<Color> rowLabelColors,
+                             ArrayList<Color> columnLabelColors,
                              ArrayList<ArrayList<Color>> valueColors) {
         
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
@@ -69,8 +69,8 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
             for (Part part : selectedPartition.getParts()) {
                 String label = part.getDisplayName();
                 labelsMap.put(label, index++);
-                horizontalLabels.add(label);
-                verticalLabels.add(label);
+                rowLabels.add(label);
+                columnLabels.add(label);
             }
             labels.add(TableItem.LabelSelection.BOTH);
 
@@ -95,8 +95,8 @@ public class AverageNumberOfNodesInPartition extends CustomLegendItemBuilder imp
             // FILLING COLORS
             for (Part<Node> part : selectedPartition.getParts()) {
                 Color color = part.getColor();
-                verticalColors.add(color);
-                horizontalColors.add(color);
+                columnLabelColors.add(color);
+                rowLabelColors.add(color);
                 ArrayList<Color> colorRow = new ArrayList<Color>();
                 for (int i = 0; i < valuesTemp.length; i++) {
                     colorRow.add(color);

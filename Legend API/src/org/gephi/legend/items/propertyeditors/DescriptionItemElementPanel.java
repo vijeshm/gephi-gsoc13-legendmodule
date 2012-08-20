@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collection;
 import org.gephi.legend.api.DescriptionItemElementValue;
+import org.gephi.legend.builders.description.elements.CustomValue;
 import org.gephi.legend.items.DescriptionItemElement;
 import org.openide.util.Lookup;
 
@@ -77,7 +78,7 @@ public class DescriptionItemElementPanel extends javax.swing.JPanel implements I
         String value = descriptionItemElementValue.getValue();
         customValueTextField.setText(value);
         if (propertyEditor != null) {
-            this.propertyEditor.setValue(new DescriptionItemElement(descriptionItemElementValue, value));
+            this.propertyEditor.setValue(new DescriptionItemElement(CUSTOM_VALUE, value));
         }
 
     }//GEN-LAST:event_valueComboBoxActionPerformed
@@ -106,5 +107,7 @@ public class DescriptionItemElementPanel extends javax.swing.JPanel implements I
             valueComboBox.addItem(descriptionItemElementValue);
         }
     }
+    
+    private static final DescriptionItemElementValue CUSTOM_VALUE = new CustomValue();
 
 }

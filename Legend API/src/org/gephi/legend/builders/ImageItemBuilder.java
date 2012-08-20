@@ -32,8 +32,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 102),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 102)
+    @ServiceProvider(service = ItemBuilder.class, position = 103),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 103)
 })
 public class ImageItemBuilder extends LegendItemBuilder {
 
@@ -115,13 +115,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
         return availableBuilders;
     }
 
-    @Override
-    public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
-    }
-
-    @Override
-    public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-    }
 
     @Override
     public Item createNewLegendItem(Graph graph) {
@@ -163,11 +156,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
         return properties;
     }
 
-    @Override
-    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        reader.next();
-        return new ArrayList<PreviewProperty>();
-    }
 
     @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
@@ -181,10 +169,6 @@ public class ImageItemBuilder extends LegendItemBuilder {
         }
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
-    }
-
-    @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
     private File defaultImageFile = new File("/Volumes/edubecks/edubecks/Dropbox/imagenes/inception.jpg");

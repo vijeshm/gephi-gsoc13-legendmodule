@@ -42,12 +42,12 @@ public class TableItemRenderer extends LegendItemRenderer {
         return itemBuilder instanceof TableItemBuilder;
     }
 
-    protected void createVerticalText(Graphics2D graphics2D, AffineTransform arrangeTranslation, Integer width, Integer height) {
+    protected void createColumnLabels(Graphics2D graphics2D, AffineTransform arrangeTranslation, Integer width, Integer height) {
 
         graphics2D.setTransform(arrangeTranslation);
 
-        int cellSizeWidth = width / verticalLabels.size();
-        int cellSizeHeight = height / horizontalLabels.size();
+        int cellSizeWidth = width / columnLabels.size();
+        int cellSizeHeight = height / rowLabels.size();
 
         // diagonal shift
         Integer diagonalShift = (int) (cellSizeWidth * Math.cos(verticalTextDirection.rotationAngle()));
@@ -55,7 +55,7 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         //font
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setColor(fontColor);
         graphics2D.setFont(font);
 
@@ -68,47 +68,27 @@ public class TableItemRenderer extends LegendItemRenderer {
 
 
         int maxVerticalTextWidth = Integer.MIN_VALUE;
-        for (StringBuilder label : verticalLabels) {
+        for (StringBuilder label : columnLabels) {
             maxVerticalTextWidth = Math.max(maxVerticalTextWidth, metrics.stringWidth(label.toString()));
         }
 
 
         switch (verticalTextDirection) {
-            case UP: {
-                //rotating
-                arrangeTranslation.translate(0, height - verticalExtraMargin);
-                arrangeTranslation.rotate(verticalTextDirection.rotationAngle());
-
-
-                for (int i = 0; i < verticalLabels.size(); i++) {
-                    String label = verticalLabels.get(i).toString();
-                    graphics2D.setColor(verticalColors.get(i));
-                    graphics2D.drawString(label,
-                            MINIMUM_MARGIN,
-                            i * cellSizeWidth + fontHeight + centerDistance);
-
-                }
-
-
-                break;
-            }
-            case DOWN: {
+            case VERTICAL: {
 
                 arrangeTranslation.translate(0, height - verticalExtraMargin);
                 arrangeTranslation.rotate(verticalTextDirection.rotationAngle());
                 graphics2D.setTransform(arrangeTranslation);
 
 
-                for (int i = 0; i < verticalLabels.size(); i++) {
-                    String label = verticalLabels.get(i).toString();
-                    graphics2D.setColor(verticalColors.get(i));
+                for (int i = 0; i < columnLabels.size(); i++) {
+                    String label = columnLabels.get(i).toString();
+                    graphics2D.setColor(columnLabelColors.get(i));
                     graphics2D.drawString(label,
-                            height - metrics.stringWidth(label) - MINIMUM_MARGIN,
-                            i * cellSizeWidth + fontHeight + centerDistance);
+                                          height - metrics.stringWidth(label) - MINIMUM_MARGIN,
+                                          i * cellSizeWidth + fontHeight + centerDistance);
 
                 }
-
-
                 break;
             }
             case DIAGONAL: {
@@ -126,12 +106,12 @@ public class TableItemRenderer extends LegendItemRenderer {
                 graphics2D.setTransform(arrangeTranslation);
 
 
-                for (int i = 0; i < verticalLabels.size(); i++) {
-                    String label = verticalLabels.get(i).toString();
-                    graphics2D.setColor(verticalColors.get(i));
+                for (int i = 0; i < columnLabels.size(); i++) {
+                    String label = columnLabels.get(i).toString();
+                    graphics2D.setColor(columnLabelColors.get(i));
                     graphics2D.drawString(label,
-                            MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
-                            (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
+                                          MINIMUM_MARGIN + ((i) * diagonalShift) + centerDistance + horizontalExtraMargin,
+                                          (i * diagonalShift) + fontHeight - centerDistance + horizontalExtraMargin);
                 }
 
                 break;
@@ -139,11 +119,11 @@ public class TableItemRenderer extends LegendItemRenderer {
             case HORIZONTAL: {
 
 
-                for (int i = 0; i < verticalLabels.size(); i++) {
-                    String label = verticalLabels.get(i).toString();
-                    graphics2D.setColor(verticalColors.get(i));
+                for (int i = 0; i < columnLabels.size(); i++) {
+                    String label = columnLabels.get(i).toString();
+                    graphics2D.setColor(columnLabelColors.get(i));
 
-                    legendDrawText(graphics2D, label, font, verticalColors.get(i), i * cellSizeWidth, 0, cellSizeWidth, height, verticalTextAlignment);
+                    legendDrawText(graphics2D, label, font, columnLabelColors.get(i), i * cellSizeWidth, 0, cellSizeWidth, height, verticalTextAlignment);
 
                 }
             }
@@ -153,12 +133,12 @@ public class TableItemRenderer extends LegendItemRenderer {
 
     }
 
-    protected void createHorizontalText(Graphics2D graphics, AffineTransform arrangeTranslation, Integer width, Integer height) {
+    protected void createRowLabels(Graphics2D graphics, AffineTransform arrangeTranslation, Integer width, Integer height) {
 
 
 
-        int cellSizeWidth = width / verticalLabels.size();
-        int cellSizeHeight = height / horizontalLabels.size();
+        int cellSizeWidth = width / columnLabels.size();
+        int cellSizeHeight = height / rowLabels.size();
 
 
 
@@ -174,11 +154,9 @@ public class TableItemRenderer extends LegendItemRenderer {
         FontMetrics metrics = graphics.getFontMetrics(font);
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setColor(Color.WHITE);
-        for (int i = 0; i < horizontalLabels.size(); i++) {
-            String label = horizontalLabels.get(i).toString();
-            graphics.setColor(horizontalColors.get(i));
-
-            legendDrawText(graphics, label, font, fontColor, 0, (i * cellSizeHeight), width - MINIMUM_MARGIN, cellSizeHeight, horizontalTextAlignment);
+        for (int i = 0; i < rowLabels.size(); i++) {
+            String label = rowLabels.get(i).toString();
+            legendDrawText(graphics, label, font, rowLabelColors.get(i), 0, (i * cellSizeHeight), width - MINIMUM_MARGIN, cellSizeHeight, horizontalTextAlignment);
 
         }
     }
@@ -187,8 +165,8 @@ public class TableItemRenderer extends LegendItemRenderer {
         //drawing background 
 
 
-        int cellSizeWidth = width / verticalLabels.size();
-        int cellSizeHeight = height / horizontalLabels.size();
+        int cellSizeWidth = width / columnLabels.size();
+        int cellSizeHeight = height / rowLabels.size();
 
         //arrange
         graphics.setTransform(arrangeTranslation);
@@ -199,55 +177,71 @@ public class TableItemRenderer extends LegendItemRenderer {
 
             for (int j = 0; j < tableValuesFloat[i].length; j++) {
 
-                graphics.setColor(valueColors.get(i).get(j));
-
-                int x1, y1, x2, y2;
+                int x = j * cellSizeWidth;
+                int y = i * cellSizeHeight;
 
                 if (isCellColoring) {
-                    switch (cellColoringDirection) {
-                        case UP: {
-                            x1 = j * cellSizeWidth;
-                            y2 = (int) (cellSizeHeight * tableValuesFloat[i][j]) - 1;
-                            y1 = ((i + 1) * cellSizeHeight) - y2;
-                            x2 = cellSizeWidth - 1;
-                            graphics.fillRect(x1, y1, x2, y2);
-                            break;
-                        }
-                        case DOWN: {
-                            x1 = j * cellSizeWidth;
-                            y2 = (int) (cellSizeHeight * tableValuesFloat[i][j]) - 1;
-                            y1 = ((i + 1) * cellSizeHeight) - y2;
-                            x2 = cellSizeWidth - 1;
-                            graphics.fillRect(x1, y1, x2, y2);
-                            break;
-                        }
-                    }
+                    drawCellColoring(graphics, x, y, cellSizeWidth, cellSizeHeight, tableValuesString.get(i).get(j), tableValuesFloat[i][j], valueColors.get(i).get(j));
                 }
                 else {
-                    x1 = j * cellSizeWidth;
-                    y1 = i * cellSizeHeight;
-                    y2 = cellSizeHeight;
-                    x2 = cellSizeWidth;
-                    legendDrawText(graphics, tableValuesFloat[i][j] + "", font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
+                    drawCellText(graphics, x, y, cellSizeWidth, cellSizeHeight, tableValues[i][j], font, valueColors.get(i).get(j));
                 }
+//                graphics.setColor(valueColors.get(i).get(j));
+//
+//                int x1, y1, x2, y2;
+//
+//                if (isCellColoring) {
+//                    x1 = j * cellSizeWidth;
+//                    y2 = (int) (cellSizeHeight * tableValuesFloat[i][j]) - 1;
+//                    y1 = ((i + 1) * cellSizeHeight) - y2;
+//                    x2 = cellSizeWidth - 1;
+//                    graphics.fillRect(x1, y1, x2, y2);
+//                }
+//                else {
+//                    x1 = j * cellSizeWidth;
+//                    y1 = i * cellSizeHeight;
+//                    y2 = cellSizeHeight;
+//                    x2 = cellSizeWidth;
+//                    legendDrawText(graphics, tableValuesFloat[i][j] + "", font, fontColor, x1, y1, x2, y2, Alignment.CENTER);
+//                }
 
                 // GRID DISPLAYING
                 if (isDisplayingGrid) {
-                    x1 = j * cellSizeWidth;
-                    y1 = i * cellSizeHeight;
-                    y2 = cellSizeHeight;
-                    x2 = cellSizeWidth;
+//                    int x1 = j * cellSizeWidth;
+//                    y1 = i * cellSizeHeight;
+//                    y2 = cellSizeHeight;
+//                    x2 = cellSizeWidth;
                     graphics.setColor(gridColor);
-                    graphics.drawRect(x1, y1, x2, y2);
+                    graphics.drawRect(x, y, cellSizeWidth, cellSizeHeight);
                 }
 
             }
         }
 
     }
-    
-    protected void drawCell(Graphics2D graphics2D, Integer x, Integer y, Integer width, Integer height, String value){
-        legendDrawText(graphics2D, value , font, fontColor, x, y, width, height, Alignment.CENTER);
+
+    /**
+     * Override this function to render the specified cell in a different way
+     *
+     * @param graphics the Graphics object to draw to
+     * @param x the x coordinate of the area containing the cell
+     * @param y the y coordinate of the area containing the cell
+     * @param width the width of the area containing the cell
+     * @param height the height of the area containing the cell
+     * @param value value to be displayed
+     * @param color rendering color for the value
+     */
+    protected void drawCellColoring(Graphics2D graphics, Integer x, Integer y, Integer width, Integer height, String value, Float valueNormalized, Color color) {
+        int x1 = x;
+        int y2 = (int) (height * Float.parseFloat(value));
+        int y1 = (y + height) - y2;
+        int x2 = width - 1;
+        graphics.setColor(color);
+        graphics.fillRect(x1, y1, x2, y2);
+    }
+
+    protected void drawCellText(Graphics2D graphics, Integer x, Integer y, Integer width, Integer height, String value, Font font, Color color) {
+        legendDrawText(graphics, value, font, color, x, y, width, height, Alignment.CENTER);
     }
 
     @Override
@@ -258,11 +252,11 @@ public class TableItemRenderer extends LegendItemRenderer {
         FontMetrics fontMetrics = graphics2D.getFontMetrics(font);
 
         int maxHorizontalTextWidth = Integer.MIN_VALUE;
-        for (StringBuilder label : horizontalLabels) {
+        for (StringBuilder label : rowLabels) {
             maxHorizontalTextWidth = Math.max(maxHorizontalTextWidth, fontMetrics.stringWidth(label.toString()));
         }
         int maxVerticalTextWidth = Integer.MIN_VALUE;
-        for (StringBuilder label : verticalLabels) {
+        for (StringBuilder label : columnLabels) {
             maxVerticalTextWidth = Math.max(maxVerticalTextWidth, fontMetrics.stringWidth(label.toString()));
         }
 
@@ -272,13 +266,7 @@ public class TableItemRenderer extends LegendItemRenderer {
         int tableWidth = 0;
         int tableHeight = 0;
         switch (verticalTextDirection) {
-            case UP: {
-                verticalLabelsHeight = maxVerticalTextWidth + 2 * MINIMUM_MARGIN;
-                tableHeight = height - verticalLabelsHeight;
-                tableWidth = width - horizontalLabelsWidth;
-                break;
-            }
-            case DOWN: {
+            case VERTICAL: {
                 verticalLabelsHeight = maxVerticalTextWidth + 2 * MINIMUM_MARGIN;
                 tableHeight = height - verticalLabelsHeight;
                 tableWidth = width - horizontalLabelsWidth;
@@ -328,15 +316,22 @@ public class TableItemRenderer extends LegendItemRenderer {
             tableOrigin.translate(horizontalLabelsWidth, 0);
         }
         else if (horizontalTextPosition == TableItem.HorizontalPosition.RIGHT) {
-            horizontalTextOrigin.translate(tableWidth, 0);
+            horizontalTextOrigin.translate(tableWidth + MINIMUM_MARGIN, 0);
             verticalTextOrigin.translate(0, 0);
             tableOrigin.translate(0, 0);
         }
-        createVerticalText(graphics2D, verticalTextOrigin, verticalLabelsWidth, verticalLabelsHeight);
-        createHorizontalText(graphics2D, horizontalTextOrigin, horizontalLabelsWidth, horizontalLabelsHeight);
+        createColumnLabels(graphics2D, verticalTextOrigin, verticalLabelsWidth, verticalLabelsHeight);
+        createRowLabels(graphics2D, horizontalTextOrigin, horizontalLabelsWidth, horizontalLabelsHeight);
         if (isCellColoring) {
             normalizeWithMinValueZero(tableValuesFloat);
         }
+        tableValues = new String[tableValuesFloat.length][tableValuesFloat[0].length];
+        for (int i = 0; i < tableValuesFloat.length; i++) {
+            for (int j = 0; j < tableValuesFloat[0].length; j++) {
+                tableValues[i][j] = tableValuesFloat[i][j] + "";
+            }
+        }
+
         createTableImage(graphics2D, tableOrigin, tableWidth, tableHeight);
     }
 
@@ -389,14 +384,14 @@ public class TableItemRenderer extends LegendItemRenderer {
 
         // READING COLORS
         valueColors = item.getData(TableItem.COLOR_VALUES);
-        verticalColors = item.getData(TableItem.COLOR_VERTICAL);
-        horizontalColors = item.getData(TableItem.COLOR_HORIZONTAL);
+        columnLabelColors = item.getData(TableItem.COLOR_VERTICAL);
+        rowLabelColors = item.getData(TableItem.COLOR_HORIZONTAL);
 
 
         // READING LABELS
         labels = item.getData(TableItem.LABELS_IDS);
-        horizontalLabels = item.getData(TableItem.HORIZONTAL_LABELS);
-        verticalLabels = item.getData(TableItem.VERTICAL_LABELS);
+        rowLabels = item.getData(TableItem.HORIZONTAL_LABELS);
+        columnLabels = item.getData(TableItem.VERTICAL_LABELS);
         for (int i = 0; i < labels.size(); i++) {
             StringBuilder label = labels.get(i);
             String newLabel = properties.getStringValue(TableProperty.getLabelProperty(itemIndex, i));
@@ -423,28 +418,29 @@ public class TableItemRenderer extends LegendItemRenderer {
         cellColoringDirection = (Direction) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_COLORING_DIRECTION));
         verticalTextDirection = (TableItem.VerticalTextDirection) properties.getValue(LegendManager.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_VERTICAL_TEXT_ROTATION));
     }
-    
-    private Font font;
-    private Color fontColor;
-    private ArrayList<StringBuilder> labels;
-    private ArrayList<StringBuilder> horizontalLabels;
-    private ArrayList<StringBuilder> verticalLabels;
-    private ArrayList<Color> horizontalColors;
-    private ArrayList<Color> verticalColors;
-    private ArrayList<ArrayList<Color>> valueColors;
-    private Boolean isCellColoring;
-    private Direction cellColoringDirection;
-    private TableItem.HorizontalPosition horizontalTextPosition;
-    private Alignment horizontalTextAlignment;
-    private TableItem.VerticalPosition verticalTextPosition;
-    private Alignment verticalTextAlignment;
-    private TableItem.VerticalTextDirection verticalTextDirection;
-    private Integer verticalExtraMargin;
-    private Integer horizontalExtraMargin;
+
+    protected Font font;
+    protected Color fontColor;
+    protected ArrayList<StringBuilder> labels;
+    protected ArrayList<StringBuilder> rowLabels;
+    protected ArrayList<StringBuilder> columnLabels;
+    protected ArrayList<Color> rowLabelColors;
+    protected ArrayList<Color> columnLabelColors;
+    protected ArrayList<ArrayList<Color>> valueColors;
+    protected Boolean isCellColoring;
+    protected Direction cellColoringDirection;
+    protected TableItem.HorizontalPosition horizontalTextPosition;
+    protected Alignment horizontalTextAlignment;
+    protected TableItem.VerticalPosition verticalTextPosition;
+    protected Alignment verticalTextAlignment;
+    protected TableItem.VerticalTextDirection verticalTextDirection;
+    protected Integer verticalExtraMargin;
+    protected Integer horizontalExtraMargin;
     private final Integer MINIMUM_MARGIN = 3;
-    private ArrayList<ArrayList<String>> tableValuesString;
-    private Float[][] tableValuesFloat;
+    protected ArrayList<ArrayList<String>> tableValuesString;
+    protected Float[][] tableValuesFloat;
+    protected String[][] tableValues;
     // Grid
-    private Boolean isDisplayingGrid;
-    private Color gridColor;
+    protected Boolean isDisplayingGrid;
+    protected Color gridColor;
 }

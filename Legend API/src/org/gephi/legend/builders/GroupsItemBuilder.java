@@ -33,8 +33,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 103),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 103)
+    @ServiceProvider(service = ItemBuilder.class, position = 101),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 101)
 })
 public class GroupsItemBuilder extends LegendItemBuilder {
 
@@ -408,12 +408,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
     }
 
     @Override
-    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        reader.nextTag();
-        return new ArrayList<PreviewProperty>();
-    }
-
-    @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
         String valueString = reader.getElementText();
@@ -425,10 +419,6 @@ public class GroupsItemBuilder extends LegendItemBuilder {
         }
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
-    }
-
-    @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
     // DEFAULT PROPERTIES

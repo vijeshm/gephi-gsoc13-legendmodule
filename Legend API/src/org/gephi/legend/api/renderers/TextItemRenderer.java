@@ -55,17 +55,35 @@ public class TextItemRenderer extends LegendItemRenderer {
     protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
         if (!body.isEmpty()) {
             graphics2D.setTransform(origin);
-            boolean computeSpace = true;
-            
+
             float currentSize = computeVerticalTextSpaceUsed(graphics2D, body, bodyFont, width);
 //            float currentSize = legendDrawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment, computeSpace);
             while (currentSize > height) {
-                bodyFont = new Font(bodyFont.getName(), bodyFont.getStyle(), bodyFont.getSize()-1);
+                bodyFont = new Font(bodyFont.getName(), bodyFont.getStyle(), bodyFont.getSize() - 1);
                 currentSize = computeVerticalTextSpaceUsed(graphics2D, body, bodyFont, width);
 //                currentSize = legendDrawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment, computeSpace);
             }
-            legendDrawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment);
+            drawText(graphics2D, body, bodyFont, bodyFontColor, width, width, width, height, bodyAlignment);
         }
+    }
+
+    /**
+        
+     * Override this function to render the specified text in a different way
+     *
+     * @param graphics2D the Graphics object to draw to
+     * @param text text to be displayed
+     * @param font rendering font for the text
+     * @param color rendering color for the text
+     * @param x the x coordinate of the area containing the text
+     * @param y the y coordinate of the area containing the text
+     * @param width the width of the area containing the text
+     * @param height the height of the area containing the text
+     * @param alignment alignment of the text. It can be LEFT, RIGHT, CENTER and
+     * JUSTIFIED
+     */
+    protected void drawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment) {
+        legendDrawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment);
     }
 
     // OWN PROPERTIES

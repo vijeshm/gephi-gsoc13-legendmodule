@@ -25,21 +25,27 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-@ServiceProvider(service = CustomTableItemBuilder.class, position = 2)
+@ServiceProvider(service = CustomTableItemBuilder.class, position = 3)
 public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder implements CustomTableItemBuilder {
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.Top10NodesWithGreaterDegree.description");
+        return NbBundle.getMessage(Top10NodesWithGreaterDegree.class, "Table.builder.Top10NodesWithGreaterDegree.description");
     }
 
     @Override
     public String getTitle() {
-        return NbBundle.getMessage(AverageNumberOfNodesInPartition.class, "Table.builder.Top10NodesWithGreaterDegree.title");
+        return NbBundle.getMessage(Top10NodesWithGreaterDegree.class, "Table.builder.Top10NodesWithGreaterDegree.title");
     }
 
     @Override
-    public void retrieveData(ArrayList<TableItem.LabelSelection> labels, ArrayList<String> horizontalLabels, ArrayList<String> verticalLabels, ArrayList<ArrayList<String>> values, ArrayList<Color> horizontalColors, ArrayList<Color> verticalColors, ArrayList<ArrayList<Color>> valueColors) {
+    public void retrieveData(ArrayList<TableItem.LabelSelection> labels,
+                             ArrayList<String> rowLabels,
+                             ArrayList<String> columnLabels,
+                             ArrayList<ArrayList<String>> values,
+                             ArrayList<Color> rowLabelColors,
+                             ArrayList<Color> columnLabelColors,
+                             ArrayList<ArrayList<Color>> valueColors) {
 
         GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
         GraphModel model = graphController.getModel();
@@ -47,33 +53,33 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
 
         List<Node> nodes = Arrays.asList(graph.getNodes().toArray());
         Collections.sort(nodes, new NodeSort(graph));
-        
+
         int topResults = 10;
         // FILLING HORIZONTAL LABELS AND COLORS
         for (int i = 0; i < topResults; i++) {
 //            StringBuilder label = new StringBuilder(nodes.get(i).getNodeData().getLabel());
             String label = nodes.get(i).getNodeData().getLabel();
-            horizontalLabels.add(label);
-            horizontalColors.add(Color.BLUE);
+            rowLabels.add(label);
+            rowLabelColors.add(Color.BLUE);
         }
         labels.add(TableItem.LabelSelection.HORIZONTAL);
-        
+
         // FILLING VERTICAL LABELS
 //        StringBuilder value = new StringBuilder("value");
         String value = "value";
-        verticalLabels.add(value);
-        verticalColors.add(Color.BLUE);
-        
+        columnLabels.add(value);
+        columnLabelColors.add(Color.BLUE);
+
         // FILLING VALUES AND COLORS
         for (int i = 0; i < topResults; i++) {
             ArrayList<String> row = new ArrayList<String>();
-            row.add(graph.getDegree(nodes.get(i))+"");
+            row.add(graph.getDegree(nodes.get(i)) + "");
             values.add(row);
             ArrayList<Color> colorsRow = new ArrayList<Color>();
             colorsRow.add(Color.BLACK);
             valueColors.add(colorsRow);
         }
-        
+
 
     }
 
@@ -90,11 +96,11 @@ public class Top10NodesWithGreaterDegree extends CustomLegendItemBuilder impleme
     private class NodeSort implements Comparator<Node> {
 
         private Graph graph;
-        
+
         public NodeSort(Graph graph) {
             this.graph = graph;
         }
-        
+
         @Override
         public int compare(Node n1, Node n2) {
             return graph.getDegree(n2) - graph.getDegree(n1);

@@ -39,7 +39,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
     /**
      *
-     * Function that actually renders the legend using the Graphics2D Object
+     * Function that actually renders the legend using the Graphics2D Object 
      *
      * @param graphics2D Graphics2D instance used to render legend
      * @param origin transformation that contains the origin and level zoom of
@@ -50,7 +50,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
     /**
-     * Function that reads the custom property's values from the
+     * Function that reads the custom properties values from the
      * PreviewProperties of the current PreviewModel
      *
      * @param item current Legend Item
@@ -227,7 +227,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         AffineTransform titleOrigin = new AffineTransform(origin);
         float titleHeight = 0;
         if (isDisplayingTitle && !title.isEmpty()) {
-//            titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, origin.getTranslateX(), origin.getTranslateY(), width);
             titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, width);
             renderTitle(graphics2D, titleOrigin, width, (int) titleHeight);
 
@@ -235,7 +234,6 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
 
         float descriptionHeight = 0;
         if (isDisplayingDescription && !description.isEmpty()) {
-//            descriptionHeight = computeVerticalTextSpaceUsed(graphics2D, description, descriptionFont, origin.getTranslateX(), origin.getTranslateY(), width);
             descriptionHeight = computeVerticalTextSpaceUsed(graphics2D, description, descriptionFont, width);
         }
         // LEGEND
@@ -243,8 +241,8 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         //adding space between elements
         legendOrigin.translate(0, titleHeight + MARGIN_BETWEEN_ELEMENTS);
         int legendWidth = width;
-        int legendHeight = (Integer) (height - Math.round(titleHeight) - Math.round(descriptionHeight) - MARGIN_BETWEEN_ELEMENTS);
-        renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
+        int legendHeight = (Integer) (height - Math.round(titleHeight) - Math.round(descriptionHeight) - 2 * MARGIN_BETWEEN_ELEMENTS);
+        
 
         // DESCRIPTION
         AffineTransform descriptionOrigin = new AffineTransform(origin);
@@ -254,10 +252,15 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
         }
 
 
+        // rendering legend
+        renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
+        
         // is selected
         if (currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
+        
+        
     }
 
     private void drawScaleAnchors(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -394,7 +397,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
             leading = layout.getLeading();
             yText += descent + leading;
         }
-        return (float) Math.ceil(yText - y - descent - leading);
+        return (float) Math.ceil(yText - y - leading);
     }
 
     /**
@@ -443,7 +446,7 @@ public abstract class LegendItemRenderer implements Renderer, MouseResponsiveRen
     private float graphOriginY = Float.MAX_VALUE;
     private float graphWidth = 0;
     private float graphHeight = 0;
-    private final int MARGIN_BETWEEN_ELEMENTS = 3;
+    private final int MARGIN_BETWEEN_ELEMENTS = 5;
     // VARIABLES
     // IS DISPLAYING
     private Boolean isDisplayingLegend;

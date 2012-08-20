@@ -4,6 +4,7 @@
  */
 package org.gephi.legend.items;
 
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.AbstractItem;
 
@@ -24,7 +25,7 @@ public class DescriptionItem extends AbstractItem implements LegendItem {
 
     @Override
     public String toString() {
-        return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[0].getValue()) + " [" + LEGEND_TYPE + "]";
+        return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
     }
     
     @Override

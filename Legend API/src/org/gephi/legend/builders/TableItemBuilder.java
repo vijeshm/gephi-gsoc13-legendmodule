@@ -37,8 +37,8 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 100),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 100)
+    @ServiceProvider(service = ItemBuilder.class, position = 104),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 104)
 })
 public class TableItemBuilder extends LegendItemBuilder {
 
@@ -668,11 +668,6 @@ public class TableItemBuilder extends LegendItemBuilder {
         return properties;
     }
 
-    @Override
-    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        reader.nextTag();
-        return new ArrayList<PreviewProperty>();
-    }
 
     @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
@@ -688,14 +683,9 @@ public class TableItemBuilder extends LegendItemBuilder {
         return property;
     }
 
-    @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
-    }
-
     //default values
-    protected final Integer defaultVerticalExtraMargin = 3;
-    protected final Integer defaultHorizontalExtraMargin = 3;
-    protected final Integer defaultMinimumMargin = 3;
+    protected final Integer defaultColumnExtraMargin = 3;
+    protected final Integer defaultRowExtraMargin = 3;
     protected final Font defaultFont = new Font("Arial", Font.PLAIN, 13);
     protected final Color defaultFontColor = Color.BLACK;
     // grid
@@ -705,24 +695,24 @@ public class TableItemBuilder extends LegendItemBuilder {
     protected final Boolean defaultIsCellColoring = false;
     protected final Direction defaultCellColoringDirection = Direction.UP;
     // side labels
-    protected final HorizontalPosition defaultHorizontalLabelsPosition = HorizontalPosition.LEFT;
-    protected final Alignment defaultHorizontalTextAlignment = Alignment.JUSTIFIED;
+    protected final HorizontalPosition defaultRowLabelsPosition = HorizontalPosition.LEFT;
+    protected final Alignment defaultRowTextAlignment = Alignment.JUSTIFIED;
     // up/bottom labels
-    protected final Alignment defaultVerticalTextAlignment = Alignment.CENTER;
-    protected final VerticalPosition defaultVerticalLabelsPosition = VerticalPosition.BOTTOM;
-    protected final TableItem.VerticalTextDirection defaultVerticalTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
+    protected final Alignment defaultColumnTextAlignment = Alignment.CENTER;
+    protected final VerticalPosition defaultColumnLabelsPosition = VerticalPosition.UP;
+    protected final TableItem.VerticalTextDirection defaultColumnTextRotation = TableItem.VerticalTextDirection.DIAGONAL;
     private final Object[] defaultValues = {
         defaultFont,
         defaultFontColor,
         defaultIsCellColoring,
-        defaultCellColoringDirection,
-        defaultHorizontalLabelsPosition,
-        defaultHorizontalTextAlignment,
-        defaultHorizontalExtraMargin,
-        defaultVerticalLabelsPosition,
-        defaultVerticalTextAlignment,
-        defaultVerticalTextRotation,
-        defaultVerticalExtraMargin,
+//        defaultCellColoringDirection,
+        defaultRowLabelsPosition,
+        defaultRowTextAlignment,
+        defaultRowExtraMargin,
+        defaultColumnLabelsPosition,
+        defaultColumnTextAlignment,
+        defaultColumnTextRotation,
+        defaultColumnExtraMargin,
         defaultIsDisplayingGrid,
         defaultGridColor
     };

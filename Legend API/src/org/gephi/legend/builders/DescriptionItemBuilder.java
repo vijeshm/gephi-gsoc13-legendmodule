@@ -37,8 +37,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 104),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 104)
+    @ServiceProvider(service = ItemBuilder.class, position = 100),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 100)
 })
 public class DescriptionItemBuilder extends LegendItemBuilder {
 
@@ -273,14 +273,6 @@ public class DescriptionItemBuilder extends LegendItemBuilder {
             availableBuilders.add((CustomLegendItemBuilder) customBuilder);
         }
         return availableBuilders;
-    }
-
-    @Override
-    public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
-    }
-
-    @Override
-    public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
     }
 
     @Override

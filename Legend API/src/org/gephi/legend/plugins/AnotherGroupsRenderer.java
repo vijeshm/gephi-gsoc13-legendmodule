@@ -13,6 +13,10 @@ import java.util.TreeMap;
 import org.gephi.legend.api.renderers.GroupsItemRenderer;
 import org.gephi.legend.items.LegendItem;
 import org.gephi.preview.spi.Renderer;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -24,7 +28,7 @@ public class AnotherGroupsRenderer extends GroupsItemRenderer {
 
     @Override
     public String getDisplayName() {
-        return "Another Groups Renderer";
+        return NbBundle.getMessage(AnotherGroupsRenderer.class, "AnotherGroupsRenderer.displayName");
     }
 
     @Override
@@ -126,6 +130,7 @@ public class AnotherGroupsRenderer extends GroupsItemRenderer {
                            LegendItem.Alignment.CENTER);
 
 
+            
 
         }
     }

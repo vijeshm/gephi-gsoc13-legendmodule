@@ -34,8 +34,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 101),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 101)
+    @ServiceProvider(service = ItemBuilder.class, position = 105),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 105)
 })
 public class TextItemBuilder extends LegendItemBuilder {
 
@@ -152,13 +152,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         return availableBuilders;
     }
 
-    @Override
-    protected void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
-    }
-
-    @Override
-    public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-    }
 
     @Override
     protected void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
@@ -199,11 +192,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         return properties;
     }
 
-    @Override
-    protected ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
-        reader.nextTag();
-        return new ArrayList<PreviewProperty>();
-    }
 
     @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
@@ -219,9 +207,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         return property;
     }
 
-    @Override
-    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
-    }
 
     // DEFAULT VALUES
     protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";

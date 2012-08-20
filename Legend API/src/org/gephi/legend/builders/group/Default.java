@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-@ServiceProvider(service=CustomGroupsItemBuilder.class, position=100)
+@ServiceProvider(service=CustomGroupsItemBuilder.class, position=1)
 public class Default extends CustomLegendItemBuilder implements CustomGroupsItemBuilder{
 
     @Override

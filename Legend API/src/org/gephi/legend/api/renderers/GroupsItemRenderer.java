@@ -30,8 +30,11 @@ import org.openide.util.lookup.ServiceProvider;
 public class GroupsItemRenderer extends LegendItemRenderer {
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        
+    protected void renderToGraphics(Graphics2D graphics2D,
+                                    AffineTransform origin,
+                                    Integer width,
+                                    Integer height) {
+
         if (labels.isEmpty()) {
             return;
         }
@@ -46,9 +49,10 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         FontMetrics fontMetrics = graphics2D.getFontMetrics();
 
 
-        int elementHeight = (height - (numRows - 1) * paddingBetweenElements) / numRows;
-        int elementWidth = (width - (numColumns - 1) * paddingBetweenElements) / numColumns;
-//        int elementWidth = width / numColumns - paddingBetweenElements;
+//        int elementHeight = (height - (numRows - 1) * paddingBetweenElements) / numRows;
+//        int elementWidth = (width - (numColumns - 1) * paddingBetweenElements) / numColumns;
+        int elementWidth = width / numColumns - paddingBetweenElements;
+        int elementHeight = height / numRows - paddingBetweenElements;
 
         int maxLabelWidth = Integer.MIN_VALUE;
         int maxLabelHeight = Integer.MIN_VALUE;
@@ -56,7 +60,7 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         // computing max label height
         for (StringBuilder label : labels) {
             maxLabelHeight = (int) Math.max(maxLabelHeight, computeVerticalTextSpaceUsed(graphics2D, label.toString(), labelFont, elementWidth));
-            
+
         }
 
         // computing max label width
@@ -96,8 +100,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
 //        }
 
         for (int i = 0; i < labels.size(); i++) {
-            int x = (i % numColumns) * elementWidth + paddingBetweenElements ;
-            int y = (i / numColumns) * elementHeight + paddingBetweenElements;
+            int x = (i % numColumns) * (elementWidth + paddingBetweenElements);
+            int y = (i / numColumns) * (elementHeight + paddingBetweenElements);
             int xShape = 0, yShape = 0, xLabel = 0, yLabel = 0;
             switch (labelPosition) {
                 case RIGHT: {
@@ -131,8 +135,57 @@ public class GroupsItemRenderer extends LegendItemRenderer {
             }
 
             drawShape(graphics2D, shape, colors.get(i), xShape, yShape, shapeWidth, shapeHeight, values.get(i));
-            legendDrawText(graphics2D, labels.get(i).toString(), labelFont, colors.get(i), xLabel, yLabel, labelWidth, labelHeight, LegendItem.Alignment.CENTER);
+            drawElementLabel(graphics2D, labels.get(i).toString(), labelFont, colors.get(i), xLabel, yLabel, labelWidth, labelHeight);
         }
+    }
+
+    /**
+     * Override this function to draw each element label in a different way.
+     *
+     * @param graphics2D the Graphics object to draw to
+     * @param label text to be displayed as label
+     * @param labelFont font used to draw the label
+     * @param labelColor rendering color for the label
+     * @param x the x coordinate of the area containing the label
+     * @param y the y coordinate of the area containing the label
+     * @param width the width of the area containing the label
+     * @param height the height of the area containing the label
+     *
+     */
+    protected void drawElementLabel(Graphics2D graphics2D,
+                                    String label,
+                                    Font labelFont,
+                                    Color labelColor,
+                                    int x,
+                                    int y,
+                                    Integer width,
+                                    Integer height) {
+        legendDrawText(graphics2D, label, labelFont, labelColor, x, y, width, height, LegendItem.Alignment.CENTER);
+    }
+
+    /**
+     * Override this function to draw each element shape or representative
+     * element in a different way.
+     *
+     * @param graphics2D the Graphics object to draw to
+     * @param shape shape specified by the user, it could be one the three
+     * values:
+     * @param value value to express as a shape
+     * @param valueColor rendering color for the value
+     * @param x the x coordinate of the area containing the label
+     * @param y the y coordinate of the area containing the label
+     * @param width the width of the area containing the label
+     * @param height the height of the area containing the label
+     */
+    protected void drawElementShape(Graphics2D graphics2D,
+                                    Shape shape,
+                                    Float value,
+                                    Color valueColor,
+                                    int x,
+                                    int y,
+                                    Integer width,
+                                    Integer height) {
+        drawShape(graphics2D, shape, valueColor, x, y, width, height, value);
     }
 
     private void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height, float scale) {
@@ -173,8 +226,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
             String newLabel = properties.getStringValue(GroupsProperty.getLabelProperty(itemIndex, i));
             label.replace(0, newLabel.length(), newLabel);
         }
-        
-        
+
+
         colors = item.getData(GroupsItem.COLORS);
         values = item.getData(GroupsItem.VALUES);
 
@@ -185,8 +238,8 @@ public class GroupsItemRenderer extends LegendItemRenderer {
         shape = (LegendItem.Shape) properties.getValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
         labelFont = properties.getFontValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
         isScalingShapes = properties.getBooleanValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SCALE_SHAPE));
-        
-                // 
+
+        // 
         ArrayList<Float> valuesNormalized = new ArrayList<Float>();
         if (isScalingShapes) {
             float maxValue = Collections.max(values);
@@ -199,9 +252,9 @@ public class GroupsItemRenderer extends LegendItemRenderer {
                 valuesNormalized.add(1f);
             }
         }
-        
+
         values = valuesNormalized;
-        
+
         paddingBetweenTextAndShape = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
         paddingBetweenElements = properties.getIntValue(LegendManager.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
 

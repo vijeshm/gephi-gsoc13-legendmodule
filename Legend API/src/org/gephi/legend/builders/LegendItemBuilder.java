@@ -362,7 +362,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
         // creating label
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        previewProperties[0] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex);
+        previewProperties[0] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " ["+item.getType()+"]");
         for (int i = 1; i < previewProperties.length; i++) {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
         }
@@ -432,7 +432,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    protected abstract void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException;
+    protected void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException{
+        
+    }
 
     /**
      * Function that takes the specific properties of each item and uses the writer to save the properties in it. It saves the properties inside an
@@ -454,7 +456,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
-    protected abstract void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException;
+    protected void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException{
+        
+    }
 
     /**
      * Function that automatically saves a property using its PropertyName and the Value attached to it. Only works if property has a known value type. Known types:
@@ -535,7 +539,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
      * @param item the item where the data would be stored
      * @throws XMLStreamException
      */
-    public abstract void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException;
+    public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException{
+        
+    }
 
     /**
      * Function that retrieves the property (propertyName and value) from an XML reader and converts it to single specific kind of property corresponding to an Item.
@@ -831,9 +837,8 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         TableItem.HorizontalPosition.LEFT
     };
     private final Object[] availableTableVerticalTextDirections = {
-        TableItem.VerticalTextDirection.UP,
+        TableItem.VerticalTextDirection.VERTICAL,
         TableItem.VerticalTextDirection.HORIZONTAL,
-        TableItem.VerticalTextDirection.DIAGONAL,
-        TableItem.VerticalTextDirection.DOWN
+        TableItem.VerticalTextDirection.DIAGONAL
     };
 }

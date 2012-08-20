@@ -10,6 +10,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.apache.batik.svggen.*;
 import org.apache.commons.codec.binary.*;
@@ -40,7 +41,6 @@ public class ImageItemRenderer extends LegendItemRenderer {
             if (imageFile.exists()) {
                 BufferedImage before = ImageIO.read(imageFile);
 
-
                 graphics2D.setTransform(origin);
                 if (before.getWidth() == width && before.getHeight() == height) {
                     graphics2D.drawImage(before, 0, 0, null);
@@ -55,44 +55,23 @@ public class ImageItemRenderer extends LegendItemRenderer {
                     AffineTransformOp scaleOperation = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
                     after = scaleOperation.filter(before, after);
 
-
-                    // EXPORTING TO SVG
+//                    // EXPORTING TO SVG
                     if (graphics2D instanceof SVGGraphics2D) {
-                        SVGGraphics2D svgGraphics2D = (SVGGraphics2D) graphics2D;
-                        SVGGeneratorContext svgGeneratorContext = svgGraphics2D.getGeneratorContext();
+                        int x = (int) origin.getTranslateX();
+                        int y = (int) origin.getTranslateY();
 
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        ImageIO.write(after, "png", baos);
-                        baos.flush();
-                        String encodedImage = Base64.encodeBase64String(baos.toByteArray());
-                        baos.close(); // should be inside a finally block
-                        Document svgDocument = svgGeneratorContext.getDOMFactory();
-
-                        Element imageBase64 = svgDocument.createElementNS("http://www.w3.org/2000/svg", "image");
-                        imageBase64.setAttribute("width", "" + after.getWidth());
-                        imageBase64.setAttribute("height", "" + after.getHeight());
-//                        imageBase64.setAttribute("transform", "scale("+scaleWidth+","+scaleHeight+") translate("+origin.getTranslateX()+","+origin.getTranslateY()+")");
-                        imageBase64.setAttribute("transform", "scale(1,1) translate(" + origin.getTranslateX() + "," + origin.getTranslateY() + ")");
-                        imageBase64.setAttribute("xlink:href", DATA_PROTOCOL_PNG_PREFIX + encodedImage);
-
-                        svgDocument.getLastChild().appendChild(imageBase64);
-
-
-
-
+                        renderImageToSVGGraphics(graphics2D, after, x, y);
 
                     }
                     else {
                         graphics2D.drawImage(after, 0, 0, null);
                     }
 
-
-
-
                 }
             }
+
         } catch (Exception e) {
-            System.out.println("@Var: e: "+e);
+            System.out.println("@Var: e: " + e);
 
 
         }
@@ -119,6 +98,43 @@ public class ImageItemRenderer extends LegendItemRenderer {
     @Override
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof ImageItemBuilder;
+    }
+
+    /**
+     * Renders an image into an SVGGraphics2D object
+     *
+     * @param graphics2D Graphics2D instance used to render legend
+     * @param image image that will be renderer
+     * @param x the x coordinate of the the position where the image will be
+     * rendered
+     * @param y the y coordinate of the the position where the image will be
+     * rendered
+     */
+    public static void renderImageToSVGGraphics(Graphics2D graphics2D, BufferedImage image, int x, int y) {
+        try {
+            SVGGraphics2D svgGraphics2D = (SVGGraphics2D) graphics2D;
+            SVGGeneratorContext svgGeneratorContext = svgGraphics2D.getGeneratorContext();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            baos.flush();
+            String encodedImage = Base64.encodeBase64String(baos.toByteArray());
+            baos.close(); // should be inside a finally block
+            Document svgDocument = svgGeneratorContext.getDOMFactory();
+
+            Element imageBase64 = svgDocument.createElementNS("http://www.w3.org/2000/svg", "image");
+            imageBase64.setAttribute("width", "" + image.getWidth());
+            imageBase64.setAttribute("height", "" + image.getHeight());
+//                        imageBase64.setAttribute("transform", "scale("+scaleWidth+","+scaleHeight+") translate("+origin.getTranslateX()+","+origin.getTranslateY()+")");
+            imageBase64.setAttribute("transform", "scale(1,1) translate(" + x + "," + y + ")");
+            imageBase64.setAttribute("xlink:href", DATA_PROTOCOL_PNG_PREFIX + encodedImage);
+
+            svgDocument.getLastChild().appendChild(imageBase64);
+//            svgDocument.getFirstChild().appendChild(imageBase64);
+        } catch (Exception e) {
+            System.out.println("@Var: e: " + e);
+        }
+
     }
 
     // OWN PROPERTIES
