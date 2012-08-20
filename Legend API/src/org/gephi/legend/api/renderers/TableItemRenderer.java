@@ -233,7 +233,7 @@ public class TableItemRenderer extends LegendItemRenderer {
      */
     protected void drawCellColoring(Graphics2D graphics, Integer x, Integer y, Integer width, Integer height, String value, Float valueNormalized, Color color) {
         int x1 = x;
-        int y2 = (int) (height * Float.parseFloat(value));
+        int y2 = (int) (height * valueNormalized);
         int y1 = (y + height) - y2;
         int x2 = width - 1;
         graphics.setColor(color);

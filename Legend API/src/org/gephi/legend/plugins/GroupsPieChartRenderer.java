@@ -36,7 +36,7 @@ public class GroupsPieChartRenderer extends GroupsItemRenderer {
     @Override
     protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
         
-        // creating dataset forjreechart
+        // creating dataset for jreechart
         DefaultPieDataset dataset = new DefaultPieDataset();
         for (int i = 0; i < values.size(); i++) {
             dataset.setValue(labels.get(i).toString(), values.get(i));
