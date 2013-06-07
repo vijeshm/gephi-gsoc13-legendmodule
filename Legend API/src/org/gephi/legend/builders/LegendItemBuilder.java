@@ -106,7 +106,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Item item = buildCustomItem(builder, graph, attributeModel);
         createDefaultProperties(newItemIndex, item);
         return item;
-
     }
 
     private void createDefaultProperties(Integer newItemIndex, Item item) {
