@@ -8,14 +8,18 @@ import java.awt.*;
 import java.beans.PropertyEditorManager;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.CustomLegendItemBuilder;
@@ -45,9 +49,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     public LegendManagerUI() {
         legendController = LegendController.getInstance();
         initComponents();
-        
-        //tooltipRenderer = new ComboboxToolTipRenderer();
-        //builderTypeComboBox.setRenderer(tooltipRenderer);
     }
 
     /**
@@ -63,6 +64,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         addLegendButton = new javax.swing.JButton();
         removeLegendButton = new javax.swing.JButton();
         editLegendButton = new javax.swing.JButton();
+        moveUp = new javax.swing.JButton();
+        moveDown = new javax.swing.JButton();
         legendManagerPanel = new javax.swing.JPanel();
         legendPropertiesPanel = new javax.swing.JPanel();
 
@@ -91,6 +94,26 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
             }
         });
         add(editLegendButton, new java.awt.GridBagConstraints());
+
+        moveUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/legend/graphics/moveup_8.png"))); // NOI18N
+        moveUp.setText(org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.moveUp.text")); // NOI18N
+        moveUp.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        moveUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                moveUpActionPerformed(evt);
+            }
+        });
+        add(moveUp, new java.awt.GridBagConstraints());
+
+        moveDown.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/legend/graphics/movedown_8.png"))); // NOI18N
+        moveDown.setText(org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.moveDown.text")); // NOI18N
+        moveDown.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        moveDown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                moveDownActionPerformed(evt);
+            }
+        });
+        add(moveDown, new java.awt.GridBagConstraints());
 
         legendManagerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, org.openide.util.NbBundle.getMessage(LegendManagerUI.class, "LegendManagerUI.legendManagerPanel.border.title"), javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP)); // NOI18N
         legendManagerPanel.setLayout(new java.awt.GridBagLayout());
@@ -122,20 +145,20 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
     public void refreshActiveLegendsComboBox() {
         /*
-        LegendManager legendManager = legendController.getLegendManager();
-        Item activeLegendItem = legendManager.getActiveLegendItem();
-        activeLegendsComboBox.removeAllItems();
-        if (activeLegendItem != null) {
-            ArrayList<Item> legendItems = legendManager.getLegendItems();
-            for (Item item : legendItems) {
-                activeLegendsComboBox.addItem(item);
-            }
+         LegendManager legendManager = legendController.getLegendManager();
+         Item activeLegendItem = legendManager.getActiveLegendItem();
+         activeLegendsComboBox.removeAllItems();
+         if (activeLegendItem != null) {
+         ArrayList<Item> legendItems = legendManager.getLegendItems();
+         for (Item item : legendItems) {
+         activeLegendsComboBox.addItem(item);
+         }
 
-            activeLegendsComboBox.setSelectedItem(activeLegendItem);
-        } else {
-            activeLegendsComboBox.setSelectedIndex(-1);
-        }
-        */
+         activeLegendsComboBox.setSelectedItem(activeLegendItem);
+         } else {
+         activeLegendsComboBox.setSelectedIndex(-1);
+         }
+         */
     }
 
     private void addLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLegendButtonActionPerformed
@@ -166,9 +189,13 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
                     // adding item to legend manager
                     legendController.addItemToLegendManager(item);
 
-                    // update property sheet
-                    // this property sheet should be converted to inplace UI. Lets see how that goes.
-                    refreshPropertySheet(item);
+                    ArrayList<Item> items = legendManager.getLegendItems();
+                    System.out.println("\n-- from add: ");
+                    for (int i = 0; i < legendManager.getNumberOfActiveItems(); i++) {
+                        System.out.print(items.get(i) + " ");
+                    }
+
+                    refreshLayers();
                 } else {
                     JOptionPane.showMessageDialog(this, chosenLegendCustomBuilder.stepsNeededToBuild(), NbBundle.getMessage(LegendManager.class, "LegendItem.stepsNeededToBuildItem"), JOptionPane.INFORMATION_MESSAGE, null);
                 }
@@ -182,7 +209,45 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         //Text: Default
     }//GEN-LAST:event_addLegendButtonActionPerformed
 
-    private void refreshPropertySheet(Item activeLegendItem) {
+    private JTable getLegendLayerModel() {
+        /* Reason to have a JTable:
+         * The columns can be added as and when there is a requirement. This is a step towards extendibility.
+         * Right now, we have 1 column, for the name. Another column can be included for visibility.
+         * When an element is clicked, we can easily figure out what was clicked by finding out the row and column, instead of having callbacks registered for each element.
+         */
+        
+        LegendManager legendManager = legendController.getLegendManager();
+        ArrayList<Item> items = legendManager.getLegendItems();
+        
+        int numberOfActiveItems = legendManager.getNumberOfActiveItems();
+        String[] columnNames = {"Legends"};
+        Object[][] rowData = new Object[numberOfActiveItems][];
+        for (int i = 0; i < legendManager.getNumberOfActiveItems(); i++) {
+            rowData[numberOfActiveItems - i - 1] = new Object[columnNames.length];
+            rowData[numberOfActiveItems - i - 1][0] = "Legend " + items.get(i);
+        }
+        DefaultTableModel legendLayerModel = new DefaultTableModel(rowData, columnNames);
+        JTable layerOrderTemp = new JTable(legendLayerModel);
+
+        layerOrderTemp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = layerOrder.rowAtPoint(e.getPoint()); //returns -1 if clicked outside the table. Hence this condition has to checked in the code further.
+                int col = layerOrder.columnAtPoint(e.getPoint());
+
+                LegendManager legendManager = legendController.getLegendManager();
+                ArrayList<Item> items = legendManager.getLegendItems();
+                if (row >= 0) {
+                    Item activeItem = items.get(legendManager.getNumberOfActiveItems() - 1 - row);
+                    Integer itemIndex = (Integer) activeItem.getData(LegendItem.ITEM_INDEX);
+                    legendManager.setActiveLegend(legendManager.getIndexFromItemIndex(itemIndex));
+                    System.out.println("\nactiveLegend: " + legendManager.getActiveLegend());
+                }
+            }
+        });
+        return layerOrderTemp;
+    }
+
+    private void refreshLayers() {
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel();
 
@@ -192,56 +257,83 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
         }
 
         legendPropertiesPanel.removeAll();
-        String[] columnNames = {"Legends"};
+
         LegendManager legendManager = legendController.getLegendManager();
         ArrayList<Item> items = legendManager.getLegendItems();
-        
-        Object[][] rowData = new Object[items.size()][];
-        for(int i=0; i<items.size(); i++)
-        {
-            rowData[i] = new Object[1];
-            rowData[i][0] = "Legend " + items.get(i).getData(LegendItem.ITEM_INDEX);
-        }
-        JTable layerOrder = new JTable(rowData, columnNames);
-        legendPropertiesPanel.add(layerOrder, BorderLayout.CENTER);
-        
-        /*
-        if (activeLegendItem != null) {
-            PropertySheet propertySheet = new PropertySheet();
 
-            propertySheet.setNodes(new Node[]{new LegendNode(propertySheet, activeLegendItem, previewModel.getProperties())});
-            propertySheet.setDescriptionAreaVisible(true);
-            legendPropertiesPanel.add(propertySheet, BorderLayout.CENTER);
+        System.out.println("\nfrom refreshlayers: " + legendManager.getNumberOfActiveItems());
+        for (Item item : items) {
+            System.out.print(item + " -- ");
         }
-        */
+        System.out.println();
+
+        layerOrder = getLegendLayerModel();
+        legendPropertiesPanel.add(layerOrder, BorderLayout.CENTER);
+
         legendPropertiesPanel.repaint();
+        legendPropertiesPanel.updateUI();
     }
 
     private void removeLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeLegendButtonActionPerformed
-        /*
-        // check wheter an element is active or not
-        if (activeLegendsComboBox.getSelectedIndex() == -1) {
-            return;
-        }
-
         LegendManager legendManager = legendController.getLegendManager();
+        int indexOfActiveLegend = legendManager.getActiveLegend();
+        if (indexOfActiveLegend != -1) //if index is -1, it means that that there are no active items
+        {
+            legendManager.removeItem(indexOfActiveLegend);
 
-        Integer activeLegend = ((Item) activeLegendsComboBox.getSelectedItem()).getData(LegendItem.ITEM_INDEX);
-        legendManager.removeItem(activeLegend);
-        refreshActiveLegendsComboBox();
-        refreshPropertySheet(legendManager.getActiveLegendItem());
-        */
+            ArrayList<Item> items = legendManager.getLegendItems();
+            System.out.println("\n-- from remove: ");
+            for (int i = 0; i < legendManager.getNumberOfActiveItems(); i++) {
+                System.out.print(items.get(i) + " ");
+            }
+            
+            refreshLayers();
+            if (legendManager.getItems().isEmpty()) {
+                legendManager.setActiveLegend(-1);
+            }
+        }
     }//GEN-LAST:event_removeLegendButtonActionPerformed
 
     private void editLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLegendButtonActionPerformed
     }//GEN-LAST:event_editLegendButtonActionPerformed
+
+    private void moveUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpActionPerformed
+        LegendManager legendManager = legendController.getLegendManager();
+        int activeLegendIndex = legendManager.getActiveLegend();
+
+        legendManager.swapItems(activeLegendIndex, legendManager.getNextActiveLegend());
+        ArrayList<Item> items = legendManager.getLegendItems();
+        System.out.println("\n-- from moveUpAction: ");
+            for (int i = 0; i < legendManager.getNumberOfActiveItems(); i++) {
+                System.out.print(items.get(i) + " ");
+            }
+        refreshLayers();
+        //select the row that corresponds to activelegend
+    }//GEN-LAST:event_moveUpActionPerformed
+
+    private void moveDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownActionPerformed
+        LegendManager legendManager = legendController.getLegendManager();
+        int activeLegendIndex = legendManager.getActiveLegend();
+        ArrayList<Item> items = legendManager.getLegendItems();
+            System.out.println("\n-- from moveDownAction: ");
+            for (int i = 0; i < legendManager.getNumberOfActiveItems(); i++) {
+                System.out.print(items.get(i) + " ");
+            }
+            
+            legendManager.swapItems(activeLegendIndex, legendManager.getPreviousActiveLegend());
+            refreshLayers();
+            //select the row that corresponds to activelegend
+    }//GEN-LAST:event_moveDownActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addLegendButton;
     private javax.swing.JButton editLegendButton;
     private javax.swing.JPanel legendManagerPanel;
     private javax.swing.JPanel legendPropertiesPanel;
+    private javax.swing.JButton moveDown;
+    private javax.swing.JButton moveUp;
     private javax.swing.JButton removeLegendButton;
     // End of variables declaration//GEN-END:variables
+    private JTable layerOrder;
 
     @Override
     public void setup(PreviewModel previewModel) {

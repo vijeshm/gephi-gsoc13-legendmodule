@@ -140,8 +140,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         String propertyString = LegendManager.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, property);
 
-
-
         switch (property) {
             case LegendProperty.LABEL: {
                 previewProperty = PreviewProperty.createProperty(
