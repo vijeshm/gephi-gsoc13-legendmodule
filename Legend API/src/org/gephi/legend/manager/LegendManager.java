@@ -19,21 +19,29 @@ import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 
 /**
- *
- * @author eduBecKs
+ * @author mvvijesh, eduBecKs
+ * This class contains all the required information about the items (legends) currently existing.
+ * This is a singleton class and an instance of this class can be created using the legendController's getLegendManager method.
+ * Here is how the legend manager works:
+ *  legendItems is an arrayList of all the items (legends), 
+ *  Items are added to this list using the legendcontroller's addItemToLegendManger method.
+ *  
+ * items is an arrayList of the items' LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex
+ * it has a one-to-one correspondence with the legendItems list. This is not a good design decision. Its better to make it as a property of the legend itself.
+ * 
+ * isActive is a arrayList of Booleans that indicate whether a particular legend is active.
+ * it has a one-to-one correspondence with the legendItems list. This is not a good design decision. Its better to make it as a property of the legend itself.
  */
 public class LegendManager {
 
     private Integer activeLegendIndex;
     private Integer currentIndex;
-    private Integer firstActiveLegend;
     private Integer numberOfItems;
     private Integer numberOfActiveItems;
     private ArrayList<Boolean> isActive;
     private ArrayList<String> items;
     private ArrayList<Item> legendItems;
     public static final String LEGEND_PROPERTIES = "legend properties";
-    //public static final String INDEX = "index";
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
@@ -44,7 +52,6 @@ public class LegendManager {
         this.currentIndex = 0;
         this.numberOfActiveItems = 0;
         this.numberOfItems = 0;
-        this.firstActiveLegend = -1;
         this.activeLegendIndex = -1;
         this.items = new ArrayList<String>();
         this.legendItems = new ArrayList<Item>();
@@ -69,8 +76,6 @@ public class LegendManager {
     }
 
     public void swapItems(int index1, int index2) {
-        System.out.println("\n-- from swapItems:");
-        System.out.println("index1: " + index1 + " index2: " + index2);
         try {
             Collections.swap(legendItems, index1, index2);
             Collections.swap(items, index1, index2);
@@ -117,19 +122,15 @@ public class LegendManager {
 
     public void removeItem(int index) {
         isActive.set(index, Boolean.FALSE);
-        setFirstActiveLegend();
-        activeLegendIndex = firstActiveLegend;
-        numberOfActiveItems -= 1;
-    }
-
-    private void setFirstActiveLegend() {
-        for (int i = 0; i < numberOfItems; i++) {
-            if (isActive.get(i)) {
-                firstActiveLegend = i;
-                return;
-            }
+        if (getPreviousActiveLegend() != -1) {
+            setActiveLegend(getPreviousActiveLegend());
+        } else if (getNextActiveLegend() != -1) {
+            setActiveLegend(getNextActiveLegend());
+        } else {
+            setActiveLegend(-1);
         }
-        firstActiveLegend = -1;
+        
+        numberOfActiveItems -= 1;
     }
 
     public void setActiveLegend(Integer activeLegend) {
@@ -155,6 +156,20 @@ public class LegendManager {
             }
         }
         return -1;
+    }
+
+    public int getPositionFromActiveLegendIndex() {
+        if (activeLegendIndex == -1) {
+            return -1;
+        }
+
+        int index = 0;
+        for (int i = 0; i != activeLegendIndex; i++) {
+            if (isActive.get(i)) {
+                index += 1;
+            }
+        }
+        return index;
     }
 
     public Integer getNextActiveLegend() {

@@ -29,7 +29,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author edubecks
+ * @author mvvijesh, edubecks
  */
 public abstract class LegendItemBuilder implements ItemBuilder {
 
@@ -339,12 +339,22 @@ public abstract class LegendItemBuilder implements ItemBuilder {
                         NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.alignment.displayName"),
                         NbBundle.getMessage(LegendManager.class, "LegendItem.property.description.alignment.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
             }
-
+                
+            case LegendProperty.USER_LEGEND_NAME: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        String.class,
+                        NbBundle.getMessage(LegendManager.class, "LegendItem.property.user.legendName.displayName"),
+                        NbBundle.getMessage(LegendManager.class, "LegendItem.property.user.legendName.description"),
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+            }
         }
 
         return previewProperty;
-
     }
 
     private PreviewProperty[] createLegendProperties(Item item) {
@@ -359,8 +369,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
 
         // creating label
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        previewProperties[0] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " ["+item.getType()+"]");
-        for (int i = 1; i < previewProperties.length; i++) {
+        previewProperties[0] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " ["+item.getType()+"]"); //setting the label
+        previewProperties[20] = createLegendProperty(item, LegendProperty.USER_LEGEND_NAME, defaultLabel + itemIndex + " ["+item.getType()+"]"); //setting the legend name
+        for (int i = 1; i < previewProperties.length - 1; i++) {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
         }
 
@@ -376,7 +387,6 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         System.arraycopy(properties, 0, previewProperties, legendProperties.length, properties.length);
 
         return previewProperties;
-
     }
 
     public static boolean updatePreviewProperty(Item item, int numOfProperties) {
@@ -777,6 +787,9 @@ public abstract class LegendItemBuilder implements ItemBuilder {
     protected Color defaultDescriptionFontColor = Color.BLACK;
     protected Alignment defaultDescriptionAlignment = Alignment.LEFT;
     protected Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
+    // PROPERTIES SET BY USER
+    protected String defaultUserLegendName = "legend name";
+            
     // default values list
     private ArrayList<Object> defaultValuesArrayList;
 
@@ -806,6 +819,7 @@ public abstract class LegendItemBuilder implements ItemBuilder {
         defaultValuesArrayList.add(this.defaultDescriptionFont);
         defaultValuesArrayList.add(this.defaultDescriptionFontColor);
         defaultValuesArrayList.add(this.defaultDescriptionAlignment);
+        defaultValuesArrayList.add(this.defaultUserLegendName);
     }
     private final Object[] availableAlignments = {
         LegendItem.Alignment.LEFT,
