@@ -462,6 +462,18 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ui-library-wrapper</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>legend-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>legend-plugin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>desktop-legend</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

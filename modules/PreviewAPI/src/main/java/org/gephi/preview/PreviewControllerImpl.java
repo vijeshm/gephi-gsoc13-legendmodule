@@ -123,7 +123,7 @@ public class PreviewControllerImpl implements PreviewController {
     @Override
     public synchronized void refreshPreview(Workspace workspace) {
         GraphModel graphModel = graphController.getGraphModel(workspace);
-        AttributeModel attributeModel = graphController.getAttributeModel(model.getWorkspace());
+        AttributeModel attributeModel = graphController.getAttributeModel(workspace);
         PreviewModelImpl previewModel = getModel(workspace);
         previewModel.clear();
 

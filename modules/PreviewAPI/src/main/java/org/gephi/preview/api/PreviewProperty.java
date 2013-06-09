@@ -253,6 +253,12 @@ public class PreviewProperty {
      * Edge arrow category
      */
     public static final String CATEGORY_EDGE_ARROWS = NbBundle.getMessage(PreviewProperty.class, "PreviewProperty.Category.EdgeArrows");
+    
+    //LEGEND categories
+    //TODO move this
+    public static final String CATEGORY_LEGEND_DYNAMIC_PROPERTY = "dynamicproperty";
+    public static final String CATEGORY_LEGEND_PROPERTY = "legendproperty";
+    
     //Variables
     final String name;
     final String displayName;

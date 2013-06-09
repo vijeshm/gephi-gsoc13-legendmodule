@@ -171,8 +171,8 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             trans.div(target.getScaling()); // ensure const. moving speed whatever the zoom is
             trans.add(lastMove);
 
-            refreshLoop.refreshSketch();
         }
+        refreshLoop.refreshSketch();
     }
 
     @Override

@@ -23,6 +23,7 @@ keystore.ks
 /modules/DesktopHierarchy/target/
 /modules/DesktopImport/target/
 /modules/DesktopLayout/target/
+/modules/DesktopLegend/target/
 /modules/DesktopPartition/target/
 /modules/DesktopPerspective/target/
 /modules/DesktopPreview/target/
@@ -56,6 +57,8 @@ keystore.ks
 /modules/ImportPluginUI/target/
 /modules/LayoutAPI/target/
 /modules/LayoutPlugin/target/
+/modules/LegendAPI/target/
+/modules/LegendPlugin/target/
 /modules/LongTaskAPI/target/
 /modules/MostRecentFilesAPI/target/
 /modules/PartitionAPI/target/

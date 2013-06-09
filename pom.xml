@@ -335,6 +335,16 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>legend-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>legend-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>io-exporter-preview</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -686,6 +696,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>desktop-layout</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>desktop-legend</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1190,6 +1205,7 @@
         <module>modules/DesktopExport</module>
         <module>modules/DesktopImport</module>
         <module>modules/DesktopLayout</module>
+        <module>modules/DesktopLegend</module>
         <module>modules/DesktopPerspective</module>
         <module>modules/DesktopPreview</module>
         <module>modules/DesktopProgress</module>
@@ -1211,6 +1227,8 @@
         <module>modules/ImportPluginUI</module>
         <module>modules/LayoutAPI</module>
         <module>modules/LayoutPlugin</module>
+        <module>modules/LegendAPI</module>
+        <module>modules/LegendPlugin</module>
         <module>modules/MostRecentFilesAPI</module>
         <module>modules/PerspectiveAPI</module>
         <module>modules/PreviewAPI</module>
