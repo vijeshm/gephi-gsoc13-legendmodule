@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.table.AbstractTableModel;
 import org.gephi.legend.items.LegendItem;
+import org.gephi.legend.properties.LegendProperty;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
@@ -19,18 +20,22 @@ import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 
 /**
- * @author mvvijesh, eduBecKs
- * This class contains all the required information about the items (legends) currently existing.
- * This is a singleton class and an instance of this class can be created using the legendController's getLegendManager method.
- * Here is how the legend manager works:
- *  legendItems is an arrayList of all the items (legends), 
- *  Items are added to this list using the legendcontroller's addItemToLegendManger method.
- *  
- * items is an arrayList of the items' LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex
- * it has a one-to-one correspondence with the legendItems list. This is not a good design decision. Its better to make it as a property of the legend itself.
- * 
- * isActive is a arrayList of Booleans that indicate whether a particular legend is active.
- * it has a one-to-one correspondence with the legendItems list. This is not a good design decision. Its better to make it as a property of the legend itself.
+ * @author mvvijesh, eduBecKs This class contains all the required information
+ * about the items (legends) currently existing. This is a singleton class and
+ * an instance of this class can be created using the legendController's
+ * getLegendManager method. Here is how the legend manager works: legendItems is
+ * an arrayList of all the items (legends), Items are added to this list using
+ * the legendcontroller's addItemToLegendManger method.
+ *
+ * items is an arrayList of the items' LEGEND_DESCRIPTION + ITEM_DESCRIPTION +
+ * currentIndex it has a one-to-one correspondence with the legendItems list.
+ * This is not a good design decision. Its better to make it as a property of
+ * the legend itself.
+ *
+ * isActive is a arrayList of Booleans that indicate whether a particular legend
+ * is active. it has a one-to-one correspondence with the legendItems list. This
+ * is not a good design decision. Its better to make it as a property of the
+ * legend itself.
  */
 public class LegendManager {
 
@@ -38,8 +43,8 @@ public class LegendManager {
     private Integer currentIndex;
     private Integer numberOfItems;
     private Integer numberOfActiveItems;
-    private ArrayList<Boolean> isActive;
-    private ArrayList<String> items;
+    //private ArrayList<Boolean> isActive; //the isActive value is made as a property of the item itself (accessible through LegendProperty.IS_ACTIVE). reason: to make the information availbale about the data more compact and reliable.
+    //private ArrayList<String> items; //the string of an item is made as a property of the item itself (accessible through LegendProperty.PROPERTIES -> ITEM). reason: to make the information availbale about the data more compact and reliable.
     private ArrayList<Item> legendItems;
     public static final String LEGEND_PROPERTIES = "legend properties";
     private static final String LEGEND_DESCRIPTION = "legend";
@@ -53,9 +58,9 @@ public class LegendManager {
         this.numberOfActiveItems = 0;
         this.numberOfItems = 0;
         this.activeLegendIndex = -1;
-        this.items = new ArrayList<String>();
+        //this.items = new ArrayList<String>();
         this.legendItems = new ArrayList<Item>();
-        this.isActive = new ArrayList<Boolean>();
+        //this.isActive = new ArrayList<Boolean>();
     }
 
     public Workspace getWorkspace() {
@@ -67,8 +72,8 @@ public class LegendManager {
     }
 
     public boolean hasActiveLegends() {
-        for (int i = 0; i < isActive.size(); i++) {
-            if (isActive.get(i)) {
+        for (int i = 0; i < numberOfItems; i++) {
+            if (legendItems.get(i).getData(LegendItem.IS_ACTIVE)) {
                 return true;
             }
         }
@@ -78,7 +83,7 @@ public class LegendManager {
     public void swapItems(int index1, int index2) {
         try {
             Collections.swap(legendItems, index1, index2);
-            Collections.swap(items, index1, index2);
+            //Collections.swap(items, index1, index2);
             //entries from isActive need not be swapped, since both are legends are active and both the entries are 'true'.
         } catch (IndexOutOfBoundsException e) {
             System.err.println(e);
@@ -97,8 +102,8 @@ public class LegendManager {
         }
 
         // updating and adding new properties
-        for (int i = 0; i < isActive.size(); i++) {
-            if (isActive.get(i)) {
+        for (int i = 0; i < numberOfItems; i++) {
+            if (legendItems.get(i).getData(LegendItem.IS_ACTIVE)) {
                 PreviewProperty[] properties =
                         (PreviewProperty[]) legendItems.get(i).getData(LegendItem.DYNAMIC_PROPERTIES);
                 for (PreviewProperty property : properties) {
@@ -112,8 +117,12 @@ public class LegendManager {
 
         activeLegendIndex = currentIndex;
 
-        items.add(LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex);
-        isActive.add(Boolean.TRUE);
+        PreviewProperty[] props = (PreviewProperty[]) item.getData(LegendItem.PROPERTIES);
+        PreviewProperty itemDescription = props[LegendProperty.ITEM];
+        itemDescription.setValue(LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex);
+
+        //items.add(LEGEND_DESCRIPTION + ITEM_DESCRIPTION + currentIndex);
+        //isActive.add(Boolean.TRUE);
         legendItems.add(item);
         currentIndex += 1;
         numberOfItems += 1;
@@ -121,7 +130,8 @@ public class LegendManager {
     }
 
     public void removeItem(int index) {
-        isActive.set(index, Boolean.FALSE);
+        legendItems.get(index).setData(LegendItem.IS_ACTIVE, Boolean.FALSE);
+        //isActive.set(index, Boolean.FALSE);
         if (getPreviousActiveLegend() != -1) {
             setActiveLegend(getPreviousActiveLegend());
         } else if (getNextActiveLegend() != -1) {
@@ -129,7 +139,7 @@ public class LegendManager {
         } else {
             setActiveLegend(-1);
         }
-        
+
         numberOfActiveItems -= 1;
     }
 
@@ -165,7 +175,7 @@ public class LegendManager {
 
         int index = 0;
         for (int i = 0; i != activeLegendIndex; i++) {
-            if (isActive.get(i)) {
+            if (legendItems.get(i).getData(LegendItem.IS_ACTIVE)) {
                 index += 1;
             }
         }
@@ -173,12 +183,12 @@ public class LegendManager {
     }
 
     public Integer getNextActiveLegend() {
-        if (activeLegendIndex == isActive.size() - 1) {
+        if (activeLegendIndex == numberOfItems - 1) {
             return -1;
         }
 
         for (int i = activeLegendIndex + 1; i < numberOfItems; i++) {
-            if (isActive.get(i)) {
+            if (legendItems.get(i).getData(LegendItem.IS_ACTIVE)) {
                 return i;
             }
         }
@@ -190,7 +200,7 @@ public class LegendManager {
             return -1;
         }
         for (int i = activeLegendIndex - 1; i >= 0; i--) {
-            if (isActive.get(i)) {
+            if (legendItems.get(i).getData(LegendItem.IS_ACTIVE)) {
                 return i;
             }
         }
@@ -206,9 +216,12 @@ public class LegendManager {
 
     public ArrayList<String> getItems() {
         ArrayList<String> activeItems = new ArrayList<String>();
+        Item currentItem;
         for (int i = 0; i < numberOfItems; i++) {
-            if (isActive.get(i)) {
-                activeItems.add(items.get(i));
+            currentItem = legendItems.get(i);
+            if (currentItem.getData(LegendItem.IS_ACTIVE)) {
+                PreviewProperty[] props = (PreviewProperty[]) currentItem.getData(LegendItem.PROPERTIES);
+                activeItems.add((String) props[LegendProperty.ITEM].getValue());
             }
         }
         return activeItems;
@@ -216,9 +229,11 @@ public class LegendManager {
 
     public ArrayList<Item> getLegendItems() {
         ArrayList<Item> activeItems = new ArrayList<Item>();
-        for (int i = 0; i < isActive.size(); i++) {
-            if (isActive.get(i)) {
-                activeItems.add(legendItems.get(i));
+        Item currentItem;
+        for (int i = 0; i < numberOfItems; i++) {
+            currentItem = legendItems.get(i);
+            if (currentItem.getData(LegendItem.IS_ACTIVE)) {
+                activeItems.add(currentItem);
             }
         }
         return activeItems;

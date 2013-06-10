@@ -14,6 +14,8 @@ import org.openide.util.NbBundle;
  */
 public interface LegendItem {
 
+    // ACTIVE
+    public static final String IS_ACTIVE = "is active";
     // DATA
     public static final String LEGEND_ITEM = "legend item";
     public static final String DATA = "data";
