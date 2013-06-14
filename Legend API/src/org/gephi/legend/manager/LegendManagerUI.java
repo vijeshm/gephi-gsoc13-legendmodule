@@ -48,6 +48,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
 
     private final LegendController legendController;
+    private JTable layerOrder;
 
     /**
      * Creates new form LegendManagerUI
@@ -247,14 +248,13 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
                     if (!layerOrder.isEditing()) {
                         // if the event is fired and the isEditing flag is unset, it means that the editing of the cell is complete.
                         LegendManager legendManager = legendController.getLegendManager();
-                        ArrayList<Item> items = legendManager.getLegendItems();
 
                         // the editing can be done only on the activelegend, In order to update the layer data, we need to find out the row and the column
                         int row = layerOrder.convertRowIndexToModel(layerOrder.getEditingRow());
                         int col = layerOrder.convertColumnIndexToModel(layerOrder.getEditingColumn());
 
                         // fetch the active item and get the reference for its user defined name attribute.
-                        Item activeItem = items.get(legendManager.getActiveLegend());
+                        Item activeItem = legendManager.getActiveLegendItem();
                         PreviewProperty[] props = (PreviewProperty[]) activeItem.getData(LegendItem.PROPERTIES);
                         PreviewProperty name = props[LegendProperty.USER_LEGEND_NAME];
 
@@ -358,7 +358,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI {
     private javax.swing.JButton moveUp;
     private javax.swing.JButton removeLegendButton;
     // End of variables declaration//GEN-END:variables
-    private JTable layerOrder;
 
     @Override
     public void setup(PreviewModel previewModel) {

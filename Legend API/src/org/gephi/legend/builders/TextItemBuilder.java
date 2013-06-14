@@ -39,6 +39,18 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class TextItemBuilder extends LegendItemBuilder {
 
+    // DEFAULT VALUES
+    protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
+    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
+    protected final Color defaultBodyFontColor = Color.BLUE;
+    protected final Alignment defaultBodyFontAlignment = Alignment.JUSTIFIED;
+    private final Object[] defaultValues = {
+        defaultBody,
+        defaultBodyFont,
+        defaultBodyFontColor,
+        defaultBodyFontAlignment
+    };
+
     @Override
     protected boolean setDefaultValues() {
         return false;
@@ -66,7 +78,7 @@ public class TextItemBuilder extends LegendItemBuilder {
 
     @Override
     protected Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
+        //CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
         Item item = createNewLegendItem(graph);
         return item;
     }
@@ -152,7 +164,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         return availableBuilders;
     }
 
-
     @Override
     protected void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
@@ -192,7 +203,6 @@ public class TextItemBuilder extends LegendItemBuilder {
         return properties;
     }
 
-
     @Override
     protected PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
         String propertyName = reader.getAttributeValue(null, XML_NAME);
@@ -206,17 +216,4 @@ public class TextItemBuilder extends LegendItemBuilder {
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
-
-
-    // DEFAULT VALUES
-    protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
-    protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
-    protected final Color defaultBodyFontColor = Color.BLUE;
-    protected final Alignment defaultBodyFontAlignment = Alignment.JUSTIFIED;
-    private final Object[] defaultValues = {
-        defaultBody,
-        defaultBodyFont,
-        defaultBodyFontColor,
-        defaultBodyFontAlignment
-    };
 }

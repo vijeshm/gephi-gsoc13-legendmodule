@@ -20,7 +20,8 @@ import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 
 /**
- * @author mvvijesh, eduBecKs This class contains all the required information
+ * @author mvvijesh, eduBecKs 
+ * This class contains all the required information
  * about the items (legends) currently existing. This is a singleton class and
  * an instance of this class can be created using the legendController's
  * getLegendManager method. Here is how the legend manager works: legendItems is

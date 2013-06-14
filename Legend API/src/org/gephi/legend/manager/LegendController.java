@@ -28,6 +28,13 @@ import org.openide.util.Lookup;
  */
 public class LegendController {
 
+    private static LegendController instance;
+    // available builders
+    private Map<String, LegendItemBuilder> builders;
+    private Collection<? extends LegendItemBuilder> availablebuilders;
+    private static final String XML_LEGEND_ITEM = "legenditem";
+    public static final String XML_LEGENDS = "legends";
+
     /**
      * Returns LegendManager instance of given workspace
      *
@@ -48,18 +55,15 @@ public class LegendController {
     /**
      * Returns LegendManager instance of current workspace
      *
-     * @return
+     * @return LegendManager Instance
      */
     public LegendManager getLegendManager() {
         return getLegendManager(Lookup.getDefault().lookup(ProjectController.class).getCurrentWorkspace());
     }
 
     private Collection<? extends LegendItemBuilder> registerLegendBuilders() {
-        builders = new HashMap<String, LegendItemBuilder>();
-
         // retrieving available builders
-        Collection<? extends LegendItemBuilder> legendItemBuilders =
-                Lookup.getDefault().lookupAll(LegendItemBuilder.class);
+        Collection<? extends LegendItemBuilder> legendItemBuilders = Lookup.getDefault().lookupAll(LegendItemBuilder.class);
 
         // registering builders
         for (LegendItemBuilder legendItemBuilder : legendItemBuilders) {
@@ -85,7 +89,6 @@ public class LegendController {
         PreviewProperties previewProperties = previewModel.getProperties();
 
         LegendManager legendManager = getLegendManager(workspace);
-
         legendManager.addItem(item);
 
         // LEGEND PROPERTIES
@@ -101,11 +104,13 @@ public class LegendController {
         for (PreviewProperty property : legendProperties) {
             previewProperties.putValue(property.getName(), property.getValue());
         }
+        
         // LEGEND OWN PROPERTIES
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
             previewProperties.putValue(property.getName(), property.getValue());
         }
+        
         // DYNAMIC PROPERTIES
         PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
         for (PreviewProperty property : dynamicProperties) {
@@ -187,10 +192,6 @@ public class LegendController {
         }
 
     }
-    private static LegendController instance = new LegendController();
-    // available builders
-    private Map<String, LegendItemBuilder> builders;
-    private Collection<? extends LegendItemBuilder> availablebuilders;
 
     /*
      * returns a Collection of the available Legend Item Builders in the system
@@ -213,8 +214,10 @@ public class LegendController {
      * Returns an Instance of LegendController
      */
     public static LegendController getInstance() {
+        if (instance == null) {
+            instance = new LegendController();
+        }
+        
         return instance;
     }
-    private static final String XML_LEGEND_ITEM = "legenditem";
-    public static final String XML_LEGENDS = "legends";
 }

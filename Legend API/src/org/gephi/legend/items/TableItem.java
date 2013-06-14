@@ -18,7 +18,7 @@ import org.openide.util.NbBundle;
  */
 public class TableItem extends AbstractItem implements LegendItem {
 
-    public static final String LEGEND_TYPE = "Table Legend";
+    public static final String LEGEND_TYPE = "Table Item";
     //data
     public static final String TABLE_VALUES = "table values";
     public static final String HORIZONTAL_LABELS = "horizontal labels";

@@ -10,6 +10,10 @@ package org.gephi.legend.api;
  */
 public abstract class CustomLegendItemBuilder {
     
+    public static final String NONE_NEEDED="";
+    public static final String DEFAULT_TITLE="Default";   
+    public static final String DEFAULT_DESCRIPTION="Description";
+    
     /**
      * Provides an user friendly description for the builder
      * This name will appear as a tooltip in the builders list
@@ -42,10 +46,6 @@ public abstract class CustomLegendItemBuilder {
      * @return 
      */
     public abstract String stepsNeededToBuild();
-    
-    public static final String NONE_NEEDED="";
-    public static final String DEFAULT_TITLE="Default";
-    public static final String DEFAULT_DESCRIPTION="Description";
     
     @Override
     public String toString(){

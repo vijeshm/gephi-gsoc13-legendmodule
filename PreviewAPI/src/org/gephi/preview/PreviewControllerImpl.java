@@ -77,7 +77,7 @@ public class PreviewControllerImpl implements PreviewController {
     public PreviewControllerImpl() {
         graphController = Lookup.getDefault().lookup(GraphController.class);
         attributeController = Lookup.getDefault().lookup(AttributeController.class);
-
+        
         //Workspace events
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
         pc.addWorkspaceListener(new WorkspaceListener() {
@@ -190,7 +190,6 @@ public class PreviewControllerImpl implements PreviewController {
 
         //Refresh dimensions
         updateDimensions(previewModel, previewModel.getItems(Item.NODE));
-
 
         //Pre process renderers
         for (Renderer r : renderers) {

@@ -31,6 +31,4 @@ public class TextItem extends AbstractItem implements LegendItem {
     public PreviewProperty[] getDynamicPreviewProperties() {
         return new PreviewProperty[0];
     }
-
-    
 }
