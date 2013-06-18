@@ -29,6 +29,50 @@ import org.openide.util.NbBundle;
  */
 public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
 
+    // xml 
+    protected static final String XML_PROPERTY = "property";
+    private static final String XML_LEGEND_TYPE = "legendtype";
+    private static final String XML_RENDERER = "renderer";
+    private static final String XML_DYNAMIC_PROPERTY = "dynamicproperty";
+    private static final String XML_LEGEND_PROPERTY = "legendproperty";
+    protected static final String XML_OWN_PROPERTY = "itemproperty";
+    protected static final String XML_NAME = "name";
+    protected static final String XML_CLASS = "class";
+    private static final String XML_DATA = "itemdata";
+    //DEFAULT VALUES 
+    // BACKGROUND AND BORDER
+    protected Boolean defaultBackgroundIsDisplaying = Boolean.FALSE;
+    protected Color defaultBackgroundColor = Color.WHITE;
+    protected Boolean defaultBorderIsDisplaying = Boolean.FALSE;
+    protected Color defaultBorderColor = Color.BLACK;
+    protected Integer defaultBorderLineThick = 5;
+    // LABEL
+    protected String defaultLabel = "";
+    // IS_DISPLAYING
+    protected Boolean defaultIsDisplaying = Boolean.TRUE;
+    //ORIGIN
+    protected Float defaultOriginX = 0f;
+    protected Float defaultOriginY = 0f;
+    //WIDTH
+    protected Float defaultWidth = 500f;
+    protected Float defaultHeight = 300f;
+    // TITLE
+    protected Boolean defaultTitleIsDisplaying = Boolean.FALSE;
+    protected String defaultTitle = "TITLE";
+    protected Font defaultTitleFont = new Font("Arial", Font.BOLD, 30);
+    protected Alignment defaultTitleAlignment = Alignment.CENTER;
+    protected Color defaultTitleFontColor = Color.BLACK;
+    // DESCRIPTION
+    protected String defaultDescription = "description ... description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...";
+    protected Boolean defaultDescriptionIsDisplaying = Boolean.FALSE;
+    protected Color defaultDescriptionFontColor = Color.BLACK;
+    protected Alignment defaultDescriptionAlignment = Alignment.LEFT;
+    protected Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
+    // PROPERTIES SET BY USER
+    protected String defaultUserLegendName = "legend name";
+    // default values list
+    private ArrayList<Object> defaultValuesArrayList;
+
     /**
      * This function creates an Item using
      *
@@ -64,7 +108,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
         LegendModel legendManager = LegendController.getInstance().getLegendModel();
 
-        ArrayList<Item> legendItems = legendManager.getLegendItems();
+        ArrayList<Item> legendItems = legendManager.getActiveItems();
         ArrayList<Item> items = new ArrayList<Item>();
         for (Item item : legendItems) {
             if (isBuilderForItem(item)) {
@@ -289,7 +333,18 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
                         NbBundle.getMessage(AbstractLegendItemBuilder.class, "LegendItem.property.description.alignment.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
             }
+            break;
 
+            case LegendProperty.USER_LEGEND_NAME: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        String.class,
+                        NbBundle.getMessage(AbstractLegendItemBuilder.class, "LegendItem.property.user.legendName.displayName"),
+                        NbBundle.getMessage(AbstractLegendItemBuilder.class, "LegendItem.property.user.legendName.description"),
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+            }
         }
 
         return previewProperty;
@@ -307,9 +362,12 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
 
         // creating label
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        previewProperties[0] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " [" + item.getType() + "]");
-        for (int i = 1; i < previewProperties.length; i++) {
-            previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
+        previewProperties[LegendProperty.LABEL] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " [" + item.getType() + "]"); //setting the label
+        previewProperties[LegendProperty.USER_LEGEND_NAME] = createLegendProperty(item, LegendProperty.USER_LEGEND_NAME, defaultLabel + itemIndex + " [" + item.getType() + "]"); //setting the legend name
+        for (int i = 0; i < previewProperties.length - 1; i++) {
+            if (i != LegendProperty.LABEL && i != LegendProperty.USER_LEGEND_NAME) {
+                previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
+            }
         }
 
         return previewProperties;
@@ -327,7 +385,9 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     }
 
     /**
-     * Function that automatically saves a property using its PropertyName and the Value attached to it. Only works if property has a known value type. Known types:
+     * Function that automatically saves a property using its PropertyName and
+     * the Value attached to it. Only works if property has a known value type.
+     * Known types:
      * <code>Integer</code>,
      * <code> Float</code>,
      * <code> String</code>,,
@@ -349,7 +409,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
             String text = writeValueAsText(propertyValue);
             writer.writeStartElement(XML_PROPERTY);
             String name = LegendModel.getPropertyFromPreviewProperty(property);
-            System.out.println("@Var: SAVING XML name: "+name+" , "+text);
+            System.out.println("@Var: SAVING XML name: " + name + " , " + text);
             writer.writeAttribute(XML_NAME, name);
             writer.writeAttribute(XML_CLASS, propertyValue.getClass().getName());
             writer.writeCharacters(text);
@@ -358,7 +418,9 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     }
 
     /**
-     * Function that takes an item and saves its data, legend properties, specific item properties, dynamic properties and data using the specified writer.
+     * Function that takes an item and saves its data, legend properties,
+     * specific item properties, dynamic properties and data using the specified
+     * writer.
      *
      * @param writer the XMLStreamWriter to write to
      * @param item the item to be saved
@@ -404,7 +466,8 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     }
 
     /**
-     * Function that retrieves the data from an XML reader and converts it to data for each kind of item
+     * Function that retrieves the data from an XML reader and converts it to
+     * data for each kind of item
      *
      * @param reader the XML reader to read the data from
      * @param item the item where the data would be stored
@@ -418,12 +481,12 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         String valueString = reader.getElementText();
         int propertyIndex = LegendProperty.getInstance().getProperty(propertyName);
         Class valueClass = defaultValuesArrayList.get(propertyIndex).getClass();
-        
+
 //        Object value = PreviewProperties.readValueFromText(valueString, valueClass);
 //        if (value == null) {
 //            value = readValueFromText(valueString, valueClass);
 //        }
-        
+
         Object value = readValueFromText(valueString, valueClass);
 
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
@@ -431,7 +494,8 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     }
 
     /**
-     * Function that takes some value in a String form and converts it to the specified class type
+     * Function that takes some value in a String form and converts it to the
+     * specified class type
      *
      * @param valueString the value in a String form
      * @param valueClass the class type to convert the value
@@ -440,22 +504,22 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     protected Object readValueFromText(String valueString, Class valueClass) {
 //        System.out.println("@Var: valueClass: "+valueClass);
 //        System.out.println("@Var: valueString: "+valueString);
-        
+
         // bug
-        if(valueString.startsWith("org.netbeans.beaninfo.editors.ColorEditor")){
+        if (valueString.startsWith("org.netbeans.beaninfo.editors.ColorEditor")) {
             // bug
             Pattern rgb = Pattern.compile(".*\\[r=(\\d+),g=(\\d+),b=(\\d+)\\]");
             Matcher matcher = rgb.matcher(valueString);
-            if(matcher.matches()){
-                valueString = "["+matcher.group(1) +","+matcher.group(2)+","+matcher.group(3)+"]";
+            if (matcher.matches()) {
+                valueString = "[" + matcher.group(1) + "," + matcher.group(2) + "," + matcher.group(3) + "]";
             }
         }
-        
+
         Object value = PreviewProperties.readValueFromText(valueString, valueClass);
-        if (value != null){
+        if (value != null) {
             return value;
         }
-        
+
         if (valueClass.equals(LegendItem.Alignment.class)) {
             value = availableAlignments[Integer.parseInt(valueString)];
         } else if (valueClass.equals(LegendItem.Shape.class)) {
@@ -468,12 +532,13 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
             value = Integer.parseInt(valueString);
         } else if (valueClass.equals(File.class)) {
             value = new File(valueString);
-        } 
+        }
         return value;
     }
 
     /**
-     * Function that retrieves the properties (propertyName and value) from an XML reader and converts it to list of properties. Normally using the
+     * Function that retrieves the properties (propertyName and value) from an
+     * XML reader and converts it to list of properties. Normally using the
      * <code>readXMLToSingleOwnProperty</code> for each property.
      *
      * @param reader the XML reader to read the data from
@@ -484,7 +549,8 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     public abstract ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException;
 
     /**
-     * Function that retrieves the dynamic properties (if any) from an XML reader and converts it to list of properties. Normally using the
+     * Function that retrieves the dynamic properties (if any) from an XML
+     * reader and converts it to list of properties. Normally using the
      * <code>readXMLToSingleOwnProperty</code> for each property.
      *
      * @param reader the XML reader to read the data from
@@ -510,7 +576,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
                     PreviewProperty property = readXMLToSingleLegendProperty(reader, item);
 //                    System.out.println("@Var: .. success property: "+property.getName());
 //                    System.out.println("@Var: property: "+property.getValue());
-                    
+
                     properties.add(property);
                     break;
                 }
@@ -530,9 +596,9 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     public void readXMLToRenderer(XMLStreamReader reader, Item item) throws XMLStreamException {
         if (reader.getLocalName().equals(XML_RENDERER)) {
             String valueString = reader.getElementText();
-            System.out.println("@Var: renderer....  "+valueString);
+            System.out.println("@Var: renderer....  " + valueString);
             LegendItemRenderer availableRenderer = LegendController.getInstance().getRenderers().get(valueString);
-            System.out.println("@Var: renderer....  "+availableRenderer);
+            System.out.println("@Var: renderer....  " + availableRenderer);
             if (availableRenderer != null) {
                 item.setData(LegendItem.RENDERER, availableRenderer);
             }
@@ -540,7 +606,9 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     }
 
     /**
-     * Function that reads the legend properties, specific item properties, dynamic properties and data and converts it to an Item using the specified reader.
+     * Function that reads the legend properties, specific item properties,
+     * dynamic properties and data and converts it to an Item using the
+     * specified reader.
      *
      * @param reader the XML reader to read the data from
      * @param newItemIndex used to create the Item
@@ -599,11 +667,12 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     /**
      * Converts the propertyValue of a known type to an String object
      *
-     * @param propertyValue Known * types: <code> LegendItem.Alignment</code>, <code> LegendItem.Shape</code> and <code> LegendItem.Direction</code>
+     * @param propertyValue Known *      * types: <code> LegendItem.Alignment</code>, <code> LegendItem.Shape</code>
+     * and <code> LegendItem.Direction</code>
      * @return
      */
     protected String writeValueAsText(Object propertyValue) {
-        
+
         String text = PreviewProperties.getValueAsText(propertyValue);
         if (text != null) {
             return text;
@@ -617,52 +686,11 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         } else if (propertyValue instanceof LegendItem.Shape) {
             LegendItem.Shape propertyValueString = (LegendItem.Shape) propertyValue;
             text = propertyValueString.getValue();
-        }else{
+        } else {
             text = propertyValue.toString();
         }
         return text;
     }
-    // xml 
-    protected static final String XML_PROPERTY = "property";
-    private static final String XML_LEGEND_TYPE = "legendtype";
-    private static final String XML_RENDERER = "renderer";
-    private static final String XML_DYNAMIC_PROPERTY = "dynamicproperty";
-    private static final String XML_LEGEND_PROPERTY = "legendproperty";
-    protected static final String XML_OWN_PROPERTY = "itemproperty";
-    protected static final String XML_NAME = "name";
-    protected static final String XML_CLASS = "class";
-    private static final String XML_DATA = "itemdata";
-    //DEFAULT VALUES 
-    // BACKGROUND AND BORDER
-    protected Boolean defaultBackgroundIsDisplaying = Boolean.FALSE;
-    protected Color defaultBackgroundColor = Color.WHITE;
-    protected Boolean defaultBorderIsDisplaying = Boolean.FALSE;
-    protected Color defaultBorderColor = Color.BLACK;
-    protected Integer defaultBorderLineThick = 5;
-    // LABEL
-    protected String defaultLabel = "";
-    // IS_DISPLAYING
-    protected Boolean defaultIsDisplaying = Boolean.TRUE;
-    //ORIGIN
-    protected Float defaultOriginX = 0f;
-    protected Float defaultOriginY = 0f;
-    //WIDTH
-    protected Float defaultWidth = 500f;
-    protected Float defaultHeight = 300f;
-    // TITLE
-    protected Boolean defaultTitleIsDisplaying = Boolean.FALSE;
-    protected String defaultTitle = "TITLE";
-    protected Font defaultTitleFont = new Font("Arial", Font.BOLD, 30);
-    protected Alignment defaultTitleAlignment = Alignment.CENTER;
-    protected Color defaultTitleFontColor = Color.BLACK;
-    // DESCRIPTION
-    protected String defaultDescription = "description ... description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...";
-    protected Boolean defaultDescriptionIsDisplaying = Boolean.FALSE;
-    protected Color defaultDescriptionFontColor = Color.BLACK;
-    protected Alignment defaultDescriptionAlignment = Alignment.LEFT;
-    protected Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
-    // default values list
-    private ArrayList<Object> defaultValuesArrayList;
 
     public AbstractLegendItemBuilder() {
         updateDefaultValues();
@@ -691,7 +719,9 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         defaultValuesArrayList.add(this.defaultDescriptionFont);
         defaultValuesArrayList.add(this.defaultDescriptionFontColor);
         defaultValuesArrayList.add(this.defaultDescriptionAlignment);
+        defaultValuesArrayList.add(this.defaultUserLegendName);
     }
+    
     private final Object[] availableAlignments = {
         LegendItem.Alignment.LEFT,
         LegendItem.Alignment.RIGHT,

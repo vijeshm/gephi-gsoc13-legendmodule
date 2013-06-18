@@ -34,6 +34,52 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, MouseResponsiveRenderer {
 
+    private Integer currentItemIndex;
+    private float graphOriginX = Float.MAX_VALUE;
+    private float graphOriginY = Float.MAX_VALUE;
+    private float graphWidth = 0;
+    private float graphHeight = 0;
+    private final int MARGIN_BETWEEN_ELEMENTS = 5;
+    // VARIABLES
+    // IS DISPLAYING
+    private Boolean isDisplayingLegend;
+    // BACKGROUND
+    private boolean backgroundIsDisplaying;
+    private Color backgroundColor;
+    private Boolean borderIsDisplaying;
+    private Color borderColor;
+    private int borderLineThick;
+    // DIMENSIONS
+    protected Integer currentWidth;
+    protected Integer currentHeight;
+    protected AffineTransform originTranslation;
+    private float currentRealOriginX;
+    private float currentRealOriginY;
+    //description
+    private Boolean isDisplayingDescription;
+    private String description;
+    private Alignment descriptionAlignment;
+    private Font descriptionFont;
+    private Color descriptionFontColor;
+    //title
+    private Boolean isDisplayingTitle;
+    private String title;
+    private Font titleFont;
+    private Alignment titleAlignment;
+    private Color titleFontColor;
+    // TRANSFORMATION
+    private Boolean currentIsSelected = Boolean.FALSE;
+    private Boolean currentIsBeingTransformed;
+    private final Color TRANSFORMATION_LEGEND_BORDER_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+    private final Color TRANSFORMATION_LEGEND_CENTER_COLOR = new Color(1f, 1f, 1f, 0.5f);
+    private int TRANSFORMATION_LEGEND_FONT_SIZE = 20;
+    private int TRANSFORMATION_LEGEND_FONT_SIZE_MIN = 20;
+    private Font TRANSFORMATION_LEGEND_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 2 * TRANSFORMATION_LEGEND_FONT_SIZE);
+    private final String TRANSFORMATION_LEGEND_LABEL = "transforming legend..";
+    private final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
+    private final int TRANSFORMATION_ANCHOR_SIZE = 20;
+    private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
+
     /**
      *
      * Function that actually renders the legend using the Graphics2D Object
@@ -128,7 +174,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
         render(graphics2D, originTranslation, currentWidth, currentHeight);
 
-
         //appending
         org.w3c.dom.Element svgRoot = document.getDocumentElement();
         svgRoot.appendChild(graphics2D.getRoot().getLastChild());
@@ -159,16 +204,16 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         Graphics2D graphics2D = target.getGraphics();
 
         AffineTransform saveState = graphics2D.getTransform();
-        
+
         originTranslation = new AffineTransform(saveState);
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
 
-//        if (currentIsBeingTransformed) {//Transformed rendering disabled
-//            renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
-//            drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
-//        } else {
-//            render(graphics2D, originTranslation, currentWidth, currentHeight);
-//        }
+        if (currentIsBeingTransformed) {
+            renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
+            drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
+        } else {
+            render(graphics2D, originTranslation, currentWidth, currentHeight);
+        }
 
         render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.setTransform(saveState);
@@ -180,20 +225,31 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         graphics2D.fillRect(0, 0, width, height);
         graphics2D.setColor(TRANSFORMATION_LEGEND_CENTER_COLOR);
         graphics2D.fillRect(TRANSFORMATION_ANCHOR_LINE_THICK,
-                            TRANSFORMATION_ANCHOR_LINE_THICK,
-                            width - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
-                            height - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
+                TRANSFORMATION_ANCHOR_LINE_THICK,
+                width - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
+                height - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
         // centeredText
         graphics2D.setColor(TRANSFORMATION_LEGEND_BORDER_COLOR);
-        if (width < 100) {
-            graphics2D.setFont(TRANSFORMATION_LEGEND_FONT_SMALL);
-        }
-        else {
-            graphics2D.setFont(TRANSFORMATION_LEGEND_FONT);
-        }
+        // determine the optimum font size for the draw area
+        int drawAreaWidth = width - 2 * TRANSFORMATION_ANCHOR_LINE_THICK;
+        Float tolerance = 0.9f;
+        int fontSizeStep = 1;
         int draggedLegendLabelWidth = graphics2D.getFontMetrics().stringWidth(TRANSFORMATION_LEGEND_LABEL);
-        graphics2D.drawString(TRANSFORMATION_LEGEND_LABEL, (width - draggedLegendLabelWidth) / 2, height / 2);
 
+        while (draggedLegendLabelWidth <= tolerance * drawAreaWidth) {
+            TRANSFORMATION_LEGEND_FONT_SIZE += fontSizeStep;
+            TRANSFORMATION_LEGEND_FONT = TRANSFORMATION_LEGEND_FONT.deriveFont(1.0f * TRANSFORMATION_LEGEND_FONT_SIZE);
+            graphics2D.setFont(TRANSFORMATION_LEGEND_FONT);
+            draggedLegendLabelWidth = graphics2D.getFontMetrics().stringWidth(TRANSFORMATION_LEGEND_LABEL);
+        }
+
+        while (draggedLegendLabelWidth >= drawAreaWidth && TRANSFORMATION_LEGEND_FONT_SIZE >= TRANSFORMATION_LEGEND_FONT_SIZE_MIN) {
+            TRANSFORMATION_LEGEND_FONT_SIZE -= fontSizeStep;
+            TRANSFORMATION_LEGEND_FONT = TRANSFORMATION_LEGEND_FONT.deriveFont(1.0f * TRANSFORMATION_LEGEND_FONT_SIZE);
+            graphics2D.setFont(TRANSFORMATION_LEGEND_FONT);
+            draggedLegendLabelWidth = graphics2D.getFontMetrics().stringWidth(TRANSFORMATION_LEGEND_LABEL);
+        }
+        graphics2D.drawString(TRANSFORMATION_LEGEND_LABEL, (width - draggedLegendLabelWidth) / 2, height / 2);
     }
 
     private void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -226,14 +282,12 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         int legendWidth = width;
         int legendHeight = (Integer) (height - Math.round(titleHeight) - Math.round(descriptionHeight) - 2 * MARGIN_BETWEEN_ELEMENTS);
 
-
         // DESCRIPTION
         AffineTransform descriptionOrigin = new AffineTransform(origin);
         descriptionOrigin.translate(0, titleHeight + legendHeight + MARGIN_BETWEEN_ELEMENTS);
         if (isDisplayingDescription && !description.isEmpty()) {
             renderDescription(graphics2D, descriptionOrigin, width, (int) descriptionHeight);
         }
-
 
         // rendering legend
         renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
@@ -263,9 +317,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             graphics2D.setColor(Color.WHITE);
             graphics2D.fillRect((int) anchorLocations[i][0] + TRANSFORMATION_ANCHOR_LINE_THICK,
-                                (int) anchorLocations[i][1] + TRANSFORMATION_ANCHOR_LINE_THICK,
-                                (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
-                                (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
+                    (int) anchorLocations[i][1] + TRANSFORMATION_ANCHOR_LINE_THICK,
+                    (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
+                    (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
         }
     }
 
@@ -287,11 +341,11 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     }
 
     private void renderBorder(Graphics2D graphics2D,
-                              AffineTransform origin,
-                              Integer width,
-                              Integer height,
-                              Integer borderThick,
-                              Color borderColor) {
+            AffineTransform origin,
+            Integer width,
+            Integer height,
+            Integer borderThick,
+            Color borderColor) {
 
         if (borderIsDisplaying) {
 
@@ -334,11 +388,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
                 if (target instanceof G2DTarget) {
                     renderG2D((G2DTarget) target);
-                }
-                else if (target instanceof SVGTarget) {
+                } else if (target instanceof SVGTarget) {
                     renderSVG((SVGTarget) target);
-                }
-                else if (target instanceof PDFTarget) {
+                } else if (target instanceof PDFTarget) {
                     renderPDF((PDFTarget) target);
                 }
             }
@@ -408,7 +460,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 //                System.out.println("@Var: y: "+y);
 //                System.out.println("@Var: yText: " + (yText - y - layout.getAscent()));
 //                System.out.println("@Var: height: " + height);
-                if (yText - y -layout.getAscent() > height) {
+                if (yText - y - layout.getAscent() > height) {
                     break;
                 }
 //                    break;
@@ -462,8 +514,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
     @Override
     public boolean isRendererForitem(Item item, PreviewProperties properties) {
-        LegendItemRenderer renderer = item.getData(LegendItem.RENDERER);
-        return renderer != null && renderer.getClass().equals(getClass());
+        Class renderer = item.getData(LegendItem.RENDERER);
+        return renderer != null && renderer.equals(getClass());
     }
 
     @Override
@@ -475,49 +527,4 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     public String toString() {
         return getDisplayName();
     }
-
-    private Integer currentItemIndex;
-    private float graphOriginX = Float.MAX_VALUE;
-    private float graphOriginY = Float.MAX_VALUE;
-    private float graphWidth = 0;
-    private float graphHeight = 0;
-    private final int MARGIN_BETWEEN_ELEMENTS = 5;
-    // VARIABLES
-    // IS DISPLAYING
-    private Boolean isDisplayingLegend;
-    // BACKGROUND
-    private boolean backgroundIsDisplaying;
-    private Color backgroundColor;
-    private Boolean borderIsDisplaying;
-    private Color borderColor;
-    private int borderLineThick;
-    // DIMENSIONS
-    protected Integer currentWidth;
-    protected Integer currentHeight;
-    protected AffineTransform originTranslation;
-    private float currentRealOriginX;
-    private float currentRealOriginY;
-    //description
-    private Boolean isDisplayingDescription;
-    private String description;
-    private Alignment descriptionAlignment;
-    private Font descriptionFont;
-    private Color descriptionFontColor;
-    //title
-    private Boolean isDisplayingTitle;
-    private String title;
-    private Font titleFont;
-    private Alignment titleAlignment;
-    private Color titleFontColor;
-    // TRANSFORMATION
-    private Boolean currentIsSelected = Boolean.FALSE;
-    private Boolean currentIsBeingTransformed;
-    private final Color TRANSFORMATION_LEGEND_BORDER_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-    private final Color TRANSFORMATION_LEGEND_CENTER_COLOR = new Color(1f, 1f, 1f, 0.5f);
-    private final Font TRANSFORMATION_LEGEND_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 24);
-    private final Font TRANSFORMATION_LEGEND_FONT_SMALL = new Font(Font.SANS_SERIF, Font.BOLD, 12);
-    private final String TRANSFORMATION_LEGEND_LABEL = "Legend";
-    private final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
-    private final int TRANSFORMATION_ANCHOR_SIZE = 20;
-    private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
 }

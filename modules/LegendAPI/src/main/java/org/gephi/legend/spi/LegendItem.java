@@ -9,21 +9,21 @@ import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.NbBundle;
 
 /**
- * Basic Item interface for defining legends.
- * It also defines many common properties for all legends.
+ * Basic Item interface for defining legends. It also defines many common
+ * properties for all legends.
+ *
  * @author edubecks
  */
 public interface LegendItem extends Item {
 
     // RENDERER
     public static final String RENDERER = "renderer";
-    
     // DATA
     public static final String LEGEND_ITEM = "legend item";
     public static final String DATA = "data";
-    //INDEX
+    // INDEX
     public static final String ITEM_INDEX = "item index";
-    //LOCATION
+    // LOCATION
     public static final String ORIGIN = "origin";
     //INDEX
     public static final String PROPERTIES = "properties";
@@ -39,13 +39,14 @@ public interface LegendItem extends Item {
     public static final String IS_SELECTED = "is selected";
     public static final String IS_BEING_TRANSFORMED = "is being transformed";
     public static final String CURRENT_TRANSFORMATION = "current transformation";
-    //ANCHOR CONSTANTS FOR ALL LEGEND ITEMS
+    // ANCHOR CONSTANTS FOR ALL LEGEND ITEMS
     public static final int TRANSFORMATION_ANCHOR_SIZE = 20;
     public static final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
     public static final float LEGEND_MIN_WIDTH = 50;
     public static final float LEGEND_MIN_HEIGHT = 50;
-    
-    public interface DynamicItem{
+
+    public interface DynamicItem {
+
         /**
          * If the type of Legend has dynamic PreviewProperty it returns it
          *
@@ -55,7 +56,6 @@ public interface LegendItem extends Item {
 
         public void updateDynamicProperties(int numOfProperties);
     }
-
 
     public enum Direction {
 
@@ -79,11 +79,10 @@ public interface LegendItem extends Item {
         public String toString() {
             return labels[value];
         }
-        
+
         public String getValue() {
             return value.toString();
         }
-
     }
 
     public enum Shape {
@@ -106,11 +105,10 @@ public interface LegendItem extends Item {
         public String toString() {
             return labels[value];
         }
-        
+
         public String getValue() {
             return value.toString();
         }
-
     }
 
     public enum Alignment {
@@ -139,6 +137,5 @@ public interface LegendItem extends Item {
         public String getValue() {
             return value.toString();
         }
-
     }
 }
