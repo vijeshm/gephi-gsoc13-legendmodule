@@ -30,8 +30,6 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
     public boolean isAnAvailableRenderer(Item item) {
         return item instanceof TextItem;
     }
-    
-    
 
     @Override
     public String getDisplayName() {

@@ -6,6 +6,8 @@ package org.gephi.legend.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.gephi.legend.spi.LegendItem;
@@ -29,6 +31,7 @@ public class LegendModel {
     private Integer numberOfInactiveItems;
     private ArrayList<Item> activeLegendItems;
     private ArrayList<Item> inactiveLegendItems;
+    private Map<Integer, blockNode> indexNodeMap;
     public static final String LEGEND_PROPERTIES = "legend properties";
     public static final String INDEX = "index"; // Where is this being used?
     private static final String LEGEND_DESCRIPTION = "legend";
@@ -44,6 +47,7 @@ public class LegendModel {
         this.numberOfInactiveItems = 0;
         this.activeLegendItems = new ArrayList<Item>();
         this.inactiveLegendItems = new ArrayList<Item>();
+        this.indexNodeMap = new HashMap<Integer, blockNode>();
     }
 
     public Workspace getWorkspace() {
@@ -55,11 +59,11 @@ public class LegendModel {
     }
 
     public boolean hasActiveLegends() {
-        if (activeLegendItems.size() != 0) {
-            return true;
+        if (activeLegendItems.isEmpty()) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public void swapItems(int index1, int index2) {
@@ -68,6 +72,10 @@ public class LegendModel {
         } catch (IndexOutOfBoundsException e) {
             System.err.println(e);
         }
+    }
+    
+    public blockNode getBlockTree(int itemIndex) {
+        return indexNodeMap.get(itemIndex);
     }
 
     public Integer getTotalNumberOfItems() {
@@ -127,6 +135,15 @@ public class LegendModel {
     public void addItem(Item item) {
         if (item != null) {
             activeLegendItems.add(item);
+            int itemIndex = (Integer) item.getData(LegendItem.ITEM_INDEX);
+            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+            /*
+            float originX = previewProperties[LegendProperty.USER_ORIGIN_X].getValue();
+            float originY = previewProperties[LegendProperty.USER_ORIGIN_Y].getValue();
+            float width = previewProperties[LegendProperty.WIDTH].getValue();
+            float height = previewProperties[LegendProperty.HEIGHT].getValue();
+            */
+            indexNodeMap.put(itemIndex, new blockNode(null, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0));
 
             numberOfActiveItems += 1;
             pickedLegendIndex = numberOfActiveItems - 1;

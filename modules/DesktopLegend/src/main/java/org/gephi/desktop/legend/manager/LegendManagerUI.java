@@ -61,7 +61,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        System.out.println(event.getSource() + " " +event.getPropertyName());
         // when a different element is selected in UI, the same must be reflected in the layers panel as well.
         if (event.getSource().getClass().equals(legendController.getClass()) && event.getPropertyName().equals(LegendController.LEGEND_ITEM_SELECTED)) {
             Item selectedItem = (Item) event.getNewValue();
@@ -202,18 +201,18 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
 
             // if the user hits cancel, chosenLegendCustomBuilder will become null, and no further operations must take place.
             if (chosenLegendCustomBuilder != null) {
-                // build the legend item
-                LegendModel legendManager = legendController.getLegendModel();
-                Integer newItemIndex = legendManager.getNextItemIndex();
-
                 if (chosenLegendCustomBuilder.isAvailableToBuild()) {
+                    // build the legend item
+                    LegendModel legendManager = legendController.getLegendModel();
+                    Integer newItemIndex = legendManager.getNextItemIndex();
                     Item item = chosenLegend.createCustomItem(newItemIndex, null, null, chosenLegendCustomBuilder);
 
-                    // adding item to legend manager
+                    // adding item to legend model
                     legendController.addItemToLegendModel(item);
 
                     // the user must be notified that the legend was actually added. Hence, update the legend layers panel.
                     refreshLayers();
+                    previewUIController.refreshPreview();
                 } else {
                     JOptionPane.showMessageDialog(this, chosenLegendCustomBuilder.stepsNeededToBuild(), NbBundle.getMessage(LegendModel.class, "LegendItem.stepsNeededToBuildItem"), JOptionPane.INFORMATION_MESSAGE, null);
                 }
@@ -235,6 +234,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             if (dialogResult == JOptionPane.YES_OPTION) {
                 legendManager.removeItem(indexOfPickedLegend);
                 refreshLayers();
+                previewUIController.refreshPreview();
             }
         }
     }//GEN-LAST:event_removeLegendButtonActionPerformed

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
+import org.gephi.legend.api.blockNode;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_HEIGHT;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_WIDTH;
@@ -113,6 +114,10 @@ public class LegendMouseListener implements PreviewMouseListener {
             if (isClickingInLegend(event.x, event.y, items.get(i), previewProperties) || isClickingInAnchor(event.x, event.y, items.get(i), previewProperties) >= 0) {
                 items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
                 LegendController.getInstance().selectItem(items.get(i));
+                
+                blockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
+                blockNode clickedBlock = root.getClickedBlock(event.x, event.y);
+                
                 break;
             }
         }

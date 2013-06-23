@@ -29,7 +29,7 @@ import org.openide.util.NbBundle;
  */
 public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
 
-    // xml 
+    // XML
     protected static final String XML_PROPERTY = "property";
     private static final String XML_LEGEND_TYPE = "legendtype";
     private static final String XML_RENDERER = "renderer";
@@ -39,32 +39,33 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     protected static final String XML_NAME = "name";
     protected static final String XML_CLASS = "class";
     private static final String XML_DATA = "itemdata";
-    //DEFAULT VALUES 
+    
+    // DEFAULT VALUES 
     // BACKGROUND AND BORDER
-    protected Boolean defaultBackgroundIsDisplaying = Boolean.FALSE;
-    protected Color defaultBackgroundColor = Color.WHITE;
-    protected Boolean defaultBorderIsDisplaying = Boolean.FALSE;
-    protected Color defaultBorderColor = Color.BLACK;
+    protected Boolean defaultBackgroundIsDisplaying = Boolean.TRUE;
+    protected Color defaultBackgroundColor = new Color(1f, 1f, 1f, 0.5f);
+    protected Boolean defaultBorderIsDisplaying = Boolean.TRUE;
+    protected Color defaultBorderColor = new Color(0f, 0f, 0f, 0.75f);
     protected Integer defaultBorderLineThick = 5;
     // LABEL
     protected String defaultLabel = "";
     // IS_DISPLAYING
     protected Boolean defaultIsDisplaying = Boolean.TRUE;
-    //ORIGIN
+    // ORIGIN
     protected Float defaultOriginX = 0f;
     protected Float defaultOriginY = 0f;
-    //WIDTH
+    // WIDTH
     protected Float defaultWidth = 500f;
     protected Float defaultHeight = 300f;
     // TITLE
-    protected Boolean defaultTitleIsDisplaying = Boolean.FALSE;
-    protected String defaultTitle = "TITLE";
+    protected Boolean defaultTitleIsDisplaying = Boolean.TRUE;
+    protected String defaultTitle = "<insert title here>";
     protected Font defaultTitleFont = new Font("Arial", Font.BOLD, 30);
     protected Alignment defaultTitleAlignment = Alignment.CENTER;
     protected Color defaultTitleFontColor = Color.BLACK;
     // DESCRIPTION
-    protected String defaultDescription = "description ... description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...description ...";
-    protected Boolean defaultDescriptionIsDisplaying = Boolean.FALSE;
+    protected String defaultDescription = "<insert description here>";
+    protected Boolean defaultDescriptionIsDisplaying = Boolean.TRUE;
     protected Color defaultDescriptionFontColor = Color.BLACK;
     protected Alignment defaultDescriptionAlignment = Alignment.LEFT;
     protected Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
@@ -82,14 +83,10 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @param builder
      * @return
      */
-    public Item createCustomItem(Integer newItemIndex,
-            Graph graph,
-            AttributeModel attributeModel,
-            CustomLegendItemBuilder builder) {
+    public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
         Item item = buildCustomItem(builder, graph, attributeModel);
         createDefaultProperties(newItemIndex, item);
         return item;
-
     }
 
     private void createDefaultProperties(Integer newItemIndex, Item item) {

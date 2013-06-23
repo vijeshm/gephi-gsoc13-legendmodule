@@ -19,6 +19,10 @@ import org.apache.batik.svggen.DefaultExtensionHandler;
 import org.apache.batik.svggen.ImageHandlerBase64Encoder;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.gephi.legend.inplaceeditor.column;
+import org.gephi.legend.inplaceeditor.element;
+import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.inplaceeditor.row;
 import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
@@ -107,11 +111,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         if (item != null) {
             currentItemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-
             // LEGEND DIMENSIONS
             currentWidth = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.WIDTH));
             currentHeight = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.HEIGHT));
-
 
             // GRAPH DIMENSIONS
             PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
@@ -122,7 +124,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Point topLeftPosition = previewModel.getTopLeftPosition();
             graphOriginX = topLeftPosition.x;
             graphOriginY = topLeftPosition.y;
-
 
             // LEGEND POSITION
             currentRealOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, currentItemIndex, LegendProperty.USER_ORIGIN_X));
@@ -172,7 +173,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         originTranslation = new AffineTransform();
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
-        render(graphics2D, originTranslation, currentWidth, currentHeight);
+        render(graphics2D, originTranslation, currentWidth, currentHeight, currentItemIndex);
 
         //appending
         org.w3c.dom.Element svgRoot = document.getDocumentElement();
@@ -194,12 +195,12 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         originTranslation.translate(-graphOriginX, -graphOriginY);
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
-        render(graphics2D, originTranslation, currentWidth, currentHeight);
+        render(graphics2D, originTranslation, currentWidth, currentHeight, currentItemIndex);
         graphics2D.dispose();
         pdfContentByte.restoreState();
     }
 
-    private void renderG2D(G2DTarget target) {
+    private void renderG2D(G2DTarget target, int itemIndex) {
 
         Graphics2D graphics2D = target.getGraphics();
 
@@ -212,10 +213,10 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
             drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
         } else {
-            render(graphics2D, originTranslation, currentWidth, currentHeight);
+            render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
         }
 
-        render(graphics2D, originTranslation, currentWidth, currentHeight);
+        //render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.setTransform(saveState);
     }
 
@@ -252,15 +253,27 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         graphics2D.drawString(TRANSFORMATION_LEGEND_LABEL, (width - draggedLegendLabelWidth) / 2, height / 2);
     }
 
-    private void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    private void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, int itemIndex) {
+
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        //BACKGROUND
-        renderBackground(graphics2D, origin, width, height);
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        Item item = legendModel.getItemAtIndex(itemIndex);
 
-        // BORDER
-        renderBorder(graphics2D, origin, width, height, borderLineThick, borderColor);
+        // General procedure to render a block:
+        // 1. create a blockNode with proper parent block reference
+        // 2. send its reference to the method that renders the block
+        // 3. within the block renderer, set the origin, dimensions and build the inplaceEditor object depending what properties must be changed on rendering the inplaceEditor.
+
+        // The rendering takes place from the outermost to innermost
+        // BORDER - border is external
+        blockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.
+        renderBorder(graphics2D, origin, width, height, borderLineThick, borderColor, item, root);
+
+        // BACKGROUND
+        renderBackground(graphics2D, origin, width, height);
 
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
@@ -268,7 +281,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         if (isDisplayingTitle && !title.isEmpty()) {
             titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, width);
             renderTitle(graphics2D, titleOrigin, width, (int) titleHeight);
-
         }
 
         float descriptionHeight = 0;
@@ -340,15 +352,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderBorder(Graphics2D graphics2D,
-            AffineTransform origin,
-            Integer width,
-            Integer height,
-            Integer borderThick,
-            Color borderColor) {
-
+    private void renderBorder(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, blockNode root) {
         if (borderIsDisplaying) {
-
             graphics2D.setTransform(origin);
             graphics2D.setColor(borderColor);
 
@@ -364,6 +369,31 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             graphics2D.fillRect(width, -borderThick, borderThick, height + 2 * borderThick);
         }
 
+        // setting the origin, dimensions and inplaceEditor
+        root.setOriginX(-borderThick);
+        root.setOriginY(-borderThick);
+        root.setBlockWidth(width + 2 * borderThick);
+        root.setBlockHeight(height + 2 * borderThick);
+
+        if (root.getInplaceEditor() == null) {            
+            // this part of the code gets executed only when the element gets rendered for the first time. 
+            // next time onwards, the ipeditor will already be associated and it need not be structured every time the item is being rendered.
+            inplaceEditor ipeditor = new inplaceEditor();
+            
+            row r;
+            column col;
+            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+            PreviewProperty prop;
+            int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            Object[] data = new Object[1];
+            data[0] = new String("Border: ");
+            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            
+            root.setInplaceEditor(ipeditor);
+        }
     }
 
     private float renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -377,17 +407,12 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
-
         if (item != null) {
-
-
             readLegendPropertiesAndValues(item, properties);
             readOwnPropertiesAndValues(item, properties);
-
             if (isDisplayingLegend) {
-
                 if (target instanceof G2DTarget) {
-                    renderG2D((G2DTarget) target);
+                    renderG2D((G2DTarget) target, currentItemIndex);
                 } else if (target instanceof SVGTarget) {
                     renderSVG((SVGTarget) target);
                 } else if (target instanceof PDFTarget) {
@@ -403,7 +428,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     }
 
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment, boolean isComputingSpace) {
-
         if (text.isEmpty()) {
             return 0f;
         }
@@ -420,7 +444,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         LineBreakMeasurer measurer = new LineBreakMeasurer(m_iterator, fontRenderContext);
         measurer.setPosition(start);
 
-
         float xText = (float) x, yText = (float) y; // text positions
 
         float descent = 0, leading = 0;
@@ -429,12 +452,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             yText += layout.getAscent();
 
-
             if (!isComputingSpace) {
-
-
-
-
                 switch (alignment) {
                     case LEFT: {
                         break;
@@ -455,7 +473,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
                         }
                         break;
                     }
-
                 }
 //                System.out.println("@Var: y: "+y);
 //                System.out.println("@Var: yText: " + (yText - y - layout.getAscent()));
