@@ -57,6 +57,7 @@ import org.gephi.utils.progress.ProgressTicket;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
@@ -156,7 +157,6 @@ public class PreviewControllerImpl implements PreviewController {
                     renderersList.add(renderer);
                 }
             }
-
             renderers = renderersList.toArray(new Renderer[0]);
         }
 

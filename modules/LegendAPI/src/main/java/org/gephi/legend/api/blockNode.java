@@ -4,6 +4,9 @@
  */
 package org.gephi.legend.api;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.legend.inplaceeditor.inplaceEditor;
 
@@ -90,12 +93,39 @@ public class blockNode {
     public void setBlockHeight(float height) {
         blockHeight = height;
     }
-    
+
     public void setInplaceEditor(inplaceEditor ipe) {
         IPEditor = ipe;
+        updateInplaceEditor();
     }
 
-    public void addChild(float x, float y, int width, int height) {
+    private void updateInplaceEditor() {
+        IPEditor.setData(inplaceEditor.ORIGIN_X, originX);
+        IPEditor.setData(inplaceEditor.ORIGIN_Y, originY);
+        IPEditor.setData(inplaceEditor.WIDTH, blockWidth);
+        IPEditor.setData(inplaceEditor.HEIGHT, blockHeight);
+    }
+
+    public void updateGeometry(float newOriginX, float newOriginY, float newWidth, float newHeight) {
+        float offsetX = newOriginX - originX;
+        float offsetY = newOriginY - originY;
+        float widthRatio = newWidth / blockWidth;
+        float heightRatio = newHeight / blockHeight;
+        originX = newOriginX;
+        originY = newOriginY;
+        blockWidth = newWidth;
+        blockHeight = newHeight;
+        updateInplaceEditor();
+        for (blockNode child : children) {
+            float childOriginX = child.getOriginX();
+            float childOriginY = child.getOriginY();
+            float childBlockWidth = child.getBlockWidth();
+            float childBlockHeight = child.getBlockHeight();
+            child.updateGeometry(childOriginX + offsetX, childOriginY + offsetY, widthRatio * childBlockWidth, heightRatio * childBlockHeight);
+        }
+    }
+
+    public void addChild(float x, float y, float width, float height) {
         blockNode child = new blockNode(this, x, y, width, height);
         children.add(child);
     }
@@ -121,6 +151,9 @@ public class blockNode {
         return this;
     }
 
-    public void renderIPEditor() {
-    }
+    /*
+     public void renderIPEditor() {
+     IPEditor.render(originX, originY);
+     }
+     */
 }

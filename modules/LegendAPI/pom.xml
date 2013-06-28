@@ -44,6 +44,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>project-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>desktop-preview</artifactId>
+            <version>0.9-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>

@@ -19,9 +19,11 @@ import org.apache.batik.svggen.DefaultExtensionHandler;
 import org.apache.batik.svggen.ImageHandlerBase64Encoder;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.gephi.graph.api.Graph;
 import org.gephi.legend.inplaceeditor.column;
 import org.gephi.legend.inplaceeditor.element;
 import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
 import org.gephi.legend.inplaceeditor.row;
 import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.spi.LegendItem;
@@ -84,7 +86,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     private final int TRANSFORMATION_ANCHOR_SIZE = 20;
     private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
 
-    /**
+    /**the 
      *
      * Function that actually renders the legend using the Graphics2D Object
      *
@@ -368,18 +370,22 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // right
             graphics2D.fillRect(width, -borderThick, borderThick, height + 2 * borderThick);
         }
-
-        // setting the origin, dimensions and inplaceEditor
-        root.setOriginX(-borderThick);
-        root.setOriginY(-borderThick);
-        root.setBlockWidth(width + 2 * borderThick);
-        root.setBlockHeight(height + 2 * borderThick);
-
-        if (root.getInplaceEditor() == null) {            
+        
+        if (root.getInplaceEditor() == null) {
             // this part of the code gets executed only when the element gets rendered for the first time. 
-            // next time onwards, the ipeditor will already be associated and it need not be structured every time the item is being rendered.
-            inplaceEditor ipeditor = new inplaceEditor();
-            
+            // next time onwards, the ipeditor will already be built and it need not be structured every time the item is being rendered.
+
+            // setting the origin, dimensions and inplaceEditor
+            root.setOriginX(-borderThick);
+            root.setOriginY(-borderThick);
+            root.setBlockWidth(width + 2 * borderThick);
+            root.setBlockHeight(height + 2 * borderThick);
+
+            Graph graph = null;
+            inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
+            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph);
+            ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+
             row r;
             column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
@@ -389,9 +395,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             r = ipeditor.addRow();
             col = r.addColumn();
             Object[] data = new Object[1];
-            data[0] = new String("Border: ");
+            data[0] = "Border: ";
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
-            
+
             root.setInplaceEditor(ipeditor);
         }
     }

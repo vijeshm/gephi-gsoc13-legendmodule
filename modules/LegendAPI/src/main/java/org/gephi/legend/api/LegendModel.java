@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.gephi.legend.inplaceeditor.inplaceEditor;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
@@ -32,12 +33,14 @@ public class LegendModel {
     private ArrayList<Item> activeLegendItems;
     private ArrayList<Item> inactiveLegendItems;
     private Map<Integer, blockNode> indexNodeMap;
-    public static final String LEGEND_PROPERTIES = "legend properties";
-    public static final String INDEX = "index"; // Where is this being used?
+    private inplaceEditor ipeditor;
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
     private final Workspace workspace;
+    public static final String LEGEND_PROPERTIES = "legend properties";
+    public static final String INDEX = "index"; // Where is this being used?
+    
 
     public LegendModel(Workspace workspace) {
         this.workspace = workspace;
@@ -48,6 +51,7 @@ public class LegendModel {
         this.activeLegendItems = new ArrayList<Item>();
         this.inactiveLegendItems = new ArrayList<Item>();
         this.indexNodeMap = new HashMap<Integer, blockNode>();
+        this.ipeditor = null;
     }
 
     public Workspace getWorkspace() {
@@ -76,6 +80,10 @@ public class LegendModel {
     
     public blockNode getBlockTree(int itemIndex) {
         return indexNodeMap.get(itemIndex);
+    }
+    
+    public void setBlockTree(int itemIndex, blockNode root) {
+        indexNodeMap.put(itemIndex, root);
     }
 
     public Integer getTotalNumberOfItems() {
@@ -231,6 +239,14 @@ public class LegendModel {
 
     public ArrayList<Item> getInactiveItems() {
         return inactiveLegendItems;
+    }
+    
+    public inplaceEditor getInplaceEditor() {
+        return ipeditor;
+    }
+    
+    public void setInplaceEditor(inplaceEditor ipeditor) {
+        this.ipeditor = ipeditor;
     }
 
     public void refreshDynamicPreviewProperties() {

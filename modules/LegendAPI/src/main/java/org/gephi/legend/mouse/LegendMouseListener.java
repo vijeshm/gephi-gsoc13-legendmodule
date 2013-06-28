@@ -1,19 +1,31 @@
 package org.gephi.legend.mouse;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
+import org.gephi.desktop.preview.PreviewTopComponent;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.api.blockNode;
+import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_HEIGHT;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_WIDTH;
 import static org.gephi.legend.spi.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
+import org.gephi.preview.G2DRenderTargetBuilder;
+import org.gephi.preview.PreviewControllerImpl;
+import org.gephi.preview.PreviewModelImpl;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewMouseEvent;
 import org.gephi.preview.api.PreviewProperties;
+import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.project.api.Workspace;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -81,10 +93,19 @@ public class LegendMouseListener implements PreviewMouseListener {
     private boolean isClickingInLegend(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
+        int borderThickness = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.BORDER_LINE_THICK));
         float realOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
         float realOriginY = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
         int width = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
         int height = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+
+        /*
+        // adjustment in order to include border as a part of the legend as well
+        realOriginX = realOriginX - borderThickness;
+        realOriginY = realOriginY - borderThickness;
+        width = width + 2 * borderThickness;
+        height = height + 2 * borderThickness;
+        */
 
         if ((pointX >= realOriginX && pointX < (realOriginX + width))
                 && (pointY >= realOriginY && pointY < (realOriginY + height))) {
@@ -100,7 +121,9 @@ public class LegendMouseListener implements PreviewMouseListener {
         // the click can be within the coordinates of a unique legend (including the anchor overlap). In this case, only the unique legend must be selected.
         // the click can be within the overlapping area of two or more legends. In this case, the legend on the top must be selected.
 
-        LegendModel legendModel = LegendController.getInstance().getLegendModel();
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        legendModel.setInplaceEditor(null); // clear the inplace editor before rendering. this is needed to disable the inplace editor from showing.
         ArrayList<Item> items = legendModel.getActiveItems();
 
         // deselect all legends
@@ -113,14 +136,17 @@ public class LegendMouseListener implements PreviewMouseListener {
         for (int i = items.size() - 1; i >= 0; i--) {
             if (isClickingInLegend(event.x, event.y, items.get(i), previewProperties) || isClickingInAnchor(event.x, event.y, items.get(i), previewProperties) >= 0) {
                 items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
-                LegendController.getInstance().selectItem(items.get(i));
-                
+                legendController.selectItem(items.get(i));
+
                 blockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
                 blockNode clickedBlock = root.getClickedBlock(event.x, event.y);
-                
+                legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
                 break;
             }
         }
+
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        previewController.refreshPreview();
         event.setConsumed(true);
     }
 
@@ -235,7 +261,7 @@ public class LegendMouseListener implements PreviewMouseListener {
                                 // reset the newly computed height to min height, if it is less than the min height
                                 if (newHeight < LEGEND_MIN_HEIGHT) {
                                     newHeight = LEGEND_MIN_HEIGHT;
-                                    
+
                                     // originY must not be changed in case the height has reached its minimum. hence it is reset. Note that originX can still change.
                                     if (Math.abs(realOriginY - newOriginY) > TRANSFORMATION_ANCHOR_SIZE) {
                                         // to avoid large displacements of the origin when the mouse is dragged quickly
@@ -248,7 +274,7 @@ public class LegendMouseListener implements PreviewMouseListener {
                                 // reset the newly computed width to min width, if it is less than the min width
                                 if (newWidth < LEGEND_MIN_WIDTH) {
                                     newWidth = LEGEND_MIN_WIDTH;
-                                    
+
                                     // originX must not be changed in case the width has reached its minimum. hence it is reset. Note that originY can still change.
                                     if (Math.abs(realOriginX - newOriginX) > TRANSFORMATION_ANCHOR_SIZE) {
                                         // to avoid large displacements of the origin when the mouse is dragged quickly
@@ -312,6 +338,8 @@ public class LegendMouseListener implements PreviewMouseListener {
                             }
                         }
 
+                        // root.updateGeometry(newOriginX - realOriginX, newOriginY - realOriginY, newWidth / width, newHeight / height);
+
                         // change for key event
                         boolean isCtrlKeyPressed = event.keyEvent != null && event.keyEvent.isControlDown();
                         if (isCtrlKeyPressed) {
@@ -344,6 +372,22 @@ public class LegendMouseListener implements PreviewMouseListener {
         Item item = legendModel.getSelectedItem();
         if (item != null) {
             item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
+
+            Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+            float realOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
+            float realOriginY = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
+            int width = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
+            int height = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+
+            blockNode root = legendModel.getBlockTree(itemIndex);
+            // relativeX would've been set in mousePressed event using the formula: (event.x - realOriginX). Hence, to obtain the realOriginX, we need to pass (event.x - relativeX)
+            // 3rd parameter is newWidth/oldWidth. 4th parameter is newHeight/oldHeight. Here, it is 1 because it is a translate operation.
+            root.updateGeometry(realOriginX, realOriginY, width, height);
+
+            // note that the canvas gets refreshed twice if the control is passed here through clicking
+            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+            previewController.refreshPreview();
+
             event.setConsumed(true);
             return;
         }
