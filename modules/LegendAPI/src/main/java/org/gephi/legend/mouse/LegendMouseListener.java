@@ -43,6 +43,43 @@ public class LegendMouseListener implements PreviewMouseListener {
     private final String TRANSFORMATION_SCALE_OPERATION = "Scale operation";
     private final String TRANSFORMATION_TRANSLATE_OPERATION = "Translate operation";
 
+    private boolean isClickingInInplaceEditor(int pointX, int pointY) {
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+
+        inplaceEditor ipeditor = legendModel.getInplaceEditor();
+        if (ipeditor != null) {
+            int originX = Integer.MAX_VALUE;
+            int originY = Integer.MAX_VALUE;
+            int width = 0;
+            int height = 0;
+
+            // to avoid thread syncing and race conditions I think. 
+            // By the time this part of the code is executed, the render function in inplaceItemRenderer might not be executed and hence the dimension limits may not be set.
+            if (ipeditor.getData(inplaceEditor.ORIGIN_X) != null) {
+                originX = ipeditor.getData(inplaceEditor.ORIGIN_X);
+            }
+
+            if (ipeditor.getData(inplaceEditor.ORIGIN_Y) != null) {
+                originY = ipeditor.getData(inplaceEditor.ORIGIN_Y);
+            }
+
+            if (ipeditor.getData(inplaceEditor.WIDTH) != null) {
+                width = ipeditor.getData(inplaceEditor.WIDTH);
+            }
+
+            if (ipeditor.getData(inplaceEditor.HEIGHT) != null) {
+                height = ipeditor.getData(inplaceEditor.HEIGHT);
+            }
+
+            if ((pointX >= originX && pointX < (originX + width))
+                    && (pointY >= originY && pointY < (originY + height))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private int isClickingInAnchor(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         float realOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
@@ -100,12 +137,12 @@ public class LegendMouseListener implements PreviewMouseListener {
         int height = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
 
         /*
-        // adjustment in order to include border as a part of the legend as well
-        realOriginX = realOriginX - borderThickness;
-        realOriginY = realOriginY - borderThickness;
-        width = width + 2 * borderThickness;
-        height = height + 2 * borderThickness;
-        */
+         // adjustment in order to include border as a part of the legend as well
+         realOriginX = realOriginX - borderThickness;
+         realOriginY = realOriginY - borderThickness;
+         width = width + 2 * borderThickness;
+         height = height + 2 * borderThickness;
+         */
 
         if ((pointX >= realOriginX && pointX < (realOriginX + width))
                 && (pointY >= realOriginY && pointY < (realOriginY + height))) {
@@ -117,36 +154,47 @@ public class LegendMouseListener implements PreviewMouseListener {
     @Override
     public void mouseClicked(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
         // when mouse is clicked on the canvas, any of the following can take place.
+        // the click can be within the inplace editor
         // the click can be outside any legend. In this case, all the items must be deselected.
         // the click can be within the coordinates of a unique legend (including the anchor overlap). In this case, only the unique legend must be selected.
         // the click can be within the overlapping area of two or more legends. In this case, the legend on the top must be selected.
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        legendModel.setInplaceEditor(null); // clear the inplace editor before rendering. this is needed to disable the inplace editor from showing.
-        ArrayList<Item> items = legendModel.getActiveItems();
+        
+        if (isClickingInInplaceEditor(event.x, event.y)) {
+            System.out.println("clicked inside inplace editor.. message from mouseClicked()::LegendMouseListener.java");
+            inplaceEditor currentEditor = legendModel.getInplaceEditor();
+            blockNode currentBlock = currentEditor.getData(inplaceEditor.BLOCKNODE);
+            Item currentItem = currentBlock.getItem();
+            legendController.selectItem(currentItem);
+        } else {
+            legendModel.setInplaceEditor(null); // clear the inplace editor before rendering. this is needed to disable the inplace editor from showing.
+            ArrayList<Item> items = legendModel.getActiveItems();
 
-        // deselect all legends
-        for (Item item : items) {
-            item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
-        }
+            // deselect all legends
+            for (Item item : items) {
+                item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
+            }
 
-        // starting from the last legend (topmost legend layer), select the legend for which the click within its boundaries.
-        // it is important to break out of the loop to avoid the possibility of multiple selection in case of overlapping legends.
-        for (int i = items.size() - 1; i >= 0; i--) {
-            if (isClickingInLegend(event.x, event.y, items.get(i), previewProperties) || isClickingInAnchor(event.x, event.y, items.get(i), previewProperties) >= 0) {
-                items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
-                legendController.selectItem(items.get(i));
+            // starting from the last legend (topmost legend layer), select the legend for which the click within its boundaries.
+            // it is important to break out of the loop to avoid the possibility of multiple selection in case of overlapping legends.
+            for (int i = items.size() - 1; i >= 0; i--) {
+                if (isClickingInLegend(event.x, event.y, items.get(i), previewProperties) || isClickingInAnchor(event.x, event.y, items.get(i), previewProperties) >= 0) {
+                    items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
+                    legendController.selectItem(items.get(i));
 
-                blockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
-                blockNode clickedBlock = root.getClickedBlock(event.x, event.y);
-                legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
-                break;
+                    blockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
+                    blockNode clickedBlock = root.getClickedBlock(event.x, event.y);
+                    legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
+                    break;
+                }
             }
         }
 
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         previewController.refreshPreview();
+
         event.setConsumed(true);
     }
 
@@ -391,7 +439,6 @@ public class LegendMouseListener implements PreviewMouseListener {
             event.setConsumed(true);
             return;
         }
-
         event.setConsumed(false);
     }
 }

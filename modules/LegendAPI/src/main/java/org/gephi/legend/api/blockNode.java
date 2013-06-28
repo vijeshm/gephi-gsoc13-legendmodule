@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.preview.api.Item;
 
 /**
  *
@@ -23,8 +24,9 @@ public class blockNode {
     private blockNode parent;
     private ArrayList<blockNode> children;
     private inplaceEditor IPEditor;
+    private Item legendItem;
 
-    public blockNode(blockNode parentNode, float x, float y, float width, float height) {
+    public blockNode(blockNode parentNode, float x, float y, float width, float height, Item parentItem) {
         originX = x;
         originY = y;
         blockWidth = width;
@@ -32,6 +34,7 @@ public class blockNode {
         parent = parentNode;
         children = new ArrayList<blockNode>();
         IPEditor = null;
+        legendItem = parentItem;
     }
 
     public Boolean isRoot() {
@@ -69,6 +72,10 @@ public class blockNode {
     public blockNode getParent() {
         return parent;
     }
+    
+    public Item getItem() {
+        return legendItem;
+    }
 
     public ArrayList<blockNode> getChildren() {
         return children;
@@ -96,14 +103,6 @@ public class blockNode {
 
     public void setInplaceEditor(inplaceEditor ipe) {
         IPEditor = ipe;
-        updateInplaceEditor();
-    }
-
-    private void updateInplaceEditor() {
-        IPEditor.setData(inplaceEditor.ORIGIN_X, originX);
-        IPEditor.setData(inplaceEditor.ORIGIN_Y, originY);
-        IPEditor.setData(inplaceEditor.WIDTH, blockWidth);
-        IPEditor.setData(inplaceEditor.HEIGHT, blockHeight);
     }
 
     public void updateGeometry(float newOriginX, float newOriginY, float newWidth, float newHeight) {
@@ -115,7 +114,6 @@ public class blockNode {
         originY = newOriginY;
         blockWidth = newWidth;
         blockHeight = newHeight;
-        updateInplaceEditor();
         for (blockNode child : children) {
             float childOriginX = child.getOriginX();
             float childOriginY = child.getOriginY();
@@ -126,7 +124,7 @@ public class blockNode {
     }
 
     public void addChild(float x, float y, float width, float height) {
-        blockNode child = new blockNode(this, x, y, width, height);
+        blockNode child = new blockNode(this, x, y, width, height, legendItem);
         children.add(child);
     }
 

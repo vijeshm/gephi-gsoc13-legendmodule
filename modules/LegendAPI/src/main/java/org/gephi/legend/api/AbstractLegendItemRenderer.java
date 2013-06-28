@@ -375,15 +375,17 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // this part of the code gets executed only when the element gets rendered for the first time. 
             // next time onwards, the ipeditor will already be built and it need not be structured every time the item is being rendered.
 
+            /*
             // setting the origin, dimensions and inplaceEditor
             root.setOriginX(-borderThick);
             root.setOriginY(-borderThick);
             root.setBlockWidth(width + 2 * borderThick);
             root.setBlockHeight(height + 2 * borderThick);
+            */
 
             Graph graph = null;
             inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph);
+            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, root);
             ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
             row r;

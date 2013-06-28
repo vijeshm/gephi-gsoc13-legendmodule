@@ -24,6 +24,8 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
+import org.gephi.legend.api.blockNode;
+import org.gephi.legend.inplaceeditor.inplaceEditor;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItemBuilder;
@@ -223,8 +225,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
     private void removeLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeLegendButtonActionPerformed
         // This method is executed when the user clicks on the remove button. It removes the legend that is currently active.
 
-        LegendModel legendManager = legendController.getLegendModel();
-        int indexOfPickedLegend = legendManager.getPickedLegend();
+        LegendModel legendModel = legendController.getLegendModel();
+        int indexOfPickedLegend = legendModel.getPickedLegend();
         if (indexOfPickedLegend == -1) {
             //if index is -1, it means that that there are no active items
             JOptionPane.showMessageDialog(this, "There are no legends to be removed.");
@@ -232,7 +234,18 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             // confirm removal
             int dialogResult = JOptionPane.showConfirmDialog(this, "Delete this legend?", "confirm removal", JOptionPane.YES_NO_OPTION);
             if (dialogResult == JOptionPane.YES_OPTION) {
-                legendManager.removeItem(indexOfPickedLegend);
+
+                Item item = legendModel.getItemAtIndex(indexOfPickedLegend);
+                legendModel.removeBlockTree((Integer) item.getData(LegendItem.ITEM_INDEX));
+
+                inplaceEditor ipeditor = legendModel.getInplaceEditor();
+                blockNode node = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                Item currentInplaceItem = node.getItem();
+                if ((Integer) currentInplaceItem.getData(LegendItem.ITEM_INDEX) == (Integer) item.getData(LegendItem.ITEM_INDEX)) {
+                    legendModel.setInplaceEditor(null);
+                }
+
+                legendModel.removeItem(indexOfPickedLegend);
                 refreshLayers();
                 previewUIController.refreshPreview();
             }
@@ -340,7 +353,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             return;
         }
 
-        LegendModel legendManager = legendController.getLegendModel();
+        LegendModel legendModel = legendController.getLegendModel();
 
         // remove the existing JTable
         legendLayers.removeAll();
@@ -354,8 +367,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
         legendLayers.updateUI();
 
         // after updating the UI, we need to indicate to the user about the legend that is currently active. hence, we select the row that contains the active legend.
-        if (legendManager.getPickedLegend() != -1) {
-            int pickedLegendPosition = legendManager.getNumberOfActiveItems() - 1 - legendManager.getPickedLegend();
+        if (legendModel.getPickedLegend() != -1) {
+            int pickedLegendPosition = legendModel.getNumberOfActiveItems() - 1 - legendModel.getPickedLegend();
             layerOrder.setRowSelectionInterval(pickedLegendPosition, pickedLegendPosition);
         }
     }

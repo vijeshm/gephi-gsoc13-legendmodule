@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
+import org.gephi.legend.api.blockNode;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.G2DTarget;
@@ -49,15 +50,26 @@ public class inplaceItemRenderer implements Renderer{
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
         inplaceEditor ipeditor = legendModel.getInplaceEditor();
-        float originX = ipeditor.getData(inplaceEditor.ORIGIN_X);
-        float originY = ipeditor.getData(inplaceEditor.ORIGIN_Y);
-        float blockWidth = ipeditor.getData(inplaceEditor.WIDTH);
-        float blockHeight = ipeditor.getData(inplaceEditor.HEIGHT);
+        blockNode node = ipeditor.getData(inplaceEditor.BLOCKNODE);
+        float blockOriginX = node.getOriginX();
+        float blockOriginY = node.getOriginY();
+        float blockWidth = node.getBlockWidth();
+        float blockHeight = node.getBlockHeight();
         float gap = ipeditor.getData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP);
+        
+        int editorOriginX = (int)(blockOriginX + blockWidth + gap);
+        int editorOriginY = (int)(blockOriginY);
+        int editorWidth = 300; // must be computed based on the number of rows and columns
+        int editorHeight = 300; // must be computed based on the number of rows and columns
+        
+        ipeditor.setData(inplaceEditor.ORIGIN_X, editorOriginX);
+        ipeditor.setData(inplaceEditor.ORIGIN_Y, editorOriginY);
+        ipeditor.setData(inplaceEditor.WIDTH, editorWidth);
+        ipeditor.setData(inplaceEditor.HEIGHT, editorHeight);
         
         Color saveState = graphics2d.getColor();
         graphics2d.setColor(new Color(0.5f, 0.5f, 0.5f, 0.8f));
-        graphics2d.fillRect((int)(originX + blockWidth + gap), (int)originY, 300, 300);
+        graphics2d.fillRect(editorOriginX, editorOriginY, editorWidth, editorHeight);
         graphics2d.setColor(saveState);
     }
     

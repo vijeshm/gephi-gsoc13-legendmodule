@@ -82,6 +82,10 @@ public class LegendModel {
         return indexNodeMap.get(itemIndex);
     }
     
+    public void removeBlockTree(int itemIndex) {
+        indexNodeMap.remove(itemIndex);
+    }
+    
     public void setBlockTree(int itemIndex, blockNode root) {
         indexNodeMap.put(itemIndex, root);
     }
@@ -110,7 +114,8 @@ public class LegendModel {
     }
 
     public void setPickedLegend(Integer pickedLegend) {
-        if (pickedLegend >= 0 && pickedLegend < numberOfActiveItems) {
+        // pickedLegend can also be -1, if there are no more items.
+        if (pickedLegend >= -1 && pickedLegend < numberOfActiveItems) {
             this.pickedLegendIndex = pickedLegend;
         }
     }
@@ -151,7 +156,7 @@ public class LegendModel {
             float width = previewProperties[LegendProperty.WIDTH].getValue();
             float height = previewProperties[LegendProperty.HEIGHT].getValue();
             */
-            indexNodeMap.put(itemIndex, new blockNode(null, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0));
+            indexNodeMap.put(itemIndex, new blockNode(null, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item));
 
             numberOfActiveItems += 1;
             pickedLegendIndex = numberOfActiveItems - 1;

@@ -10,6 +10,7 @@ import org.gephi.attribute.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
+import org.gephi.legend.api.blockNode;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.spi.ItemBuilder;
@@ -32,11 +33,12 @@ public class inplaceItemBuilder implements ItemBuilder {
     public inplaceItemBuilder() {
     }
 
-    public inplaceEditor createInplaceEditor(Graph graph) {
+    public inplaceEditor createInplaceEditor(Graph graph, blockNode node) {
         inplaceEditor ipeditor = new inplaceEditor(graph);
         ipeditor.setData(inplaceEditor.RENDERER, inplaceItemRenderer.class);
         ipeditor.setData(inplaceEditor.BORDER_THICK, borderLineThickness);
         ipeditor.setData(inplaceEditor.BACKGROUND_COLOR, backgroundColor);
+        ipeditor.setData(inplaceEditor.BLOCKNODE, node);
         // the gap between the block and its inplace editor must be atleast half the width of the anchor to avoid overlapping.
         // By default, its set to 0. Hence, this property must be reset in the AbstractLegendItemRenderer's render method, since it is a private property.
         ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, 0);

@@ -36,6 +36,7 @@ public class inplaceEditor implements Item {
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
     public static final String BLOCK_INPLACEEDITOR_GAP = "gap";
+    public static final String BLOCKNODE = "blocknode";
     private ArrayList<row> rows;
     private final String type;
     private final Object source;
