@@ -399,7 +399,20 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Object[] data = new Object[1];
             data[0] = "Border: ";
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
-
+            
+            col = r.addColumn();
+            data = new Object[1];
+            data[0] = true;
+            col.addElement(element.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
+            
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
+            
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
+            
             root.setInplaceEditor(ipeditor);
         }
     }

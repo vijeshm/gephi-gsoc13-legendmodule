@@ -20,12 +20,13 @@ public class element {
      public static final Integer TEXT = 2;
      public static final Integer CHECKBOX = 3;
      public static final Integer IMAGE = 4;
-     public static final Integer ALIGNMENT_LEFT = 5;
-     public static final Integer ALIGNMENT_CENTER = 6;
-     public static final Integer ALIGNMENT_RIGHT = 7;
-     public static final Integer ALIGNMENT_JUSTIFY = 8;
-     public static final Integer ALIGNMENT_ALL = 9;
-     public static final Integer ALIGNMENT_LCR = 10;
+     public static final Integer COLOR = 5;
+     public static final Integer ALIGNMENT_LEFT = 6;
+     public static final Integer ALIGNMENT_CENTER = 7;
+     public static final Integer ALIGNMENT_RIGHT = 8;
+     public static final Integer ALIGNMENT_JUSTIFY = 9;
+     public static final Integer ALIGNMENT_ALL = 10;
+     public static final Integer ALIGNMENT_LCR = 11;
      */
     public static enum ELEMENT_TYPE {
 
@@ -34,6 +35,7 @@ public class element {
         TEXT,
         CHECKBOX,
         IMAGE,
+        COLOR,
         ALIGNMENT_LEFT,
         ALIGNMENT_CENTER,
         ALIGNMENT_RIGHT,
@@ -41,6 +43,24 @@ public class element {
         ALIGNMENT_ALL,
         ALIGNMENT_LCR
     };
+    
+    /*
+    public static String[] ELEMENT_TYPE_STRING = {
+        "LABEL",            // 0
+        "FONT",             // 1
+        "TEXT",             // 2
+        "CHECKBOX",         // 3
+        "IMAGE",            // 4
+        "COLOR",            // 5
+        "ALIGNMENT_LEFT",   // 6
+        "ALIGNMENT_CENTER", // 7
+        "ALIGNMENT_RIGHT",  // 8
+        "ALIGNMENT_JUSTIFY",// 9
+        "ALIGNMENT_ALL",    // 10
+        "ALIGNMENT_LCR"     // 11
+    };
+    */
+    
     private ELEMENT_TYPE type;
     private Integer itemIndex;
     private PreviewProperty property;
@@ -56,11 +76,6 @@ public class element {
                 this.data = new Object[1];
                 this.data[0] = (String) data[0]; // label, or current text
                 break;
-                
-            case FONT:
-                this.data = new Object[1];
-                this.data[0] = (Font) data[0]; // font
-                break;
 
             case IMAGE:
                 this.data = new Object[3];
@@ -69,7 +84,7 @@ public class element {
                 this.data[2] = (Integer) data[2]; // height
                 break;
 
-            // no extra data is required for checkbox and alignments
+            // no extra data is required for checkbox, alignments, font and color
         }
     }
 
