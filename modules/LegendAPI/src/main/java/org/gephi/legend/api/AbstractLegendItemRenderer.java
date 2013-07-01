@@ -360,7 +360,14 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             graphics2D.setColor(borderColor);
 
             // border is external
-            graphics2D.fillRect(-borderLineThick, -borderLineThick, width + 2 * borderLineThick, height + 2 * borderLineThick);
+            // top
+            graphics2D.fillRect(-borderThick, -borderThick, width + 2 * borderThick, borderThick);
+            // bottom
+            graphics2D.fillRect(-borderThick, height, width + 2 * borderThick, borderThick);
+            // left
+            graphics2D.fillRect(-borderThick, 0, borderThick, height);
+            // right
+            graphics2D.fillRect(width, 0, borderThick, height);
         }
         
         if (root.getInplaceEditor() == null) {
