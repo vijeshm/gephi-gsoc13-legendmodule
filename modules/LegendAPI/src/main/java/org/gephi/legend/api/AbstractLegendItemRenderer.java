@@ -360,28 +360,12 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             graphics2D.setColor(borderColor);
 
             // border is external
-
-            // top
-            graphics2D.fillRect(-borderThick, -borderThick, width + 2 * borderThick, borderThick);
-            // bottom
-            graphics2D.fillRect(-borderThick, height, width + 2 * borderThick, borderThick);
-            // left
-            graphics2D.fillRect(-borderThick, -borderThick, borderThick, height + 2 * borderThick);
-            // right
-            graphics2D.fillRect(width, -borderThick, borderThick, height + 2 * borderThick);
+            graphics2D.fillRect(-borderLineThick, -borderLineThick, width + 2 * borderLineThick, height + 2 * borderLineThick);
         }
         
         if (root.getInplaceEditor() == null) {
             // this part of the code gets executed only when the element gets rendered for the first time. 
             // next time onwards, the ipeditor will already be built and it need not be structured every time the item is being rendered.
-
-            /*
-            // setting the origin, dimensions and inplaceEditor
-            root.setOriginX(-borderThick);
-            root.setOriginY(-borderThick);
-            root.setBlockWidth(width + 2 * borderThick);
-            root.setBlockHeight(height + 2 * borderThick);
-            */
 
             Graph graph = null;
             inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
@@ -401,17 +385,33 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
             
             col = r.addColumn();
-            data = new Object[1];
-            data[0] = true;
-            col.addElement(element.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
+            // element1
+            data = new Object[3];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/visible.png";
+            data[2] = "/org/gephi/legend/graphics/invisible.png";
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+            // element2
+            data = new Object[3];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/visible.png";
+            data[2] = "/org/gephi/legend/graphics/invisible.png";
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+            // element3
+            data = new Object[3];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/visible.png";
+            data[2] = "/org/gephi/legend/graphics/invisible.png";
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+            
             
             col = r.addColumn();
-            data = new Object[0];
+            data = new Object[0]; // for a color propoerty, extra data isnt needed.
             col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
             
             col = r.addColumn();
-            data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
+            data = new Object[0]; // for a numerical property, extra data isnt needed.
+            col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data);
             
             root.setInplaceEditor(ipeditor);
         }

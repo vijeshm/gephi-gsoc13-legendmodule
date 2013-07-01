@@ -163,8 +163,10 @@ public class LegendMouseListener implements PreviewMouseListener {
         LegendModel legendModel = legendController.getLegendModel();
         
         if (isClickingInInplaceEditor(event.x, event.y)) {
-            System.out.println("clicked inside inplace editor.. message from mouseClicked()::LegendMouseListener.java");
             inplaceEditor currentEditor = legendModel.getInplaceEditor();
+            currentEditor.reflectAction(event.x, event.y);
+            
+            // the corresponding legend shouldnt be deselected. hence, reselect it.
             blockNode currentBlock = currentEditor.getData(inplaceEditor.BLOCKNODE);
             Item currentItem = currentBlock.getItem();
             legendController.selectItem(currentItem);

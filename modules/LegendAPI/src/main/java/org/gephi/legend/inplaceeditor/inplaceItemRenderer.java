@@ -44,16 +44,19 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class inplaceItemRenderer implements Renderer {
 
-    private Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
-    private Font LABEL_FONT = new Font("Arial", Font.PLAIN, 30);
-    private Color LABEL_COLOR = Color.BLACK;
-    private int BLOCK_SIZE = 50;
-    private Color BORDER_COLOR = Color.BLACK;
-    private int BORDER_SIZE = 1;
-    private float COLOR_MARGIN = 0.2f;
-    private Map<Integer, String> fontLookup = new HashMap<Integer, String>();
-    private Font FONT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 10);
-    private Color FONT_DISPLAY_COLOR = Color.BLACK;
+    // all these values should be made as final. They are temporarily not final because of debugging purposes
+    public static Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
+    public static Font LABEL_FONT = new Font("Arial", Font.PLAIN, 30);
+    public static Color LABEL_COLOR = Color.BLACK;
+    public static int UNIT_SIZE = 50;
+    public static Color BORDER_COLOR = Color.BLACK;
+    public static int BORDER_SIZE = 1;
+    public static float COLOR_MARGIN = 0.2f;
+    public static Map<Integer, String> fontLookup = new HashMap<Integer, String>();
+    public static Font FONT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 20);
+    public static Color FONT_DISPLAY_COLOR = Color.BLACK;
+    public static Font NUMBER_FONT = new Font("Arial", Font.PLAIN, 20);
+    public static Color NUMBER_COLOR = Color.BLACK;
 
     @Override
     public String getDisplayName() {
@@ -108,9 +111,10 @@ public class inplaceItemRenderer implements Renderer {
         int colBlock;
         int elemBlock;
         int maxElementsCount;
+        boolean selected;
         ArrayList<Integer> elementsCount = new ArrayList<Integer>();
         ArrayList<row> rows = ipeditor.getRows();
-        
+
         // iterate through all the rows, corresponding columns and their corresponding elements. 
         // based on the type of element, render accordingly.
         // editorHeight is trivial. its just the block size times the number of rows.
@@ -122,91 +126,196 @@ public class inplaceItemRenderer implements Renderer {
             ArrayList<column> columns = rows.get(rowBlock).getColumns();
             for (colBlock = 0; colBlock < columns.size(); colBlock++) {
                 ArrayList<element> elements = columns.get(colBlock).getElements();
+                selected = false;
                 for (elemBlock = 0; elemBlock < elements.size(); elemBlock++) {
-                    Object[] data = elements.get(elemBlock).getAssociatedData();
                     element elem = elements.get(elemBlock);
+                    Object[] data = elem.getAssociatedData();
                     element.ELEMENT_TYPE type = elem.getElementType();
-                    if (type == element.ELEMENT_TYPE.LABEL) {
-                        graphics2d.setFont(LABEL_FONT);
-                        int fontWidth = getFontWidth(graphics2d, (String) data[0]);
-                        int fontHeight = getFontHeight(graphics2d);
-                        int numberOfBlocks = fontWidth / BLOCK_SIZE + 1;
+                    PreviewProperty prop = elem.getProperty();
 
-                        graphics2d.setColor(BACKGROUND);
-                        graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE,
-                                (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE,
-                                BLOCK_SIZE * numberOfBlocks + 1,
-                                BLOCK_SIZE + 1);
+                    // temporary computational variablses
+                    int fontWidth;
+                    int fontHeight;
+                    int numberOfBlocks;
+                    String displayString;
 
-                        graphics2d.setColor(LABEL_COLOR);
-                        graphics2d.drawString((String) data[0], (editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE, (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE + BLOCK_SIZE / 2 + fontHeight / 2);
-
-                        currentElementsCount += numberOfBlocks;
-                    } else if (type == element.ELEMENT_TYPE.CHECKBOX) {
-                        try {
-                            PreviewProperty prop = elem.getProperty();
-                            Boolean isDisplaying = prop.getValue();
-                            BufferedImage img;
-                            if (isDisplaying) {
-                                img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/visible.png"));
-                            } else {
-                                img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/invisible.png"));
-                            }
+                    switch (type) {
+                        case LABEL:
+                            graphics2d.setFont(LABEL_FONT);
+                            fontWidth = getFontWidth(graphics2d, (String) data[0]);
+                            fontHeight = getFontHeight(graphics2d);
+                            numberOfBlocks = fontWidth / UNIT_SIZE + 1;
 
                             graphics2d.setColor(BACKGROUND);
-                            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE,
-                                    (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE,
-                                    BLOCK_SIZE + 1,
-                                    BLOCK_SIZE + 1);
-                            graphics2d.drawImage(img,
-                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE,
-                                    (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE,
-                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE + BLOCK_SIZE,
-                                    (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE + BLOCK_SIZE,
-                                    0,
-                                    0,
-                                    img.getWidth(),
-                                    img.getHeight(), null);
+                            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE * numberOfBlocks + 1,
+                                    UNIT_SIZE + 1);
+
+                            graphics2d.setColor(LABEL_COLOR);
+                            graphics2d.drawString((String) data[0],
+                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + numberOfBlocks * UNIT_SIZE / 2 - fontWidth / 2,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
+
+                            elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE * numberOfBlocks,
+                                    UNIT_SIZE);
+
+                            currentElementsCount += numberOfBlocks;
+                            break;
+
+                        case CHECKBOX:
+                            try {
+                                BufferedImage img;
+                                if ((Boolean) data[0]) {
+                                    img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/checked.png"));
+                                } else {
+                                    img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/unchecked.png"));
+                                }
+
+                                graphics2d.setColor(BACKGROUND);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        UNIT_SIZE + 1,
+                                        UNIT_SIZE + 1);
+
+                                graphics2d.drawImage(img,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                        0,
+                                        0,
+                                        img.getWidth(),
+                                        img.getHeight(), null);
+
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        UNIT_SIZE,
+                                        UNIT_SIZE);
+
+                                currentElementsCount += 1;
+                            } catch (IOException e) {
+                            }
+                            break;
+                            
+                        case COLOR:
+                            Color color = prop.getValue();
+                            graphics2d.setColor(BACKGROUND);
+                            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE + 1,
+                                    UNIT_SIZE + 1);
+
+                            graphics2d.setColor(color);
+                            // some margin on all sides of the element
+                            graphics2d.fillRect((int) ((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + COLOR_MARGIN * UNIT_SIZE),
+                                    (int) ((editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + COLOR_MARGIN * UNIT_SIZE),
+                                    (int) ((1 - 2 * COLOR_MARGIN) * UNIT_SIZE),
+                                    (int) ((1 - 2 * COLOR_MARGIN) * UNIT_SIZE));
+
+                            elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE,
+                                    UNIT_SIZE);
+
                             currentElementsCount += 1;
-                        } catch (IOException e) {
-                        }
-                    } else if (type == element.ELEMENT_TYPE.COLOR) {
-                        PreviewProperty prop = elem.getProperty();
-                        Color color = prop.getValue();
-                        graphics2d.setColor(BACKGROUND);
-                        graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE,
-                                (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE,
-                                BLOCK_SIZE + 1,
-                                BLOCK_SIZE + 1);
+                            break;
 
-                        graphics2d.setColor(color);
-                        // some margin on all sides of the element
-                        graphics2d.fillRect((int) ((editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE + COLOR_MARGIN * BLOCK_SIZE),
-                                (int) ((editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE + COLOR_MARGIN * BLOCK_SIZE),
-                                (int) ((1 - 2 * COLOR_MARGIN) * BLOCK_SIZE),
-                                (int) ((1 - 2 * COLOR_MARGIN) * BLOCK_SIZE));
-                        currentElementsCount += 1;
-                    }
-                    else if(type == element.ELEMENT_TYPE.FONT)  {
-                        PreviewProperty prop = elem.getProperty();
-                        Font font = prop.getValue();
-                        
-                        String displayString = font.getFontName() + " " + font.getSize() + " " + fontLookup.get(font.getStyle());
-                        graphics2d.setFont(FONT_DISPLAY_FONT);
-                        int fontWidth = getFontWidth(graphics2d, displayString);
-                        int fontHeight = getFontHeight(graphics2d);
-                        int numberOfBlocks = fontWidth / BLOCK_SIZE + 1;
+                        case FONT:
+                            Font font = prop.getValue();
 
-                        graphics2d.setColor(BACKGROUND);
-                        graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE,
-                                (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE,
-                                BLOCK_SIZE * numberOfBlocks + 1,
-                                BLOCK_SIZE + 1);
+                            displayString = font.getFontName() + " " + font.getSize();
+                            graphics2d.setFont(FONT_DISPLAY_FONT);
+                            fontWidth = getFontWidth(graphics2d, displayString);
+                            fontHeight = getFontHeight(graphics2d);
+                            numberOfBlocks = fontWidth / UNIT_SIZE + 1;
 
-                        graphics2d.setColor(FONT_DISPLAY_COLOR);
-                        graphics2d.drawString(displayString, (editorOriginX + BORDER_SIZE) + currentElementsCount * BLOCK_SIZE, (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE + BLOCK_SIZE / 2 + fontHeight / 2);
+                            graphics2d.setColor(BACKGROUND);
+                            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE * numberOfBlocks + 1,
+                                    UNIT_SIZE + 1);
 
-                        currentElementsCount += numberOfBlocks;
+                            graphics2d.setColor(FONT_DISPLAY_COLOR);
+                            graphics2d.drawString(displayString,
+                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + numberOfBlocks * UNIT_SIZE / 2 - fontWidth / 2,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
+
+                            elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE * numberOfBlocks,
+                                    UNIT_SIZE);
+
+                            currentElementsCount += numberOfBlocks;
+                            break;
+
+                        case IMAGE:
+                            try {
+                                // data[0] : says whether the element is selected
+                                // data[1] : default url for unselected
+                                // data[2] : url for selected image
+
+                                // load the default image (unselected)
+                                BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
+                                // if atleast one element is selected, the first one is taken into consideration
+                                // if no elements are selected, the last one is forcibly selected
+                                if (!selected && ((Boolean) data[0] || (elemBlock == elements.size() - 1))) {
+                                    img = ImageIO.read(getClass().getResourceAsStream((String) data[2]));
+                                    selected = true;
+                                }
+
+                                graphics2d.setColor(BACKGROUND);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        UNIT_SIZE + 1,
+                                        UNIT_SIZE + 1);
+                                graphics2d.drawImage(img,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                        0,
+                                        0,
+                                        img.getWidth(),
+                                        img.getHeight(), null);
+
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        UNIT_SIZE,
+                                        UNIT_SIZE);
+
+                                currentElementsCount += 1;
+                            } catch (IOException e) {
+                            }
+                            break;
+
+                        case NUMBER:
+                            graphics2d.setFont(NUMBER_FONT);
+                            displayString = "" + prop.getValue();
+                            fontWidth = getFontWidth(graphics2d, (String) displayString);
+                            fontHeight = getFontHeight(graphics2d);
+                            numberOfBlocks = fontWidth / UNIT_SIZE + 1;
+
+                            graphics2d.setColor(BACKGROUND);
+                            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE * numberOfBlocks + 1,
+                                    UNIT_SIZE + 1);
+
+                            graphics2d.setColor(NUMBER_COLOR);
+                            graphics2d.drawString(displayString,
+                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + numberOfBlocks * UNIT_SIZE / 2 - fontWidth / 2,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
+
+                            elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                    UNIT_SIZE * numberOfBlocks,
+                                    UNIT_SIZE);
+
+                            currentElementsCount += numberOfBlocks;
+                            break;
                     }
                 }
             }
@@ -218,14 +327,14 @@ public class inplaceItemRenderer implements Renderer {
         graphics2d.setColor(BACKGROUND);
         for (rowBlock = 0; rowBlock < elementsCount.size(); rowBlock++) {
             int currentElementCount = elementsCount.get(rowBlock);
-            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementCount * BLOCK_SIZE,
-                    (editorOriginY + BORDER_SIZE) + rowBlock * BLOCK_SIZE,
-                    (maxElementsCount - currentElementCount) * BLOCK_SIZE + 1,
-                    BLOCK_SIZE + 1);
+            graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementCount * UNIT_SIZE,
+                    (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                    (maxElementsCount - currentElementCount) * UNIT_SIZE + 1,
+                    UNIT_SIZE + 1);
         }
 
-        editorWidth = maxElementsCount * BLOCK_SIZE + 2 * BORDER_SIZE;
-        editorHeight = rowBlock * BLOCK_SIZE + 2 * BORDER_SIZE;
+        editorWidth = maxElementsCount * UNIT_SIZE + 2 * BORDER_SIZE;
+        editorHeight = rowBlock * UNIT_SIZE + 2 * BORDER_SIZE;
 
         // rendering borders
         graphics2d.setColor(BORDER_COLOR);

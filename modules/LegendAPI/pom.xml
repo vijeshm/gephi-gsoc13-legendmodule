@@ -50,6 +50,12 @@
             <version>0.9-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>ui-library-wrapper</artifactId>
+            <version>0.9-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>        
     </dependencies>
 
     <build>

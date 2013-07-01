@@ -4,6 +4,7 @@
  */
 package org.gephi.legend.inplaceeditor;
 
+import com.bric.swing.ColorPicker;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -11,14 +12,25 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
 import org.gephi.legend.api.LegendController;
+import org.gephi.legend.api.LegendModel;
+import org.gephi.legend.api.LegendProperty;
+import org.gephi.legend.api.blockNode;
+import org.gephi.legend.spi.LegendItem;
+import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.G2DRenderTargetBuilder;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.openide.util.Lookup;
 import sun.awt.RepaintArea;
+import sun.reflect.generics.tree.Tree;
 
 /**
  *
@@ -78,40 +90,111 @@ public class inplaceEditor implements Item {
         return rows;
     }
 
-    /*
-    // rendering methods
-    public void render(float originX, float originY) {
-        AffineTransform saveState = graphics2D.getTransform();
+    public void reflectAction(int x, int y) {
+        int borderSize = inplaceItemRenderer.BORDER_SIZE;
+        int unitSize = inplaceItemRenderer.UNIT_SIZE;
+        int editorOriginX = getData(ORIGIN_X);
+        int editorOriginY = getData(ORIGIN_Y);
+        int editorWidth = getData(WIDTH);
+        int editorHeight = getData(HEIGHT);
 
-        AffineTransform originTranslation = new AffineTransform(saveState);
-        originTranslation.translate(originX, originY);
+        // get the item associated with the inplace editor
+        blockNode node = getData(BLOCKNODE);
+        Item item = node.getItem();
+        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics2D.setTransform(originTranslation);
-        graphics2D.setColor(Color.BLACK);
-        graphics2D.fillRect(-500, -300, 500, 300);
+        // get the preview properties to make the changes get reflected
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        PreviewProperties previewProperties = previewModel.getProperties();
 
-        graphics2D.setTransform(saveState);
+        // find out which element has been clicked based on the click-coordinates and element coordinates
+        element selectedElem = null;
+        column selectedColumn = null;
+        for (row r : rows) {
+            ArrayList<column> columns = r.getColumns();
+            for (column c : columns) {
+                ArrayList<element> elements = c.getElements();
+                for (element elem : elements) {
+                    // check the condition excluding the left border. this is to avoid overlapping between elements
+                    if ((x > elem.getOriginX() && x <= elem.getOriginX() + elem.getElementWidth())
+                            && (y > elem.getOriginY() && y <= elem.getOriginY() + elem.getElementHeight())) {
+                        selectedColumn = c;
+                        selectedElem = elem;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        // if the click is on a label, nothing should happen
+        // if the click is on a font, a font chooser should pop up. on choosing, the new font should be set in the item property, as well as preview property.
+        // if the click is on a text, a new text area should pop up. heading should be property that we're editing.
+        // if the click is on a checkbox, toggle the behavior - negate the property value and update the preview property.
+        // image always appears as a sequence of elements in a column. So, if a click happens on an image, then draw a rectangle around the image, indicating that its selected.
+        // if the click is on a color, display a color box popup. the new is set to the corresponding property
+        // if the click is on a number, then display a popup to change the number and display its name on the top.
+        PreviewProperty prop = selectedElem.getProperty();
+        switch (selectedElem.getElementType()) {
+            case LABEL:
+                break;
+
+            case FONT:
+                break;
+
+            case TEXT:
+                break;
+
+            case CHECKBOX:
+                break;
+
+            case IMAGE:
+                break;
+
+            case COLOR:
+                Color selectedColor = ColorPicker.showDialog(null, Color.WHITE, true);
+                if (selectedColor != null) {
+                    prop.setValue(selectedColor);
+                    previewProperties.putValue(prop.getName(), selectedColor);
+                }
+                break;
+
+            case NUMBER:
+                String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
+                if (newValueString != null) {
+                    try {
+                        Integer newNumber = Integer.parseInt(newValueString);
+                        prop.setValue(newNumber);
+                        previewProperties.putValue(prop.getName(), newNumber);
+                    } catch (NumberFormatException e) {
+                    }
+                }
+                break;
+        }
     }
-    */
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public Object getSource() {
         return source;
     }
 
+    @Override
     public <D> D getData(String key) {
         return (D) data.get(key);
     }
 
+    @Override
     public void setData(String key, Object value) {
         data.put(key, value);
     }
 
+    @Override
     public String[] getKeys() {
         return data.keySet().toArray(new String[0]);
     }

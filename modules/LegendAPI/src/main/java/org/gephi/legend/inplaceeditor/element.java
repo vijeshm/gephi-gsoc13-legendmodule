@@ -21,12 +21,7 @@ public class element {
      public static final Integer CHECKBOX = 3;
      public static final Integer IMAGE = 4;
      public static final Integer COLOR = 5;
-     public static final Integer ALIGNMENT_LEFT = 6;
-     public static final Integer ALIGNMENT_CENTER = 7;
-     public static final Integer ALIGNMENT_RIGHT = 8;
-     public static final Integer ALIGNMENT_JUSTIFY = 9;
-     public static final Integer ALIGNMENT_ALL = 10;
-     public static final Integer ALIGNMENT_LCR = 11;
+     public static final Integer NUMBER = 6;
      */
     public static enum ELEMENT_TYPE {
 
@@ -36,12 +31,7 @@ public class element {
         CHECKBOX,
         IMAGE,
         COLOR,
-        ALIGNMENT_LEFT,
-        ALIGNMENT_CENTER,
-        ALIGNMENT_RIGHT,
-        ALIGNMENT_JUSTIFY,
-        ALIGNMENT_ALL,
-        ALIGNMENT_LCR
+        NUMBER
     };
     
     /*
@@ -52,12 +42,7 @@ public class element {
         "CHECKBOX",         // 3
         "IMAGE",            // 4
         "COLOR",            // 5
-        "ALIGNMENT_LEFT",   // 6
-        "ALIGNMENT_CENTER", // 7
-        "ALIGNMENT_RIGHT",  // 8
-        "ALIGNMENT_JUSTIFY",// 9
-        "ALIGNMENT_ALL",    // 10
-        "ALIGNMENT_LCR"     // 11
+        "NUMBER",           // 6
     };
     */
     
@@ -65,6 +50,12 @@ public class element {
     private Integer itemIndex;
     private PreviewProperty property;
     private Object[] data;
+    
+    // these properties are set by the inPlaceRenderer when the the element is rendered.
+    private int originX;
+    private int originY;
+    private int elementWidth;
+    private int elementHeight;
 
     public element(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
         this.type = type;
@@ -79,16 +70,23 @@ public class element {
 
             case IMAGE:
                 this.data = new Object[3];
-                this.data[0] = (Image) data[0]; // image
-                this.data[1] = (Integer) data[1]; // width
-                this.data[2] = (Integer) data[2]; // height
+                this.data[0] = (Boolean) data[0]; // state whether its selected or not
+                this.data[1] = (String) data[1]; // url of the default image (unselected)
+                this.data[2] = (String) data[2]; // url of the image when selected
                 break;
-
-            // no extra data is required for checkbox, alignments, font and color
+                
+            // no extra data is required for checkbox, number, alignments, font and color
         }
     }
 
-    // only get methods, no set methods. this is because an element is concrete once it is built.
+    // only get methods, no set methods (except for geometry). this is because an element is concrete once it is built.
+    public void setGeometry(int x, int y, int width, int height) {
+        originX = x;
+        originY = y;
+        elementWidth = width;
+        elementHeight = height;
+    }
+    
     public PreviewProperty getProperty() {
         return property;
     }
@@ -104,7 +102,20 @@ public class element {
     public Object[] getAssociatedData() {
         return data;
     }
-
-    public void render() {
+    
+    public int getOriginX() {
+        return originX;
     }
+    
+    public int getOriginY() {
+        return originY;
+    }
+    
+    public int getElementWidth() {
+        return elementWidth;
+    }
+    
+    public int getElementHeight() {
+        return elementHeight;
+    }  
 }
