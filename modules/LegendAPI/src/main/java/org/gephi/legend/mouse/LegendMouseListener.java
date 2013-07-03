@@ -161,14 +161,15 @@ public class LegendMouseListener implements PreviewMouseListener {
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        
+
         if (isClickingInInplaceEditor(event.x, event.y)) {
             inplaceEditor currentEditor = legendModel.getInplaceEditor();
             currentEditor.reflectAction(event.x, event.y);
-            
+
             // the corresponding legend shouldnt be deselected. hence, reselect it.
             blockNode currentBlock = currentEditor.getData(inplaceEditor.BLOCKNODE);
             Item currentItem = currentBlock.getItem();
+            currentItem.setData(LegendItem.IS_SELECTED, true);
             legendController.selectItem(currentItem);
         } else {
             legendModel.setInplaceEditor(null); // clear the inplace editor before rendering. this is needed to disable the inplace editor from showing.
@@ -202,7 +203,7 @@ public class LegendMouseListener implements PreviewMouseListener {
 
     @Override
     public void mousePressed(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        mouseClicked(event, previewProperties, workspace); //Update selected legend as if the press was a click.
+        // mouseClicked(event, previewProperties, workspace); //Update selected legend as if the press was a click.
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();

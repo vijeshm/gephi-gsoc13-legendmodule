@@ -86,7 +86,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     private final int TRANSFORMATION_ANCHOR_SIZE = 20;
     private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
 
-    /**the 
+    /**
+     * the
      *
      * Function that actually renders the legend using the Graphics2D Object
      *
@@ -262,21 +263,24 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        Item item = legendModel.getItemAtIndex(itemIndex);
+        Item item = legendModel.getItemAtIndex(legendModel.getListIndexFromItemIndex(itemIndex));
 
         // General procedure to render a block:
         // 1. create a blockNode with proper parent block reference
         // 2. send its reference to the method that renders the block
         // 3. within the block renderer, set the origin, dimensions and build the inplaceEditor object depending what properties must be changed on rendering the inplaceEditor.
 
-        // The rendering takes place from the outermost to innermost
+        // The rendering takes place from the outermost block to innermost block
         // BORDER - border is external
         blockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.
         renderBorder(graphics2D, origin, width, height, borderLineThick, borderColor, item, root);
 
+        // The background properties must also be included as a part of the root block.
         // BACKGROUND
-        renderBackground(graphics2D, origin, width, height);
+        renderBackground(graphics2D, origin, width, height, item, root);
 
+        // A title is a new block. (The first child of a root in fact.)
+        // Create a new block with root as the parent.
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
         float titleHeight = 0;
@@ -342,15 +346,41 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         return legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
     }
 
-    private void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    private void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Item item, blockNode root) {
+        // this part of the code will get executed only after the border is rendered. Hence, an inplaceeditor will already be set.
         if (backgroundIsDisplaying) {
             graphics2D.setTransform(origin);
             graphics2D.setColor(backgroundColor);
             graphics2D.fillRect(0, 0, width, height);
-//            graphics2D.setColor(backgroundBorderColor);
-//            for (int i = 1; i <= backgroundBorderLineThick; i++) {
-//                graphics2D.drawRect(-i, -i, width + 2 * i, height + 2 * i);
-//            }
+        }
+
+        // this function will be called every now and then, in response to mouse events. Hence, the background controls get accumulated.
+        // To avoid this, we've to append only when the sole controls added is the border controls. i.e, the number of rows in the ipeditor is 1.
+        inplaceEditor ipeditor = root.getInplaceEditor();
+        if (ipeditor.getRows().size() == 1) {
+            row r;
+            column col;
+            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+            PreviewProperty prop;
+            int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+            // add the row that controls background properties
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            Object[] data = new Object[1];
+            data[0] = "Background: ";
+            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+
+            col = r.addColumn();
+            data = new Object[3];
+            data[0] = backgroundIsDisplaying;
+            data[1] = "/org/gephi/legend/graphics/invisible.png";
+            data[2] = "/org/gephi/legend/graphics/visible.png";
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
+
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data);
         }
     }
 
@@ -369,7 +399,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // right
             graphics2D.fillRect(width, 0, borderThick, height);
         }
-        
+
         if (root.getInplaceEditor() == null) {
             // this part of the code gets executed only when the element gets rendered for the first time. 
             // next time onwards, the ipeditor will already be built and it need not be structured every time the item is being rendered.
@@ -390,36 +420,45 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Object[] data = new Object[1];
             data[0] = "Border: ";
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
-            
+
             col = r.addColumn();
-            // element1
             data = new Object[3];
-            data[0] = false;
-            data[1] = "/org/gephi/legend/graphics/visible.png";
-            data[2] = "/org/gephi/legend/graphics/invisible.png";
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-            // element2
-            data = new Object[3];
-            data[0] = false;
-            data[1] = "/org/gephi/legend/graphics/visible.png";
-            data[2] = "/org/gephi/legend/graphics/invisible.png";
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-            // element3
-            data = new Object[3];
-            data[0] = false;
-            data[1] = "/org/gephi/legend/graphics/visible.png";
-            data[2] = "/org/gephi/legend/graphics/invisible.png";
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-            
-            
+            data[0] = borderIsDisplaying;
+            data[1] = "/org/gephi/legend/graphics/invisible.png";
+            data[2] = "/org/gephi/legend/graphics/visible.png";
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
+
+            /* example of adding images under same column
+             col = r.addColumn();
+             // element1
+             data = new Object[3];
+             data[0] = false;
+             data[1] = "/org/gephi/legend/graphics/visible.png";
+             data[2] = "/org/gephi/legend/graphics/invisible.png";
+             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+             // element2
+             data = new Object[3];
+             data[0] = false;
+             data[1] = "/org/gephi/legend/graphics/visible.png";
+             data[2] = "/org/gephi/legend/graphics/invisible.png";
+             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+             // element3
+             data = new Object[3];
+             data[0] = false;
+             data[1] = "/org/gephi/legend/graphics/visible.png";
+             data[2] = "/org/gephi/legend/graphics/invisible.png";
+             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+             */
+
+
             col = r.addColumn();
             data = new Object[0]; // for a color propoerty, extra data isnt needed.
             col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
-            
+
             col = r.addColumn();
             data = new Object[0]; // for a numerical property, extra data isnt needed.
             col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data);
-            
+
             root.setInplaceEditor(ipeditor);
         }
     }

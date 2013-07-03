@@ -260,8 +260,8 @@ public class inplaceItemRenderer implements Renderer {
                                 // load the default image (unselected)
                                 BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
                                 // if atleast one element is selected, the first one is taken into consideration
-                                // if no elements are selected, the last one is forcibly selected
-                                if (!selected && ((Boolean) data[0] || (elemBlock == elements.size() - 1))) {
+                                // if no elements are selected, the last one is NOT forcibly selected
+                                if (!selected && (Boolean) data[0]) {
                                     img = ImageIO.read(getClass().getResourceAsStream((String) data[2]));
                                     selected = true;
                                 }

@@ -136,6 +136,8 @@ public class inplaceEditor implements Item {
         // if the click is on a color, display a color box popup. the new is set to the corresponding property
         // if the click is on a number, then display a popup to change the number and display its name on the top.
         PreviewProperty prop = selectedElem.getProperty();
+        Object[] elementData = selectedElem.getAssociatedData();
+        
         switch (selectedElem.getElementType()) {
             case LABEL:
                 break;
@@ -150,10 +152,14 @@ public class inplaceEditor implements Item {
                 break;
 
             case IMAGE:
+                    Boolean isSelected = (Boolean) elementData[0];
+                    elementData[0] = !isSelected;
+                    prop.setValue(!isSelected);
+                    previewProperties.putValue(prop.getName(), !isSelected);
                 break;
 
             case COLOR:
-                Color selectedColor = ColorPicker.showDialog(null, Color.WHITE, true);
+                Color selectedColor = ColorPicker.showDialog(null, (Color) prop.getValue(), true);
                 if (selectedColor != null) {
                     prop.setValue(selectedColor);
                     previewProperties.putValue(prop.getName(), selectedColor);

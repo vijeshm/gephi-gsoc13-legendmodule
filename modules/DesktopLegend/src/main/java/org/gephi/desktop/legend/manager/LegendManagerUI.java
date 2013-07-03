@@ -239,10 +239,12 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
                 legendModel.removeBlockTree((Integer) item.getData(LegendItem.ITEM_INDEX));
 
                 inplaceEditor ipeditor = legendModel.getInplaceEditor();
-                blockNode node = ipeditor.getData(inplaceEditor.BLOCKNODE);
-                Item currentInplaceItem = node.getItem();
-                if ((Integer) currentInplaceItem.getData(LegendItem.ITEM_INDEX) == (Integer) item.getData(LegendItem.ITEM_INDEX)) {
-                    legendModel.setInplaceEditor(null);
+                if (ipeditor != null) {
+                    blockNode node = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    Item currentInplaceItem = node.getItem();
+                    if ((Integer) currentInplaceItem.getData(LegendItem.ITEM_INDEX) == (Integer) item.getData(LegendItem.ITEM_INDEX)) {
+                        legendModel.setInplaceEditor(null);
+                    }
                 }
 
                 legendModel.removeItem(indexOfPickedLegend);
