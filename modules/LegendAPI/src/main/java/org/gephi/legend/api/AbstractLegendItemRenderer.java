@@ -8,6 +8,7 @@ import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -273,6 +274,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         // The rendering takes place from the outermost block to innermost block
         // BORDER - border is external
         blockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.
+        root.updateGeometry(currentRealOriginX, currentRealOriginY, currentWidth, currentHeight);
         renderBorder(graphics2D, origin, width, height, borderLineThick, borderColor, item, root);
 
         // The background properties must also be included as a part of the root block.
@@ -283,28 +285,35 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         // Create a new block with root as the parent.
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
-        float titleHeight = 0;
+        float titleBoundaryWidth = 0;
+        float titleBoundaryHeight = 0;
         if (isDisplayingTitle && !title.isEmpty()) {
-            titleHeight = computeVerticalTextSpaceUsed(graphics2D, title, titleFont, width);
-            renderTitle(graphics2D, titleOrigin, width, (int) titleHeight);
+            // set the font to titleFont so that the height can be computed accordingly
+            graphics2D.setFont(titleFont);
+            titleBoundaryWidth = width;
+            titleBoundaryHeight = graphics2D.getFontMetrics().getHeight();
+            blockNode titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight);
+            // titleBoundaryHeight = getFontHeight(graphics2D, title, titleFont, (int) titleBoundaryWidth, (int) titleFontHeight);
+            renderTitle(graphics2D, titleOrigin, (int) titleBoundaryWidth, (int) titleBoundaryHeight, item, titleNode);
         }
 
+        blockNode descNode = new blockNode(root, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item);
         float descriptionHeight = 0;
         if (isDisplayingDescription && !description.isEmpty()) {
-            descriptionHeight = computeVerticalTextSpaceUsed(graphics2D, description, descriptionFont, width);
+            descriptionHeight = getFontHeight(graphics2D, description, descriptionFont, width, height);
         }
         // LEGEND
         AffineTransform legendOrigin = new AffineTransform(origin);
         //adding space between elements
-        legendOrigin.translate(0, titleHeight + MARGIN_BETWEEN_ELEMENTS);
+        legendOrigin.translate(0, titleBoundaryHeight + MARGIN_BETWEEN_ELEMENTS);
         int legendWidth = width;
-        int legendHeight = (Integer) (height - Math.round(titleHeight) - Math.round(descriptionHeight) - 2 * MARGIN_BETWEEN_ELEMENTS);
+        int legendHeight = (Integer) (height - Math.round(titleBoundaryHeight) - Math.round(descriptionHeight) - 2 * MARGIN_BETWEEN_ELEMENTS);
 
         // DESCRIPTION
         AffineTransform descriptionOrigin = new AffineTransform(origin);
-        descriptionOrigin.translate(0, titleHeight + legendHeight + MARGIN_BETWEEN_ELEMENTS);
+        descriptionOrigin.translate(0, titleBoundaryHeight + legendHeight + MARGIN_BETWEEN_ELEMENTS);
         if (isDisplayingDescription && !description.isEmpty()) {
-            renderDescription(graphics2D, descriptionOrigin, width, (int) descriptionHeight);
+            renderDescription(graphics2D, descriptionOrigin, width, (int) descriptionHeight, item, descNode);
         }
 
         // rendering legend
@@ -341,47 +350,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private float renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    private float renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Item item, blockNode node) {
         graphics2D.setTransform(origin);
         return legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
-    }
-
-    private void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Item item, blockNode root) {
-        // this part of the code will get executed only after the border is rendered. Hence, an inplaceeditor will already be set.
-        if (backgroundIsDisplaying) {
-            graphics2D.setTransform(origin);
-            graphics2D.setColor(backgroundColor);
-            graphics2D.fillRect(0, 0, width, height);
-        }
-
-        // this function will be called every now and then, in response to mouse events. Hence, the background controls get accumulated.
-        // To avoid this, we've to append only when the sole controls added is the border controls. i.e, the number of rows in the ipeditor is 1.
-        inplaceEditor ipeditor = root.getInplaceEditor();
-        if (ipeditor.getRows().size() == 1) {
-            row r;
-            column col;
-            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
-            PreviewProperty prop;
-            int itemIndex = item.getData(LegendItem.ITEM_INDEX);
-
-            // add the row that controls background properties
-            r = ipeditor.addRow();
-            col = r.addColumn();
-            Object[] data = new Object[1];
-            data[0] = "Background: ";
-            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
-
-            col = r.addColumn();
-            data = new Object[3];
-            data[0] = backgroundIsDisplaying;
-            data[1] = "/org/gephi/legend/graphics/invisible.png";
-            data[2] = "/org/gephi/legend/graphics/visible.png";
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
-
-            col = r.addColumn();
-            data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data);
-        }
     }
 
     private void renderBorder(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, blockNode root) {
@@ -428,29 +399,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[2] = "/org/gephi/legend/graphics/visible.png";
             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
 
-            /* example of adding images under same column
-             col = r.addColumn();
-             // element1
-             data = new Object[3];
-             data[0] = false;
-             data[1] = "/org/gephi/legend/graphics/visible.png";
-             data[2] = "/org/gephi/legend/graphics/invisible.png";
-             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-             // element2
-             data = new Object[3];
-             data[0] = false;
-             data[1] = "/org/gephi/legend/graphics/visible.png";
-             data[2] = "/org/gephi/legend/graphics/invisible.png";
-             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-             // element3
-             data = new Object[3];
-             data[0] = false;
-             data[1] = "/org/gephi/legend/graphics/visible.png";
-             data[2] = "/org/gephi/legend/graphics/invisible.png";
-             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-             */
-
-
             col = r.addColumn();
             data = new Object[0]; // for a color propoerty, extra data isnt needed.
             col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
@@ -463,9 +411,129 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private float renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+    private void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Item item, blockNode root) {
+        // this part of the code will get executed only after the border is rendered. Hence, an inplaceeditor will already be set.
+        if (backgroundIsDisplaying) {
+            graphics2D.setTransform(origin);
+            graphics2D.setColor(backgroundColor);
+            graphics2D.fillRect(0, 0, width, height);
+        }
+
+        // this function will be called every now and then, in response to mouse events. Hence, the background controls get accumulated.
+        // To avoid this, we've to append only when the sole controls added is the border controls. i.e, the number of rows in the ipeditor is 1.
+        inplaceEditor ipeditor = root.getInplaceEditor();
+        if (ipeditor.getRows().size() == 1) {
+            row r;
+            column col;
+            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+            PreviewProperty prop;
+            int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+            // add the row that controls background properties
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            Object[] data = new Object[1];
+            data[0] = "Background: ";
+            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+
+            col = r.addColumn();
+            data = new Object[3];
+            data[0] = backgroundIsDisplaying;
+            data[1] = "/org/gephi/legend/graphics/invisible.png";
+            data[2] = "/org/gephi/legend/graphics/visible.png";
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
+
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data);
+        }
+    }
+
+    private void renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer boundaryWidth, Integer boundaryHeight, Item item, blockNode titleNode) {
+        // this part of the code is executed only after rendering the background. (border and background would've already been rendered)
+        // isDisplayingTitle will definitely be enabled if the control is transfered here. So, there is no need to check for it.
         graphics2D.setTransform(origin);
-        return legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, width, height, titleAlignment);
+        legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, boundaryWidth, boundaryHeight, titleAlignment, false);
+
+        if (titleNode.getInplaceEditor() == null) {
+            Graph graph = null;
+            inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
+            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, titleNode);
+            ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+
+            row r;
+            column col;
+            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+            PreviewProperty prop;
+            int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            Object[] data = new Object[1];
+            data[0] = "Title: ";
+            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
+
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);            
+            
+            col = r.addColumn();
+            // left-alignment
+            data = new Object[4];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/left_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/left_selected.png";
+            data[3] = Alignment.LEFT;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            
+            // center alignment
+            data = new Object[4];
+            data[0] = true;
+            data[1] = "/org/gephi/legend/graphics/center_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/center_selected.png";
+            data[3] = Alignment.CENTER;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            
+            // right alignment
+            data = new Object[4];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/right_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/right_selected.png";
+            data[3] = Alignment.RIGHT;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            
+            // justified
+            data = new Object[4];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/justified_selected.png";
+            data[3] = Alignment.JUSTIFIED;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            
+            titleNode.setInplaceEditor(ipeditor);
+        }
+    }
+
+    private int getFontWidth(Graphics2D graphics2d, String str) {
+        return graphics2d.getFontMetrics().stringWidth(str);
+    }
+
+    /**
+     * Using the width as a parameter, it computes the vertical space used by
+     * some text even if it fits in multiple lines
+     *
+     * @param graphics2D
+     * @param text string containing the text
+     * @param font font used to display the text
+     * @param width max width to be used by the text
+     * @return
+     */
+    protected float getFontHeight(Graphics2D graphics2D, String text, Font font, Integer boundaryWidth, Integer boundaryHeight) {
+        return legendDrawText(graphics2D, text, font, Color.BLACK, 0, 0, boundaryWidth, boundaryHeight, Alignment.LEFT, true);
     }
 
     @Override
@@ -511,9 +579,11 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         LineBreakMeasurer measurer = new LineBreakMeasurer(m_iterator, fontRenderContext);
         measurer.setPosition(start);
 
-        float xText = (float) x, yText = (float) y; // text positions
+        float xText = (float) x;
+        float yText = (float) y; // text positions
 
-        float descent = 0, leading = 0;
+        float descent = 0;
+        float leading = 0;
         while (measurer.getPosition() < end) {
             TextLayout layout = measurer.nextLayout(width);
 
@@ -554,6 +624,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             leading = layout.getLeading();
             yText += descent + leading;
         }
+
+        // alignment, font, font color, isdisplaying
+
         return (float) Math.ceil(yText - y - leading);
     }
 
@@ -580,20 +653,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 //        System.out.println("@Var: spaceUsed: " + spaceUsed);
         y = y + (height - spaceUsed) / 2;
         return legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, false);
-    }
-
-    /**
-     * Using the width as a parameter, it computes the vertical space used by
-     * some text even if it fits in multiple lines
-     *
-     * @param graphics2D
-     * @param text string containing the text
-     * @param font font used to display the text
-     * @param width max width to be used by the text
-     * @return
-     */
-    protected float computeVerticalTextSpaceUsed(Graphics2D graphics2D, String text, Font font, Integer width) {
-        return legendDrawText(graphics2D, text, font, Color.BLACK, 0, 0, width, currentHeight, Alignment.LEFT, true);
     }
 
     @Override

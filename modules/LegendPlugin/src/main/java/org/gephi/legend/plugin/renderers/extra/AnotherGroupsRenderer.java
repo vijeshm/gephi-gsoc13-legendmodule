@@ -62,7 +62,7 @@ public class AnotherGroupsRenderer extends GroupsItemRenderer {
         // computing label sizes
         float labelHeight = Integer.MIN_VALUE;
         for (int i = 0; i < sortedLabels.size(); i++) {
-            float singleLabelHeight = computeVerticalTextSpaceUsed(graphics2D, sortedLabels.get(i).toString(), labelFont, width);
+            float singleLabelHeight = getFontHeight(graphics2D, sortedLabels.get(i).toString(), labelFont, width, height); //temporarily used height. gotto rethink this further.
             labelHeight = Math.max(singleLabelHeight, labelHeight);
         }
         int labelWidth = elementWidth;

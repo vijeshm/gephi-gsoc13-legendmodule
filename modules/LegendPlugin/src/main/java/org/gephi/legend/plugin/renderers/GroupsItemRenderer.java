@@ -65,7 +65,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // computing max label height
         for (StringBuilder label : labels) {
-            maxLabelHeight = (int) Math.max(maxLabelHeight, computeVerticalTextSpaceUsed(graphics2D, label.toString(), labelFont, elementWidth));
+            maxLabelHeight = (int) Math.max(maxLabelHeight, getFontHeight(graphics2D, label.toString(), labelFont, elementWidth, height)); //temporary soln. gotto rethink the height part.
 
         }
 

@@ -123,9 +123,10 @@ public class blockNode {
         }
     }
 
-    public void addChild(float x, float y, float width, float height) {
+    public blockNode addChild(float x, float y, float width, float height) {
         blockNode child = new blockNode(this, x, y, width, height, legendItem);
         children.add(child);
+        return child;
     }
 
     public Boolean isClickInBlock(int x, int y) {

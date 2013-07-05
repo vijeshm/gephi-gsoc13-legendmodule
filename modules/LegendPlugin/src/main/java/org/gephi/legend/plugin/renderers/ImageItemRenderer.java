@@ -84,7 +84,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
             } else {
                 String noImageMessage = NbBundle.getMessage(ImageItemRenderer.class, "ImageItemRenderer.no.image.message");
                 
-                float messageHeight = computeVerticalTextSpaceUsed(graphics2D, noImageMessage, titleFont, width);
+                float messageHeight = getFontHeight(graphics2D, noImageMessage, titleFont, width, height); //temporary solution. gotto rethink this further.
                 legendDrawText(graphics2D, noImageMessage, titleFont, Color.BLACK, 0, 0, width, (int)messageHeight, LegendItem.Alignment.CENTER);
             }
         } catch (Exception e) {

@@ -6,6 +6,7 @@ package org.gephi.legend.inplaceeditor;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -199,7 +200,7 @@ public class inplaceItemRenderer implements Renderer {
                             } catch (IOException e) {
                             }
                             break;
-                            
+
                         case COLOR:
                             Color color = prop.getValue();
                             graphics2d.setColor(BACKGROUND);
@@ -362,7 +363,8 @@ public class inplaceItemRenderer implements Renderer {
     }
 
     private int getFontHeight(Graphics2D graphics2d) {
-        return graphics2d.getFontMetrics().getHeight();
+        FontMetrics metric = graphics2d.getFontMetrics();
+        return metric.getHeight() - metric.getDescent();
     }
 
     @Override

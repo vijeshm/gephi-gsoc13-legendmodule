@@ -69,10 +69,7 @@ public class element {
                 break;
 
             case IMAGE:
-                this.data = new Object[3];
-                this.data[0] = (Boolean) data[0]; // state whether its selected or not
-                this.data[1] = (String) data[1]; // url of the default image (unselected)
-                this.data[2] = (String) data[2]; // url of the image when selected
+                this.data = data;
                 break;
                 
             // no extra data is required for checkbox, number, alignments, font and color
