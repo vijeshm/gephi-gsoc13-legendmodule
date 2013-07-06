@@ -285,10 +285,10 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
         if (root.getInplaceEditor().getRows().size() == 2) {
             addVisibilityControls("Title", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item);
+            addVisibilityControls("Description", previewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item);
         }
 
-
-        // A title is a new block. (The first child of a root in fact.)
+        // A title is a new block. (The first child of a root in fact, initiallly.)
         // Create a new block with root as the parent.
         // TITLE
         AffineTransform titleOrigin = new AffineTransform(origin);
@@ -309,6 +309,29 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             root.removeChild(blockNode.TITLE);
         }
 
+        
+        // A description is a new block. (The second child of a root in fact, initially)
+        // Create a new block with root as the parent.
+        // DESCRIPTION
+        
+        float descBoundaryWidth = 0;
+        float descBoundaryHeight = 0;
+        if (isDisplayingDescription && !description.isEmpty()) {
+            // set the font to titleFont so that the height can be computed accordingly
+            graphics2D.setFont(descriptionFont);
+            descBoundaryWidth = width;
+            descBoundaryHeight = graphics2D.getFontMetrics().getHeight();
+            origin.translate(0, height - descBoundaryHeight);
+            renderDescription(graphics2D, origin, (int) descBoundaryWidth, (int) descBoundaryHeight);
+            if (!root.hasChild(blockNode.DESC)) {
+                blockNode descNode = root.addChild(0, height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight, blockNode.DESC);
+                buildInplaceDesc(graphics2D, origin, descNode, item);
+            }
+        } else {
+            root.removeChild(blockNode.DESC);
+        }
+        
+        /*
         blockNode descNode = new blockNode(root, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item, blockNode.DESC);
         float descriptionHeight = 0;
         if (isDisplayingDescription && !description.isEmpty()) {
@@ -335,6 +358,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         if (currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
+        */
     }
 
     private void drawScaleAnchors(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -360,11 +384,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
                     (int) anchorLocations[i][2] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK,
                     (int) anchorLocations[i][3] - 2 * TRANSFORMATION_ANCHOR_LINE_THICK);
         }
-    }
-
-    private float renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Item item, blockNode node) {
-        graphics2D.setTransform(origin);
-        return legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
     }
 
     private void renderBorder(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, blockNode root) {
@@ -559,7 +578,87 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             titleNode.setInplaceEditor(ipeditor);
         }
     }
+    
+    private void renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
+        graphics2D.setTransform(origin);
+        legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
+    }
 
+    private void buildInplaceDesc(Graphics2D graphics2D, AffineTransform origin, blockNode descNode, Item item) {
+        // the flow of this method is the same as the buildInplaceTitle method. 
+        // The flow is repeated keeping in mind that there might be some special treatment give to description in the future.
+        graphics2D.setTransform(origin);
+        if (descNode.getInplaceEditor() == null) {
+            Graph graph = null;
+            inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
+            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, descNode);
+            ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+
+            row r;
+            column col;
+            PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+            PreviewProperty prop;
+            int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            Object[] data = new Object[1];
+            data[0] = "Description: ";
+            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data);
+
+            // we could have another property for title background.
+
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data);
+
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
+
+            r = ipeditor.addRow();
+            col = r.addColumn();
+            // left-alignment
+            data = new Object[4];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/left_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/left_selected.png";
+            data[3] = Alignment.LEFT;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+
+            // center alignment
+            data = new Object[4];
+            data[0] = true;
+            data[1] = "/org/gephi/legend/graphics/center_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/center_selected.png";
+            data[3] = Alignment.CENTER;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+
+            // right alignment
+            data = new Object[4];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/right_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/right_selected.png";
+            data[3] = Alignment.RIGHT;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+
+            // justified
+            data = new Object[4];
+            data[0] = false;
+            data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
+            data[2] = "/org/gephi/legend/graphics/justified_selected.png";
+            data[3] = Alignment.JUSTIFIED;
+            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+
+            descNode.setInplaceEditor(ipeditor);
+        }
+    }
+    
     private int getFontWidth(Graphics2D graphics2d, String str) {
         return graphics2d.getFontMetrics().stringWidth(str);
     }

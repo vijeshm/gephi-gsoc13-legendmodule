@@ -155,7 +155,7 @@ public class inplaceItemRenderer implements Renderer {
 
                             graphics2d.setColor(LABEL_COLOR);
                             graphics2d.drawString((String) data[0],
-                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + numberOfBlocks * UNIT_SIZE / 2 - fontWidth / 2,
+                                    (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
                                     (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
 
                             elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,

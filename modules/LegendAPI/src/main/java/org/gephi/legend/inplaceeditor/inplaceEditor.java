@@ -139,90 +139,94 @@ public class inplaceEditor implements Item {
         // image always appears as a sequence of elements in a column. So, if a click happens on an image, then draw a rectangle around the image, indicating that its selected.
         // if the click is on a color, display a color box popup. the new is set to the corresponding property
         // if the click is on a number, then display a popup to change the number and display its name on the top.
+        if (selectedColumn != null && selectedElem != null) {
             if (selectedColumn.elements.size() > 1) {
-            // if the column that you've selected has multiple elements, each should represent the same property
-            // the value of the selected element should be set as the value of the common property.
-            // Object[] data: data[0] says whether it is selected. data[1] says what value to set as the property.
-            ArrayList<element> elements = selectedColumn.elements;
+                // if the column that you've selected has multiple elements, each should represent the same property
+                // the value of the selected element should be set as the value of the common property.
+                // Object[] data: data[0] says whether it is selected. data[1] says what value to set as the property.
+                ArrayList<element> elements = selectedColumn.elements;
 
-            // checking if all the properties are the same
-            Boolean uniform = true;
-            PreviewProperty prop = elements.get(0).getProperty();
-            for (element e : elements) {
-                if (e.getProperty().getDisplayName() != prop.getDisplayName()) {
-                    uniform = false;
-                    break;
-                }
-            }
-
-            if (uniform) {
-                // for all the elements, set data[0] as unselected. for the selectedItem, set data[0] as selected.
+                // checking if all the properties are the same
+                Boolean uniform = true;
+                PreviewProperty prop = elements.get(0).getProperty();
                 for (element e : elements) {
-                    Object[] elementData = e.getAssociatedData();
-                    elementData[0] = false;
+                    if (e.getProperty().getDisplayName() != prop.getDisplayName()) {
+                        uniform = false;
+                        break;
+                    }
                 }
 
-                Object[] elementData = selectedElem.getAssociatedData();
-                elementData[0] = true;
-                prop.setValue(elementData[3]);
-                previewProperties.putValue(prop.getName(), elementData[3]);
+                if (uniform) {
+                    // for all the elements, set data[0] as unselected. for the selectedItem, set data[0] as selected.
+                    for (element e : elements) {
+                        Object[] elementData = e.getAssociatedData();
+                        elementData[0] = false;
+                    }
+
+                    Object[] elementData = selectedElem.getAssociatedData();
+                    elementData[0] = true;
+                    prop.setValue(elementData[3]);
+                    previewProperties.putValue(prop.getName(), elementData[3]);
+                } else {
+                    prop.setValue(null);
+                }
+
             } else {
-                prop.setValue(null);
-            }
 
-        } else {
+                PreviewProperty prop = selectedElem.getProperty();
+                Object[] elementData = selectedElem.getAssociatedData();
 
-            PreviewProperty prop = selectedElem.getProperty();
-            Object[] elementData = selectedElem.getAssociatedData();
+                switch (selectedElem.getElementType()) {
+                    case LABEL:
+                        break;
 
-            switch (selectedElem.getElementType()) {
-                case LABEL:
-                    break;
-
-                case FONT:
-                    JFontChooser chooser = new JFontChooser((Font) prop.getValue());
-                    Font chosenFont = chooser.showDialog(new JFrame("choose a font"), (Font) prop.getValue());
-                    if( chosenFont != null) {
-                        prop.setValue(chosenFont);
-                        previewProperties.putValue(prop.getName(), chosenFont);
-                    }
-                    break;
-
-                case TEXT:
-                    String newValue = (String) JOptionPane.showInputDialog(null, "Enter new text:", null);
-                    prop.setValue(newValue);
-                    previewProperties.putValue(prop.getName(), newValue);
-                    break;
-
-                case CHECKBOX:
-                    break;
-
-                case IMAGE:
-                    Boolean isSelected = (Boolean) elementData[0];
-                    elementData[0] = !isSelected;
-                    prop.setValue(!isSelected);
-                    previewProperties.putValue(prop.getName(), !isSelected);
-                    break;
-
-                case COLOR:
-                    Color selectedColor = ColorPicker.showDialog(null, (Color) prop.getValue(), true);
-                    if (selectedColor != null) {
-                        prop.setValue(selectedColor);
-                        previewProperties.putValue(prop.getName(), selectedColor);
-                    }
-                    break;
-
-                case NUMBER:
-                    String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
-                    if (newValueString != null) {
-                        try {
-                            Integer newNumber = Integer.parseInt(newValueString);
-                            prop.setValue(newNumber);
-                            previewProperties.putValue(prop.getName(), newNumber);
-                        } catch (NumberFormatException e) {
+                    case FONT:
+                        JFontChooser chooser = new JFontChooser((Font) prop.getValue());
+                        Font chosenFont = chooser.showDialog(new JFrame("choose a font"), (Font) prop.getValue());
+                        if (chosenFont != null) {
+                            prop.setValue(chosenFont);
+                            previewProperties.putValue(prop.getName(), chosenFont);
                         }
-                    }
-                    break;
+                        break;
+
+                    case TEXT:
+                        String newValue = (String) JOptionPane.showInputDialog(null, "Enter new text:", null);
+                        if (newValue != null) {
+                            prop.setValue(newValue);
+                            previewProperties.putValue(prop.getName(), newValue);
+                        }
+                        break;
+
+                    case CHECKBOX:
+                        break;
+
+                    case IMAGE:
+                        Boolean isSelected = (Boolean) elementData[0];
+                        elementData[0] = !isSelected;
+                        prop.setValue(!isSelected);
+                        previewProperties.putValue(prop.getName(), !isSelected);
+                        break;
+
+                    case COLOR:
+                        Color selectedColor = ColorPicker.showDialog(null, (Color) prop.getValue(), true);
+                        if (selectedColor != null) {
+                            prop.setValue(selectedColor);
+                            previewProperties.putValue(prop.getName(), selectedColor);
+                        }
+                        break;
+
+                    case NUMBER:
+                        String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
+                        if (newValueString != null) {
+                            try {
+                                Integer newNumber = Integer.parseInt(newValueString);
+                                prop.setValue(newNumber);
+                                previewProperties.putValue(prop.getName(), newNumber);
+                            } catch (NumberFormatException e) {
+                            }
+                        }
+                        break;
+                }
             }
         }
     }
