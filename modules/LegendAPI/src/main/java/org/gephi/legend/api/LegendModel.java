@@ -156,7 +156,7 @@ public class LegendModel {
             float width = previewProperties[LegendProperty.WIDTH].getValue();
             float height = previewProperties[LegendProperty.HEIGHT].getValue();
             */
-            indexNodeMap.put(itemIndex, new blockNode(null, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item));
+            indexNodeMap.put(itemIndex, new blockNode(null, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item, blockNode.ROOT));
 
             numberOfActiveItems += 1;
             pickedLegendIndex = numberOfActiveItems - 1;

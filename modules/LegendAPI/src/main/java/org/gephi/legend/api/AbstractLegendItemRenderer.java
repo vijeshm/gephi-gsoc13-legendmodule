@@ -281,6 +281,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         // BACKGROUND
         renderBackground(graphics2D, origin, width, height, item, root);
 
+        // add more options to the root block - control the visibility of title and description
+        PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+        if (root.getInplaceEditor().getRows().size() == 2) {
+            addVisibilityControls("Title", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item);
+        }
+
+
         // A title is a new block. (The first child of a root in fact.)
         // Create a new block with root as the parent.
         // TITLE
@@ -292,12 +299,17 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             graphics2D.setFont(titleFont);
             titleBoundaryWidth = width;
             titleBoundaryHeight = graphics2D.getFontMetrics().getHeight();
-            blockNode titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight);
-            // titleBoundaryHeight = getFontHeight(graphics2D, title, titleFont, (int) titleBoundaryWidth, (int) titleFontHeight);
-            renderTitle(graphics2D, titleOrigin, (int) titleBoundaryWidth, (int) titleBoundaryHeight, item, titleNode);
+            renderTitle(graphics2D, titleOrigin, (int) titleBoundaryWidth, (int) titleBoundaryHeight);
+            
+            if (!root.hasChild(blockNode.TITLE)) {
+                blockNode titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, blockNode.TITLE);
+                buildInplaceTitle(graphics2D, titleOrigin, titleNode, item);
+            }
+        } else {
+            root.removeChild(blockNode.TITLE);
         }
 
-        blockNode descNode = new blockNode(root, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item);
+        blockNode descNode = new blockNode(root, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item, blockNode.DESC);
         float descriptionHeight = 0;
         if (isDisplayingDescription && !description.isEmpty()) {
             descriptionHeight = getFontHeight(graphics2D, description, descriptionFont, width, height);
@@ -449,12 +461,34 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer boundaryWidth, Integer boundaryHeight, Item item, blockNode titleNode) {
+    private void addVisibilityControls(String displayString, PreviewProperty prop, Boolean defaultVal, blockNode root, Item item) {
+        inplaceEditor ipeditor = root.getInplaceEditor();
+        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+        row r = ipeditor.addRow();
+
+        column col = r.addColumn();
+        Object[] data = new Object[1];
+        data[0] = displayString;
+        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+
+        col = r.addColumn();
+        data = new Object[3];
+        data[0] = defaultVal;
+        data[1] = "/org/gephi/legend/graphics/invisible.png";
+        data[2] = "/org/gephi/legend/graphics/visible.png";
+        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, prop, data);
+    }
+
+    private void renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer boundaryWidth, Integer boundaryHeight) {
         // this part of the code is executed only after rendering the background. (border and background would've already been rendered)
         // isDisplayingTitle will definitely be enabled if the control is transfered here. So, there is no need to check for it.
         graphics2D.setTransform(origin);
         legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, boundaryWidth, boundaryHeight, titleAlignment, false);
+    }
 
+    private void buildInplaceTitle(Graphics2D graphics2D, AffineTransform origin, blockNode titleNode, Item item) {
+        graphics2D.setTransform(origin);
         if (titleNode.getInplaceEditor() == null) {
             Graph graph = null;
             inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
@@ -472,15 +506,23 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Object[] data = new Object[1];
             data[0] = "Title: ";
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
-            
+
+            col = r.addColumn();
+            data = new Object[0];
+            col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data);
+
+            // we could have another property for title background.
+
+            r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
             col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
 
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);            
-            
+            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);
+
+            r = ipeditor.addRow();
             col = r.addColumn();
             // left-alignment
             data = new Object[4];
@@ -489,7 +531,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[2] = "/org/gephi/legend/graphics/left_selected.png";
             data[3] = Alignment.LEFT;
             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
-            
+
             // center alignment
             data = new Object[4];
             data[0] = true;
@@ -497,7 +539,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[2] = "/org/gephi/legend/graphics/center_selected.png";
             data[3] = Alignment.CENTER;
             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
-            
+
             // right alignment
             data = new Object[4];
             data[0] = false;
@@ -505,7 +547,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[2] = "/org/gephi/legend/graphics/right_selected.png";
             data[3] = Alignment.RIGHT;
             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
-            
+
             // justified
             data = new Object[4];
             data[0] = false;
@@ -513,7 +555,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[2] = "/org/gephi/legend/graphics/justified_selected.png";
             data[3] = Alignment.JUSTIFIED;
             col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
-            
+
             titleNode.setInplaceEditor(ipeditor);
         }
     }

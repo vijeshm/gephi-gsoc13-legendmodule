@@ -317,6 +317,34 @@ public class inplaceItemRenderer implements Renderer {
 
                             currentElementsCount += numberOfBlocks;
                             break;
+                        case TEXT:
+                            try {
+                                BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/edit.png"));
+
+                                graphics2d.setColor(BACKGROUND);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        UNIT_SIZE + 1,
+                                        UNIT_SIZE + 1);
+                                graphics2d.drawImage(img,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                        0,
+                                        0,
+                                        img.getWidth(),
+                                        img.getHeight(), null);
+
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                        UNIT_SIZE,
+                                        UNIT_SIZE);
+
+                                currentElementsCount += 1;
+                            } catch (IOException e) {
+                            }
+                            break;
                     }
                 }
             }

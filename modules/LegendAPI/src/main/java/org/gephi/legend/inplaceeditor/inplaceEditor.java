@@ -139,7 +139,7 @@ public class inplaceEditor implements Item {
         // image always appears as a sequence of elements in a column. So, if a click happens on an image, then draw a rectangle around the image, indicating that its selected.
         // if the click is on a color, display a color box popup. the new is set to the corresponding property
         // if the click is on a number, then display a popup to change the number and display its name on the top.
-        if (selectedColumn.elements.size() > 1) {
+            if (selectedColumn.elements.size() > 1) {
             // if the column that you've selected has multiple elements, each should represent the same property
             // the value of the selected element should be set as the value of the common property.
             // Object[] data: data[0] says whether it is selected. data[1] says what value to set as the property.
@@ -189,6 +189,9 @@ public class inplaceEditor implements Item {
                     break;
 
                 case TEXT:
+                    String newValue = (String) JOptionPane.showInputDialog(null, "Enter new text:", null);
+                    prop.setValue(newValue);
+                    previewProperties.putValue(prop.getName(), newValue);
                     break;
 
                 case CHECKBOX:

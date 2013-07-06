@@ -17,6 +17,9 @@ import org.gephi.preview.api.Item;
  */
 public class blockNode {
 
+    public static String ROOT = "root node";
+    public static String TITLE = "title node";
+    public static String DESC = "description node";
     private float originX;
     private float originY;
     private float blockWidth;
@@ -25,8 +28,9 @@ public class blockNode {
     private ArrayList<blockNode> children;
     private inplaceEditor IPEditor;
     private Item legendItem;
+    private String id;
 
-    public blockNode(blockNode parentNode, float x, float y, float width, float height, Item parentItem) {
+    public blockNode(blockNode parentNode, float x, float y, float width, float height, Item parentItem, String tag) {
         originX = x;
         originY = y;
         blockWidth = width;
@@ -35,6 +39,7 @@ public class blockNode {
         children = new ArrayList<blockNode>();
         IPEditor = null;
         legendItem = parentItem;
+        id = tag;
     }
 
     public Boolean isRoot() {
@@ -72,7 +77,7 @@ public class blockNode {
     public blockNode getParent() {
         return parent;
     }
-    
+
     public Item getItem() {
         return legendItem;
     }
@@ -83,6 +88,10 @@ public class blockNode {
 
     public inplaceEditor getInplaceEditor() {
         return IPEditor;
+    }
+
+    public String getTag() {
+        return id;
     }
 
     public void setOriginX(float x) {
@@ -123,10 +132,29 @@ public class blockNode {
         }
     }
 
-    public blockNode addChild(float x, float y, float width, float height) {
-        blockNode child = new blockNode(this, x, y, width, height, legendItem);
+    public blockNode addChild(float x, float y, float width, float height, String tag) {
+        blockNode child = new blockNode(this, x, y, width, height, legendItem, tag);
         children.add(child);
         return child;
+    }
+
+    public void removeChild(String tag) {
+        for (blockNode child : children) {
+            if (child.getTag() == tag) {
+                children.remove(child);
+                break;
+            }
+        }
+    }
+
+    public Boolean hasChild(String tag) {
+        for (blockNode child : children) {
+            if(child.getTag() == tag){
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public Boolean isClickInBlock(int x, int y) {

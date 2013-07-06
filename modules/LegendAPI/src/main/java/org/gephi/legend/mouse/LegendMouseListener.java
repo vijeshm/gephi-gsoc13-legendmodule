@@ -252,7 +252,9 @@ public class LegendMouseListener implements PreviewMouseListener {
 
                 event.setConsumed(true);
                 return;
-            } else if (isClickingInLegend(event.x, event.y, item, previewProperties)) {
+            }
+
+            if (isClickingInLegend(event.x, event.y, item, previewProperties)) {
                 relativeX = event.x - realOriginX;
                 relativeY = event.y - realOriginY;
 
@@ -261,16 +263,16 @@ public class LegendMouseListener implements PreviewMouseListener {
 
                 event.setConsumed(true);
                 return;
-            } else {
-                item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
-                item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
-                relativeX = 0;
-                relativeY = 0;
-                legendController.selectItem(null);
-
-                event.setConsumed(true);
-                return;
             }
+
+            item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
+            item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
+            relativeX = 0;
+            relativeY = 0;
+            legendController.selectItem(null);
+
+            event.setConsumed(true);
+            return;
         }
     }
 

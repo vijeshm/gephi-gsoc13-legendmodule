@@ -64,8 +64,7 @@ public class element {
         switch (type) {
             case LABEL:
             case TEXT:
-                this.data = new Object[1];
-                this.data[0] = (String) data[0]; // label, or current text
+                this.data = data;
                 break;
 
             case IMAGE:
