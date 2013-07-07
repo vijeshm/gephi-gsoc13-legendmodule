@@ -36,6 +36,7 @@ import org.gephi.preview.spi.PreviewMouseListener;
 import org.openide.util.Lookup;
 
 /**
+ *
  * @author edubecks
  */
 public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, MouseResponsiveRenderer {
@@ -260,6 +261,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics2D.setTransform(origin);
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
@@ -273,11 +275,11 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         // The rendering takes place from the outermost block to innermost block
         // BORDER - border is external
         blockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.        
-        renderBorder(graphics2D, origin, width, height, borderLineThick, borderColor, item, root);
+        renderBorder(graphics2D, width, height, borderLineThick, borderColor, item, root);
 
         // The background properties must also be included as a part of the root block.
         // BACKGROUND
-        renderBackground(graphics2D, origin, width, height, item, root);
+        renderBackground(graphics2D, width, height, item, root);
 
         // add more options to the root block - control the visibility of title and description
         PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
@@ -285,12 +287,14 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             addVisibilityControls("Title:", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item);
             addVisibilityControls("Description:", previewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item);
         }
-        drawBlockBoundary(graphics2D, origin, root);
+        
+        root.updateGeometry(currentRealOriginX, currentRealOriginY, width, height);
+        drawBlockBoundary(graphics2D, root);
 
         // A title is a new block. (The first child of a root in fact, initiallly.)
         // Create a new block with root as the parent.
         // TITLE
-        AffineTransform titleOrigin = new AffineTransform(origin);
+        // AffineTransform titleOrigin = new AffineTransform(origin);
         float titleBoundaryWidth = 0;
         float titleBoundaryHeight = 0;
         if (isDisplayingTitle && !title.isEmpty()) {
@@ -298,25 +302,25 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             graphics2D.setFont(titleFont);
             titleBoundaryWidth = width;
             titleBoundaryHeight = graphics2D.getFontMetrics().getHeight();
-            renderTitle(graphics2D, titleOrigin, (int) titleBoundaryWidth, (int) titleBoundaryHeight);
+            renderTitle(graphics2D, (int) titleBoundaryWidth, (int) titleBoundaryHeight);
 
             blockNode titleNode = root.getChild(blockNode.TITLE);
             // the following code ensures that there is only one title node at any point in time.
             if (titleNode == null) {
                 titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, blockNode.TITLE);
-                buildInplaceTitle(graphics2D, titleOrigin, titleNode, item);
+                buildInplaceTitle(graphics2D, titleNode, item);
             }
             
-            drawBlockBoundary(graphics2D, titleOrigin, titleNode);
+            titleNode.updateGeometry(currentRealOriginX, currentRealOriginY, titleBoundaryWidth, titleBoundaryHeight);
+            drawBlockBoundary(graphics2D, titleNode);
         } else {
             root.removeChild(blockNode.TITLE);
         }
 
-
         // A description is a new block. (The second child of a root in fact, initially)
         // Create a new block with root as the parent.
         // DESCRIPTION
-        AffineTransform descOrigin = new AffineTransform(origin);
+        // AffineTransform descOrigin = new AffineTransform(origin);
         float descBoundaryWidth = 0;
         float descBoundaryHeight = 0;
         if (isDisplayingDescription && !description.isEmpty()) {
@@ -324,17 +328,18 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             graphics2D.setFont(descriptionFont);
             descBoundaryWidth = width;
             descBoundaryHeight = graphics2D.getFontMetrics().getHeight();
-            descOrigin.translate(0, height - descBoundaryHeight);
-            renderDescription(graphics2D, descOrigin, (int) descBoundaryWidth, (int) descBoundaryHeight);
+            // descOrigin.translate(0, height - descBoundaryHeight);
+            renderDescription(graphics2D, 0, (int) (height - descBoundaryHeight), (int) descBoundaryWidth, (int) descBoundaryHeight);
 
             blockNode descNode = root.getChild(blockNode.DESC);
             // the following code ensures that there is only one description node at any point in time.
             if (descNode == null) {
-                descNode = root.addChild(0, 0, descBoundaryWidth, descBoundaryHeight, blockNode.DESC);
-                buildInplaceDesc(graphics2D, descOrigin, descNode, item);
+                descNode = root.addChild(0, height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight, blockNode.DESC);
+                buildInplaceDesc(graphics2D, descNode, item);
             }
-            
-            drawBlockBoundary(graphics2D, descOrigin, descNode);
+
+            descNode.updateGeometry(currentRealOriginX, currentRealOriginY + height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight);
+            drawBlockBoundary(graphics2D, descNode);
         } else {
             root.removeChild(blockNode.DESC);
         }
@@ -367,6 +372,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         if (currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
+        
+        // root.updateGeometry(currentRealOriginX, currentRealOriginY, currentWidth, currentHeight);
     }
 
     private void drawScaleAnchors(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
@@ -394,9 +401,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderBorder(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, blockNode root) {
+    private void renderBorder(Graphics2D graphics2D, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, blockNode root) {
         if (borderIsDisplaying) {
-            graphics2D.setTransform(origin);
             graphics2D.setColor(borderColor);
 
             // border is external
@@ -450,10 +456,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderBackground(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, Item item, blockNode root) {
+    private void renderBackground(Graphics2D graphics2D, Integer width, Integer height, Item item, blockNode root) {
         // this part of the code will get executed only after the border is rendered. Hence, an inplaceeditor will already be set.
         if (backgroundIsDisplaying) {
-            graphics2D.setTransform(origin);
             graphics2D.setColor(backgroundColor);
             graphics2D.fillRect(0, 0, width, height);
         }
@@ -507,15 +512,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, prop, data);
     }
 
-    private void renderTitle(Graphics2D graphics2D, AffineTransform origin, Integer boundaryWidth, Integer boundaryHeight) {
+    private void renderTitle(Graphics2D graphics2D, Integer boundaryWidth, Integer boundaryHeight) {
         // this part of the code is executed only after rendering the background. (border and background would've already been rendered)
         // isDisplayingTitle will definitely be enabled if the control is transfered here. So, there is no need to check for it.
-        graphics2D.setTransform(origin);
         legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, boundaryWidth, boundaryHeight, titleAlignment, false);
     }
 
-    private void buildInplaceTitle(Graphics2D graphics2D, AffineTransform origin, blockNode titleNode, Item item) {
-        graphics2D.setTransform(origin);
+    private void buildInplaceTitle(Graphics2D graphics2D, blockNode titleNode, Item item) {
         if (titleNode.getInplaceEditor() == null) {
             Graph graph = null;
             inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
@@ -587,15 +590,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderDescription(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        graphics2D.setTransform(origin);
-        legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, 0, 0, width, height, descriptionAlignment);
+    private void renderDescription(Graphics2D graphics2D, Integer x, Integer y, Integer width, Integer height) {
+        legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, x, y, width, height, descriptionAlignment);
     }
 
-    private void buildInplaceDesc(Graphics2D graphics2D, AffineTransform origin, blockNode descNode, Item item) {
+    private void buildInplaceDesc(Graphics2D graphics2D, blockNode descNode, Item item) {
         // the flow of this method is the same as the buildInplaceTitle method. 
         // The flow is repeated keeping in mind that there might be some special treatment give to description in the future.
-        graphics2D.setTransform(origin);
         if (descNode.getInplaceEditor() == null) {
             Graph graph = null;
             inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
@@ -671,11 +672,10 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         return graphics2d.getFontMetrics().stringWidth(str);
     }
 
-    private void drawBlockBoundary(Graphics2D graphics2D, AffineTransform origin, blockNode node) {
-        graphics2D.setTransform(origin);
+    private void drawBlockBoundary(Graphics2D graphics2D, blockNode node) {
         graphics2D.setColor(Color.RED);
-        int originX = (int) node.getOriginX();
-        int originY = (int) node.getOriginY();
+        int originX = (int) (node.getOriginX() - currentRealOriginX);
+        int originY = (int) (node.getOriginY() - currentRealOriginY);
         int width = (int) node.getBlockWidth();
         int height = (int) node.getBlockHeight();
         int tagWidth = graphics2D.getFontMetrics().stringWidth(node.getTag());
@@ -684,16 +684,16 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         graphics2D.setColor(Color.RED);
         graphics2D.drawRect(originX, originY, width, height);
         graphics2D.drawString(node.getTag(), originX + width / 2 - tagWidth / 2, originY + height / 2);
-        
-        /*
-        for (blockNode child : node.getChildren()) {
-            int childOriginX = (int) child.getOriginX();
-            int childOriginY = (int) child.getOriginY();
-            int childWidth = (int) child.getBlockWidth();
-            int childHeight = (int) child.getBlockHeight();
 
-            drawBlockBoundaries(graphics2D, origin, child);
-        }*/
+        /*
+         for (blockNode child : node.getChildren()) {
+         int childOriginX = (int) child.getOriginX();
+         int childOriginY = (int) child.getOriginY();
+         int childWidth = (int) child.getBlockWidth();
+         int childHeight = (int) child.getBlockHeight();
+
+         drawBlockBoundaries(graphics2D, origin, child);
+         }*/
     }
 
     /**

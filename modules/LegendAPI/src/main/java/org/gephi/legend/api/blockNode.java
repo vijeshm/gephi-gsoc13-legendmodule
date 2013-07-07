@@ -115,6 +115,12 @@ public class blockNode {
     }
 
     public void updateGeometry(float newOriginX, float newOriginY, float newWidth, float newHeight) {
+        originX = newOriginX;
+        originY = newOriginY;
+        blockWidth = newWidth;
+        blockHeight = newHeight;
+        
+        /* PREVIOUS: Recursive implementation that bubbles down the children
         float offsetX = newOriginX - originX;
         float offsetY = newOriginY - originY;
         float widthRatio = newWidth / blockWidth;
@@ -130,6 +136,7 @@ public class blockNode {
             float childBlockHeight = child.getBlockHeight();
             child.updateGeometry(childOriginX + offsetX, childOriginY + offsetY, widthRatio * childBlockWidth, heightRatio * childBlockHeight);
         }
+        */
     }
 
     public blockNode addChild(float x, float y, float width, float height, String tag) {
