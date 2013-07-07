@@ -37,7 +37,7 @@ import org.openide.util.Lookup;
 
 /**
  *
- * @author edubecks
+ * @author mvvijesh, edubecks
  */
 public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, MouseResponsiveRenderer {
 
@@ -88,9 +88,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
 
     /**
-     * the
-     *
-     * Function that actually renders the legend using the Graphics2D Object
+     * the Function that actually renders the legend using the Graphics2D Object
      *
      * @param graphics2D Graphics2D instance used to render legend
      * @param origin transformation that contains the origin and level zoom of
@@ -556,7 +554,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn();
             // left-alignment
             data = new Object[4];
-            data[0] = false;
+            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.LEFT;
             data[1] = "/org/gephi/legend/graphics/left_unselected.png";
             data[2] = "/org/gephi/legend/graphics/left_selected.png";
             data[3] = Alignment.LEFT;
@@ -564,7 +562,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             // center alignment
             data = new Object[4];
-            data[0] = true;
+            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.CENTER;
             data[1] = "/org/gephi/legend/graphics/center_unselected.png";
             data[2] = "/org/gephi/legend/graphics/center_selected.png";
             data[3] = Alignment.CENTER;
@@ -572,7 +570,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             // right alignment
             data = new Object[4];
-            data[0] = false;
+            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.RIGHT;
             data[1] = "/org/gephi/legend/graphics/right_unselected.png";
             data[2] = "/org/gephi/legend/graphics/right_selected.png";
             data[3] = Alignment.RIGHT;
@@ -580,7 +578,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             // justified
             data = new Object[4];
-            data[0] = false;
+            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
             data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
             data[2] = "/org/gephi/legend/graphics/justified_selected.png";
             data[3] = Alignment.JUSTIFIED;
@@ -634,7 +632,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn();
             // left-alignment
             data = new Object[4];
-            data[0] = false;
+            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.LEFT;
             data[1] = "/org/gephi/legend/graphics/left_unselected.png";
             data[2] = "/org/gephi/legend/graphics/left_selected.png";
             data[3] = Alignment.LEFT;
@@ -642,7 +640,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             // center alignment
             data = new Object[4];
-            data[0] = true;
+            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.CENTER;
             data[1] = "/org/gephi/legend/graphics/center_unselected.png";
             data[2] = "/org/gephi/legend/graphics/center_selected.png";
             data[3] = Alignment.CENTER;
@@ -650,7 +648,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             // right alignment
             data = new Object[4];
-            data[0] = false;
+            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.RIGHT;;
             data[1] = "/org/gephi/legend/graphics/right_unselected.png";
             data[2] = "/org/gephi/legend/graphics/right_selected.png";
             data[3] = Alignment.RIGHT;
@@ -658,7 +656,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             // justified
             data = new Object[4];
-            data[0] = false;
+            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
             data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
             data[2] = "/org/gephi/legend/graphics/justified_selected.png";
             data[3] = Alignment.JUSTIFIED;
@@ -674,6 +672,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
     private void drawBlockBoundary(Graphics2D graphics2D, blockNode node) {
         graphics2D.setColor(Color.RED);
+        graphics2D.setFont(new Font("Arial", Font.PLAIN, 20));
         int originX = (int) (node.getOriginX() - currentRealOriginX);
         int originY = (int) (node.getOriginY() - currentRealOriginY);
         int width = (int) node.getBlockWidth();
