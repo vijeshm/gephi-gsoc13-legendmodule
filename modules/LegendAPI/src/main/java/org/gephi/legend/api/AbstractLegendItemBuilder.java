@@ -54,7 +54,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     // ORIGIN
     protected Float defaultOriginX = 0f;
     protected Float defaultOriginY = 0f;
-    // WIDTH
+    // WIDTH AND HEIGHT
     protected Float defaultWidth = 500f;
     protected Float defaultHeight = 300f;
     // TITLE

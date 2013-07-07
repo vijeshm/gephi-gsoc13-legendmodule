@@ -31,15 +31,15 @@ public class blockNode {
     private String id;
 
     public blockNode(blockNode parentNode, float x, float y, float width, float height, Item parentItem, String tag) {
+        parent = parentNode;
         originX = x;
         originY = y;
         blockWidth = width;
         blockHeight = height;
-        parent = parentNode;
-        children = new ArrayList<blockNode>();
-        IPEditor = null;
         legendItem = parentItem;
         id = tag;
+        children = new ArrayList<blockNode>();
+        IPEditor = null;
     }
 
     public Boolean isRoot() {
@@ -146,15 +146,15 @@ public class blockNode {
             }
         }
     }
-
-    public Boolean hasChild(String tag) {
-        for (blockNode child : children) {
-            if(child.getTag() == tag){
-                return true;
+    
+    public blockNode getChild(String tag) {
+        for(blockNode child : children) {
+            if(child.getTag() == tag) {
+                return child;
             }
         }
         
-        return false;
+        return null;
     }
 
     public Boolean isClickInBlock(int x, int y) {

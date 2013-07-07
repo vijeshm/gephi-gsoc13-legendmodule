@@ -4,6 +4,7 @@
  */
 package org.gephi.legend.api;
 
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -150,13 +151,11 @@ public class LegendModel {
             activeLegendItems.add(item);
             int itemIndex = (Integer) item.getData(LegendItem.ITEM_INDEX);
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
-            /*
             float originX = previewProperties[LegendProperty.USER_ORIGIN_X].getValue();
             float originY = previewProperties[LegendProperty.USER_ORIGIN_Y].getValue();
             float width = previewProperties[LegendProperty.WIDTH].getValue();
             float height = previewProperties[LegendProperty.HEIGHT].getValue();
-            */
-            indexNodeMap.put(itemIndex, new blockNode(null, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item, blockNode.ROOT));
+            indexNodeMap.put(itemIndex, new blockNode(null, originX, originY, width, height, item, blockNode.ROOT));
 
             numberOfActiveItems += 1;
             pickedLegendIndex = numberOfActiveItems - 1;
