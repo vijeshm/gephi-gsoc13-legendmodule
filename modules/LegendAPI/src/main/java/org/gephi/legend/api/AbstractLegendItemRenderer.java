@@ -98,6 +98,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      */
     protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
+    protected void renderToGraphics(Graphics2D graphics2D, blockNode legendNode) {
+    }
+
     /**
      * Function that reads the custom properties values from the
      * PreviewProperties of the current PreviewModel
@@ -285,7 +288,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             addVisibilityControls("Title:", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item);
             addVisibilityControls("Description:", previewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item);
         }
-        
+
         root.updateGeometry(currentRealOriginX, currentRealOriginY, width, height);
         drawBlockBoundary(graphics2D, root);
 
@@ -308,7 +311,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
                 titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, blockNode.TITLE);
                 buildInplaceTitle(graphics2D, titleNode, item);
             }
-            
+
             titleNode.updateGeometry(currentRealOriginX, currentRealOriginY, titleBoundaryWidth, titleBoundaryHeight);
             drawBlockBoundary(graphics2D, titleNode);
         } else {
@@ -342,36 +345,16 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             root.removeChild(blockNode.DESC);
         }
 
-        /*
-         blockNode descNode = new blockNode(root, Float.MAX_VALUE, Float.MAX_VALUE, 0, 0, item, blockNode.DESC);
-         float descriptionHeight = 0;
-         if (isDisplayingDescription && !description.isEmpty()) {
-         descriptionHeight = getFontHeight(graphics2D, description, descriptionFont, width, height);
-         }
-         // LEGEND
-         AffineTransform legendOrigin = new AffineTransform(origin);
-         //adding space between elements
-         legendOrigin.translate(0, titleBoundaryHeight + MARGIN_BETWEEN_ELEMENTS);
-         int legendWidth = width;
-         int legendHeight = (Integer) (height - Math.round(titleBoundaryHeight) - Math.round(descriptionHeight) - 2 * MARGIN_BETWEEN_ELEMENTS);
+        // rendering legend
+        blockNode legendNode = new blockNode(root, currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight, item, blockNode.LEGEND);
+        drawBlockBoundary(graphics2D, legendNode);
+        renderToGraphics(graphics2D, legendNode);
+        // renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
 
-         // DESCRIPTION
-         AffineTransform descriptionOrigin = new AffineTransform(origin);
-         descriptionOrigin.translate(0, titleBoundaryHeight + legendHeight + MARGIN_BETWEEN_ELEMENTS);
-         if (isDisplayingDescription && !description.isEmpty()) {
-         renderDescription(graphics2D, descriptionOrigin, width, (int) descriptionHeight, item, descNode);
-         }
-
-         // rendering legend
-         renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
-         */
-
-        // is selected
+        // draw the anchors if the item is selected
         if (currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
-        
-        // root.updateGeometry(currentRealOriginX, currentRealOriginY, currentWidth, currentHeight);
     }
 
     private void drawScaleAnchors(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {

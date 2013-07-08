@@ -20,6 +20,7 @@ public class blockNode {
     public static String ROOT = "root node";
     public static String TITLE = "title node";
     public static String DESC = "description node";
+    public static String LEGEND = "legend node";
     private float originX;
     private float originY;
     private float blockWidth;
