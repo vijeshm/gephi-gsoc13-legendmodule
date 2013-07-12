@@ -33,8 +33,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author mvvijesh
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 106),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 106)
+    @ServiceProvider(service = ItemBuilder.class, position = 105),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 105)
 })
 public class TextItemBuilder extends AbstractLegendItemBuilder {
     
