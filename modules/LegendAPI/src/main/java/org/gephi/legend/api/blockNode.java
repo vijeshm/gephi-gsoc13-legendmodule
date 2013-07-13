@@ -52,7 +52,7 @@ public class blockNode {
     }
 
     public Boolean isLeaf() {
-        if (children.size() != 0) {
+        if (!children.isEmpty()) {
             return Boolean.FALSE;
         } else {
             return Boolean.TRUE;
@@ -120,28 +120,32 @@ public class blockNode {
         originY = newOriginY;
         blockWidth = newWidth;
         blockHeight = newHeight;
-        
+
         /* PREVIOUS: Recursive implementation that bubbles down the children
-        float offsetX = newOriginX - originX;
-        float offsetY = newOriginY - originY;
-        float widthRatio = newWidth / blockWidth;
-        float heightRatio = newHeight / blockHeight;
-        originX = newOriginX;
-        originY = newOriginY;
-        blockWidth = newWidth;
-        blockHeight = newHeight;
-        for (blockNode child : children) {
-            float childOriginX = child.getOriginX();
-            float childOriginY = child.getOriginY();
-            float childBlockWidth = child.getBlockWidth();
-            float childBlockHeight = child.getBlockHeight();
-            child.updateGeometry(childOriginX + offsetX, childOriginY + offsetY, widthRatio * childBlockWidth, heightRatio * childBlockHeight);
-        }
-        */
+         float offsetX = newOriginX - originX;
+         float offsetY = newOriginY - originY;
+         float widthRatio = newWidth / blockWidth;
+         float heightRatio = newHeight / blockHeight;
+         originX = newOriginX;
+         originY = newOriginY;
+         blockWidth = newWidth;
+         blockHeight = newHeight;
+         for (blockNode child : children) {
+         float childOriginX = child.getOriginX();
+         float childOriginY = child.getOriginY();
+         float childBlockWidth = child.getBlockWidth();
+         float childBlockHeight = child.getBlockHeight();
+         child.updateGeometry(childOriginX + offsetX, childOriginY + offsetY, widthRatio * childBlockWidth, heightRatio * childBlockHeight);
+         }
+         */
     }
 
     public blockNode addChild(float x, float y, float width, float height, String tag) {
         blockNode child = new blockNode(this, x, y, width, height, legendItem, tag);
+        return addChild(child);
+    }
+    
+    public blockNode addChild(blockNode child) {
         children.add(child);
         return child;
     }
@@ -154,14 +158,14 @@ public class blockNode {
             }
         }
     }
-    
+
     public blockNode getChild(String tag) {
-        for(blockNode child : children) {
-            if(child.getTag() == tag) {
+        for (blockNode child : children) {
+            if (child.getTag() == tag) {
                 return child;
             }
         }
-        
+
         return null;
     }
 

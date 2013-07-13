@@ -15,8 +15,8 @@ import org.gephi.preview.api.PreviewProperty;
  */
 public class TextItem extends AbstractItem implements LegendItem {
     //BODY
-    public static final String BODY = "New Body";
-    public static final String LEGEND_TYPE= "New Text Item";
+    public static final String BODY = "Body";
+    public static final String LEGEND_TYPE= "Text Item";
     
     public TextItem(Object source) {
         super(source, LEGEND_TYPE);

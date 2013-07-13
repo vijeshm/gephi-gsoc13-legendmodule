@@ -13,6 +13,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendModel;
+import org.gephi.legend.api.blockNode;
 import org.gephi.legend.plugin.builders.TableItemBuilder;
 import org.gephi.legend.plugin.items.TableItem;
 import org.gephi.legend.plugin.properties.TableProperty;
@@ -245,6 +246,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
+    protected void renderToGraphics(Graphics2D graphics2d, blockNode legenNode) {
+        // fill this with the functionality of the other renderToGraphics function
+    }
+    
+    @Override // to be deprecated
     protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
 
         graphics2D.setTransform(origin);

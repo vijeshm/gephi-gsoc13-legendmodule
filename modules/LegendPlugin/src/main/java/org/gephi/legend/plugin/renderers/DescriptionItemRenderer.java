@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
+import org.gephi.legend.api.blockNode;
 import org.gephi.legend.plugin.builders.DescriptionItemBuilder;
 import org.gephi.legend.plugin.items.DescriptionItem;
 import org.gephi.legend.plugin.items.DescriptionItemElement;
@@ -36,6 +37,11 @@ public class DescriptionItemRenderer extends AbstractLegendItemRenderer {
     @Override
     public boolean isAnAvailableRenderer(Item item) {
         return item instanceof DescriptionItem;
+    }
+    
+    @Override
+    protected void renderToGraphics(Graphics2D graphics2d, blockNode legenNode) {
+        // fill this with the functionality of the other renderToGraphics function
     }
 
     @Override

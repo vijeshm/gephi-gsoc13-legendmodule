@@ -25,7 +25,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author edubecks
+ * @author mvvijesh, edubecks
  */
 public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
 

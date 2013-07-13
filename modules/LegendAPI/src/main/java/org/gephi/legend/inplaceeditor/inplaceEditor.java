@@ -190,7 +190,7 @@ public class inplaceEditor implements Item {
                         break;
 
                     case TEXT:
-                        String newValue = (String) JOptionPane.showInputDialog(null, "Enter new text:", null);
+                        String newValue = (String) JOptionPane.showInputDialog(null, "Enter new text:", (String) prop.getValue());
                         if (newValue != null) {
                             prop.setValue(newValue);
                             previewProperties.putValue(prop.getName(), newValue);

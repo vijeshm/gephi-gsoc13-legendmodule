@@ -41,51 +41,51 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, MouseResponsiveRenderer {
 
-    private Integer currentItemIndex;
-    private float graphOriginX = Float.MAX_VALUE;
-    private float graphOriginY = Float.MAX_VALUE;
-    private float graphWidth = 0;
-    private float graphHeight = 0;
-    private final int MARGIN_BETWEEN_ELEMENTS = 5;
+    protected Integer currentItemIndex;
+    protected float graphOriginX = Float.MAX_VALUE;
+    protected float graphOriginY = Float.MAX_VALUE;
+    protected float graphWidth = 0;
+    protected float graphHeight = 0;
+    protected final int MARGIN_BETWEEN_ELEMENTS = 5;
     // VARIABLES
     // IS DISPLAYING
-    private Boolean isDisplayingLegend;
+    protected Boolean isDisplayingLegend;
     // BACKGROUND
-    private boolean backgroundIsDisplaying;
-    private Color backgroundColor;
-    private Boolean borderIsDisplaying;
-    private Color borderColor;
-    private int borderLineThick;
+    protected boolean backgroundIsDisplaying;
+    protected Color backgroundColor;
+    protected Boolean borderIsDisplaying;
+    protected Color borderColor;
+    protected int borderLineThick;
     // DIMENSIONS
     protected Integer currentWidth;
     protected Integer currentHeight;
     protected AffineTransform originTranslation;
-    private float currentRealOriginX;
-    private float currentRealOriginY;
+    protected float currentRealOriginX;
+    protected float currentRealOriginY;
     //description
-    private Boolean isDisplayingDescription;
-    private String description;
-    private Alignment descriptionAlignment;
-    private Font descriptionFont;
-    private Color descriptionFontColor;
+    protected Boolean isDisplayingDescription;
+    protected String description;
+    protected Alignment descriptionAlignment;
+    protected Font descriptionFont;
+    protected Color descriptionFontColor;
     //title
-    private Boolean isDisplayingTitle;
-    private String title;
-    private Font titleFont;
-    private Alignment titleAlignment;
-    private Color titleFontColor;
+    protected Boolean isDisplayingTitle;
+    protected String title;
+    protected Font titleFont;
+    protected Alignment titleAlignment;
+    protected Color titleFontColor;
     // TRANSFORMATION
-    private Boolean currentIsSelected = Boolean.FALSE;
-    private Boolean currentIsBeingTransformed;
-    private final Color TRANSFORMATION_LEGEND_BORDER_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-    private final Color TRANSFORMATION_LEGEND_CENTER_COLOR = new Color(1f, 1f, 1f, 0.5f);
-    private int TRANSFORMATION_LEGEND_FONT_SIZE = 20;
-    private int TRANSFORMATION_LEGEND_FONT_SIZE_MIN = 20;
-    private Font TRANSFORMATION_LEGEND_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 2 * TRANSFORMATION_LEGEND_FONT_SIZE);
-    private final String TRANSFORMATION_LEGEND_LABEL = "transforming legend..";
-    private final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
-    private final int TRANSFORMATION_ANCHOR_SIZE = 20;
-    private final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
+    protected Boolean currentIsSelected = Boolean.FALSE;
+    protected Boolean currentIsBeingTransformed;
+    protected final Color TRANSFORMATION_LEGEND_BORDER_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+    protected final Color TRANSFORMATION_LEGEND_CENTER_COLOR = new Color(1f, 1f, 1f, 0.5f);
+    protected int TRANSFORMATION_LEGEND_FONT_SIZE = 20;
+    protected int TRANSFORMATION_LEGEND_FONT_SIZE_MIN = 20;
+    protected Font TRANSFORMATION_LEGEND_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 2 * TRANSFORMATION_LEGEND_FONT_SIZE);
+    protected final String TRANSFORMATION_LEGEND_LABEL = "transforming legend..";
+    protected final Color TRANSFORMATION_ANCHOR_COLOR = Color.LIGHT_GRAY;
+    protected final int TRANSFORMATION_ANCHOR_SIZE = 20;
+    protected final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
 
     /**
      * the Function that actually renders the legend using the Graphics2D Object
@@ -98,8 +98,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      */
     protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
-    protected void renderToGraphics(Graphics2D graphics2D, blockNode legendNode) {
-    }
+    protected abstract void renderToGraphics(Graphics2D graphics2D, blockNode legendNode);
 
     /**
      * Function that reads the custom properties values from the
@@ -309,7 +308,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // the following code ensures that there is only one title node at any point in time.
             if (titleNode == null) {
                 titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, blockNode.TITLE);
-                buildInplaceTitle(graphics2D, titleNode, item);
+                buildInplaceTitle(titleNode, item);
             }
 
             titleNode.updateGeometry(currentRealOriginX, currentRealOriginY, titleBoundaryWidth, titleBoundaryHeight);
@@ -336,7 +335,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // the following code ensures that there is only one description node at any point in time.
             if (descNode == null) {
                 descNode = root.addChild(0, height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight, blockNode.DESC);
-                buildInplaceDesc(graphics2D, descNode, item);
+                buildInplaceDesc(descNode, item);
             }
 
             descNode.updateGeometry(currentRealOriginX, currentRealOriginY + height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight);
@@ -346,10 +345,15 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
 
         // rendering legend
-        blockNode legendNode = new blockNode(root, currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight, item, blockNode.LEGEND);
+        blockNode legendNode = root.getChild(blockNode.LEGEND);
+        if (legendNode == null) {
+            legendNode = root.addChild(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight, blockNode.LEGEND);
+            legendNode.setInplaceEditor(root.getInplaceEditor()); // for all emptpy areas in the legend block, a click should correspond to the root's inplace editor
+        }
+        
+        legendNode.updateGeometry(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight);
         drawBlockBoundary(graphics2D, legendNode);
         renderToGraphics(graphics2D, legendNode);
-        // renderToGraphics(graphics2D, legendOrigin, legendWidth, legendHeight);
 
         // draw the anchors if the item is selected
         if (currentIsSelected) {
@@ -499,7 +503,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, boundaryWidth, boundaryHeight, titleAlignment, false);
     }
 
-    private void buildInplaceTitle(Graphics2D graphics2D, blockNode titleNode, Item item) {
+    private void buildInplaceTitle(blockNode titleNode, Item item) {
         if (titleNode.getInplaceEditor() == null) {
             Graph graph = null;
             inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
@@ -575,7 +579,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, x, y, width, height, descriptionAlignment);
     }
 
-    private void buildInplaceDesc(Graphics2D graphics2D, blockNode descNode, Item item) {
+    private void buildInplaceDesc(blockNode descNode, Item item) {
         // the flow of this method is the same as the buildInplaceTitle method. 
         // The flow is repeated keeping in mind that there might be some special treatment give to description in the future.
         if (descNode.getInplaceEditor() == null) {
@@ -653,7 +657,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         return graphics2d.getFontMetrics().stringWidth(str);
     }
 
-    private void drawBlockBoundary(Graphics2D graphics2D, blockNode node) {
+    protected void drawBlockBoundary(Graphics2D graphics2D, blockNode node) {
         graphics2D.setColor(Color.RED);
         graphics2D.setFont(new Font("Arial", Font.PLAIN, 20));
         int originX = (int) (node.getOriginX() - currentRealOriginX);
@@ -804,9 +808,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      * @return
      */
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment) {
-//        System.out.println("@Var: drawElementLabel: " + text);
+        // (x, y, width, height) represents the box in which the given text must be rendered. The text is drawn in the vertical center by default. The horizontal alignment depends on the parameters.
         float spaceUsed = legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, true);
-//        System.out.println("@Var: spaceUsed: " + spaceUsed);
         y = y + (height - spaceUsed) / 2;
         return legendDrawText(graphics2D, text, font, color, x, y, width, height, alignment, false);
     }

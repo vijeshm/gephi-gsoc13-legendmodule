@@ -20,6 +20,7 @@ import org.apache.commons.codec.binary.*;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
+import org.gephi.legend.api.blockNode;
 import org.gephi.legend.plugin.builders.ImageItemBuilder;
 import org.gephi.legend.plugin.items.ImageItem;
 import org.gephi.legend.plugin.properties.ImageProperty;
@@ -42,6 +43,11 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
     @Override
     public boolean isAnAvailableRenderer(Item item) {
         return item instanceof ImageItem;
+    }
+    
+    @Override
+    protected void renderToGraphics(Graphics2D graphics2d, blockNode legenNode) {
+        // fill this with the functionality of the other renderToGraphics function
     }
 
     @Override
