@@ -30,6 +30,7 @@ import org.gephi.legend.inplaceeditor.inplaceEditor;
 import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
 import org.gephi.legend.inplaceeditor.row;
 import org.gephi.legend.spi.LegendItem;
+import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
@@ -142,9 +143,11 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
                 fontSize -= stepSize;
                 font = font.deriveFont((float) fontSize);
                 graphics2D.setFont(font);
+                graphics2D.setColor(NO_IMAGE_FONT_COLOR);
 
                 float messageHeight = graphics2D.getFontMetrics().getHeight();
-                legendDrawText(graphics2D, noImageMessage, font, NO_IMAGE_FONT_COLOR, 0, canvasHeight / 2 - messageHeight / 2, canvasWidth, (int) messageHeight, LegendItem.Alignment.CENTER);
+                float messageWidth = graphics2D.getFontMetrics().stringWidth(noImageMessage);
+                graphics2D.drawString(noImageMessage, canvasOriginX + canvasWidth / 2 - messageWidth / 2, canvasOriginY + canvasHeight / 2 - messageHeight / 2);
             }
         } catch (Exception e) {
             Logger.getLogger(ImageItemRenderer.class.getName()).log(Level.WARNING, e.getMessage());
@@ -168,7 +171,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         Object[] data = new Object[1];
         data[0] = "Source:";
         col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-        
+
         col = r.addColumn();
         data = new Object[0];
         col.addElement(element.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data);
@@ -178,22 +181,22 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         data = new Object[1];
         data[0] = "Margin:";
         col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-        
+
         col = r.addColumn();
         data = new Object[0];
         col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data);
-        
+
         r = ipeditor.addRow();
         col = r.addColumn();
         data = new Object[1];
         data[0] = "Scale:";
         col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-        
+
         col = r.addColumn();
         data = new Object[1];
         data[0] = useImageAspectRatio;
         col.addElement(element.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data);
-        
+
         imageNode.setInplaceEditor(ipeditor);
     }
 
