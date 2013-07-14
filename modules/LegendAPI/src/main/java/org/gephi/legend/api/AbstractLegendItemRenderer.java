@@ -350,7 +350,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             legendNode = root.addChild(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight, blockNode.LEGEND);
             legendNode.setInplaceEditor(root.getInplaceEditor()); // for all emptpy areas in the legend block, a click should correspond to the root's inplace editor
         }
-        
+
         legendNode.updateGeometry(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight);
         drawBlockBoundary(graphics2D, legendNode);
         renderToGraphics(graphics2D, legendNode);
@@ -522,13 +522,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[0] = "Title: ";
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
+            // we could have another property for title background.
+
+            r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
             col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data);
 
-            // we could have another property for title background.
-
-            r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
             col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
@@ -600,13 +600,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[0] = "Description: ";
             col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
+            // we could have another property for title background.
+
+            r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
             col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data);
 
-            // we could have another property for title background.
-
-            r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
             col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data);
@@ -754,16 +754,19 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
                     case LEFT: {
                         break;
                     }
+                        
                     case RIGHT: {
                         Rectangle2D bounds = layout.getBounds();
                         xText = (float) ((x + width - bounds.getWidth()) - bounds.getX());
                         break;
                     }
+                        
                     case CENTER: {
                         Rectangle2D bounds = layout.getBounds();
                         xText = (float) ((x + width / 2 - bounds.getWidth() / 2) - bounds.getX());
                         break;
                     }
+                        
                     case JUSTIFIED: {
                         if (measurer.getPosition() < end) {
                             layout = layout.getJustifiedLayout(width);
@@ -771,21 +774,15 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
                         break;
                     }
                 }
-//                System.out.println("@Var: y: "+y);
-//                System.out.println("@Var: yText: " + (yText - y - layout.getAscent()));
-//                System.out.println("@Var: height: " + height);
-                if (yText - y - layout.getAscent() > height) {
+                if (yText - y + layout.getDescent() + layout.getLeading() >= height) {
                     break;
                 }
-//                    break;
                 layout.draw(graphics2D, xText, yText);
             }
             descent = layout.getDescent();
             leading = layout.getLeading();
             yText += descent + leading;
         }
-
-        // alignment, font, font color, isdisplaying
 
         return (float) Math.ceil(yText - y - leading);
     }

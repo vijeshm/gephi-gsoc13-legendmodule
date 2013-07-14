@@ -40,8 +40,8 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 104),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 104)
+    @ServiceProvider(service = ItemBuilder.class, position = 103),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 103)
 })
 public class TableItemBuilder extends AbstractLegendItemBuilder {
 

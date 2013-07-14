@@ -25,7 +25,7 @@ import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
-@ServiceProvider(service = Renderer.class, position = 501)
+@ServiceProvider(service = Renderer.class, position = 503)
 public class TableItemRenderer extends AbstractLegendItemRenderer {
 
     @Override

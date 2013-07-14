@@ -31,7 +31,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 503)
+@ServiceProvider(service = Renderer.class, position = 501)
 public class DescriptionItemRenderer extends AbstractLegendItemRenderer {
     
     @Override

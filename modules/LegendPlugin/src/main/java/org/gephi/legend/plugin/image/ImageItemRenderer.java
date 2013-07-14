@@ -45,7 +45,7 @@ import org.w3c.dom.Element;
  *
  * @author mvvijesh, edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 502)
+@ServiceProvider(service = Renderer.class, position = 504)
 public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
     public static final String IMAGENODE = "image node";
@@ -166,13 +166,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         r = ipeditor.addRow();
         col = r.addColumn();
         Object[] data = new Object[1];
-        data[0] = "Image:";
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-
-        r = ipeditor.addRow();
-        col = r.addColumn();
-        data = new Object[1];
-        data[0] = "URL:";
+        data[0] = "Source:";
         col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
         
         col = r.addColumn();
@@ -182,7 +176,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         r = ipeditor.addRow();
         col = r.addColumn();
         data = new Object[1];
-        data[0] = "Margin";
+        data[0] = "Margin:";
         col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
         
         col = r.addColumn();

@@ -36,8 +36,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 101),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 101)
+    @ServiceProvider(service = ItemBuilder.class, position = 102),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 102)
 })
 public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 

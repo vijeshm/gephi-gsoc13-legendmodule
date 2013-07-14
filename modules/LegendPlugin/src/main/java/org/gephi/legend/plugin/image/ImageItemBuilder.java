@@ -31,14 +31,14 @@ import org.openide.util.lookup.ServiceProviders;
  * @author mvvijesh, edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 107),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 107)
+    @ServiceProvider(service = ItemBuilder.class, position = 104),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 104)
 })
 public class ImageItemBuilder extends AbstractLegendItemBuilder {
 
     private File defaultImageFile = new File("/");
     private Boolean defaultLockAspectRatio = Boolean.TRUE;
-    private int defaultMargin = 5;
+    private int defaultMargin = 10;
     private final Object[] defaultValues = {
         defaultImageFile,
         defaultLockAspectRatio,

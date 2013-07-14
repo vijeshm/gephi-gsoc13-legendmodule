@@ -33,7 +33,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author mvvijesh
  */
-@ServiceProvider(service = Renderer.class, position = 506)
+@ServiceProvider(service = Renderer.class, position = 505)
 public class TextItemRenderer extends AbstractLegendItemRenderer {
     // unique identifiers for some of the blocks (nodes). A similar definition is given in blockNode.java for root, title, description and legend.
 
@@ -110,15 +110,9 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        Object[] data = new Object[1];
-        data[0] = "Text: ";
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
-
-        col = r.addColumn();
-        data = new Object[0];
+        Object[] data = new Object[0];
         col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data);
-
-        r = ipeditor.addRow();
+        
         col = r.addColumn();
         data = new Object[0];
         col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data);
