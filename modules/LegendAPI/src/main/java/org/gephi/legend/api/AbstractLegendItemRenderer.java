@@ -62,13 +62,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     protected AffineTransform originTranslation;
     protected float currentRealOriginX;
     protected float currentRealOriginY;
-    //description
+    // DESCRIPTION
     protected Boolean isDisplayingDescription;
     protected String description;
     protected Alignment descriptionAlignment;
     protected Font descriptionFont;
     protected Color descriptionFontColor;
-    //title
+    // TITLE
     protected Boolean isDisplayingTitle;
     protected String title;
     protected Font titleFont;

@@ -4,8 +4,8 @@
  */
 package org.gephi.legend.plugin.text;
 
+import org.gephi.legend.api.AbstractItem;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.plugin.items.AbstractItem;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.preview.api.PreviewProperty;
 

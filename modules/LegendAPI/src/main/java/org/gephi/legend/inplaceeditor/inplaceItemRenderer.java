@@ -8,11 +8,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,8 +18,6 @@ import javax.imageio.ImageIO;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.blockNode;
-import org.gephi.legend.spi.LegendItem;
-import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewModel;
@@ -31,7 +26,6 @@ import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -255,10 +249,6 @@ public class inplaceItemRenderer implements Renderer {
 
                             case IMAGE:
                                 try {
-                                    // data[0] : says whether the element is selected
-                                    // data[1] : default url for unselected
-                                    // data[2] : url for selected image
-
                                     // load the default image (unselected)
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
                                     // if atleast one element is selected, the first one is taken into consideration
@@ -318,10 +308,39 @@ public class inplaceItemRenderer implements Renderer {
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
+                                
                             case TEXT:
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/edit.png"));
 
+                                    graphics2d.setColor(BACKGROUND);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                            UNIT_SIZE + 1,
+                                            UNIT_SIZE + 1);
+                                    graphics2d.drawImage(img,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            0,
+                                            0,
+                                            img.getWidth(),
+                                            img.getHeight(), null);
+
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                            UNIT_SIZE,
+                                            UNIT_SIZE);
+
+                                    currentElementsCount += 1;
+                                } catch (IOException e) {
+                                }
+                                break;
+                                
+                            case FILE:
+                                try {
+                                    BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/file.png"));
                                     graphics2d.setColor(BACKGROUND);
                                     graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
                                             (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,

@@ -12,10 +12,12 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.gephi.legend.api.LegendController;
@@ -198,6 +200,10 @@ public class inplaceEditor implements Item {
                         break;
 
                     case CHECKBOX:
+                        Boolean currentState = (Boolean) prop.getValue();
+                        elementData[0] = !currentState;
+                        prop.setValue(!currentState);
+                        previewProperties.putValue(prop.getName(), !currentState);
                         break;
 
                     case IMAGE:
@@ -226,6 +232,14 @@ public class inplaceEditor implements Item {
                             }
                         }
                         break;
+
+                    case FILE:
+                        JFileChooser fc = new JFileChooser();
+                        int returnVal = fc.showOpenDialog(null);
+                        if (returnVal == JFileChooser.APPROVE_OPTION) {
+                            File file = fc.getSelectedFile();
+                            previewProperties.putValue(prop.getName(), file);
+                        }
                 }
             }
         }

@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.legend.plugin.renderers.GroupsItemRenderer;
-import org.gephi.legend.plugin.renderers.ImageItemRenderer;
 import org.gephi.preview.spi.Renderer;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -62,6 +61,7 @@ public class GroupsPieChartRenderer extends GroupsItemRenderer {
         int x = (int) origin.getTranslateX();
         int y = (int) origin.getTranslateY();
 
+        /* - this has been disabled when the image renderer was modified. fix this later on.
         graphics2D.setTransform(origin);
         if (graphics2D instanceof SVGGraphics2D) {
             ImageItemRenderer.renderImageToSVGGraphics(
@@ -73,6 +73,7 @@ public class GroupsPieChartRenderer extends GroupsItemRenderer {
         else {
             graphics2D.drawImage(jfreechartImage, 0, 0, null);
         }
+        */
 
     }
     

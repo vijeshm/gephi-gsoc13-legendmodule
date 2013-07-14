@@ -22,6 +22,7 @@ public class element {
      public static final Integer IMAGE = 4;
      public static final Integer COLOR = 5;
      public static final Integer NUMBER = 6;
+     public static final Integer FILE = 7;
      */
     public static enum ELEMENT_TYPE {
 
@@ -31,7 +32,8 @@ public class element {
         CHECKBOX,
         IMAGE,
         COLOR,
-        NUMBER
+        NUMBER,
+        FILE
     };
     
     /*
@@ -43,6 +45,7 @@ public class element {
         "IMAGE",            // 4
         "COLOR",            // 5
         "NUMBER",           // 6
+        "FILE"              // 7
     };
     */
     
@@ -64,14 +67,12 @@ public class element {
         switch (type) {
             case LABEL:
             case TEXT:
-                this.data = data;
-                break;
-
             case IMAGE:
+            case CHECKBOX:
                 this.data = data;
                 break;
                 
-            // no extra data is required for checkbox, number, alignments, font and color
+            // no extra data is required for number, alignments, font, color and file
         }
     }
 
