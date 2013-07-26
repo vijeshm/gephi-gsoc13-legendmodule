@@ -168,6 +168,10 @@ public class blockNode {
 
         return null;
     }
+    
+    public void removeAllChildren() {
+        children = new ArrayList<blockNode>();
+    }
 
     public Boolean isClickInBlock(int x, int y) {
         return (x >= originX && x <= originX + blockWidth) && (y >= originY && y <= originY + blockHeight);

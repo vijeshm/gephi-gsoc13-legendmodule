@@ -289,7 +289,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
 
         root.updateGeometry(currentRealOriginX, currentRealOriginY, width, height);
-        drawBlockBoundary(graphics2D, root);
+        // drawBlockBoundary(graphics2D, root);
 
         // A title is a new block. (The first child of a root in fact, initiallly.)
         // Create a new block with root as the parent.
@@ -312,7 +312,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             }
 
             titleNode.updateGeometry(currentRealOriginX, currentRealOriginY, titleBoundaryWidth, titleBoundaryHeight);
-            drawBlockBoundary(graphics2D, titleNode);
+            // drawBlockBoundary(graphics2D, titleNode);
         } else {
             root.removeChild(blockNode.TITLE);
         }
@@ -339,7 +339,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             }
 
             descNode.updateGeometry(currentRealOriginX, currentRealOriginY + height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight);
-            drawBlockBoundary(graphics2D, descNode);
+            // drawBlockBoundary(graphics2D, descNode);
         } else {
             root.removeChild(blockNode.DESC);
         }
@@ -352,7 +352,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
 
         legendNode.updateGeometry(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight);
-        drawBlockBoundary(graphics2D, legendNode);
+        // drawBlockBoundary(graphics2D, legendNode);
         renderToGraphics(graphics2D, legendNode);
 
         // draw the anchors if the item is selected
