@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.gephi.legend.inplaceeditor.inplaceEditor;
 import org.gephi.preview.api.Item;
 
@@ -30,6 +32,7 @@ public class blockNode {
     private inplaceEditor IPEditor;
     private Item legendItem;
     private String id;
+    private Map<String, Object> data; //for optional extra information
 
     public blockNode(blockNode parentNode, float x, float y, float width, float height, Item parentItem, String tag) {
         parent = parentNode;
@@ -41,6 +44,15 @@ public class blockNode {
         id = tag;
         children = new ArrayList<blockNode>();
         IPEditor = null;
+        data = new HashMap<String, Object>();
+    }
+    
+    public <D> D getData(String key) {
+        return (D) data.get(key);
+    }
+
+    public void setData(String key, Object value) {
+        data.put(key, value);
     }
 
     public Boolean isRoot() {
