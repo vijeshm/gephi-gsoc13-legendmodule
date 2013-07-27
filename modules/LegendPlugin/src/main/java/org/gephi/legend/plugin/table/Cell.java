@@ -24,13 +24,13 @@ import org.gephi.preview.api.PreviewProperty;
  */
 public class Cell {
 
-    private static final int BACKGROUND_COLOR = 0;
-    private static final int BORDER_COLOR = 1;
-    private static final int CELL_FONT = 2;
-    private static final int CELL_ALIGNMENT = 3;
-    private static final int CELL_FONT_COLOR = 4;
-    private static final int CELL_CONTENT = 5;
-    private static String[] OWN_PROPERTIES = {
+    public static final int BACKGROUND_COLOR = 0;
+    public static final int BORDER_COLOR = 1;
+    public static final int CELL_FONT = 2;
+    public static final int CELL_ALIGNMENT = 3;
+    public static final int CELL_FONT_COLOR = 4;
+    public static final int CELL_CONTENT = 5;
+    public static String[] OWN_PROPERTIES = {
         ".cell.background.color",
         ".cell.border.color",
         ".cell.font.face",
@@ -39,54 +39,6 @@ public class Cell {
         ".cell.content"
     };
 
-    /**
-     * @return the BACKGROUND_COLOR
-     */
-    public static int getBACKGROUND_COLOR() {
-        return BACKGROUND_COLOR;
-    }
-
-    /**
-     * @return the BORDER_COLOR
-     */
-    public static int getBORDER_COLOR() {
-        return BORDER_COLOR;
-    }
-
-    /**
-     * @return the CELL_FONT
-     */
-    public static int getCELL_FONT() {
-        return CELL_FONT;
-    }
-
-    /**
-     * @return the CELL_ALIGNMENT
-     */
-    public static int getCELL_ALIGNMENT() {
-        return CELL_ALIGNMENT;
-    }
-
-    /**
-     * @return the CELL_FONT_COLOR
-     */
-    public static int getCELL_FONT_COLOR() {
-        return CELL_FONT_COLOR;
-    }
-
-    /**
-     * @return the CELL_CONTENT
-     */
-    public static int getCELL_CONTENT() {
-        return CELL_CONTENT;
-    }
-
-    /**
-     * @return the OWN_PROPERTIES
-     */
-    public static String[] getOWN_PROPERTIES() {
-        return OWN_PROPERTIES;
-    }
     // define the default properties of the cell
     private Item item = null;
     private Integer row = null;
@@ -148,15 +100,15 @@ public class Cell {
         }
 
         PreviewProperty previewProperty = null;
-        String propertyString = LegendModel.getProperty(getOWN_PROPERTIES(), (Integer) getItem().getData(LegendItem.ITEM_INDEX), property);
+        String propertyString = LegendModel.getProperty(OWN_PROPERTIES, (Integer) getItem().getData(LegendItem.ITEM_INDEX), property);
         switch (property) {
             case BACKGROUND_COLOR:
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
                         Color.class,
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getBACKGROUND_COLOR()],
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getBACKGROUND_COLOR()],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[BACKGROUND_COLOR],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[BACKGROUND_COLOR],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
@@ -165,8 +117,8 @@ public class Cell {
                         this,
                         propertyString,
                         Color.class,
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getBORDER_COLOR()],
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getBORDER_COLOR()],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[BORDER_COLOR],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[BORDER_COLOR],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
@@ -175,8 +127,8 @@ public class Cell {
                         this,
                         propertyString,
                         Font.class,
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_FONT()],
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_FONT()],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_FONT],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_FONT],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
@@ -185,8 +137,8 @@ public class Cell {
                         this,
                         propertyString,
                         Alignment.class,
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_ALIGNMENT()],
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_ALIGNMENT()],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_ALIGNMENT],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_ALIGNMENT],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
@@ -195,8 +147,8 @@ public class Cell {
                         this,
                         propertyString,
                         Color.class,
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_FONT_COLOR()],
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_FONT_COLOR()],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_FONT_COLOR],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_FONT_COLOR],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
@@ -205,8 +157,8 @@ public class Cell {
                         this,
                         propertyString,
                         String.class,
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_CONTENT()],
-                        "TableItem.cell." + row + "." + column + getOWN_PROPERTIES()[getCELL_CONTENT()],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_CONTENT],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_CONTENT],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
         }

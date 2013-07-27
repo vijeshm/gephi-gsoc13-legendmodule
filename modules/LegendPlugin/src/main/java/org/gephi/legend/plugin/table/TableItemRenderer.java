@@ -54,6 +54,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
     private float colWidthTolerance = 0.1f;
+    private int numberOfTableProperties = TableProperty.OWN_PROPERTIES.length;
+    private int numberOfCellProperties = Cell.OWN_PROPERTIES.length;
 
     @Override
     public boolean isAnAvailableRenderer(Item item) {
@@ -203,18 +205,74 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                 inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
                 ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+                int baseIndexOfCellProperties = numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties;
 
                 // modify inplace editors
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 Object[] data = new Object[1];
-                data[0] = "Table:";
+                data[0] = "Cell:";
                 col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
+                col = r.addColumn();
+                data = new Object[0]; // for a color property, extra data isnt needed.
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.BACKGROUND_COLOR], data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.BORDER_COLOR], data);
+
+                r = ipeditor.addRow();
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_CONTENT], data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_FONT_COLOR], data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_FONT], data);
+
+                r = ipeditor.addRow();
+                col = r.addColumn();
+                // left-alignment
+                data = new Object[4];
+                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
+                data[1] = "/org/gephi/legend/graphics/left_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/left_selected.png";
+                data[3] = Alignment.LEFT;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+
+                // center alignment
+                data = new Object[4];
+                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
+                data[1] = "/org/gephi/legend/graphics/center_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/center_selected.png";
+                data[3] = Alignment.CENTER;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+
+                // right alignment
+                data = new Object[4];
+                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
+                data[1] = "/org/gephi/legend/graphics/right_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/right_selected.png";
+                data[3] = Alignment.RIGHT;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+
+                // justified
+                data = new Object[4];
+                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
+                data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/justified_selected.png";
+                data[3] = Alignment.JUSTIFIED;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+
                 cellNode.setInplaceEditor(ipeditor);
-                
+
                 // reset the legend model's inplace editor
-                if(activeCellRow != null && rowNumber == activeCellRow && activeCellColumn != null && colNumber == activeCellColumn) {
+                if (activeCellRow != null && rowNumber == activeCellRow && activeCellColumn != null && colNumber == activeCellColumn) {
                     legendModel.setInplaceEditor(ipeditor);
                 }
             }
@@ -226,7 +284,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Color saveColor = graphics2D.getColor();
 
         ArrayList<blockNode> cellNodes = tableNode.getChildren();
-        ArrayList<ArrayList<Cell>> table = item.getTable();
+        PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        // ArrayList<ArrayList<Cell>> table = item.getTable();
         blockNode cellNode;
         Cell cell;
         Color cellBackgroundColor;
@@ -258,12 +317,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellHeight = (int) cellNode.getBlockHeight();
 
                 // cell properties
-                cellBackgroundColor = cell.getBackgroundColor();
-                cellBorderColor = cell.getBorderColor();
-                cellFont = cell.getCellFont();
-                cellAlignment = cell.getCellAlignment();
-                cellFontColor = cell.getCellFontColor();
-                cellContent = cell.getCellContent();
+                cellBackgroundColor = (Color) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.BACKGROUND_COLOR].getValue(); // cell.getBackgroundColor();
+                cellBorderColor = (Color) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.BORDER_COLOR].getValue(); // cell.getBorderColor();
+                cellFont = (Font) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_FONT].getValue(); // cell.getCellFont();
+                cellAlignment = (Alignment) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_ALIGNMENT].getValue(); // cell.getCellAlignment();
+                cellFontColor = (Color) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_FONT_COLOR].getValue();// cell.getCellFontColor();
+                cellContent = (String) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_CONTENT].getValue(); // cell.getCellContent();
 
                 /*
                  // CELLPADDING
