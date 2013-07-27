@@ -12,6 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
+import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.blockNode;
 import org.gephi.legend.inplaceeditor.column;
@@ -34,7 +35,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author mvvijesh, edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 507)
+@ServiceProvider(service = Renderer.class, position = 501)
 public class TableItemRenderer extends AbstractLegendItemRenderer {
 
     public static String TABLENODE = "table node";
@@ -101,7 +102,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 }
             }
 
-            tempMaxColWidth = (int) ((1 + colWidthTolerance) * tempMaxColWidth); 
+            tempMaxColWidth = (int) ((1 + colWidthTolerance) * tempMaxColWidth);
             // the column width should be exactly the same as the width of the longest string in the column, since it causes rendering problems.
             if (tempMaxColWidth > maxColWidth) {
                 colWidths[col] = maxColWidth;
@@ -137,76 +138,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         // since cells are built every single time, there is no need to update the geometry
         buildCellNodes(tableNode, item, rowHeight, colWidths);
 
-        // draw the cells here
-        Font saveFont = graphics2D.getFont();
-        Color saveColor = graphics2D.getColor();
-
-        ArrayList<blockNode> cellNodes = tableNode.getChildren();
-        ArrayList<ArrayList<Cell>> table = ((TableItem) item).getTable();
-        blockNode cellNode;
-        Cell cell;
-        Color cellBackgroundColor;
-        Color cellBorderColor;
-        Font cellFont;
-        Alignment cellAlignment;;
-        Color cellFontColor;
-        String cellContent;
-        int cellOriginX;
-        int cellOriginY;
-        int cellWidth;
-        int cellHeight;
-
-        /*
-        // CELLSPACING
-        graphics2D.setColor(Color.RED);
-        graphics2D.fillRect((int) (tableOriginX - currentRealOriginX), (int) (tableOriginY - currentRealOriginY), tableWidth, tableHeight);
-        */
-
-        for (int rowNumber = 0; rowNumber < tableNumberOfRows; rowNumber++) {
-            for (int colNumber = 0; colNumber < tableNumberOfColumns; colNumber++) {
-                cellNode = cellNodes.get(rowNumber * tableNumberOfColumns + colNumber); // the geometric information related to block node can be found here
-                cell = table.get(rowNumber).get(colNumber); // the properties of the cell can be found here
-
-                // cell geometry
-                cellOriginX = (int) (cellNode.getOriginX() - currentRealOriginX);
-                cellOriginY = (int) (cellNode.getOriginY() - currentRealOriginY);
-                cellWidth = (int) cellNode.getBlockWidth();
-                cellHeight = (int) cellNode.getBlockHeight();
-
-                // cell properties
-                cellBackgroundColor = cell.getBackgroundColor();
-                cellBorderColor = cell.getBorderColor();
-                cellFont = cell.getCellFont();
-                cellAlignment = cell.getCellAlignment();
-                cellFontColor = cell.getCellFontColor();
-                cellContent = cell.getCellContent();
-
-                /*
-                // CELLPADDING
-                graphics2D.setColor(Color.GREEN);
-                graphics2D.fillRect(cellOriginX - tableCellPadding, cellOriginY - tableCellPadding, cellWidth + 2 * tableCellPadding, cellHeight + 2 * tableCellPadding);
-                */
-                
-                // BACKGROUND - render the background first, then go with the border
-                graphics2D.setColor(cellBackgroundColor);
-                graphics2D.fillRect(cellOriginX, cellOriginY, cellWidth, cellHeight);
-
-                // BORDER - is internal and falls with the boundaries of the cell.
-                graphics2D.setColor(cellBorderColor);
-                graphics2D.fillRect(cellOriginX, cellOriginY, cellWidth, tableCellBorderSize);  // top
-                graphics2D.fillRect(cellOriginX, cellOriginY + cellHeight - tableCellBorderSize, cellWidth, tableCellBorderSize);   // bottom
-                graphics2D.fillRect(cellOriginX, cellOriginY + tableCellBorderSize, tableCellBorderSize, cellHeight - 2 * tableCellBorderSize);
-                graphics2D.fillRect(cellOriginX + cellWidth - tableCellBorderSize, cellOriginY + tableCellBorderSize, tableCellBorderSize, cellHeight - 2 * tableCellBorderSize); // left
-
-                // TEXT
-                legendDrawText(graphics2D, cellContent, cellFont, cellFontColor, cellOriginX, cellOriginY, cellWidth, cellHeight, cellAlignment);
-                
-                drawBlockBoundary(graphics2D, cellNode);
-            }
-        }
-
-        graphics2D.setColor(saveColor);
-        graphics2D.setFont(saveFont);
+        // render the cells
+        renderCells(graphics2D, tableNode, (TableItem) item);
     }
 
     private void buildCellNodes(blockNode tableNode, Item item, int rowHeight, int[] colWidths) {
@@ -259,6 +192,89 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellNode.setInplaceEditor(ipeditor);
             }
         }
+        /*
+        // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        inplaceEditor currentInplaceEditor = legendModel.getInplaceEditor();
+        if (currentInplaceEditor != null) {
+            // redirect the inplace editor reference only if there was a reference to the old editor.
+            blockNode currentBlockNode = currentInplaceEditor.getData(inplaceEditor.BLOCKNODE);
+            legendModel.setInplaceEditor(currentBlockNode.getInplaceEditor());
+        }
+        */
+    }
+
+    private void renderCells(Graphics2D graphics2D, blockNode tableNode, TableItem item) {
+        Font saveFont = graphics2D.getFont();
+        Color saveColor = graphics2D.getColor();
+
+        ArrayList<blockNode> cellNodes = tableNode.getChildren();
+        ArrayList<ArrayList<Cell>> table = item.getTable();
+        blockNode cellNode;
+        Cell cell;
+        Color cellBackgroundColor;
+        Color cellBorderColor;
+        Font cellFont;
+        Alignment cellAlignment;;
+        Color cellFontColor;
+        String cellContent;
+        int cellOriginX;
+        int cellOriginY;
+        int cellWidth;
+        int cellHeight;
+
+        /*
+         // CELLSPACING
+         graphics2D.setColor(Color.RED);
+         graphics2D.fillRect((int) (tableOriginX - currentRealOriginX), (int) (tableOriginY - currentRealOriginY), tableWidth, tableHeight);
+         */
+
+        for (int rowNumber = 0; rowNumber < tableNumberOfRows; rowNumber++) {
+            for (int colNumber = 0; colNumber < tableNumberOfColumns; colNumber++) {
+                cellNode = cellNodes.get(rowNumber * tableNumberOfColumns + colNumber); // the geometric information related to block node can be found here
+                cell = table.get(rowNumber).get(colNumber); // the properties of the cell can be found here
+
+                // cell geometry
+                cellOriginX = (int) (cellNode.getOriginX() - currentRealOriginX);
+                cellOriginY = (int) (cellNode.getOriginY() - currentRealOriginY);
+                cellWidth = (int) cellNode.getBlockWidth();
+                cellHeight = (int) cellNode.getBlockHeight();
+
+                // cell properties
+                cellBackgroundColor = cell.getBackgroundColor();
+                cellBorderColor = cell.getBorderColor();
+                cellFont = cell.getCellFont();
+                cellAlignment = cell.getCellAlignment();
+                cellFontColor = cell.getCellFontColor();
+                cellContent = cell.getCellContent();
+
+                /*
+                 // CELLPADDING
+                 graphics2D.setColor(Color.GREEN);
+                 graphics2D.fillRect(cellOriginX - tableCellPadding, cellOriginY - tableCellPadding, cellWidth + 2 * tableCellPadding, cellHeight + 2 * tableCellPadding);
+                 */
+
+                // BACKGROUND - render the background first, then go with the border
+                graphics2D.setColor(cellBackgroundColor);
+                graphics2D.fillRect(cellOriginX, cellOriginY, cellWidth, cellHeight);
+
+                // BORDER - is internal and falls with the boundaries of the cell.
+                graphics2D.setColor(cellBorderColor);
+                graphics2D.fillRect(cellOriginX, cellOriginY, cellWidth, tableCellBorderSize);  // top
+                graphics2D.fillRect(cellOriginX, cellOriginY + cellHeight - tableCellBorderSize, cellWidth, tableCellBorderSize);   // bottom
+                graphics2D.fillRect(cellOriginX, cellOriginY + tableCellBorderSize, tableCellBorderSize, cellHeight - 2 * tableCellBorderSize);
+                graphics2D.fillRect(cellOriginX + cellWidth - tableCellBorderSize, cellOriginY + tableCellBorderSize, tableCellBorderSize, cellHeight - 2 * tableCellBorderSize); // left
+
+                // TEXT
+                legendDrawText(graphics2D, cellContent, cellFont, cellFontColor, cellOriginX, cellOriginY, cellWidth, cellHeight, cellAlignment);
+
+                drawBlockBoundary(graphics2D, cellNode);
+            }
+        }
+
+        graphics2D.setColor(saveColor);
+        graphics2D.setFont(saveFont);
     }
 
     @Override // to be deprecated
