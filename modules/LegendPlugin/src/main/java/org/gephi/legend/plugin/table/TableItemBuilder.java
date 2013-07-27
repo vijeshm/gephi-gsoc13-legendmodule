@@ -227,7 +227,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
 
     @Override
     public String getType() {
-        return org.gephi.legend.plugin.items.TableItem.LEGEND_TYPE;
+        return TableItem.LEGEND_TYPE;
     }
 
     @Override
