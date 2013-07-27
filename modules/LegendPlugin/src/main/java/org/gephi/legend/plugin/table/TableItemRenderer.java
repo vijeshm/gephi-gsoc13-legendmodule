@@ -40,6 +40,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
     public static String TABLENODE = "table node";
     public static String CELLNODE = "cell node";
+    public static String CELLNODE_ROW_NUMBER = "cell node row number";
+    public static String CELLNODE_COL_NUMBER = "cell node column number";
     // OWN PROPERTIES - refine the variable name to have semantic
     private Font tableFont;
     private Color tableFontColor;
@@ -143,6 +145,22 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     }
 
     private void buildCellNodes(blockNode tableNode, Item item, int rowHeight, int[] colWidths) {
+        // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        inplaceEditor currentInplaceEditor = legendModel.getInplaceEditor();
+        Integer activeCellRow = null;
+        Integer activeCellColumn = null;
+        // if the active inplace editor belongs to a cell blocknode, then store its row and column.
+        // the row and column are later on used to reset the legend model's inplace editor
+        if (currentInplaceEditor != null) {
+            blockNode currentBlockNode = currentInplaceEditor.getData(inplaceEditor.BLOCKNODE);
+            if (currentBlockNode.getTag().equals(CELLNODE)) {
+                activeCellRow = currentBlockNode.getData(CELLNODE_ROW_NUMBER);
+                activeCellColumn = currentBlockNode.getData(CELLNODE_COL_NUMBER);
+            }
+        }
+
         //remove all the cell nodes and rebuild them
         tableNode.removeAllChildren();
 
@@ -178,11 +196,15 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 int tableCellHeight = rowHeight;
 
                 blockNode cellNode = tableNode.addChild(tableCellOriginX, tableCellOriginY, tableCellWidth, tableCellHeight, CELLNODE);
+                // setting optional data - to identify which cell this
+                // this can be used to reset the inplace editor in the legend model
+                cellNode.setData(CELLNODE_ROW_NUMBER, rowNumber);
+                cellNode.setData(CELLNODE_COL_NUMBER, colNumber);
 
                 inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
                 ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
-                // modify inplace editors
 
+                // modify inplace editors
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 Object[] data = new Object[1];
@@ -190,19 +212,13 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
                 cellNode.setInplaceEditor(ipeditor);
+                
+                // reset the legend model's inplace editor
+                if(activeCellRow != null && rowNumber == activeCellRow && activeCellColumn != null && colNumber == activeCellColumn) {
+                    legendModel.setInplaceEditor(ipeditor);
+                }
             }
         }
-        /*
-        // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
-        LegendController legendController = LegendController.getInstance();
-        LegendModel legendModel = legendController.getLegendModel();
-        inplaceEditor currentInplaceEditor = legendModel.getInplaceEditor();
-        if (currentInplaceEditor != null) {
-            // redirect the inplace editor reference only if there was a reference to the old editor.
-            blockNode currentBlockNode = currentInplaceEditor.getData(inplaceEditor.BLOCKNODE);
-            legendModel.setInplaceEditor(currentBlockNode.getInplaceEditor());
-        }
-        */
     }
 
     private void renderCells(Graphics2D graphics2D, blockNode tableNode, TableItem item) {
