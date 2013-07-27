@@ -205,12 +205,14 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
             tableItem.addColumn(i, defaultBackgroundColor, defaultBorderColor, defaultFont, defaultFontAlignment, defaultFontColor, content);
         }
         
+        /*
         // the the addColumn method would've updated the item's OWN_PROPERTIES.
         // Hence, add all those updated properties to the previewProperties
         Object[] updatedPreviewProps = item.getData(LegendItem.OWN_PROPERTIES);        
         for(Object prop : updatedPreviewProps) {
             previewProperties.add((PreviewProperty)prop);
         }
+        */
         
         return previewProperties.toArray(new PreviewProperty[0]);
     }

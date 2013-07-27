@@ -57,6 +57,7 @@ public class Cell {
         cellFontColor,
         cellContent
     };
+    private PreviewProperty[] previewProperties = new PreviewProperty[OWN_PROPERTIES.length];
 
     Cell(Item item, int row, int column) {
         this.item = item;
@@ -85,9 +86,9 @@ public class Cell {
         }
     }
 
-    private void addCellProperty(int row, int column, int property, Object value) {
+    private void addCellProperty(int row, int column, int propertyIndex, Object value) {
+        /*
         // get the list of preview properties, convert to an array list, 
-
         // During the creation of the legend, previewPropertiesList will be null, since the OWN_PROPERTIES are yet to be defined.
         ArrayList<PreviewProperty> previewProperties = new ArrayList<PreviewProperty>();
         if (getItem().getData(LegendItem.OWN_PROPERTIES) != null) {
@@ -98,10 +99,11 @@ public class Cell {
                 previewProperties.add((PreviewProperty) prop);
             }
         }
+        */
 
         PreviewProperty previewProperty = null;
-        String propertyString = LegendModel.getProperty(OWN_PROPERTIES, (Integer) getItem().getData(LegendItem.ITEM_INDEX), property);
-        switch (property) {
+        String propertyString = LegendModel.getProperty(OWN_PROPERTIES, (Integer) item.getData(LegendItem.ITEM_INDEX), propertyIndex);
+        switch (propertyIndex) {
             case BACKGROUND_COLOR:
                 previewProperty = PreviewProperty.createProperty(
                         this,
@@ -163,47 +165,10 @@ public class Cell {
                 break;
         }
 
-        previewProperties.add(previewProperty);
-        getItem().setData(LegendItem.OWN_PROPERTIES, previewProperties.toArray());
+        previewProperties[propertyIndex] = previewProperty;
     }
-
-    String getCellContent() {
-        return cellContent;
-    }
-
-    Item getItem() {
-        return item;
-    }
-
-    public Integer getRow() {
-        return row;
-    }
-
-    public Integer getColumn() {
-        return column;
-    }
-
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public Color getBorderColor() {
-        return borderColor;
-    }
-
-    public Font getCellFont() {
-        return cellFont;
-    }
-
-    public Alignment getCellAlignment() {
-        return cellAlignment;
-    }
-
-    public Color getCellFontColor() {
-        return cellFontColor;
-    }
-
-    public Object[] getDefaultValues() {
-        return defaultValues;
+    
+    public PreviewProperty[] getPreviewProperties() {
+        return previewProperties;
     }
 }

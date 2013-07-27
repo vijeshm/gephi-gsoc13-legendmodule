@@ -95,12 +95,19 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int[] colWidths = new int[numberOfColumns];
         int stringWidth;
         FontMetrics fontMetrics;
+        PreviewProperty[] previewProperties = null;
+        Font cellFont = null;
+        String cellContent = null;
         for (int col = 0; col < numberOfColumns; col++) {
             int tempMaxColWidth = 0;
             for (int row = 0; row < numberOfRows; row++) {
-                graphics2D.setFont(table.get(row).get(col).getCellFont());
-                fontMetrics = graphics2D.getFontMetrics(table.get(row).get(col).getCellFont());
-                stringWidth = fontMetrics.stringWidth(table.get(row).get(col).getCellContent());
+                previewProperties = table.get(row).get(col).getPreviewProperties();
+                cellFont = (Font) previewProperties[Cell.CELL_FONT].getValue();
+                cellContent = (String) previewProperties[Cell.CELL_CONTENT].getValue();
+
+                graphics2D.setFont(cellFont);
+                fontMetrics = graphics2D.getFontMetrics(cellFont);
+                stringWidth = fontMetrics.stringWidth(cellContent);
                 if (stringWidth > tempMaxColWidth) {
                     tempMaxColWidth = stringWidth;
                 }
@@ -169,10 +176,10 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         //associate inplace editors with the cellNodes
         Graph graph = null;
         inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
+        PreviewProperty[] previewProperties = null;
+        Cell cell = null;
         row r;
         column col;
-        PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
-        PreviewProperty prop;
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         int tableOriginX = (int) tableNode.getOriginX();
@@ -203,9 +210,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellNode.setData(CELLNODE_ROW_NUMBER, rowNumber);
                 cellNode.setData(CELLNODE_COL_NUMBER, colNumber);
 
+                cell = table.get(rowNumber).get(colNumber);
+                previewProperties = cell.getPreviewProperties();
+
                 inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
                 ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
-                int baseIndexOfCellProperties = numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties;
 
                 // modify inplace editors
                 r = ipeditor.addRow();
@@ -216,58 +225,58 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                 col = r.addColumn();
                 data = new Object[0]; // for a color property, extra data isnt needed.
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.BACKGROUND_COLOR], data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[Cell.BACKGROUND_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.BORDER_COLOR], data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[Cell.BORDER_COLOR], data);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_CONTENT], data);
+                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[Cell.CELL_CONTENT], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_FONT_COLOR], data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[Cell.CELL_FONT_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_FONT], data);
+                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[Cell.CELL_FONT], data);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 // left-alignment
                 data = new Object[4];
-                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
+                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
                 data[1] = "/org/gephi/legend/graphics/left_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/left_selected.png";
                 data[3] = Alignment.LEFT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // center alignment
                 data = new Object[4];
-                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
+                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
                 data[1] = "/org/gephi/legend/graphics/center_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/center_selected.png";
                 data[3] = Alignment.CENTER;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // right alignment
                 data = new Object[4];
-                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
+                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
                 data[1] = "/org/gephi/legend/graphics/right_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/right_selected.png";
                 data[3] = Alignment.RIGHT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // justified
                 data = new Object[4];
-                data[0] = previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
+                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
                 data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/justified_selected.png";
                 data[3] = Alignment.JUSTIFIED;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[baseIndexOfCellProperties + Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
 
                 cellNode.setInplaceEditor(ipeditor);
 
@@ -284,7 +293,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Color saveColor = graphics2D.getColor();
 
         ArrayList<blockNode> cellNodes = tableNode.getChildren();
-        PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        PreviewProperty[] previewProperties = null;
         // ArrayList<ArrayList<Cell>> table = item.getTable();
         blockNode cellNode;
         Cell cell;
@@ -309,6 +318,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             for (int colNumber = 0; colNumber < tableNumberOfColumns; colNumber++) {
                 cellNode = cellNodes.get(rowNumber * tableNumberOfColumns + colNumber); // the geometric information related to block node can be found here
                 cell = table.get(rowNumber).get(colNumber); // the properties of the cell can be found here
+                previewProperties = cell.getPreviewProperties();
 
                 // cell geometry
                 cellOriginX = (int) (cellNode.getOriginX() - currentRealOriginX);
@@ -317,12 +327,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellHeight = (int) cellNode.getBlockHeight();
 
                 // cell properties
-                cellBackgroundColor = (Color) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.BACKGROUND_COLOR].getValue(); // cell.getBackgroundColor();
-                cellBorderColor = (Color) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.BORDER_COLOR].getValue(); // cell.getBorderColor();
-                cellFont = (Font) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_FONT].getValue(); // cell.getCellFont();
-                cellAlignment = (Alignment) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_ALIGNMENT].getValue(); // cell.getCellAlignment();
-                cellFontColor = (Color) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_FONT_COLOR].getValue();// cell.getCellFontColor();
-                cellContent = (String) previewProperties[numberOfTableProperties + (rowNumber * tableNumberOfColumns + colNumber) * numberOfCellProperties + Cell.CELL_CONTENT].getValue(); // cell.getCellContent();
+                cellBackgroundColor = (Color) previewProperties[Cell.BACKGROUND_COLOR].getValue(); // cell.getBackgroundColor();
+                cellBorderColor = (Color) previewProperties[Cell.BORDER_COLOR].getValue(); // cell.getBorderColor();
+                cellFont = (Font) previewProperties[Cell.CELL_FONT].getValue(); // cell.getCellFont();
+                cellAlignment = (Alignment) previewProperties[Cell.CELL_ALIGNMENT].getValue(); // cell.getCellAlignment();
+                cellFontColor = (Color) previewProperties[Cell.CELL_FONT_COLOR].getValue();// cell.getCellFontColor();
+                cellContent = (String) previewProperties[Cell.CELL_CONTENT].getValue(); // cell.getCellContent();
 
                 /*
                  // CELLPADDING
