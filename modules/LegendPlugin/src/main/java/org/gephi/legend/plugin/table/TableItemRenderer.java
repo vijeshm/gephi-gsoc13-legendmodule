@@ -228,31 +228,36 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 // cell spacing
                 r = ipeditor.addRow();
                 col = r.addColumn();
-                data = new Object[1];
-                data[0] = "Cell Spacing:";
-                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+                data = new Object[3];
+                // to display a static image, set data[0] to true or false, data[1] and data[2] to same image.
+                data[0] = true;
+                data[1] = "/org/gephi/legend/graphics/cell_spacing.png";
+                data[2] = "/org/gephi/legend/graphics/cell_spacing.png";
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
                 col = r.addColumn();
                 data = new Object[0];
                 col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
 
                 // cell padding
-                r = ipeditor.addRow();
                 col = r.addColumn();
-                data = new Object[1];
-                data[0] = "Cell Padding:";
-                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+                data = new Object[3];
+                data[0] = true;
+                data[1] = "/org/gephi/legend/graphics/cell_padding.png";
+                data[2] = "/org/gephi/legend/graphics/cell_padding.png";
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
                 col = r.addColumn();
                 data = new Object[0];
                 col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
 
                 // border size
-                r = ipeditor.addRow();
                 col = r.addColumn();
-                data = new Object[1];
-                data[0] = "Border Size:";
-                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+                data = new Object[3];
+                data[0] = true;
+                data[1] = "/org/gephi/legend/graphics/cell_border.png";
+                data[2] = "/org/gephi/legend/graphics/cell_border.png";
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
                 col = r.addColumn();
                 data = new Object[0];

@@ -207,10 +207,12 @@ public class inplaceEditor implements Item {
                         break;
 
                     case IMAGE:
-                        Boolean isSelected = (Boolean) elementData[0];
-                        elementData[0] = !isSelected;
-                        prop.setValue(!isSelected);
-                        previewProperties.putValue(prop.getName(), !isSelected);
+                        if (prop != null) { // prop is null when providing support for static images.
+                            Boolean isSelected = (Boolean) elementData[0];
+                            elementData[0] = !isSelected;
+                            prop.setValue(!isSelected);
+                            previewProperties.putValue(prop.getName(), !isSelected);
+                        }
                         break;
 
                     case COLOR:
@@ -222,7 +224,8 @@ public class inplaceEditor implements Item {
                         break;
 
                     case NUMBER:
-                        String newValueString = (String) JOptionPane.showInputDialog(null, "New Value", "" + prop.getValue());
+                        // String newValueString = (String) JOptionPane.showInputDialog(null, "New Value", "" + prop.getValue());
+                        String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, prop.getValue());
                         // newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
                         if (newValueString != null) {
                             try {
