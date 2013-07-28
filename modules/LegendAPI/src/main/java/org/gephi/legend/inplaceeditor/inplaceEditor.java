@@ -222,7 +222,8 @@ public class inplaceEditor implements Item {
                         break;
 
                     case NUMBER:
-                        String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
+                        String newValueString = (String) JOptionPane.showInputDialog(null, "New Value", "" + prop.getValue());
+                        // newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
                         if (newValueString != null) {
                             try {
                                 Integer newNumber = Integer.parseInt(newValueString);

@@ -43,13 +43,13 @@ public class Cell {
     private Item item = null;
     private Integer row = null;
     private Integer column = null;
-    private Color backgroundColor = new Color(1f, 1f, 1f, 0.5f);
-    private Color borderColor = Color.BLACK;
-    private Font cellFont = new Font("Arial", Font.PLAIN, 20);
-    private Alignment cellAlignment = Alignment.CENTER;
-    private Color cellFontColor = Color.BLACK;
-    private String cellContent = "click to modify";
-    private Object[] defaultValues = {
+    public static final Color backgroundColor = new Color(1f, 1f, 1f, 0.5f);
+    public static final Color borderColor = Color.BLACK;
+    public static final Font cellFont = new Font("Arial", Font.PLAIN, 20);
+    public static final Alignment cellAlignment = Alignment.CENTER;
+    public static final Color cellFontColor = Color.BLACK;
+    public static final String cellContent = "click to modify";
+    public static final Object[] defaultValues = {
         backgroundColor,
         borderColor,
         cellFont,
@@ -74,12 +74,12 @@ public class Cell {
         this.item = item;
         this.row = row;
         this.column = column;
-        this.backgroundColor = backgroundColor;
-        this.borderColor = borderColor;
-        this.cellFont = cellFont;
-        this.cellAlignment = cellAlignment;
-        this.cellFontColor = cellFontColor;
-        this.cellContent = cellContent;
+        defaultValues[BACKGROUND_COLOR] = backgroundColor;
+        defaultValues[BORDER_COLOR] = borderColor;
+        defaultValues[CELL_FONT] = cellFont;
+        defaultValues[CELL_ALIGNMENT] = cellAlignment;
+        defaultValues[CELL_FONT_COLOR] = cellFontColor;
+        defaultValues[CELL_CONTENT] = cellContent;
 
         for (int i = 0; i < OWN_PROPERTIES.length; i++) {
             addCellProperty(row, column, i, defaultValues[i]);

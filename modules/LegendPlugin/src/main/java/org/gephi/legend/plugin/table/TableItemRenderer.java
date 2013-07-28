@@ -27,6 +27,7 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
+import org.netbeans.swing.tabcontrol.event.TabActionEvent;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -176,7 +177,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         //associate inplace editors with the cellNodes
         Graph graph = null;
         inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-        PreviewProperty[] previewProperties = null;
+        PreviewProperty[] cellPreviewProperties = null;
+        PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         Cell cell = null;
         row r;
         column col;
@@ -211,7 +213,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellNode.setData(CELLNODE_COL_NUMBER, colNumber);
 
                 cell = table.get(rowNumber).get(colNumber);
-                previewProperties = cell.getPreviewProperties();
+                cellPreviewProperties = cell.getPreviewProperties();
 
                 inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
                 ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
@@ -220,63 +222,103 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 Object[] data = new Object[1];
+                data[0] = "Table:";
+                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+
+                // cell spacing
+                r = ipeditor.addRow();
+                col = r.addColumn();
+                data = new Object[1];
+                data[0] = "Cell Spacing:";
+                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
+
+                // cell padding
+                r = ipeditor.addRow();
+                col = r.addColumn();
+                data = new Object[1];
+                data[0] = "Cell Padding:";
+                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
+
+                // border size
+                r = ipeditor.addRow();
+                col = r.addColumn();
+                data = new Object[1];
+                data[0] = "Border Size:";
+                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
+
+                // Cell Properties
+                r = ipeditor.addRow();
+                col = r.addColumn();
+                data = new Object[1];
                 data[0] = "Cell:";
                 col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
                 col = r.addColumn();
                 data = new Object[0]; // for a color property, extra data isnt needed.
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[Cell.BACKGROUND_COLOR], data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[Cell.BORDER_COLOR], data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[Cell.CELL_CONTENT], data);
+                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[Cell.CELL_FONT_COLOR], data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[Cell.CELL_FONT], data);
+                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 // left-alignment
                 data = new Object[4];
-                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
                 data[1] = "/org/gephi/legend/graphics/left_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/left_selected.png";
                 data[3] = Alignment.LEFT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // center alignment
                 data = new Object[4];
-                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
                 data[1] = "/org/gephi/legend/graphics/center_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/center_selected.png";
                 data[3] = Alignment.CENTER;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // right alignment
                 data = new Object[4];
-                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
                 data[1] = "/org/gephi/legend/graphics/right_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/right_selected.png";
                 data[3] = Alignment.RIGHT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // justified
                 data = new Object[4];
-                data[0] = previewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
                 data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/justified_selected.png";
                 data[3] = Alignment.JUSTIFIED;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 cellNode.setInplaceEditor(ipeditor);
 
@@ -344,12 +386,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 graphics2D.setColor(cellBackgroundColor);
                 graphics2D.fillRect(cellOriginX, cellOriginY, cellWidth, cellHeight);
 
-                // BORDER - is internal and falls with the boundaries of the cell.
+                // BORDER - external border
                 graphics2D.setColor(cellBorderColor);
-                graphics2D.fillRect(cellOriginX, cellOriginY, cellWidth, tableCellBorderSize);  // top
-                graphics2D.fillRect(cellOriginX, cellOriginY + cellHeight - tableCellBorderSize, cellWidth, tableCellBorderSize);   // bottom
-                graphics2D.fillRect(cellOriginX, cellOriginY + tableCellBorderSize, tableCellBorderSize, cellHeight - 2 * tableCellBorderSize);
-                graphics2D.fillRect(cellOriginX + cellWidth - tableCellBorderSize, cellOriginY + tableCellBorderSize, tableCellBorderSize, cellHeight - 2 * tableCellBorderSize); // left
+                graphics2D.fillRect(cellOriginX - tableCellBorderSize, cellOriginY - tableCellBorderSize, cellWidth + 2 * tableCellBorderSize, tableCellBorderSize);  // top
+                graphics2D.fillRect(cellOriginX - tableCellBorderSize, cellOriginY + cellHeight, cellWidth + 2 * tableCellBorderSize, tableCellBorderSize);   // bottom
+                graphics2D.fillRect(cellOriginX - tableCellBorderSize, cellOriginY, tableCellBorderSize, cellHeight);
+                graphics2D.fillRect(cellOriginX + cellWidth, cellOriginY, tableCellBorderSize, cellHeight); // left
 
                 // TEXT
                 legendDrawText(graphics2D, cellContent, cellFont, cellFontColor, cellOriginX, cellOriginY, cellWidth, cellHeight, cellAlignment);
