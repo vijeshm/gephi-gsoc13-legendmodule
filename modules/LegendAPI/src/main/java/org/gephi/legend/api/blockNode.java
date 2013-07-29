@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.spi.LegendItem;
 import org.gephi.preview.api.Item;
 
 /**
@@ -30,7 +31,7 @@ public class blockNode {
     private blockNode parent;
     private ArrayList<blockNode> children;
     private inplaceEditor IPEditor;
-    private Item legendItem;
+    private LegendItem legendItem;
     private String id;
     private Map<String, Object> data; //for optional extra information
 
@@ -40,7 +41,7 @@ public class blockNode {
         originY = y;
         blockWidth = width;
         blockHeight = height;
-        legendItem = parentItem;
+        legendItem = (LegendItem) parentItem;
         id = tag;
         children = new ArrayList<blockNode>();
         IPEditor = null;
@@ -91,7 +92,7 @@ public class blockNode {
         return parent;
     }
 
-    public Item getItem() {
+    public LegendItem getItem() {
         return legendItem;
     }
 

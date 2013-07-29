@@ -244,6 +244,11 @@ public class inplaceEditor implements Item {
                             File file = fc.getSelectedFile();
                             previewProperties.putValue(prop.getName(), file);
                         }
+                        break;
+                        
+                    case FUNCTION:
+                        inplaceClickResponse responder = (inplaceClickResponse) elementData[0];
+                        responder.performAction(this);
                 }
             }
         }

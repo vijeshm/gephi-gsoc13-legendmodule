@@ -58,8 +58,6 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         defaultTableCellPadding,
         defaultTableBorderSize,
         defaultTableBorderColor,
-        defaultTableNumberOfRows,
-        defaultTableNumberOfColumns
     };
 
     @Override
@@ -156,28 +154,6 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
                         Color.class,
                         NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.border.color.displayName"),
                         NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.border.color.description"),
-                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
-                break;
-            }
-
-            case TableProperty.TABLE_NUMBER_OF_ROWS: {
-                previewProperty = PreviewProperty.createProperty(
-                        this,
-                        propertyString,
-                        Integer.class,
-                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.number.of.rows.displayName"),
-                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.number.of.rows.description"),
-                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
-                break;
-            }
-
-            case TableProperty.TABLE_NUMBER_OF_COLUMNS: {
-                previewProperty = PreviewProperty.createProperty(
-                        this,
-                        propertyString,
-                        Integer.class,
-                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.number.of.columns.displayName"),
-                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.number.of.columns.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }

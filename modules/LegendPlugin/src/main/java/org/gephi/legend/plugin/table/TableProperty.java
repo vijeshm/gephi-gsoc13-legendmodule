@@ -21,8 +21,6 @@ public class TableProperty {
     public static final int TABLE_CELL_PADDING = 4;
     public static final int TABLE_BORDER_SIZE = 5;
     public static final int TABLE_BORDER_COLOR = 6;
-    public static final int TABLE_NUMBER_OF_ROWS = 7;
-    public static final int TABLE_NUMBER_OF_COLUMNS = 8;
     
     public static String[] OWN_PROPERTIES = {
         ".table.font",
@@ -31,9 +29,7 @@ public class TableProperty {
         ".table.cell.spacing",
         ".table.cell.padding",
         ".table.border.size",
-        ".table.border.color",
-        ".table.number.of.rows",
-        ".table.number.of.columns",
+        ".table.border.color"
     };
     
     public static final int[] LIST_OF_PROPERTIES = {
@@ -44,8 +40,6 @@ public class TableProperty {
         TABLE_CELL_PADDING,
         TABLE_BORDER_SIZE,
         TABLE_BORDER_COLOR,
-        TABLE_NUMBER_OF_ROWS,
-        TABLE_NUMBER_OF_COLUMNS,
     };
     
     private static TableProperty instance = new TableProperty();

@@ -23,6 +23,7 @@ public class element {
      public static final Integer COLOR = 5;
      public static final Integer NUMBER = 6;
      public static final Integer FILE = 7;
+     public static final Integer FUNCTION = 8;
      */
     public static enum ELEMENT_TYPE {
 
@@ -33,7 +34,8 @@ public class element {
         IMAGE,
         COLOR,
         NUMBER,
-        FILE
+        FILE,
+        FUNCTION
     };
     
     /*
@@ -45,7 +47,8 @@ public class element {
         "IMAGE",            // 4
         "COLOR",            // 5
         "NUMBER",           // 6
-        "FILE"              // 7
+        "FILE",             // 7
+        "FUNCTION"          // 8
     };
     */
     
@@ -69,6 +72,10 @@ public class element {
             case TEXT:
             case IMAGE:
             case CHECKBOX:
+            case FUNCTION:
+                // data[0] = reference to an object that implements the inplaceClickResponse interface
+                // data[1] = image to be used during rendering
+                
                 this.data = data;
                 break;
                 

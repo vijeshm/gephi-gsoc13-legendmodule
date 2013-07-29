@@ -10,6 +10,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendController;
@@ -17,6 +18,7 @@ import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.blockNode;
 import org.gephi.legend.inplaceeditor.column;
 import org.gephi.legend.inplaceeditor.element;
+import org.gephi.legend.inplaceeditor.inplaceClickResponse;
 import org.gephi.legend.inplaceeditor.inplaceEditor;
 import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
 import org.gephi.legend.inplaceeditor.row;
@@ -74,8 +76,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableCellPadding = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_PADDING));
         tableCellBorderSize = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_SIZE));
         tableCellBorderColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_COLOR));
-        tableNumberOfRows = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_NUMBER_OF_ROWS));
-        tableNumberOfColumns = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_NUMBER_OF_COLUMNS));
+        tableNumberOfRows = ((TableItem) item).getNumberOfRows();
+        tableNumberOfColumns = ((TableItem) item).getNumberOfColumns();
 
         table = ((TableItem) item).getTable();
     }
@@ -325,6 +327,79 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[3] = Alignment.JUSTIFIED;
                 col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
+                r = ipeditor.addRow();
+                // insert_row button
+                col = r.addColumn();
+                data = new Object[2];
+                data[0] = new inplaceClickResponse() {
+                    @Override
+                    public void performAction(inplaceEditor ipeditor) {
+                        int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to add a row?", "Confirm Row Addition", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_OPTION) {
+                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            TableItem tableItem = (TableItem) cellNode.getItem();
+                            int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
+                            tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
+                        }
+                    }
+                };
+                data[1] = "/org/gephi/legend/graphics/insert_row.png";
+                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+
+                // insert_column button
+                col = r.addColumn();
+                data = new Object[2];
+                data[0] = new inplaceClickResponse() {
+                    @Override
+                    public void performAction(inplaceEditor ipeditor) {
+                        int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to add a column?", "Confirm Column Addition", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_OPTION) {
+                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            TableItem tableItem = (TableItem) cellNode.getItem();
+                            int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
+                            tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
+                        }
+                    }
+                };
+                data[1] = "/org/gephi/legend/graphics/insert_column.png";
+                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                
+                // delete_row button
+                col = r.addColumn();
+                data = new Object[2];
+                data[0] = new inplaceClickResponse() {
+                    @Override
+                    public void performAction(inplaceEditor ipeditor) {
+                        int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to delete this row?", "Confirm Row Deletion", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_OPTION) {
+                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            TableItem tableItem = (TableItem) cellNode.getItem();
+                            int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
+                            tableItem.deleteRow(cellRowNumber);
+                        }
+                    }
+                };
+                data[1] = "/org/gephi/legend/graphics/delete_row.png";
+                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                
+                // delete_column button
+                col = r.addColumn();
+                data = new Object[2];
+                data[0] = new inplaceClickResponse() {
+                    @Override
+                    public void performAction(inplaceEditor ipeditor) {
+                        int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to delete this column?", "Confirm Column Deletion", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_OPTION) {
+                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            TableItem tableItem = (TableItem) cellNode.getItem();
+                            int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
+                            tableItem.deleteColumn(cellColNumber);
+                        }
+                    }
+                };
+                data[1] = "/org/gephi/legend/graphics/delete_column.png";
+                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                
                 cellNode.setInplaceEditor(ipeditor);
 
                 // reset the legend model's inplace editor

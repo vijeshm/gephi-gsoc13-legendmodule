@@ -308,7 +308,7 @@ public class inplaceItemRenderer implements Renderer {
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
-                                
+
                             case TEXT:
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/edit.png"));
@@ -337,10 +337,38 @@ public class inplaceItemRenderer implements Renderer {
                                 } catch (IOException e) {
                                 }
                                 break;
-                                
+
                             case FILE:
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/file.png"));
+                                    graphics2d.setColor(BACKGROUND);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                            UNIT_SIZE + 1,
+                                            UNIT_SIZE + 1);
+                                    graphics2d.drawImage(img,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            0,
+                                            0,
+                                            img.getWidth(),
+                                            img.getHeight(), null);
+
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
+                                            UNIT_SIZE,
+                                            UNIT_SIZE);
+
+                                    currentElementsCount += 1;
+                                } catch (IOException e) {
+                                }
+                                break;
+
+                            case FUNCTION:
+                                try {
+                                    BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
                                     graphics2d.setColor(BACKGROUND);
                                     graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
                                             (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,

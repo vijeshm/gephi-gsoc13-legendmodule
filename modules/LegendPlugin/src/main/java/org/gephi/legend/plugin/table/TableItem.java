@@ -37,6 +37,17 @@ public class TableItem extends AbstractItem implements LegendItem {
         return table;
     }
 
+    public int getNumberOfRows() {
+        return table.size();
+    }
+
+    public int getNumberOfColumns() {
+        if (table.size() > 0) {
+            return table.get(0).size();
+        }
+        return 0;
+    }
+
     public void addRow(int pos, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent) {
         int numberOfRows = table.size();
         int numberOfColumns = 0;
@@ -51,6 +62,7 @@ public class TableItem extends AbstractItem implements LegendItem {
             row.add(cell);
         }
 
+        // add the row to the table
         table.add(pos, row);
     }
 
@@ -98,19 +110,9 @@ public class TableItem extends AbstractItem implements LegendItem {
 
     public void deleteColumn(int pos) {
         int numberOfRows = table.size();
-        PreviewProperty[] previewPropertiesList = (PreviewProperty[]) this.getData(LegendItem.OWN_PROPERTIES);
-        ArrayList<PreviewProperty> previewProperties = new ArrayList<PreviewProperty>(Arrays.asList(previewPropertiesList));
-        ArrayList<PreviewProperty> newPreviewProperties = new ArrayList<PreviewProperty>();
-
         for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
-            for (PreviewProperty prop : previewProperties) {
-                if (!prop.getDisplayName().startsWith("TableItem.cell" + rowNumber + "." + pos)) {
-                    newPreviewProperties.add(prop);
-                }
-            }
             table.get(rowNumber).remove(pos);
         }
-        this.setData(LegendItem.OWN_PROPERTIES, newPreviewProperties.toArray());
     }
 
     @Override
