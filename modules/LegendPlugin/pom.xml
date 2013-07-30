@@ -52,5 +52,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>preview-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>ui-library-wrapper</artifactId>
+            <version>0.9-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>
