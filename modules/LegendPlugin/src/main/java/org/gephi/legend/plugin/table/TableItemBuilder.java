@@ -34,20 +34,20 @@ import org.openide.util.lookup.ServiceProviders;
  * @author mvvijesh, edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 107),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 107)
+    @ServiceProvider(service = ItemBuilder.class, position = 101),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 101)
 })
 public class TableItemBuilder extends AbstractLegendItemBuilder {
 
-    protected final String content = "click to modify content";
+    protected final String content = Cell.cellContent;
     // default Values
-    protected final Font defaultFont = new Font("Arial", Font.PLAIN, 14);
-    protected final Color defaultFontColor = Color.BLACK;
-    protected final Alignment defaultFontAlignment = Alignment.CENTER;
+    protected final Font defaultFont = Cell.cellFont;
+    protected final Color defaultFontColor = Cell.cellFontColor;
+    protected final Alignment defaultFontAlignment = Cell.cellAlignment;
     protected final int defaultTableCellSpacing = 10;
     protected final int defaultTableCellPadding = 5;
     protected final int defaultTableBorderSize = 5;
-    protected final Color defaultTableBorderColor = Color.BLACK;
+    protected final Color defaultTableBorderColor = Cell.borderColor;
     protected final int defaultTableNumberOfRows = 2;
     protected final int defaultTableNumberOfColumns = 3;
     protected final Object[] defaultValues = {

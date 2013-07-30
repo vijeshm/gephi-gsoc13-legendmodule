@@ -45,10 +45,10 @@ public class Cell {
     private Integer column = null;
     public static final Color backgroundColor = new Color(1f, 1f, 1f, 0.5f);
     public static final Color borderColor = Color.BLACK;
-    public static final Font cellFont = new Font("Arial", Font.PLAIN, 20);
+    public static final Font cellFont = new Font("Arial", Font.PLAIN, 25);
     public static final Alignment cellAlignment = Alignment.CENTER;
     public static final Color cellFontColor = Color.BLACK;
-    public static final String cellContent = "click to modify";
+    public static final String cellContent = "click to modify properties";
     public static final Object[] defaultValues = {
         backgroundColor,
         borderColor,
