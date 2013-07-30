@@ -60,8 +60,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
     private float colWidthTolerance = 0.1f;
-    private int numberOfTableProperties = TableProperty.OWN_PROPERTIES.length;
-    private int numberOfCellProperties = Cell.OWN_PROPERTIES.length;
 
     @Override
     public boolean isAnAvailableRenderer(Item item) {
