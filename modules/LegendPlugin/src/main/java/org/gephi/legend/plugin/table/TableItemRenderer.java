@@ -279,11 +279,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         if (confirmation == JOptionPane.YES_NO_OPTION) {
                             blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
-                            PreviewProperty[] previewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
-                            Color tableCellBorderColor = previewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
+                            PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                            Color tableCellBorderColor = tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
                             Color selectedColor = ColorPicker.showDialog(null, tableCellBorderColor, true);
                             if (selectedColor != null) {
                                 ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                                tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].setValue(selectedColor);
                                 PreviewProperty[] cellPreviewProperties = null;
                                 int numberOfRows = tableItem.getNumberOfRows();
                                 int numberOfCols = tableItem.getNumberOfColumns();
@@ -301,6 +302,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[1] = "/org/gephi/legend/graphics/table_cell_border_color.png";
                 col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
+                // table font
                 col = r.addColumn();
                 data = new Object[2];
                 data[0] = new inplaceClickResponse() {
@@ -310,12 +312,13 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         if (confirmation == JOptionPane.YES_NO_OPTION) {
                             blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
-                            PreviewProperty[] previewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
-                            Font tableCellFont = previewProperties[TableProperty.TABLE_FONT].getValue();
+                            PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                            Font tableCellFont = tablePreviewProperties[TableProperty.TABLE_FONT].getValue();
                             JFontChooser chooser = new JFontChooser(tableCellFont);
                             Font chosenFont = chooser.showDialog(new JFrame("choose a font"), tableCellFont);
                             if (chosenFont != null) {
                                 ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                                tablePreviewProperties[TableProperty.TABLE_FONT].setValue(chosenFont);
                                 PreviewProperty[] cellPreviewProperties = null;
                                 int numberOfRows = tableItem.getNumberOfRows();
                                 int numberOfCols = tableItem.getNumberOfColumns();
@@ -333,6 +336,39 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[1] = "/org/gephi/legend/graphics/table_font.png";
                 col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
+                // table font color
+                col = r.addColumn();
+                data = new Object[2];
+                data[0] = new inplaceClickResponse() {
+                    @Override
+                    public void performAction(inplaceEditor ipeditor) {
+                        int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font color for all cells?", "Confirm Font Color Change", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_NO_OPTION) {
+                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            TableItem tableItem = (TableItem) cellNode.getItem();
+                            PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                            Color tableCellFontColor = tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].getValue();
+                            Color selectedColor = ColorPicker.showDialog(null, tableCellFontColor, true);
+                            if (selectedColor != null) {
+                                ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                                tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].setValue(selectedColor);
+                                PreviewProperty[] cellPreviewProperties = null;
+                                int numberOfRows = tableItem.getNumberOfRows();
+                                int numberOfCols = tableItem.getNumberOfColumns();
+                                for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                                    for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                        Cell cell = table.get(rowNumber).get(colNumber);
+                                        cellPreviewProperties = cell.getPreviewProperties();
+                                        cellPreviewProperties[Cell.CELL_FONT_COLOR].setValue(selectedColor);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                data[1] = "/org/gephi/legend/graphics/table_font_color.png";
+                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                
                 r = ipeditor.addRow();
                 // insert_row button
                 col = r.addColumn();
