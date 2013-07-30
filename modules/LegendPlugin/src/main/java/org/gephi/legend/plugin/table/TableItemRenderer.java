@@ -5,12 +5,14 @@
 package org.gephi.legend.plugin.table;
 
 import com.bric.swing.ColorPicker;
+import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
@@ -267,6 +269,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
 
                 r = ipeditor.addRow();
+                // border color
                 col = r.addColumn();
                 data = new Object[2];
                 data[0] = new inplaceClickResponse() {
@@ -285,7 +288,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                                 int numberOfRows = tableItem.getNumberOfRows();
                                 int numberOfCols = tableItem.getNumberOfColumns();
                                 for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
-                                    for(int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                    for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
                                         Cell cell = table.get(rowNumber).get(colNumber);
                                         cellPreviewProperties = cell.getPreviewProperties();
                                         cellPreviewProperties[Cell.BORDER_COLOR].setValue(selectedColor);
@@ -297,7 +300,39 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 };
                 data[1] = "/org/gephi/legend/graphics/table_cell_border_color.png";
                 col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
-                
+
+                col = r.addColumn();
+                data = new Object[2];
+                data[0] = new inplaceClickResponse() {
+                    @Override
+                    public void performAction(inplaceEditor ipeditor) {
+                        int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font for all cells?", "Confirm Font Change", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_NO_OPTION) {
+                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            TableItem tableItem = (TableItem) cellNode.getItem();
+                            PreviewProperty[] previewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                            Font tableCellFont = previewProperties[TableProperty.TABLE_FONT].getValue();
+                            JFontChooser chooser = new JFontChooser(tableCellFont);
+                            Font chosenFont = chooser.showDialog(new JFrame("choose a font"), tableCellFont);
+                            if (chosenFont != null) {
+                                ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                                PreviewProperty[] cellPreviewProperties = null;
+                                int numberOfRows = tableItem.getNumberOfRows();
+                                int numberOfCols = tableItem.getNumberOfColumns();
+                                for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                                    for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                        Cell cell = table.get(rowNumber).get(colNumber);
+                                        cellPreviewProperties = cell.getPreviewProperties();
+                                        cellPreviewProperties[Cell.CELL_FONT].setValue(chosenFont);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                data[1] = "/org/gephi/legend/graphics/table_font.png";
+                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+
                 r = ipeditor.addRow();
                 // insert_row button
                 col = r.addColumn();
