@@ -60,6 +60,9 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
     private float colWidthTolerance = 0.1f;
+    private int cellSpacingLowerLimit = 5;
+    private int cellPaddingLowerLimit = 5;
+    private int cellBorderLowerLimit = 5;
 
     @Override
     public boolean isAnAvailableRenderer(Item item) {
@@ -140,14 +143,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         blockNode tableNode = legendNode.getChild(TABLENODE);
         if (tableNode == null) {
             tableNode = legendNode.addChild(tableOriginX, tableOriginY, tableWidth, tableHeight, TABLENODE);
-            // the table, by itself doesnt have an inplace editor.
-            // The table properties are taken by the cell properties.
-            // Hence, there is no need to build a table inplace editor.
+            buildInplaceTable(tableNode, item);
         }
 
         // update the geometry and draw the geometric dimensions - this is redundant only when the first time the legend it created.
         tableNode.updateGeometry(tableOriginX, tableOriginY, tableWidth, tableHeight);
-        drawBlockBoundary(graphics2D, tableNode);
 
         // cells are re-constructed everytime the table item is rendered
         // since cells are built every single time, there is no need to update the geometry
@@ -155,6 +155,171 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
         // render the cells
         renderCells(graphics2D, tableNode, (TableItem) item);
+    }
+
+    private void buildInplaceTable(blockNode tableNode, Item item) {
+        // associate an inplace renderer with the table node
+        Graph graph = null;
+        inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
+        inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, tableNode);
+        ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+
+        buildTableProperties(ipeditor, itemIndex, tablePreviewProperties);
+
+        tableNode.setInplaceEditor(ipeditor);
+    }
+
+    private void buildTableProperties(inplaceEditor ipeditor, int itemIndex, PreviewProperty[] tablePreviewProperties) {
+        row r;
+        column col;
+
+        // modify inplace editors
+        r = ipeditor.addRow();
+        col = r.addColumn();
+        Object[] data = new Object[1];
+        data[0] = "Table:";
+        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+
+        // cell spacing
+        r = ipeditor.addRow();
+        col = r.addColumn();
+        data = new Object[3];
+        // to display a static image, set data[0] to true or false, data[1] and data[2] to same image.
+        data[0] = true;
+        data[1] = "/org/gephi/legend/graphics/cell_spacing.png";
+        data[2] = "/org/gephi/legend/graphics/cell_spacing.png";
+        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+
+        col = r.addColumn();
+        data = new Object[0];
+        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
+
+        // cell padding
+        col = r.addColumn();
+        data = new Object[3];
+        data[0] = true;
+        data[1] = "/org/gephi/legend/graphics/cell_padding.png";
+        data[2] = "/org/gephi/legend/graphics/cell_padding.png";
+        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+
+        col = r.addColumn();
+        data = new Object[0];
+        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
+
+        // border size
+        col = r.addColumn();
+        data = new Object[3];
+        data[0] = true;
+        data[1] = "/org/gephi/legend/graphics/cell_border.png";
+        data[2] = "/org/gephi/legend/graphics/cell_border.png";
+        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+
+        col = r.addColumn();
+        data = new Object[0];
+        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
+
+        r = ipeditor.addRow();
+        // border color
+        col = r.addColumn();
+        data = new Object[2];
+        data[0] = new inplaceClickResponse() {
+            @Override
+            public void performAction(inplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the border color of all cells?", "Confirm Border Color Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                    Color tableCellBorderColor = tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
+                    Color selectedColor = ColorPicker.showDialog(null, tableCellBorderColor, true);
+                    if (selectedColor != null) {
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].setValue(selectedColor);
+                        PreviewProperty[] cellPreviewProperties = null;
+                        int numberOfRows = tableItem.getNumberOfRows();
+                        int numberOfCols = tableItem.getNumberOfColumns();
+                        for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                            for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                Cell cell = table.get(rowNumber).get(colNumber);
+                                cellPreviewProperties = cell.getPreviewProperties();
+                                cellPreviewProperties[Cell.BORDER_COLOR].setValue(selectedColor);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        data[1] = "/org/gephi/legend/graphics/table_cell_border_color.png";
+        col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+
+        // table font
+        col = r.addColumn();
+        data = new Object[2];
+        data[0] = new inplaceClickResponse() {
+            @Override
+            public void performAction(inplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font for all cells?", "Confirm Font Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                    Font tableCellFont = tablePreviewProperties[TableProperty.TABLE_FONT].getValue();
+                    JFontChooser chooser = new JFontChooser(tableCellFont);
+                    Font chosenFont = chooser.showDialog(new JFrame("choose a font"), tableCellFont);
+                    if (chosenFont != null) {
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        tablePreviewProperties[TableProperty.TABLE_FONT].setValue(chosenFont);
+                        PreviewProperty[] cellPreviewProperties = null;
+                        int numberOfRows = tableItem.getNumberOfRows();
+                        int numberOfCols = tableItem.getNumberOfColumns();
+                        for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                            for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                Cell cell = table.get(rowNumber).get(colNumber);
+                                cellPreviewProperties = cell.getPreviewProperties();
+                                cellPreviewProperties[Cell.CELL_FONT].setValue(chosenFont);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        data[1] = "/org/gephi/legend/graphics/table_font.png";
+        col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+
+        // table font color
+        col = r.addColumn();
+        data = new Object[2];
+        data[0] = new inplaceClickResponse() {
+            @Override
+            public void performAction(inplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font color for all cells?", "Confirm Font Color Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                    Color tableCellFontColor = tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].getValue();
+                    Color selectedColor = ColorPicker.showDialog(null, tableCellFontColor, true);
+                    if (selectedColor != null) {
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].setValue(selectedColor);
+                        PreviewProperty[] cellPreviewProperties = null;
+                        int numberOfRows = tableItem.getNumberOfRows();
+                        int numberOfCols = tableItem.getNumberOfColumns();
+                        for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                            for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                Cell cell = table.get(rowNumber).get(colNumber);
+                                cellPreviewProperties = cell.getPreviewProperties();
+                                cellPreviewProperties[Cell.CELL_FONT_COLOR].setValue(selectedColor);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        data[1] = "/org/gephi/legend/graphics/table_font_color.png";
+        col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
     }
 
     private void buildCellNodes(blockNode tableNode, Item item, int rowHeight, int[] colWidths) {
@@ -222,151 +387,74 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
                 // modify inplace editors
+
+                if (tableCellSpacing < cellSpacingLowerLimit && tableCellPadding < cellPaddingLowerLimit && tableCellBorderSize < cellBorderLowerLimit) {
+                    // build controls for general properties of the table
+                    buildTableProperties(ipeditor, itemIndex, tablePreviewProperties);
+                }
+
+                // Cell Properties
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 Object[] data = new Object[1];
-                data[0] = "Table:";
+                data[0] = "Cell:";
                 col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
-                // cell spacing
+                col = r.addColumn();
+                data = new Object[0]; // for a color property, extra data isnt needed.
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data);
+
+                col = r.addColumn();
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data);
+
                 r = ipeditor.addRow();
                 col = r.addColumn();
-                data = new Object[3];
-                // to display a static image, set data[0] to true or false, data[1] and data[2] to same image.
-                data[0] = true;
-                data[1] = "/org/gephi/legend/graphics/cell_spacing.png";
-                data[2] = "/org/gephi/legend/graphics/cell_spacing.png";
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+                data = new Object[0];
+                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
-
-                // cell padding
-                col = r.addColumn();
-                data = new Object[3];
-                data[0] = true;
-                data[1] = "/org/gephi/legend/graphics/cell_padding.png";
-                data[2] = "/org/gephi/legend/graphics/cell_padding.png";
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
-
-                // border size
-                col = r.addColumn();
-                data = new Object[3];
-                data[0] = true;
-                data[1] = "/org/gephi/legend/graphics/cell_border.png";
-                data[2] = "/org/gephi/legend/graphics/cell_border.png";
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
-
-                col = r.addColumn();
-                data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
+                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
 
                 r = ipeditor.addRow();
-                // border color
                 col = r.addColumn();
-                data = new Object[2];
-                data[0] = new inplaceClickResponse() {
-                    @Override
-                    public void performAction(inplaceEditor ipeditor) {
-                        int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the border color of all cells?", "Confirm Border Color Change", JOptionPane.YES_NO_OPTION);
-                        if (confirmation == JOptionPane.YES_NO_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
-                            TableItem tableItem = (TableItem) cellNode.getItem();
-                            PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
-                            Color tableCellBorderColor = tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
-                            Color selectedColor = ColorPicker.showDialog(null, tableCellBorderColor, true);
-                            if (selectedColor != null) {
-                                ArrayList<ArrayList<Cell>> table = tableItem.getTable();
-                                tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].setValue(selectedColor);
-                                PreviewProperty[] cellPreviewProperties = null;
-                                int numberOfRows = tableItem.getNumberOfRows();
-                                int numberOfCols = tableItem.getNumberOfColumns();
-                                for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
-                                    for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
-                                        Cell cell = table.get(rowNumber).get(colNumber);
-                                        cellPreviewProperties = cell.getPreviewProperties();
-                                        cellPreviewProperties[Cell.BORDER_COLOR].setValue(selectedColor);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-                data[1] = "/org/gephi/legend/graphics/table_cell_border_color.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                // left-alignment
+                data = new Object[4];
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
+                data[1] = "/org/gephi/legend/graphics/left_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/left_selected.png";
+                data[3] = Alignment.LEFT;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
-                // table font
-                col = r.addColumn();
-                data = new Object[2];
-                data[0] = new inplaceClickResponse() {
-                    @Override
-                    public void performAction(inplaceEditor ipeditor) {
-                        int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font for all cells?", "Confirm Font Change", JOptionPane.YES_NO_OPTION);
-                        if (confirmation == JOptionPane.YES_NO_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
-                            TableItem tableItem = (TableItem) cellNode.getItem();
-                            PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
-                            Font tableCellFont = tablePreviewProperties[TableProperty.TABLE_FONT].getValue();
-                            JFontChooser chooser = new JFontChooser(tableCellFont);
-                            Font chosenFont = chooser.showDialog(new JFrame("choose a font"), tableCellFont);
-                            if (chosenFont != null) {
-                                ArrayList<ArrayList<Cell>> table = tableItem.getTable();
-                                tablePreviewProperties[TableProperty.TABLE_FONT].setValue(chosenFont);
-                                PreviewProperty[] cellPreviewProperties = null;
-                                int numberOfRows = tableItem.getNumberOfRows();
-                                int numberOfCols = tableItem.getNumberOfColumns();
-                                for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
-                                    for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
-                                        Cell cell = table.get(rowNumber).get(colNumber);
-                                        cellPreviewProperties = cell.getPreviewProperties();
-                                        cellPreviewProperties[Cell.CELL_FONT].setValue(chosenFont);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-                data[1] = "/org/gephi/legend/graphics/table_font.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                // center alignment
+                data = new Object[4];
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
+                data[1] = "/org/gephi/legend/graphics/center_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/center_selected.png";
+                data[3] = Alignment.CENTER;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
-                // table font color
-                col = r.addColumn();
-                data = new Object[2];
-                data[0] = new inplaceClickResponse() {
-                    @Override
-                    public void performAction(inplaceEditor ipeditor) {
-                        int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font color for all cells?", "Confirm Font Color Change", JOptionPane.YES_NO_OPTION);
-                        if (confirmation == JOptionPane.YES_NO_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
-                            TableItem tableItem = (TableItem) cellNode.getItem();
-                            PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
-                            Color tableCellFontColor = tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].getValue();
-                            Color selectedColor = ColorPicker.showDialog(null, tableCellFontColor, true);
-                            if (selectedColor != null) {
-                                ArrayList<ArrayList<Cell>> table = tableItem.getTable();
-                                tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].setValue(selectedColor);
-                                PreviewProperty[] cellPreviewProperties = null;
-                                int numberOfRows = tableItem.getNumberOfRows();
-                                int numberOfCols = tableItem.getNumberOfColumns();
-                                for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
-                                    for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
-                                        Cell cell = table.get(rowNumber).get(colNumber);
-                                        cellPreviewProperties = cell.getPreviewProperties();
-                                        cellPreviewProperties[Cell.CELL_FONT_COLOR].setValue(selectedColor);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-                data[1] = "/org/gephi/legend/graphics/table_font_color.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
-                
+                // right alignment
+                data = new Object[4];
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
+                data[1] = "/org/gephi/legend/graphics/right_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/right_selected.png";
+                data[3] = Alignment.RIGHT;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+
+                // justified
+                data = new Object[4];
+                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
+                data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
+                data[2] = "/org/gephi/legend/graphics/justified_selected.png";
+                data[3] = Alignment.JUSTIFIED;
+                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+
                 r = ipeditor.addRow();
                 // insert_row button
                 col = r.addColumn();
@@ -439,68 +527,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 };
                 data[1] = "/org/gephi/legend/graphics/delete_column.png";
                 col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
-
-                // Cell Properties
-                r = ipeditor.addRow();
-                col = r.addColumn();
-                data = new Object[1];
-                data[0] = "Cell:";
-                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-
-                col = r.addColumn();
-                data = new Object[0]; // for a color property, extra data isnt needed.
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data);
-
-                col = r.addColumn();
-                data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data);
-
-                r = ipeditor.addRow();
-                col = r.addColumn();
-                data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data);
-
-                col = r.addColumn();
-                data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
-
-                col = r.addColumn();
-                data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
-
-                r = ipeditor.addRow();
-                col = r.addColumn();
-                // left-alignment
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
-                data[1] = "/org/gephi/legend/graphics/left_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/left_selected.png";
-                data[3] = Alignment.LEFT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
-
-                // center alignment
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
-                data[1] = "/org/gephi/legend/graphics/center_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/center_selected.png";
-                data[3] = Alignment.CENTER;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
-
-                // right alignment
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
-                data[1] = "/org/gephi/legend/graphics/right_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/right_selected.png";
-                data[3] = Alignment.RIGHT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
-
-                // justified
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
-                data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/justified_selected.png";
-                data[3] = Alignment.JUSTIFIED;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 cellNode.setInplaceEditor(ipeditor);
 
@@ -577,8 +603,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                 // TEXT
                 legendDrawText(graphics2D, cellContent, cellFont, cellFontColor, cellOriginX, cellOriginY, cellWidth, cellHeight, cellAlignment);
-
-                drawBlockBoundary(graphics2D, cellNode);
             }
         }
 
