@@ -49,33 +49,15 @@ public class LegendMouseListener implements PreviewMouseListener {
 
         InplaceEditor ipeditor = legendModel.getInplaceEditor();
         if (ipeditor != null) {
-            System.out.println("ipeditor isnt null");
             int originX = Integer.MAX_VALUE;
             int originY = Integer.MAX_VALUE;
             int width = 0;
             int height = 0;
 
-            // to avoid thread syncing and race conditions I think. 
-            // By the time this part of the code is executed, the render function in inplaceItemRenderer might not be executed and hence the dimension limits may not be set.
-            if (ipeditor.getData(InplaceEditor.ORIGIN_X) != null) {
-                originX = ipeditor.getData(InplaceEditor.ORIGIN_X);
-                System.out.println("originX isnt null");
-            }
-
-            if (ipeditor.getData(InplaceEditor.ORIGIN_Y) != null) {
-                originY = ipeditor.getData(InplaceEditor.ORIGIN_Y);
-                System.out.println("originY isnt null");
-            }
-
-            if (ipeditor.getData(InplaceEditor.WIDTH) != null) {
-                width = ipeditor.getData(InplaceEditor.WIDTH);
-                System.out.println("width isnt null");
-            }
-
-            if (ipeditor.getData(InplaceEditor.HEIGHT) != null) {
-                height = ipeditor.getData(InplaceEditor.HEIGHT);
-                System.out.println("height isnt null");
-            }
+            originX = ipeditor.getData(InplaceEditor.ORIGIN_X);
+            originY = ipeditor.getData(InplaceEditor.ORIGIN_Y);
+            width = ipeditor.getData(InplaceEditor.WIDTH);
+            height = ipeditor.getData(InplaceEditor.HEIGHT);
 
             if ((pointX >= originX && pointX < (originX + width))
                     && (pointY >= originY && pointY < (originY + height))) {
@@ -168,7 +150,6 @@ public class LegendMouseListener implements PreviewMouseListener {
         LegendModel legendModel = legendController.getLegendModel();
 
         if (isClickingInInplaceEditor(event.x, event.y)) {
-            System.out.println("clicked inside the inplace editor");
             InplaceEditor currentEditor = legendModel.getInplaceEditor();
             currentEditor.reflectAction(event.x, event.y);
 
@@ -178,7 +159,6 @@ public class LegendMouseListener implements PreviewMouseListener {
             currentItem.setData(LegendItem.IS_SELECTED, true);
             legendController.selectItem(currentItem);
         } else {
-            System.out.println("didnt click inside inplace editor");
             legendModel.setInplaceEditor(null); // clear the inplace editor before rendering. this is needed to disable the inplace editor from showing.
             ArrayList<Item> items = legendModel.getActiveItems();
 
