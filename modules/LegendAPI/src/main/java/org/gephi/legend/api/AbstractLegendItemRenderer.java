@@ -213,14 +213,16 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         originTranslation = new AffineTransform(saveState);
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
 
+        /*
         if (currentIsBeingTransformed) {
             renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
             drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
         } else {
             render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
         }
+        */
+        render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
 
-        //render(graphics2D, originTranslation, currentWidth, currentHeight);
         graphics2D.setTransform(saveState);
     }
 

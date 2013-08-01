@@ -27,6 +27,7 @@ public class TableItem extends AbstractItem implements LegendItem {
     // public static final String NUMBER_OF_ROWS = "Number of Rows";
     // public static final String NUMBER_OF_COLUMNS = "Number of Columns";
     private ArrayList<ArrayList<Cell>> table;
+    private Boolean structureChanged;
 
     public TableItem(Object source) {
         super(source, LEGEND_TYPE);
@@ -64,6 +65,9 @@ public class TableItem extends AbstractItem implements LegendItem {
 
         // add the row to the table
         table.add(pos, row);
+
+        // indicate that the table structure has changed
+        structureChanged = true;
     }
 
     public void deleteRow(int pos) {
@@ -97,6 +101,9 @@ public class TableItem extends AbstractItem implements LegendItem {
         this.setData(LegendItem.OWN_PROPERTIES, newPreviewProperties.toArray());
 
         table.remove(pos);
+
+        // indicate that the table structure has changed
+        structureChanged = true;
     }
 
     public void addColumn(int columnNumber, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent) {
@@ -106,6 +113,9 @@ public class TableItem extends AbstractItem implements LegendItem {
             Cell cell = new Cell(this, rowNumber, columnNumber, backgroundColor, borderColor, cellFont, cellAlignment, cellFontColor, cellContent);
             table.get(rowNumber).add(columnNumber, cell);
         }
+
+        // indicate that the table structure has changed
+        structureChanged = true;
     }
 
     public void deleteColumn(int pos) {
@@ -113,6 +123,17 @@ public class TableItem extends AbstractItem implements LegendItem {
         for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
             table.get(rowNumber).remove(pos);
         }
+
+        // indicate that the table structure has changed
+        structureChanged = true;
+    }
+    
+    public Boolean getStructureChanged() {
+        return structureChanged;
+    }
+    
+    public void setStructureChanged(Boolean change) {
+        structureChanged = change;
     }
 
     @Override
