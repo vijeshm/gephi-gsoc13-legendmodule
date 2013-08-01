@@ -18,13 +18,13 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.blockNode;
-import org.gephi.legend.inplaceeditor.column;
-import org.gephi.legend.inplaceeditor.element;
-import org.gephi.legend.inplaceeditor.inplaceClickResponse;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
-import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
-import org.gephi.legend.inplaceeditor.row;
+import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.Column;
+import org.gephi.legend.inplaceeditor.Element;
+import org.gephi.legend.inplaceeditor.InplaceClickResponse;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.Row;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
@@ -92,7 +92,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, blockNode legendNode) {
+    protected void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode) {
         int blockOriginX = (int) (legendNode.getOriginX());
         int blockOriginY = (int) (legendNode.getOriginY());
         int blockWidth = (int) legendNode.getBlockWidth();
@@ -145,7 +145,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int tableOriginX = blockOriginX + blockWidth / 2 - tableWidth / 2;
         int tableOriginY = blockOriginY + blockHeight / 2 - tableHeight / 2; //as of now, tableOriginY is same as blockOriginY
         TableItem item = (TableItem) legendNode.getItem();
-        blockNode tableNode = legendNode.getChild(TABLENODE);
+        BlockNode tableNode = legendNode.getChild(TABLENODE);
         if (tableNode == null) {
             tableNode = legendNode.addChild(tableOriginX, tableOriginY, tableWidth, tableHeight, TABLENODE);
             buildInplaceTable(tableNode, item);
@@ -165,7 +165,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         if (insufficientEmptySpace) {
             // The table properties must be added only once, to avoid the chain of properties.
             // check if the table properties has been added.
-            if(!(Boolean)tableNode.getInplaceEditor().getData(TABLE_PROPERTIES_ADDED)) {
+            if (!(Boolean) tableNode.getInplaceEditor().getData(TABLE_PROPERTIES_ADDED)) {
                 addTablePropertiesToCells(tableNode, item);
                 tableNode.getInplaceEditor().setData(TABLE_PROPERTIES_ADDED, true);
             }
@@ -178,12 +178,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         renderCells(graphics2D, tableNode, (TableItem) item);
     }
 
-    private void buildInplaceTable(blockNode tableNode, Item item) {
+    private void buildInplaceTable(BlockNode tableNode, Item item) {
         // associate an inplace renderer with the table node
         Graph graph = null;
-        inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-        inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, tableNode);
-        ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+        InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+        InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, tableNode);
+        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
 
@@ -192,17 +192,17 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableNode.setInplaceEditor(ipeditor);
     }
 
-    private void buildCellNodes(blockNode tableNode, Item item, int rowHeight, int[] colWidths) {
+    private void buildCellNodes(BlockNode tableNode, Item item, int rowHeight, int[] colWidths) {
         // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        inplaceEditor currentInplaceEditor = legendModel.getInplaceEditor();
+        InplaceEditor currentInplaceEditor = legendModel.getInplaceEditor();
         Integer activeCellRow = null;
         Integer activeCellColumn = null;
         // if the active inplace editor belongs to  a cell blocknode, then store its row and column.
         // the row and column are later on used to reset the legend model's inplace editor
         if (currentInplaceEditor != null) {
-            blockNode currentBlockNode = currentInplaceEditor.getData(inplaceEditor.BLOCKNODE);
+            BlockNode currentBlockNode = currentInplaceEditor.getData(InplaceEditor.BLOCKNODE);
             if (currentBlockNode.getTag().equals(CELLNODE)) {
                 activeCellRow = currentBlockNode.getData(CELLNODE_ROW_NUMBER);
                 activeCellColumn = currentBlockNode.getData(CELLNODE_COL_NUMBER);
@@ -214,11 +214,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
         // associate inplace editors with the cellNodes
         Graph graph = null;
-        inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
+        InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         PreviewProperty[] cellPreviewProperties = null;
         Cell cell = null;
-        row r;
-        column col;
+        Row r;
+        Column col;
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         int tableOriginX = (int) tableNode.getOriginX();
@@ -241,7 +241,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 int tableCellWidth = colWidths[colNumber];
                 int tableCellHeight = rowHeight;
 
-                blockNode cellNode = tableNode.addChild(tableCellOriginX, tableCellOriginY, tableCellWidth, tableCellHeight, CELLNODE);
+                BlockNode cellNode = tableNode.addChild(tableCellOriginX, tableCellOriginY, tableCellWidth, tableCellHeight, CELLNODE);
                 // setting optional data - to identify which cell this is
                 // this can be used to reset the inplace editor in the legend model
                 cellNode.setData(CELLNODE_ROW_NUMBER, rowNumber);
@@ -250,8 +250,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cell = table.get(rowNumber).get(colNumber);
                 cellPreviewProperties = cell.getPreviewProperties();
 
-                inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
-                ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+                InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
+                ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
                 // modify inplace editors
 
@@ -260,28 +260,28 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 col = r.addColumn();
                 Object[] data = new Object[1];
                 data[0] = "Cell:";
-                col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+                col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
                 col = r.addColumn();
                 data = new Object[0]; // for a color property, extra data isnt needed.
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data);
+                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data);
+                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data);
+                col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
+                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
 
                 col = r.addColumn();
                 data = new Object[0];
-                col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
+                col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
@@ -291,7 +291,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[1] = "/org/gephi/legend/graphics/left_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/left_selected.png";
                 data[3] = Alignment.LEFT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // center alignment
                 data = new Object[4];
@@ -299,7 +299,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[1] = "/org/gephi/legend/graphics/center_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/center_selected.png";
                 data[3] = Alignment.CENTER;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // right alignment
                 data = new Object[4];
@@ -307,7 +307,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[1] = "/org/gephi/legend/graphics/right_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/right_selected.png";
                 data[3] = Alignment.RIGHT;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 // justified
                 data = new Object[4];
@@ -315,18 +315,18 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
                 data[2] = "/org/gephi/legend/graphics/justified_selected.png";
                 data[3] = Alignment.JUSTIFIED;
-                col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
 
                 r = ipeditor.addRow();
                 // insert_row button
                 col = r.addColumn();
                 data = new Object[2];
-                data[0] = new inplaceClickResponse() {
+                data[0] = new InplaceClickResponse() {
                     @Override
-                    public void performAction(inplaceEditor ipeditor) {
+                    public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to add a row?", "Confirm Row Addition", JOptionPane.YES_NO_OPTION);
                         if (confirmation == JOptionPane.YES_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
                             tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
@@ -334,17 +334,17 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 };
                 data[1] = "/org/gephi/legend/graphics/insert_row.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
                 // insert_column button
                 col = r.addColumn();
                 data = new Object[2];
-                data[0] = new inplaceClickResponse() {
+                data[0] = new InplaceClickResponse() {
                     @Override
-                    public void performAction(inplaceEditor ipeditor) {
+                    public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to add a column?", "Confirm Column Addition", JOptionPane.YES_NO_OPTION);
                         if (confirmation == JOptionPane.YES_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
                             tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
@@ -352,17 +352,17 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 };
                 data[1] = "/org/gephi/legend/graphics/insert_column.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
                 // delete_row button
                 col = r.addColumn();
                 data = new Object[2];
-                data[0] = new inplaceClickResponse() {
+                data[0] = new InplaceClickResponse() {
                     @Override
-                    public void performAction(inplaceEditor ipeditor) {
+                    public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to delete this row?", "Confirm Row Deletion", JOptionPane.YES_NO_OPTION);
                         if (confirmation == JOptionPane.YES_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
                             tableItem.deleteRow(cellRowNumber);
@@ -370,17 +370,17 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 };
                 data[1] = "/org/gephi/legend/graphics/delete_row.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
                 // delete_column button
                 col = r.addColumn();
                 data = new Object[2];
-                data[0] = new inplaceClickResponse() {
+                data[0] = new InplaceClickResponse() {
                     @Override
-                    public void performAction(inplaceEditor ipeditor) {
+                    public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to delete this column?", "Confirm Column Deletion", JOptionPane.YES_NO_OPTION);
                         if (confirmation == JOptionPane.YES_OPTION) {
-                            blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                            BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
                             tableItem.deleteColumn(cellColNumber);
@@ -388,7 +388,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 };
                 data[1] = "/org/gephi/legend/graphics/delete_column.png";
-                col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
                 cellNode.setInplaceEditor(ipeditor);
 
@@ -400,27 +400,27 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    private void addTablePropertiesToCells(blockNode tableNode, TableItem item) {
+    private void addTablePropertiesToCells(BlockNode tableNode, TableItem item) {
         PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        ArrayList<blockNode> cellNodes = tableNode.getChildren();
-        for (blockNode cellNode : cellNodes) {
-            inplaceEditor ipeditor = cellNode.getInplaceEditor();
+        ArrayList<BlockNode> cellNodes = tableNode.getChildren();
+        for (BlockNode cellNode : cellNodes) {
+            InplaceEditor ipeditor = cellNode.getInplaceEditor();
             // build controls for general properties of the table
             buildTableProperties(ipeditor, itemIndex, tablePreviewProperties);
         }
     }
 
-    private void buildTableProperties(inplaceEditor ipeditor, int itemIndex, PreviewProperty[] tablePreviewProperties) {
-        row r;
-        column col;
+    private void buildTableProperties(InplaceEditor ipeditor, int itemIndex, PreviewProperty[] tablePreviewProperties) {
+        Row r;
+        Column col;
 
         // modify inplace editors
         r = ipeditor.addRow();
         col = r.addColumn();
         Object[] data = new Object[1];
         data[0] = "Table:";
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         // cell spacing
         r = ipeditor.addRow();
@@ -430,11 +430,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data[0] = true;
         data[1] = "/org/gephi/legend/graphics/cell_spacing.png";
         data[2] = "/org/gephi/legend/graphics/cell_spacing.png";
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
+        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
 
         // cell padding
         col = r.addColumn();
@@ -442,11 +442,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data[0] = true;
         data[1] = "/org/gephi/legend/graphics/cell_padding.png";
         data[2] = "/org/gephi/legend/graphics/cell_padding.png";
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
+        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
 
         // border size
         col = r.addColumn();
@@ -454,22 +454,22 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data[0] = true;
         data[1] = "/org/gephi/legend/graphics/cell_border.png";
         data[2] = "/org/gephi/legend/graphics/cell_border.png";
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
+        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
 
         r = ipeditor.addRow();
         // border color
         col = r.addColumn();
         data = new Object[2];
-        data[0] = new inplaceClickResponse() {
+        data[0] = new InplaceClickResponse() {
             @Override
-            public void performAction(inplaceEditor ipeditor) {
+            public void performAction(InplaceEditor ipeditor) {
                 int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the border color of all cells?", "Confirm Border Color Change", JOptionPane.YES_NO_OPTION);
                 if (confirmation == JOptionPane.YES_NO_OPTION) {
-                    blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                     TableItem tableItem = (TableItem) cellNode.getItem();
                     PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
                     Color tableCellBorderColor = tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
@@ -492,17 +492,17 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             }
         };
         data[1] = "/org/gephi/legend/graphics/table_cell_border_color.png";
-        col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
         // table font
         col = r.addColumn();
         data = new Object[2];
-        data[0] = new inplaceClickResponse() {
+        data[0] = new InplaceClickResponse() {
             @Override
-            public void performAction(inplaceEditor ipeditor) {
+            public void performAction(InplaceEditor ipeditor) {
                 int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font for all cells?", "Confirm Font Change", JOptionPane.YES_NO_OPTION);
                 if (confirmation == JOptionPane.YES_NO_OPTION) {
-                    blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                     TableItem tableItem = (TableItem) cellNode.getItem();
                     PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
                     Font tableCellFont = tablePreviewProperties[TableProperty.TABLE_FONT].getValue();
@@ -526,17 +526,17 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             }
         };
         data[1] = "/org/gephi/legend/graphics/table_font.png";
-        col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
 
         // table font color
         col = r.addColumn();
         data = new Object[2];
-        data[0] = new inplaceClickResponse() {
+        data[0] = new InplaceClickResponse() {
             @Override
-            public void performAction(inplaceEditor ipeditor) {
+            public void performAction(InplaceEditor ipeditor) {
                 int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font color for all cells?", "Confirm Font Color Change", JOptionPane.YES_NO_OPTION);
                 if (confirmation == JOptionPane.YES_NO_OPTION) {
-                    blockNode cellNode = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                     TableItem tableItem = (TableItem) cellNode.getItem();
                     PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
                     Color tableCellFontColor = tablePreviewProperties[TableProperty.TABLE_FONT_COLOR].getValue();
@@ -559,11 +559,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             }
         };
         data[1] = "/org/gephi/legend/graphics/table_font_color.png";
-        col.addElement(element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
     }
 
-    private void updateCellGeometry(blockNode tableNode, int rowHeight, int[] colWidths) {
-        ArrayList<blockNode> cellNodes = tableNode.getChildren();
+    private void updateCellGeometry(BlockNode tableNode, int rowHeight, int[] colWidths) {
+        ArrayList<BlockNode> cellNodes = tableNode.getChildren();
         int tableOriginX = (int) tableNode.getOriginX();
         int tableOriginY = (int) tableNode.getOriginY();
         //precompute the relative positions of the columns from the table legend's origin.
@@ -574,7 +574,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             columnOrigins[i] = sum;
             sum += colWidths[i];
         }
-        for (blockNode cellNode : cellNodes) {
+        for (BlockNode cellNode : cellNodes) {
             int rowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
             int colNumber = cellNode.getData(CELLNODE_COL_NUMBER);
 
@@ -587,14 +587,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    private void renderCells(Graphics2D graphics2D, blockNode tableNode, TableItem item) {
+    private void renderCells(Graphics2D graphics2D, BlockNode tableNode, TableItem item) {
         Font saveFont = graphics2D.getFont();
         Color saveColor = graphics2D.getColor();
 
-        ArrayList<blockNode> cellNodes = tableNode.getChildren();
+        ArrayList<BlockNode> cellNodes = tableNode.getChildren();
         PreviewProperty[] previewProperties = null;
         // ArrayList<ArrayList<Cell>> table = item.getTable();
-        blockNode cellNode;
+        BlockNode cellNode;
         Cell cell;
         Color cellBackgroundColor;
         Color cellBorderColor;

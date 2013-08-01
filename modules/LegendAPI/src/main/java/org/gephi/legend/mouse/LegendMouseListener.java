@@ -6,9 +6,9 @@ import org.gephi.desktop.preview.PreviewTopComponent;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.blockNode;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
-import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
+import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_HEIGHT;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_WIDTH;
@@ -47,7 +47,7 @@ public class LegendMouseListener implements PreviewMouseListener {
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
 
-        inplaceEditor ipeditor = legendModel.getInplaceEditor();
+        InplaceEditor ipeditor = legendModel.getInplaceEditor();
         if (ipeditor != null) {
             System.out.println("ipeditor isnt null");
             int originX = Integer.MAX_VALUE;
@@ -57,23 +57,23 @@ public class LegendMouseListener implements PreviewMouseListener {
 
             // to avoid thread syncing and race conditions I think. 
             // By the time this part of the code is executed, the render function in inplaceItemRenderer might not be executed and hence the dimension limits may not be set.
-            if (ipeditor.getData(inplaceEditor.ORIGIN_X) != null) {
-                originX = ipeditor.getData(inplaceEditor.ORIGIN_X);
+            if (ipeditor.getData(InplaceEditor.ORIGIN_X) != null) {
+                originX = ipeditor.getData(InplaceEditor.ORIGIN_X);
                 System.out.println("originX isnt null");
             }
 
-            if (ipeditor.getData(inplaceEditor.ORIGIN_Y) != null) {
-                originY = ipeditor.getData(inplaceEditor.ORIGIN_Y);
+            if (ipeditor.getData(InplaceEditor.ORIGIN_Y) != null) {
+                originY = ipeditor.getData(InplaceEditor.ORIGIN_Y);
                 System.out.println("originY isnt null");
             }
 
-            if (ipeditor.getData(inplaceEditor.WIDTH) != null) {
-                width = ipeditor.getData(inplaceEditor.WIDTH);
+            if (ipeditor.getData(InplaceEditor.WIDTH) != null) {
+                width = ipeditor.getData(InplaceEditor.WIDTH);
                 System.out.println("width isnt null");
             }
 
-            if (ipeditor.getData(inplaceEditor.HEIGHT) != null) {
-                height = ipeditor.getData(inplaceEditor.HEIGHT);
+            if (ipeditor.getData(InplaceEditor.HEIGHT) != null) {
+                height = ipeditor.getData(InplaceEditor.HEIGHT);
                 System.out.println("height isnt null");
             }
 
@@ -169,11 +169,11 @@ public class LegendMouseListener implements PreviewMouseListener {
 
         if (isClickingInInplaceEditor(event.x, event.y)) {
             System.out.println("clicked inside the inplace editor");
-            inplaceEditor currentEditor = legendModel.getInplaceEditor();
+            InplaceEditor currentEditor = legendModel.getInplaceEditor();
             currentEditor.reflectAction(event.x, event.y);
 
             // the corresponding legend shouldnt be deselected. hence, reselect it.
-            blockNode currentBlock = currentEditor.getData(inplaceEditor.BLOCKNODE);
+            BlockNode currentBlock = currentEditor.getData(InplaceEditor.BLOCKNODE);
             Item currentItem = currentBlock.getItem();
             currentItem.setData(LegendItem.IS_SELECTED, true);
             legendController.selectItem(currentItem);
@@ -194,8 +194,8 @@ public class LegendMouseListener implements PreviewMouseListener {
                     items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
                     legendController.selectItem(items.get(i));
 
-                    blockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
-                    blockNode clickedBlock = root.getClickedBlock(event.x, event.y);
+                    BlockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
+                    BlockNode clickedBlock = root.getClickedBlock(event.x, event.y);
                     legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
                     break;
                 }
@@ -439,7 +439,7 @@ public class LegendMouseListener implements PreviewMouseListener {
             int width = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
             int height = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
 
-            blockNode root = legendModel.getBlockTree(itemIndex);
+            BlockNode root = legendModel.getBlockTree(itemIndex);
             // relativeX would've been set in mousePressed event using the formula: (event.x - realOriginX). Hence, to obtain the realOriginX, we need to pass (event.x - relativeX)
             // 3rd parameter is newWidth/oldWidth. 4th parameter is newHeight/oldHeight. Here, it is 1 because it is a translate operation.
             root.updateGeometry(realOriginX, realOriginY, width, height);

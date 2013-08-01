@@ -17,7 +17,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.blockNode;
+import org.gephi.legend.api.BlockNode;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewModel;
@@ -35,9 +35,9 @@ import org.openide.util.lookup.ServiceProviders;
  */
 @ServiceProviders(value = {
     @ServiceProvider(service = Renderer.class, position = 506),
-    @ServiceProvider(service = inplaceItemRenderer.class, position = 506)
+    @ServiceProvider(service = InplaceItemRenderer.class, position = 506)
 })
-public class inplaceItemRenderer implements Renderer {
+public class InplaceItemRenderer implements Renderer {
 
     // all these values should be made as final. They are temporarily not final because of debugging purposes
     public static Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
@@ -81,16 +81,16 @@ public class inplaceItemRenderer implements Renderer {
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        inplaceEditor ipeditor = legendModel.getInplaceEditor();
+        InplaceEditor ipeditor = legendModel.getInplaceEditor();
 
         if (ipeditor != null) {
             // get the geometry of the block associated with the current inplace item.
-            blockNode node = ipeditor.getData(inplaceEditor.BLOCKNODE);
+            BlockNode node = ipeditor.getData(InplaceEditor.BLOCKNODE);
             float blockOriginX = node.getOriginX();
             float blockOriginY = node.getOriginY();
             float blockWidth = node.getBlockWidth();
             float blockHeight = node.getBlockHeight();
-            float gap = ipeditor.getData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP);
+            float gap = ipeditor.getData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP);
 
             // save current states and restore it later
             Color saveColorState = graphics2d.getColor();
@@ -109,7 +109,7 @@ public class inplaceItemRenderer implements Renderer {
             int maxElementsCount;
             boolean selected;
             ArrayList<Integer> elementsCount = new ArrayList<Integer>();
-            ArrayList<row> rows = ipeditor.getRows();
+            ArrayList<Row> rows = ipeditor.getRows();
 
             // iterate through all the rows, corresponding columns and their corresponding elements. 
             // based on the type of element, render accordingly.
@@ -119,14 +119,14 @@ public class inplaceItemRenderer implements Renderer {
             // while filling, add 1 to width and height, to avoid gaps between elements.
             for (rowBlock = 0; rowBlock < rows.size(); rowBlock++) {
                 int currentElementsCount = 0;
-                ArrayList<column> columns = rows.get(rowBlock).getColumns();
+                ArrayList<Column> columns = rows.get(rowBlock).getColumns();
                 for (colBlock = 0; colBlock < columns.size(); colBlock++) {
-                    ArrayList<element> elements = columns.get(colBlock).getElements();
+                    ArrayList<Element> elements = columns.get(colBlock).getElements();
                     selected = false;
                     for (elemBlock = 0; elemBlock < elements.size(); elemBlock++) {
-                        element elem = elements.get(elemBlock);
+                        Element elem = elements.get(elemBlock);
                         Object[] data = elem.getAssociatedData();
-                        element.ELEMENT_TYPE type = elem.getElementType();
+                        Element.ELEMENT_TYPE type = elem.getElementType();
                         PreviewProperty prop = elem.getProperty();
 
                         // temporary computational variablses
@@ -428,10 +428,10 @@ public class inplaceItemRenderer implements Renderer {
             graphics2d.setFont(saveFontState);
             graphics2d.setColor(saveColorState);
 
-            ipeditor.setData(inplaceEditor.ORIGIN_X, editorOriginX);
-            ipeditor.setData(inplaceEditor.ORIGIN_Y, editorOriginY);
-            ipeditor.setData(inplaceEditor.WIDTH, editorWidth);
-            ipeditor.setData(inplaceEditor.HEIGHT, editorHeight);
+            ipeditor.setData(InplaceEditor.ORIGIN_X, editorOriginX);
+            ipeditor.setData(InplaceEditor.ORIGIN_Y, editorOriginY);
+            ipeditor.setData(InplaceEditor.WIDTH, editorWidth);
+            ipeditor.setData(InplaceEditor.HEIGHT, editorHeight);
         }
     }
 
@@ -451,12 +451,12 @@ public class inplaceItemRenderer implements Renderer {
 
     @Override
     public boolean isRendererForitem(Item item, PreviewProperties properties) {
-        Class renderer = item.getData(inplaceEditor.RENDERER);
+        Class renderer = item.getData(InplaceEditor.RENDERER);
         return renderer != null && renderer.equals(getClass());
     }
 
     @Override
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
-        return itemBuilder instanceof inplaceItemBuilder;
+        return itemBuilder instanceof InplaceItemBuilder;
     }
 }

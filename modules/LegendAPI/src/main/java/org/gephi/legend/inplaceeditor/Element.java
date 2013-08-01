@@ -12,7 +12,7 @@ import org.gephi.preview.api.PreviewProperty;
  *
  * @author mvvijesh
  */
-public class element {
+public class Element {
 
     /*
      public static final Integer LABEL = 0;
@@ -63,7 +63,7 @@ public class element {
     private int elementWidth;
     private int elementHeight;
 
-    public element(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
+    public Element(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
         this.type = type;
         this.itemIndex = itemIndex;
         this.property = property;

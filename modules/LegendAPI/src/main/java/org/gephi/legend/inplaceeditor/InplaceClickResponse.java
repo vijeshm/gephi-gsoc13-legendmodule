@@ -10,6 +10,6 @@ import org.gephi.legend.spi.LegendItem;
  *
  * @author mvvijesh
  */
-public interface inplaceClickResponse {
-    void performAction(inplaceEditor ipeditor);
+public interface InplaceClickResponse {
+    void performAction(InplaceEditor ipeditor);
 }

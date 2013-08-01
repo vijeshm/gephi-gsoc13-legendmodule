@@ -11,37 +11,37 @@ import org.gephi.preview.api.PreviewProperty;
  *
  * @author mvvijesh
  */
-public class column {
-    row r;
-    inplaceEditor ipeditor;
-    ArrayList<element> elements;
+public class Column {
+    Row r;
+    InplaceEditor ipeditor;
+    ArrayList<Element> elements;
     
-    public column(inplaceEditor ipeditor, row r)    {
+    public Column(InplaceEditor ipeditor, Row r)    {
         this.r = r;
         this.ipeditor = ipeditor;
-        elements = new ArrayList<element>();
+        elements = new ArrayList<Element>();
     }
     
-    public element addElement(element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
-        element elem = new element(type, itemIndex, property, data);
+    public Element addElement(Element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
+        Element elem = new Element(type, itemIndex, property, data);
         elements.add(elem);
         return elem;
     }
     
-    public void deleteElement(element e)    {
+    public void deleteElement(Element e)    {
         elements.remove(e);
     }
     
     // get methods
-    public row getRow(){
+    public Row getRow(){
         return r;
     }
     
-    public inplaceEditor getInplaceEditor() {
+    public InplaceEditor getInplaceEditor() {
         return ipeditor;
     }
     
-    public ArrayList<element> getElements()   {
+    public ArrayList<Element> getElements()   {
         return elements;
     }
     

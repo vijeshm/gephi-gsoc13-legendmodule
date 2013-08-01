@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.blockNode;
+import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.G2DRenderTargetBuilder;
@@ -42,7 +42,7 @@ import sun.reflect.generics.tree.Tree;
  *
  * @author mvvijesh
  */
-public class inplaceEditor implements Item {
+public class InplaceEditor implements Item {
 
     public static final String RENDERER = "inplaceRenderer";
     // public static final String ROWS = "rows";
@@ -55,57 +55,57 @@ public class inplaceEditor implements Item {
     public static final String HEIGHT = "height";
     public static final String BLOCK_INPLACEEDITOR_GAP = "gap";
     public static final String BLOCKNODE = "blocknode";
-    private ArrayList<row> rows;
+    private ArrayList<Row> rows;
     private final String type;
     private final Object source;
     private final Map<String, Object> data;
 
-    public inplaceEditor(Object source) {
+    public InplaceEditor(Object source) {
         this.source = source;
         this.type = TYPE;
-        this.rows = new ArrayList<row>();
+        this.rows = new ArrayList<Row>();
         this.data = new HashMap<String, Object>();
     }
 
-    public row addRow() {
-        row r = new row(this);
+    public Row addRow() {
+        Row r = new Row(this);
         rows.add(r);
         return r;
     }
 
-    public void deleteRow(row r) {
+    public void deleteRow(Row r) {
         rows.remove(r);
     }
 
-    public column addColumn(row r) {
-        column col = r.addColumn();
+    public Column addColumn(Row r) {
+        Column col = r.addColumn();
         return col;
     }
 
-    public void deleteColumn(row r, column col) {
+    public void deleteColumn(Row r, Column col) {
         r.deleteColumn(col);
     }
 
-    public element addElement(row r, column col, element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
-        element elem = r.addElement(col, type, itemIndex, property, data);
+    public Element addElement(Row r, Column col, Element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
+        Element elem = r.addElement(col, type, itemIndex, property, data);
         return elem;
     }
 
     // get methods
-    public ArrayList<row> getRows() {
+    public ArrayList<Row> getRows() {
         return rows;
     }
 
     public void reflectAction(int x, int y) {
-        int borderSize = inplaceItemRenderer.BORDER_SIZE;
-        int unitSize = inplaceItemRenderer.UNIT_SIZE;
+        int borderSize = InplaceItemRenderer.BORDER_SIZE;
+        int unitSize = InplaceItemRenderer.UNIT_SIZE;
         int editorOriginX = getData(ORIGIN_X);
         int editorOriginY = getData(ORIGIN_Y);
         int editorWidth = getData(WIDTH);
         int editorHeight = getData(HEIGHT);
 
         // get the item associated with the inplace editor
-        blockNode node = getData(BLOCKNODE);
+        BlockNode node = getData(BLOCKNODE);
         Item item = node.getItem();
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
@@ -115,13 +115,13 @@ public class inplaceEditor implements Item {
         PreviewProperties previewProperties = previewModel.getProperties();
 
         // find out which element has been clicked based on the click-coordinates and element coordinates
-        element selectedElem = null;
-        column selectedColumn = null;
-        for (row r : rows) {
-            ArrayList<column> columns = r.getColumns();
-            for (column c : columns) {
-                ArrayList<element> elements = c.getElements();
-                for (element elem : elements) {
+        Element selectedElem = null;
+        Column selectedColumn = null;
+        for (Row r : rows) {
+            ArrayList<Column> columns = r.getColumns();
+            for (Column c : columns) {
+                ArrayList<Element> elements = c.getElements();
+                for (Element elem : elements) {
                     // check the condition excluding the left border. this is to avoid overlapping between elements
                     if ((x > elem.getOriginX() && x <= elem.getOriginX() + elem.getElementWidth())
                             && (y > elem.getOriginY() && y <= elem.getOriginY() + elem.getElementHeight())) {
@@ -146,12 +146,12 @@ public class inplaceEditor implements Item {
                 // if the column that you've selected has multiple elements, each should represent the same property
                 // the value of the selected element should be set as the value of the common property.
                 // Object[] data: data[0] says whether it is selected. data[1] says what value to set as the property.
-                ArrayList<element> elements = selectedColumn.elements;
+                ArrayList<Element> elements = selectedColumn.elements;
 
                 // checking if all the properties are the same
                 Boolean uniform = true;
                 PreviewProperty prop = elements.get(0).getProperty();
-                for (element e : elements) {
+                for (Element e : elements) {
                     if (e.getProperty().getDisplayName() != prop.getDisplayName()) {
                         uniform = false;
                         break;
@@ -160,7 +160,7 @@ public class inplaceEditor implements Item {
 
                 if (uniform) {
                     // for all the elements, set data[0] as unselected. for the selectedItem, set data[0] as selected.
-                    for (element e : elements) {
+                    for (Element e : elements) {
                         Object[] elementData = e.getAssociatedData();
                         elementData[0] = false;
                     }
@@ -247,7 +247,7 @@ public class inplaceEditor implements Item {
                         break;
                         
                     case FUNCTION:
-                        inplaceClickResponse responder = (inplaceClickResponse) elementData[0];
+                        InplaceClickResponse responder = (InplaceClickResponse) elementData[0];
                         responder.performAction(this);
                 }
             }

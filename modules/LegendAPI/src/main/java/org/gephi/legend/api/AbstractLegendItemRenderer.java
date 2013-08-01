@@ -21,11 +21,11 @@ import org.apache.batik.svggen.ImageHandlerBase64Encoder;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.graph.api.Graph;
-import org.gephi.legend.inplaceeditor.column;
-import org.gephi.legend.inplaceeditor.element;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
-import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
-import org.gephi.legend.inplaceeditor.row;
+import org.gephi.legend.inplaceeditor.Column;
+import org.gephi.legend.inplaceeditor.Element;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.Row;
 import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
@@ -98,7 +98,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      */
     protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
-    protected abstract void renderToGraphics(Graphics2D graphics2D, blockNode legendNode);
+    protected abstract void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode);
 
     /**
      * Function that reads the custom properties values from the
@@ -276,7 +276,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         // The rendering takes place from the outermost block to innermost block
         // BORDER - border is external
-        blockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.        
+        BlockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.        
         renderBorder(graphics2D, width, height, borderLineThick, borderColor, item, root);
 
         // The background properties must also be included as a part of the root block.
@@ -306,17 +306,17 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             titleBoundaryHeight = graphics2D.getFontMetrics().getHeight();
             renderTitle(graphics2D, (int) titleBoundaryWidth, (int) titleBoundaryHeight);
 
-            blockNode titleNode = root.getChild(blockNode.TITLE);
+            BlockNode titleNode = root.getChild(BlockNode.TITLE);
             // the following code ensures that there is only one title node at any point in time.
             if (titleNode == null) {
-                titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, blockNode.TITLE);
+                titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, BlockNode.TITLE);
                 buildInplaceTitle(titleNode, item);
             }
 
             titleNode.updateGeometry(currentRealOriginX, currentRealOriginY, titleBoundaryWidth, titleBoundaryHeight);
             // drawBlockBoundary(graphics2D, titleNode);
         } else {
-            root.removeChild(blockNode.TITLE);
+            root.removeChild(BlockNode.TITLE);
         }
 
         // A description is a new block. (The second child of a root in fact, initially)
@@ -333,23 +333,23 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // descOrigin.translate(0, height - descBoundaryHeight);
             renderDescription(graphics2D, 0, (int) (height - descBoundaryHeight), (int) descBoundaryWidth, (int) descBoundaryHeight);
 
-            blockNode descNode = root.getChild(blockNode.DESC);
+            BlockNode descNode = root.getChild(BlockNode.DESC);
             // the following code ensures that there is only one description node at any point in time.
             if (descNode == null) {
-                descNode = root.addChild(0, height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight, blockNode.DESC);
+                descNode = root.addChild(0, height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight, BlockNode.DESC);
                 buildInplaceDesc(descNode, item);
             }
 
             descNode.updateGeometry(currentRealOriginX, currentRealOriginY + height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight);
             // drawBlockBoundary(graphics2D, descNode);
         } else {
-            root.removeChild(blockNode.DESC);
+            root.removeChild(BlockNode.DESC);
         }
 
         // rendering legend
-        blockNode legendNode = root.getChild(blockNode.LEGEND);
+        BlockNode legendNode = root.getChild(BlockNode.LEGEND);
         if (legendNode == null) {
-            legendNode = root.addChild(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight, blockNode.LEGEND);
+            legendNode = root.addChild(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight, BlockNode.LEGEND);
             legendNode.setInplaceEditor(root.getInplaceEditor()); // for all emptpy areas in the legend block, a click should correspond to the root's inplace editor
         }
 
@@ -388,7 +388,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderBorder(Graphics2D graphics2D, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, blockNode root) {
+    private void renderBorder(Graphics2D graphics2D, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, BlockNode root) {
         if (borderIsDisplaying) {
             graphics2D.setColor(borderColor);
 
@@ -408,12 +408,12 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // next time onwards, the ipeditor will already be built and it need not be structured every time the item is being rendered.
 
             Graph graph = null;
-            inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, root);
-            ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+            InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+            InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, root);
+            ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
-            row r;
-            column col;
+            Row r;
+            Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
             PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -422,28 +422,28 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn();
             Object[] data = new Object[1];
             data[0] = "Border: ";
-            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             col = r.addColumn();
             data = new Object[3];
             data[0] = borderIsDisplaying;
             data[1] = "/org/gephi/legend/graphics/invisible.png";
             data[2] = "/org/gephi/legend/graphics/visible.png";
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
 
             col = r.addColumn();
             data = new Object[0]; // for a color propoerty, extra data isnt needed.
-            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
 
             col = r.addColumn();
             data = new Object[0]; // for a numerical property, extra data isnt needed.
-            col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data);
+            col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data);
 
             root.setInplaceEditor(ipeditor);
         }
     }
 
-    private void renderBackground(Graphics2D graphics2D, Integer width, Integer height, Item item, blockNode root) {
+    private void renderBackground(Graphics2D graphics2D, Integer width, Integer height, Item item, BlockNode root) {
         // this part of the code will get executed only after the border is rendered. Hence, an inplaceeditor will already be set.
         if (backgroundIsDisplaying) {
             graphics2D.setColor(backgroundColor);
@@ -452,10 +452,10 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         // this function will be called every now and then, in response to mouse events. Hence, the background controls get accumulated.
         // To avoid this, we've to append only when the sole controls added is the border controls. i.e, the number of rows in the ipeditor is 1.
-        inplaceEditor ipeditor = root.getInplaceEditor();
+        InplaceEditor ipeditor = root.getInplaceEditor();
         if (ipeditor.getRows().size() == 1) {
-            row r;
-            column col;
+            Row r;
+            Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
             PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -465,38 +465,38 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn();
             Object[] data = new Object[1];
             data[0] = "Background: ";
-            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             col = r.addColumn();
             data = new Object[3];
             data[0] = backgroundIsDisplaying;
             data[1] = "/org/gephi/legend/graphics/invisible.png";
             data[2] = "/org/gephi/legend/graphics/visible.png";
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
 
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data);
         }
     }
 
-    private void addVisibilityControls(String displayString, PreviewProperty prop, Boolean defaultVal, blockNode root, Item item) {
-        inplaceEditor ipeditor = root.getInplaceEditor();
+    private void addVisibilityControls(String displayString, PreviewProperty prop, Boolean defaultVal, BlockNode root, Item item) {
+        InplaceEditor ipeditor = root.getInplaceEditor();
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        row r = ipeditor.addRow();
+        Row r = ipeditor.addRow();
 
-        column col = r.addColumn();
+        Column col = r.addColumn();
         Object[] data = new Object[1];
         data[0] = displayString;
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+        col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
         col = r.addColumn();
         data = new Object[3];
         data[0] = defaultVal;
         data[1] = "/org/gephi/legend/graphics/invisible.png";
         data[2] = "/org/gephi/legend/graphics/visible.png";
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, prop, data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, prop, data);
     }
 
     private void renderTitle(Graphics2D graphics2D, Integer boundaryWidth, Integer boundaryHeight) {
@@ -505,15 +505,15 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, boundaryWidth, boundaryHeight, titleAlignment, false);
     }
 
-    private void buildInplaceTitle(blockNode titleNode, Item item) {
+    private void buildInplaceTitle(BlockNode titleNode, Item item) {
         if (titleNode.getInplaceEditor() == null) {
             Graph graph = null;
-            inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, titleNode);
-            ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+            InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+            InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, titleNode);
+            ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
-            row r;
-            column col;
+            Row r;
+            Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
             PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -522,22 +522,22 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn();
             Object[] data = new Object[1];
             data[0] = "Title: ";
-            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             // we could have another property for title background.
 
             r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data);
+            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data);
 
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
 
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);
+            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);
 
             r = ipeditor.addRow();
             col = r.addColumn();
@@ -547,7 +547,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/left_unselected.png";
             data[2] = "/org/gephi/legend/graphics/left_selected.png";
             data[3] = Alignment.LEFT;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
 
             // center alignment
             data = new Object[4];
@@ -555,7 +555,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/center_unselected.png";
             data[2] = "/org/gephi/legend/graphics/center_selected.png";
             data[3] = Alignment.CENTER;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
 
             // right alignment
             data = new Object[4];
@@ -563,7 +563,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/right_unselected.png";
             data[2] = "/org/gephi/legend/graphics/right_selected.png";
             data[3] = Alignment.RIGHT;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
 
             // justified
             data = new Object[4];
@@ -571,7 +571,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
             data[2] = "/org/gephi/legend/graphics/justified_selected.png";
             data[3] = Alignment.JUSTIFIED;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
 
             titleNode.setInplaceEditor(ipeditor);
         }
@@ -581,17 +581,17 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, x, y, width, height, descriptionAlignment);
     }
 
-    private void buildInplaceDesc(blockNode descNode, Item item) {
+    private void buildInplaceDesc(BlockNode descNode, Item item) {
         // the flow of this method is the same as the buildInplaceTitle method. 
         // The flow is repeated keeping in mind that there might be some special treatment give to description in the future.
         if (descNode.getInplaceEditor() == null) {
             Graph graph = null;
-            inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-            inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, descNode);
-            ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+            InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+            InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, descNode);
+            ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
-            row r;
-            column col;
+            Row r;
+            Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
             PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -600,22 +600,22 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn();
             Object[] data = new Object[1];
             data[0] = "Description: ";
-            col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             // we could have another property for title background.
 
             r = ipeditor.addRow();
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data);
+            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data);
 
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data);
 
             col = r.addColumn();
             data = new Object[0];
-            col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
+            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
 
             r = ipeditor.addRow();
             col = r.addColumn();
@@ -625,7 +625,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/left_unselected.png";
             data[2] = "/org/gephi/legend/graphics/left_selected.png";
             data[3] = Alignment.LEFT;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
 
             // center alignment
             data = new Object[4];
@@ -633,7 +633,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/center_unselected.png";
             data[2] = "/org/gephi/legend/graphics/center_selected.png";
             data[3] = Alignment.CENTER;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
 
             // right alignment
             data = new Object[4];
@@ -641,7 +641,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/right_unselected.png";
             data[2] = "/org/gephi/legend/graphics/right_selected.png";
             data[3] = Alignment.RIGHT;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
 
             // justified
             data = new Object[4];
@@ -649,7 +649,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
             data[2] = "/org/gephi/legend/graphics/justified_selected.png";
             data[3] = Alignment.JUSTIFIED;
-            col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
 
             descNode.setInplaceEditor(ipeditor);
         }
@@ -659,7 +659,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         return graphics2d.getFontMetrics().stringWidth(str);
     }
 
-    protected void drawBlockBoundary(Graphics2D graphics2D, blockNode node) {
+    protected void drawBlockBoundary(Graphics2D graphics2D, BlockNode node) {
         graphics2D.setColor(Color.RED);
         graphics2D.setFont(new Font("Arial", Font.PLAIN, 20));
         int originX = (int) (node.getOriginX() - currentRealOriginX);

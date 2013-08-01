@@ -12,12 +12,12 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.blockNode;
-import org.gephi.legend.inplaceeditor.column;
-import org.gephi.legend.inplaceeditor.element;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
-import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
-import org.gephi.legend.inplaceeditor.row;
+import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.Column;
+import org.gephi.legend.inplaceeditor.Element;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.Row;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
@@ -70,7 +70,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, blockNode legendNode) {
+    protected void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode) {
         // draw the text
         int blockOriginX = (int) (legendNode.getOriginX());
         int blockOriginY = (int) (legendNode.getOriginY());
@@ -84,7 +84,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         int textOriginX = blockOriginX;
         int textOriginY = blockOriginY + blockHeight / 2 - textHeight / 2;
         Item item = legendNode.getItem();
-        blockNode textNode = legendNode.getChild(TEXTNODE);
+        BlockNode textNode = legendNode.getChild(TEXTNODE);
         if (textNode == null) {
             textNode = legendNode.addChild(textOriginX, textOriginY, textWidth, textHeight, TEXTNODE);
             buildInplaceText(textNode, item);
@@ -95,15 +95,15 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         drawBlockBoundary(graphics2D, textNode);
     }
 
-    private void buildInplaceText(blockNode textNode, Item item) {
+    private void buildInplaceText(BlockNode textNode, Item item) {
         // associate an inplace renderer with the textNode
         Graph graph = null;
-        inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-        inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, textNode);
-        ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+        InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+        InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, textNode);
+        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
-        row r;
-        column col;
+        Row r;
+        Column col;
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         PreviewProperty prop;
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -111,15 +111,15 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         r = ipeditor.addRow();
         col = r.addColumn();
         Object[] data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data);
+        col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data);
         
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data);
+        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data);
 
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data);
+        col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data);
 
         r = ipeditor.addRow();
         col = r.addColumn();
@@ -129,7 +129,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         data[1] = "/org/gephi/legend/graphics/left_unselected.png";
         data[2] = "/org/gephi/legend/graphics/left_selected.png";
         data[3] = Alignment.LEFT;
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
 
         // center alignment
         data = new Object[4];
@@ -137,7 +137,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         data[1] = "/org/gephi/legend/graphics/center_unselected.png";
         data[2] = "/org/gephi/legend/graphics/center_selected.png";
         data[3] = Alignment.CENTER;
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
 
         // right alignment
         data = new Object[4];
@@ -145,7 +145,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         data[1] = "/org/gephi/legend/graphics/right_unselected.png";
         data[2] = "/org/gephi/legend/graphics/right_selected.png";
         data[3] = Alignment.RIGHT;
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
 
         // justified
         data = new Object[4];
@@ -153,7 +153,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
         data[2] = "/org/gephi/legend/graphics/justified_selected.png";
         data[3] = Alignment.JUSTIFIED;
-        col.addElement(element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data);
 
         textNode.setInplaceEditor(ipeditor);
     }

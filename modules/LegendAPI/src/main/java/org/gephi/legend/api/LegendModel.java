@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
@@ -33,15 +33,14 @@ public class LegendModel {
     private Integer numberOfInactiveItems;
     private ArrayList<Item> activeLegendItems;
     private ArrayList<Item> inactiveLegendItems;
-    private Map<Integer, blockNode> indexNodeMap;
-    private inplaceEditor ipeditor;
+    private Map<Integer, BlockNode> indexNodeMap;
+    private InplaceEditor ipeditor;
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
     private final Workspace workspace;
     public static final String LEGEND_PROPERTIES = "legend properties";
     public static final String INDEX = "index"; // Where is this being used?
-    
 
     public LegendModel(Workspace workspace) {
         this.workspace = workspace;
@@ -51,7 +50,7 @@ public class LegendModel {
         this.numberOfInactiveItems = 0;
         this.activeLegendItems = new ArrayList<Item>();
         this.inactiveLegendItems = new ArrayList<Item>();
-        this.indexNodeMap = new HashMap<Integer, blockNode>();
+        this.indexNodeMap = new HashMap<Integer, BlockNode>();
         this.ipeditor = null;
     }
 
@@ -78,16 +77,16 @@ public class LegendModel {
             System.err.println(e);
         }
     }
-    
-    public blockNode getBlockTree(int itemIndex) {
+
+    public BlockNode getBlockTree(int itemIndex) {
         return indexNodeMap.get(itemIndex);
     }
-    
+
     public void removeBlockTree(int itemIndex) {
         indexNodeMap.remove(itemIndex);
     }
-    
-    public void setBlockTree(int itemIndex, blockNode root) {
+
+    public void setBlockTree(int itemIndex, BlockNode root) {
         indexNodeMap.put(itemIndex, root);
     }
 
@@ -155,7 +154,7 @@ public class LegendModel {
             float originY = previewProperties[LegendProperty.USER_ORIGIN_Y].getValue();
             float width = previewProperties[LegendProperty.WIDTH].getValue();
             float height = previewProperties[LegendProperty.HEIGHT].getValue();
-            indexNodeMap.put(itemIndex, new blockNode(null, originX, originY, width, height, item, blockNode.ROOT));
+            indexNodeMap.put(itemIndex, new BlockNode(null, originX, originY, width, height, item, BlockNode.ROOT));
 
             numberOfActiveItems += 1;
             pickedLegendIndex = numberOfActiveItems - 1;
@@ -244,12 +243,12 @@ public class LegendModel {
     public ArrayList<Item> getInactiveItems() {
         return inactiveLegendItems;
     }
-    
-    public inplaceEditor getInplaceEditor() {
+
+    public InplaceEditor getInplaceEditor() {
         return ipeditor;
     }
-    
-    public void setInplaceEditor(inplaceEditor ipeditor) {
+
+    public void setInplaceEditor(InplaceEditor ipeditor) {
         this.ipeditor = ipeditor;
     }
 

@@ -24,8 +24,8 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.blockNode;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItemBuilder;
@@ -238,9 +238,9 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
                 Item item = legendModel.getItemAtIndex(indexOfPickedLegend);
                 legendModel.removeBlockTree((Integer) item.getData(LegendItem.ITEM_INDEX));
 
-                inplaceEditor ipeditor = legendModel.getInplaceEditor();
+                InplaceEditor ipeditor = legendModel.getInplaceEditor();
                 if (ipeditor != null) {
-                    blockNode node = ipeditor.getData(inplaceEditor.BLOCKNODE);
+                    BlockNode node = ipeditor.getData(InplaceEditor.BLOCKNODE);
                     Item currentInplaceItem = node.getItem();
                     if ((Integer) currentInplaceItem.getData(LegendItem.ITEM_INDEX) == (Integer) item.getData(LegendItem.ITEM_INDEX)) {
                         legendModel.setInplaceEditor(null);

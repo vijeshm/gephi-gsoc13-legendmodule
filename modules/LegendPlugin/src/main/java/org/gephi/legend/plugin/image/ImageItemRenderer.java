@@ -23,12 +23,11 @@ import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.blockNode;
-import org.gephi.legend.inplaceeditor.column;
-import org.gephi.legend.inplaceeditor.element;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
-import org.gephi.legend.inplaceeditor.inplaceItemBuilder;
-import org.gephi.legend.inplaceeditor.row;
+import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.Column;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.Row;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
@@ -67,7 +66,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, blockNode legendNode) {
+    protected void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode) {
         try {
             // get the legendNode Geometry
             int blockOriginX = (int) (legendNode.getOriginX());
@@ -76,7 +75,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
             int blockHeight = (int) legendNode.getBlockHeight();
             Item item = legendNode.getItem();
 
-            blockNode imageNode = legendNode.getChild(IMAGENODE);
+            BlockNode imageNode = legendNode.getChild(IMAGENODE);
             if (imageNode == null) {
                 imageNode = legendNode.addChild(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin, IMAGENODE);
                 buildInplaceImage(imageNode, item);
@@ -154,14 +153,14 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    private void buildInplaceImage(blockNode imageNode, Item item) {
+    private void buildInplaceImage(BlockNode imageNode, Item item) {
         Graph graph = null;
-        inplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(inplaceItemBuilder.class);
-        inplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, imageNode);
-        ipeditor.setData(inplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
+        InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+        InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, imageNode);
+        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
-        row r;
-        column col;
+        Row r;
+        Column col;
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         PreviewProperty prop;
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -170,32 +169,32 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         col = r.addColumn();
         Object[] data = new Object[1];
         data[0] = "Source:";
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data);
 
         r = ipeditor.addRow();
         col = r.addColumn();
         data = new Object[1];
         data[0] = "Margin:";
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();
         data = new Object[0];
-        col.addElement(element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data);
 
         r = ipeditor.addRow();
         col = r.addColumn();
         data = new Object[1];
         data[0] = "Scale:";
-        col.addElement(element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();
         data = new Object[1];
         data[0] = useImageAspectRatio;
-        col.addElement(element.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data);
 
         imageNode.setInplaceEditor(ipeditor);
     }

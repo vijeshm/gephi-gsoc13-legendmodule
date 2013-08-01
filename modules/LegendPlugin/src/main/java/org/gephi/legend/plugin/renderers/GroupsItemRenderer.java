@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.blockNode;
+import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.plugin.builders.GroupsItemBuilder;
 import org.gephi.legend.plugin.items.GroupsItem;
 import org.gephi.legend.plugin.properties.GroupsProperty;
@@ -37,7 +37,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
     }
     
     @Override
-    protected void renderToGraphics(Graphics2D graphics2d, blockNode legenNode) {
+    protected void renderToGraphics(Graphics2D graphics2d, BlockNode legenNode) {
         // fill this with the functionality of the other renderToGraphics function
     }
 

@@ -10,7 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.gephi.legend.inplaceeditor.inplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.preview.api.Item;
 
@@ -18,7 +18,7 @@ import org.gephi.preview.api.Item;
  *
  * @author mvvijesh
  */
-public class blockNode {
+public class BlockNode {
 
     public static String ROOT = "root node";
     public static String TITLE = "title node";
@@ -28,14 +28,14 @@ public class blockNode {
     private float originY;
     private float blockWidth;
     private float blockHeight;
-    private blockNode parent;
-    private ArrayList<blockNode> children;
-    private inplaceEditor IPEditor;
+    private BlockNode parent;
+    private ArrayList<BlockNode> children;
+    private InplaceEditor IPEditor;
     private LegendItem legendItem;
     private String id;
     private Map<String, Object> data; //for optional extra information
 
-    public blockNode(blockNode parentNode, float x, float y, float width, float height, Item parentItem, String tag) {
+    public BlockNode(BlockNode parentNode, float x, float y, float width, float height, Item parentItem, String tag) {
         parent = parentNode;
         originX = x;
         originY = y;
@@ -43,7 +43,7 @@ public class blockNode {
         blockHeight = height;
         legendItem = (LegendItem) parentItem;
         id = tag;
-        children = new ArrayList<blockNode>();
+        children = new ArrayList<BlockNode>();
         IPEditor = null;
         data = new HashMap<String, Object>();
     }
@@ -88,7 +88,7 @@ public class blockNode {
         return blockHeight;
     }
 
-    public blockNode getParent() {
+    public BlockNode getParent() {
         return parent;
     }
 
@@ -96,11 +96,11 @@ public class blockNode {
         return legendItem;
     }
 
-    public ArrayList<blockNode> getChildren() {
+    public ArrayList<BlockNode> getChildren() {
         return children;
     }
 
-    public inplaceEditor getInplaceEditor() {
+    public InplaceEditor getInplaceEditor() {
         return IPEditor;
     }
 
@@ -124,7 +124,7 @@ public class blockNode {
         blockHeight = height;
     }
 
-    public void setInplaceEditor(inplaceEditor ipe) {
+    public void setInplaceEditor(InplaceEditor ipe) {
         IPEditor = ipe;
     }
 
@@ -153,18 +153,18 @@ public class blockNode {
          */
     }
 
-    public blockNode addChild(float x, float y, float width, float height, String tag) {
-        blockNode child = new blockNode(this, x, y, width, height, legendItem, tag);
+    public BlockNode addChild(float x, float y, float width, float height, String tag) {
+        BlockNode child = new BlockNode(this, x, y, width, height, legendItem, tag);
         return addChild(child);
     }
     
-    public blockNode addChild(blockNode child) {
+    public BlockNode addChild(BlockNode child) {
         children.add(child);
         return child;
     }
 
     public void removeChild(String tag) {
-        for (blockNode child : children) {
+        for (BlockNode child : children) {
             if (child.getTag() == tag) {
                 children.remove(child);
                 break;
@@ -172,8 +172,8 @@ public class blockNode {
         }
     }
 
-    public blockNode getChild(String tag) {
-        for (blockNode child : children) {
+    public BlockNode getChild(String tag) {
+        for (BlockNode child : children) {
             if (child.getTag() == tag) {
                 return child;
             }
@@ -183,21 +183,21 @@ public class blockNode {
     }
     
     public void removeAllChildren() {
-        children = new ArrayList<blockNode>();
+        children = new ArrayList<BlockNode>();
     }
 
     public Boolean isClickInBlock(int x, int y) {
         return (x >= originX && x <= originX + blockWidth) && (y >= originY && y <= originY + blockHeight);
     }
 
-    public blockNode getClickedBlock(int x, int y) {
+    public BlockNode getClickedBlock(int x, int y) {
         // trivial case: when the block is a leaf and the click takes place within the block, this is the block you're looking for.
         if (isLeaf() && isClickInBlock(x, y)) {
             return this;
         }
 
         // check if any of the block's children contains the click. If so, invoke this funciton in the child in order to bubble up the event.
-        for (blockNode child : children) {
+        for (BlockNode child : children) {
             if (child.isClickInBlock(x, y)) {
                 return child.getClickedBlock(x, y);
             }
