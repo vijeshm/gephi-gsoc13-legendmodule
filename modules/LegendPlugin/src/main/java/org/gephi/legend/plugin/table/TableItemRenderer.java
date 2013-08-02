@@ -103,34 +103,47 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int maxColWidth = (blockWidth - (numberOfColumns + 1) * tableCellSpacing - 2 * numberOfColumns * tableCellPadding - 2 * numberOfColumns * tableCellBorderSize) / numberOfColumns;
         int rowHeight = (blockHeight - (numberOfRows + 1) * tableCellSpacing - 2 * numberOfRows * tableCellPadding - 2 * numberOfRows * tableCellBorderSize) / numberOfRows;
 
+        TableItem item = (TableItem) legendNode.getItem();
+        PreviewProperty[] itemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+
         // determine all the column widths
         int[] colWidths = new int[numberOfColumns];
-        int stringWidth;
-        FontMetrics fontMetrics;
-        PreviewProperty[] previewProperties = null;
-        Font cellFont = null;
-        String cellContent = null;
-        for (int col = 0; col < numberOfColumns; col++) {
-            int tempMaxColWidth = 0;
-            for (int row = 0; row < numberOfRows; row++) {
-                previewProperties = table.get(row).get(col).getPreviewProperties();
-                cellFont = (Font) previewProperties[Cell.CELL_FONT].getValue();
-                cellContent = (String) previewProperties[Cell.CELL_CONTENT].getValue();
 
-                graphics2D.setFont(cellFont);
-                fontMetrics = graphics2D.getFontMetrics(cellFont);
-                stringWidth = fontMetrics.stringWidth(cellContent);
-                if (stringWidth > tempMaxColWidth) {
-                    tempMaxColWidth = stringWidth;
-                }
+        if ((Boolean) itemPreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue()) {
+            // the table should occupy the entire width
+            for (int i = 0; i < numberOfColumns; i++) {
+                colWidths[i] = maxColWidth;
             }
+        } else {
+            // the table shouldnt occupy the entire width
+            // Hence, compute and fill up the column widths appropriately
+            int stringWidth;
+            FontMetrics fontMetrics;
+            PreviewProperty[] cellPreviewProperties = null;
+            Font cellFont = null;
+            String cellContent = null;
+            for (int col = 0; col < numberOfColumns; col++) {
+                int tempMaxColWidth = 0;
+                for (int row = 0; row < numberOfRows; row++) {
+                    cellPreviewProperties = table.get(row).get(col).getPreviewProperties();
+                    cellFont = (Font) cellPreviewProperties[Cell.CELL_FONT].getValue();
+                    cellContent = (String) cellPreviewProperties[Cell.CELL_CONTENT].getValue();
 
-            tempMaxColWidth = (int) ((1 + colWidthTolerance) * tempMaxColWidth);
-            // the column width should be exactly the same as the width of the longest string in the column, since it causes rendering problems.
-            if (tempMaxColWidth > maxColWidth) {
-                colWidths[col] = maxColWidth;
-            } else {
-                colWidths[col] = tempMaxColWidth;
+                    graphics2D.setFont(cellFont);
+                    fontMetrics = graphics2D.getFontMetrics(cellFont);
+                    stringWidth = fontMetrics.stringWidth(cellContent);
+                    if (stringWidth > tempMaxColWidth) {
+                        tempMaxColWidth = stringWidth;
+                    }
+                }
+
+                tempMaxColWidth = (int) ((1 + colWidthTolerance) * tempMaxColWidth);
+                // the column width should be exactly the same as the width of the longest string in the column, since it causes rendering problems.
+                if (tempMaxColWidth > maxColWidth) {
+                    colWidths[col] = maxColWidth;
+                } else {
+                    colWidths[col] = tempMaxColWidth;
+                }
             }
         }
 
@@ -144,7 +157,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int tableHeight = blockHeight;
         int tableOriginX = blockOriginX + blockWidth / 2 - tableWidth / 2;
         int tableOriginY = blockOriginY + blockHeight / 2 - tableHeight / 2; //as of now, tableOriginY is same as blockOriginY
-        TableItem item = (TableItem) legendNode.getItem();
         BlockNode tableNode = legendNode.getChild(TABLENODE);
         if (tableNode == null) {
             tableNode = legendNode.addChild(tableOriginX, tableOriginY, tableWidth, tableHeight, TABLENODE);
@@ -560,6 +572,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         };
         data[1] = "/org/gephi/legend/graphics/table_font_color.png";
         col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        
+        // border size
+        col = r.addColumn();
+        data = new Object[3];
+        data[0] = (Boolean) tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue();
+        data[1] = "/org/gephi/legend/graphics/column_expand.png";
+        data[2] = "/org/gephi/legend/graphics/column_collapse.png";
+        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data);
     }
 
     private void updateCellGeometry(BlockNode tableNode, int rowHeight, int[] colWidths) {

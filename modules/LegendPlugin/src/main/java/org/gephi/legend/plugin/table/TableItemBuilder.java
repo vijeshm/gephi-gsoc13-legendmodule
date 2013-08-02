@@ -48,6 +48,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
     protected final int defaultTableCellPadding = 5;
     protected final int defaultTableBorderSize = 5;
     protected final Color defaultTableBorderColor = Cell.borderColor;
+    protected final Boolean defaultTableWidthFull = true;
     protected final int defaultTableNumberOfRows = 2;
     protected final int defaultTableNumberOfColumns = 3;
     protected final Object[] defaultValues = {
@@ -58,6 +59,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         defaultTableCellPadding,
         defaultTableBorderSize,
         defaultTableBorderColor,
+        defaultTableWidthFull
     };
 
     @Override
@@ -68,7 +70,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
 
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-        TableItem item = (TableItem) createNewLegendItem(graph);       
+        TableItem item = (TableItem) createNewLegendItem(graph);
 
         // setting default renderer
         item.setData(LegendItem.RENDERER, TableItemRenderer.class);
@@ -157,6 +159,17 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
+
+            case TableProperty.TABLE_WIDTH_FULL: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Boolean.class,
+                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.width.full.displayName"),
+                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.width.full.description"),
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+            }
         }
 
         return previewProperty;
@@ -170,9 +183,9 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         int[] properties = TableProperty.LIST_OF_PROPERTIES;
         ArrayList<PreviewProperty> previewProperties = new ArrayList<PreviewProperty>();
         for (int i = 0; i < defaultValues.length; i++) {
-                previewProperties.add(createLegendProperty(tableItem, properties[i], defaultValues[i]));
+            previewProperties.add(createLegendProperty(tableItem, properties[i], defaultValues[i]));
         }
-        
+
         //build the basic default table
         for (int i = 0; i < defaultTableNumberOfRows; i++) {
             tableItem.addRow(i, defaultBackgroundColor, defaultBorderColor, defaultFont, defaultFontAlignment, defaultFontColor, content);
@@ -180,16 +193,16 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         for (int i = 0; i < defaultTableNumberOfColumns; i++) {
             tableItem.addColumn(i, defaultBackgroundColor, defaultBorderColor, defaultFont, defaultFontAlignment, defaultFontColor, content);
         }
-        
+
         /*
-        // the the addColumn method would've updated the item's OWN_PROPERTIES.
-        // Hence, add all those updated properties to the previewProperties
-        Object[] updatedPreviewProps = item.getData(LegendItem.OWN_PROPERTIES);        
-        for(Object prop : updatedPreviewProps) {
-            previewProperties.add((PreviewProperty)prop);
-        }
-        */
-        
+         // the the addColumn method would've updated the item's OWN_PROPERTIES.
+         // Hence, add all those updated properties to the previewProperties
+         Object[] updatedPreviewProps = item.getData(LegendItem.OWN_PROPERTIES);        
+         for(Object prop : updatedPreviewProps) {
+         previewProperties.add((PreviewProperty)prop);
+         }
+         */
+
         return previewProperties.toArray(new PreviewProperty[0]);
     }
 

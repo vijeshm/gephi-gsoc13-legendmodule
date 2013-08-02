@@ -21,6 +21,7 @@ public class TableProperty {
     public static final int TABLE_CELL_PADDING = 4;
     public static final int TABLE_BORDER_SIZE = 5;
     public static final int TABLE_BORDER_COLOR = 6;
+    public static final int TABLE_WIDTH_FULL = 7;
     
     public static String[] OWN_PROPERTIES = {
         ".table.font",
@@ -29,7 +30,8 @@ public class TableProperty {
         ".table.cell.spacing",
         ".table.cell.padding",
         ".table.border.size",
-        ".table.border.color"
+        ".table.border.color",
+        ".table.width.full"
     };
     
     public static final int[] LIST_OF_PROPERTIES = {
@@ -40,6 +42,7 @@ public class TableProperty {
         TABLE_CELL_PADDING,
         TABLE_BORDER_SIZE,
         TABLE_BORDER_COLOR,
+        TABLE_WIDTH_FULL
     };
     
     private static TableProperty instance = new TableProperty();
