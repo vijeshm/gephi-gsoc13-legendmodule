@@ -30,7 +30,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Eduardo Ramos<eduramiba@gmail.com>
+ * @author mvvijesh, Eduardo Ramos<eduramiba@gmail.com>
  */
 @ServiceProvider(service = PreviewMouseListener.class)
 public class LegendMouseListener implements PreviewMouseListener {
@@ -185,10 +185,26 @@ public class LegendMouseListener implements PreviewMouseListener {
 
     @Override
     public void mousePressed(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
-        // mouseClicked(event, previewProperties, workspace); //Update selected legend as if the press was a click.
-
+        // enable direct interaction with the legend. i.e, the user need not click first and then drag.
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
+
+        ArrayList<Item> items = legendModel.getActiveItems();
+        // deselect all legends
+        for (Item item : items) {
+            item.setData(LegendItem.IS_SELECTED, Boolean.FALSE);
+        }
+        // starting from the last legend (topmost legend layer), select the legend for which the click within its boundaries.
+        // it is important to break out of the loop to avoid the possibility of multiple selection in case of overlapping legends.
+        for (int i = items.size() - 1; i >= 0; i--) {
+            if (isClickingInLegend(event.x, event.y, items.get(i), previewProperties) || isClickingInAnchor(event.x, event.y, items.get(i), previewProperties) >= 0) {
+                items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
+                legendController.selectItem(items.get(i));
+                legendModel.setInplaceEditor(null);
+                break;
+            }
+        }
+
         Item item = legendModel.getSelectedItem();
 
         if (item != null) {
