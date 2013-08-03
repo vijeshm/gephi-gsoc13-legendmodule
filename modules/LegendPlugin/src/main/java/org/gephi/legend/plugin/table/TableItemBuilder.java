@@ -48,6 +48,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
     protected final int defaultTableCellPadding = 5;
     protected final int defaultTableBorderSize = 5;
     protected final Color defaultTableBorderColor = Cell.borderColor;
+    protected final Color defaultTableBackgroundColor = new Color(0f, 0.35f, 1f, 0.5f);
     protected final Boolean defaultTableWidthFull = false;
     protected final int defaultTableNumberOfRows = 2;
     protected final int defaultTableNumberOfColumns = 3;
@@ -59,6 +60,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         defaultTableCellPadding,
         defaultTableBorderSize,
         defaultTableBorderColor,
+        defaultTableBackgroundColor,
         defaultTableWidthFull
     };
 
@@ -156,6 +158,17 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
                         Color.class,
                         NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.border.color.displayName"),
                         NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.border.color.description"),
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+            }
+
+            case TableProperty.TABLE_BACKGROUND_COLOR: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Color.class,
+                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.background.color.displayName"),
+                        NbBundle.getMessage(TableItemBuilder.class, "TableItem.property.background.color.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }

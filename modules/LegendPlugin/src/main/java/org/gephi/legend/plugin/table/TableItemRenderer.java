@@ -57,6 +57,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableCellPadding;
     private int tableCellBorderSize;
     private Color tableCellBorderColor;
+    private Color tableBackgroundColor;
     private int tableNumberOfRows;
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
@@ -83,6 +84,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableCellPadding = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_PADDING));
         tableCellBorderSize = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_SIZE));
         tableCellBorderColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_COLOR));
+        tableBackgroundColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BACKGROUND_COLOR));
         tableNumberOfRows = ((TableItem) item).getNumberOfRows();
         tableNumberOfColumns = ((TableItem) item).getNumberOfColumns();
 
@@ -160,11 +162,16 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         BlockNode tableNode = legendNode.getChild(TABLENODE);
         if (tableNode == null) {
             tableNode = legendNode.addChild(tableOriginX, tableOriginY, tableWidth, tableHeight, TABLENODE);
+
             buildInplaceTable(tableNode, item);
         }
 
         // update the geometry of the table node - this is redundant only when the first time the legend is created.
         tableNode.updateGeometry(tableOriginX, tableOriginY, tableWidth, tableHeight);
+
+        // render background
+        graphics2D.setColor(tableBackgroundColor);
+        graphics2D.fillRect((int) (tableOriginX - currentRealOriginX), (int) (tableOriginY - currentRealOriginY), tableWidth, tableHeight);
 
         // cells are re-constructed only when the structure (i.e, number of rows and columns) of the table is changed
         if (structureChanged) {
@@ -473,6 +480,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
 
         r = ipeditor.addRow();
+        //background color
+        col = r.addColumn();
+        data = new Object[0];
+        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], data);
+        
         // border color
         col = r.addColumn();
         data = new Object[2];
@@ -572,7 +584,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         };
         data[1] = "/org/gephi/legend/graphics/table_font_color.png";
         col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
-        
+
         // border size
         col = r.addColumn();
         data = new Object[3];
