@@ -48,7 +48,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
     protected final int defaultTableCellPadding = 5;
     protected final int defaultTableBorderSize = 5;
     protected final Color defaultTableBorderColor = Cell.borderColor;
-    protected final Boolean defaultTableWidthFull = true;
+    protected final Boolean defaultTableWidthFull = false;
     protected final int defaultTableNumberOfRows = 2;
     protected final int defaultTableNumberOfColumns = 3;
     protected final Object[] defaultValues = {

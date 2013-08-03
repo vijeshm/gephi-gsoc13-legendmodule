@@ -200,7 +200,6 @@ public class LegendMouseListener implements PreviewMouseListener {
             if (isClickingInLegend(event.x, event.y, items.get(i), previewProperties) || isClickingInAnchor(event.x, event.y, items.get(i), previewProperties) >= 0) {
                 items.get(i).setData(LegendItem.IS_SELECTED, Boolean.TRUE);
                 legendController.selectItem(items.get(i));
-                legendModel.setInplaceEditor(null);
                 break;
             }
         }
