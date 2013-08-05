@@ -20,12 +20,14 @@ import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.BlockNode;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -43,7 +45,6 @@ public class InplaceItemRenderer implements Renderer {
     public static Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
     public static Font LABEL_FONT = new Font("Arial", Font.PLAIN, 30);
     public static Color LABEL_COLOR = Color.BLACK;
-    public static int UNIT_SIZE = 50;
     public static Color BORDER_COLOR = Color.BLACK;
     public static int BORDER_SIZE = 1;
     public static float COLOR_MARGIN = 0.2f;
@@ -82,6 +83,11 @@ public class InplaceItemRenderer implements Renderer {
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
         InplaceEditor ipeditor = legendModel.getInplaceEditor();
+        
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        PreviewProperties previewProperties = previewModel.getProperties();
+        int blockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
 
         if (ipeditor != null) {
             // get the geometry of the block associated with the current inplace item.
@@ -140,23 +146,23 @@ public class InplaceItemRenderer implements Renderer {
                                 graphics2d.setFont(LABEL_FONT);
                                 fontWidth = getFontWidth(graphics2d, (String) data[0]);
                                 fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / UNIT_SIZE + 1;
+                                numberOfBlocks = fontWidth / blockUnitSize + 1;
 
                                 graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE * numberOfBlocks + 1,
-                                        UNIT_SIZE + 1);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize * numberOfBlocks + 1,
+                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(LABEL_COLOR);
                                 graphics2d.drawString((String) data[0],
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
 
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE * numberOfBlocks,
-                                        UNIT_SIZE);
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize * numberOfBlocks,
+                                        blockUnitSize);
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
@@ -171,25 +177,25 @@ public class InplaceItemRenderer implements Renderer {
                                     }
 
                                     graphics2d.setColor(BACKGROUND);
-                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE + 1,
-                                            UNIT_SIZE + 1);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize + 1,
+                                            blockUnitSize + 1);
 
                                     graphics2d.drawImage(img,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize,
                                             0,
                                             0,
                                             img.getWidth(),
                                             img.getHeight(), null);
 
-                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE,
-                                            UNIT_SIZE);
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize,
+                                            blockUnitSize);
 
                                     currentElementsCount += 1;
                                 } catch (IOException e) {
@@ -199,22 +205,22 @@ public class InplaceItemRenderer implements Renderer {
                             case COLOR:
                                 Color color = prop.getValue();
                                 graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE + 1,
-                                        UNIT_SIZE + 1);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize + 1,
+                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(color);
                                 // some margin on all sides of the element
-                                graphics2d.fillRect((int) ((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + COLOR_MARGIN * UNIT_SIZE),
-                                        (int) ((editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + COLOR_MARGIN * UNIT_SIZE),
-                                        (int) ((1 - 2 * COLOR_MARGIN) * UNIT_SIZE),
-                                        (int) ((1 - 2 * COLOR_MARGIN) * UNIT_SIZE));
+                                graphics2d.fillRect((int) ((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + COLOR_MARGIN * blockUnitSize),
+                                        (int) ((editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + COLOR_MARGIN * blockUnitSize),
+                                        (int) ((1 - 2 * COLOR_MARGIN) * blockUnitSize),
+                                        (int) ((1 - 2 * COLOR_MARGIN) * blockUnitSize));
 
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE,
-                                        UNIT_SIZE);
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize,
+                                        blockUnitSize);
 
                                 currentElementsCount += 1;
                                 break;
@@ -226,23 +232,23 @@ public class InplaceItemRenderer implements Renderer {
                                 graphics2d.setFont(FONT_DISPLAY_FONT);
                                 fontWidth = getFontWidth(graphics2d, displayString);
                                 fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / UNIT_SIZE + 1;
+                                numberOfBlocks = fontWidth / blockUnitSize + 1;
 
                                 graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE * numberOfBlocks + 1,
-                                        UNIT_SIZE + 1);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize * numberOfBlocks + 1,
+                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(FONT_DISPLAY_COLOR);
                                 graphics2d.drawString(displayString,
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + numberOfBlocks * UNIT_SIZE / 2 - fontWidth / 2,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
 
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE * numberOfBlocks,
-                                        UNIT_SIZE);
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize * numberOfBlocks,
+                                        blockUnitSize);
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
@@ -259,24 +265,24 @@ public class InplaceItemRenderer implements Renderer {
                                     }
 
                                     graphics2d.setColor(BACKGROUND);
-                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE + 1,
-                                            UNIT_SIZE + 1);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize + 1,
+                                            blockUnitSize + 1);
                                     graphics2d.drawImage(img,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize,
                                             0,
                                             0,
                                             img.getWidth(),
                                             img.getHeight(), null);
 
-                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE,
-                                            UNIT_SIZE);
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize,
+                                            blockUnitSize);
 
                                     currentElementsCount += 1;
                                 } catch (IOException e) {
@@ -288,23 +294,23 @@ public class InplaceItemRenderer implements Renderer {
                                 displayString = "" + prop.getValue();
                                 fontWidth = getFontWidth(graphics2d, (String) displayString);
                                 fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / UNIT_SIZE + 1;
+                                numberOfBlocks = fontWidth / blockUnitSize + 1;
 
                                 graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE * numberOfBlocks + 1,
-                                        UNIT_SIZE + 1);
+                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize * numberOfBlocks + 1,
+                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(NUMBER_COLOR);
                                 graphics2d.drawString(displayString,
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + numberOfBlocks * UNIT_SIZE / 2 - fontWidth / 2,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE / 2 + fontHeight / 2);
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
 
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                        UNIT_SIZE * numberOfBlocks,
-                                        UNIT_SIZE);
+                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                        blockUnitSize * numberOfBlocks,
+                                        blockUnitSize);
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
@@ -314,24 +320,24 @@ public class InplaceItemRenderer implements Renderer {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/edit.png"));
 
                                     graphics2d.setColor(BACKGROUND);
-                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE + 1,
-                                            UNIT_SIZE + 1);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize + 1,
+                                            blockUnitSize + 1);
                                     graphics2d.drawImage(img,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize,
                                             0,
                                             0,
                                             img.getWidth(),
                                             img.getHeight(), null);
 
-                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE,
-                                            UNIT_SIZE);
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize,
+                                            blockUnitSize);
 
                                     currentElementsCount += 1;
                                 } catch (IOException e) {
@@ -342,24 +348,24 @@ public class InplaceItemRenderer implements Renderer {
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/file.png"));
                                     graphics2d.setColor(BACKGROUND);
-                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE + 1,
-                                            UNIT_SIZE + 1);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize + 1,
+                                            blockUnitSize + 1);
                                     graphics2d.drawImage(img,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize,
                                             0,
                                             0,
                                             img.getWidth(),
                                             img.getHeight(), null);
 
-                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE,
-                                            UNIT_SIZE);
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize,
+                                            blockUnitSize);
 
                                     currentElementsCount += 1;
                                 } catch (IOException e) {
@@ -370,24 +376,24 @@ public class InplaceItemRenderer implements Renderer {
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
                                     graphics2d.setColor(BACKGROUND);
-                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE + 1,
-                                            UNIT_SIZE + 1);
+                                    graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize + 1,
+                                            blockUnitSize + 1);
                                     graphics2d.drawImage(img,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE + UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE + UNIT_SIZE,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize,
                                             0,
                                             0,
                                             img.getWidth(),
                                             img.getHeight(), null);
 
-                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * UNIT_SIZE,
-                                            (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                                            UNIT_SIZE,
-                                            UNIT_SIZE);
+                                    elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
+                                            (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                                            blockUnitSize,
+                                            blockUnitSize);
 
                                     currentElementsCount += 1;
                                 } catch (IOException e) {
@@ -404,14 +410,14 @@ public class InplaceItemRenderer implements Renderer {
             graphics2d.setColor(BACKGROUND);
             for (rowBlock = 0; rowBlock < elementsCount.size(); rowBlock++) {
                 int currentElementCount = elementsCount.get(rowBlock);
-                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementCount * UNIT_SIZE,
-                        (editorOriginY + BORDER_SIZE) + rowBlock * UNIT_SIZE,
-                        (maxElementsCount - currentElementCount) * UNIT_SIZE + 1,
-                        UNIT_SIZE + 1);
+                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementCount * blockUnitSize,
+                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
+                        (maxElementsCount - currentElementCount) * blockUnitSize + 1,
+                        blockUnitSize + 1);
             }
 
-            editorWidth = maxElementsCount * UNIT_SIZE + 2 * BORDER_SIZE;
-            editorHeight = rowBlock * UNIT_SIZE + 2 * BORDER_SIZE;
+            editorWidth = maxElementsCount * blockUnitSize + 2 * BORDER_SIZE;
+            editorHeight = rowBlock * blockUnitSize + 2 * BORDER_SIZE;
 
             // rendering borders
             graphics2d.setColor(BORDER_COLOR);

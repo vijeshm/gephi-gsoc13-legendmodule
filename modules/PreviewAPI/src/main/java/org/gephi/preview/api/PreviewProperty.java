@@ -68,6 +68,14 @@ public class PreviewProperty {
 
     //Constants global
     /**
+     * General <code>Integer</code> property which specifies the default size of a block of inplace editor.
+     */
+    public static final String DEFAULT_INPLACE_BLOCK_UNIT_SIZE = "inplace.block-unit-size-default";
+    /**
+     * General <code>Integer</code> property which specifies the size of a block of inplace editor.
+     */
+    public static final String INPLACE_BLOCK_UNIT_SIZE = "inplace.block-unit-size";
+    /**
      * General <code>Boolean</code> property which indicates wheter the graph is directed
      */
     public static final String DIRECTED = "directed";

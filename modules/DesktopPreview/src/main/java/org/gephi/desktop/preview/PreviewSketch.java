@@ -55,6 +55,9 @@ import javax.swing.SwingUtilities;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewMouseEvent;
 import org.gephi.preview.api.G2DTarget;
+import org.gephi.preview.api.PreviewModel;
+import org.gephi.preview.api.PreviewProperties;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.Vector;
 import org.openide.util.Lookup;
 
@@ -67,6 +70,8 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     private static final int WHEEL_TIMER = 500;
     //Data
     private final PreviewController previewController;
+    private final PreviewModel previewModel;
+    private final PreviewProperties previewProperties;
     private final G2DTarget target;
     //Geometry
     private final Vector ref = new Vector();
@@ -75,10 +80,13 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     private final RefreshLoop refreshLoop = new RefreshLoop();
     private Timer wheelTimer;
     private boolean inited;
+    private float scalingFactor = 2f;
 
     public PreviewSketch(G2DTarget target) {
         this.target = target;
         previewController = Lookup.getDefault().lookup(PreviewController.class);
+        previewModel = previewController.getModel();
+        previewProperties = previewModel.getProperties();
     }
 
     @Override
@@ -143,7 +151,10 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             return;
         }
         float way = -e.getUnitsToScroll() / Math.abs(e.getUnitsToScroll());
-        target.setScaling(target.getScaling() * (way > 0 ? 2f : 0.5f));
+        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        target.setScaling(target.getScaling() * (way > 0 ? scalingFactor : 1 / scalingFactor));
+        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize * (way > 0 ? 1 / scalingFactor : scalingFactor));
+
         setMoving(true);
         if (wheelTimer != null) {
             wheelTimer.cancel();
@@ -180,16 +191,22 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     }
 
     public void zoomPlus() {
-        target.setScaling(target.getScaling() * 2f);
+        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize / scalingFactor);
+        target.setScaling(target.getScaling() * scalingFactor);
         refreshLoop.refreshSketch();
     }
 
     public void zoomMinus() {
-        target.setScaling(target.getScaling() / 2f);
+        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize * scalingFactor);
+        target.setScaling(target.getScaling() / scalingFactor);
         refreshLoop.refreshSketch();
     }
 
     public void resetZoom() {
+        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize);
         target.reset();
         refreshLoop.refreshSketch();
     }

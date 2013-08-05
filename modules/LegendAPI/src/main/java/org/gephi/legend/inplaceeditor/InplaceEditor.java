@@ -97,8 +97,13 @@ public class InplaceEditor implements Item {
     }
 
     public void reflectAction(int x, int y) {
+        // get the preview properties to make the changes get reflected
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        PreviewProperties previewProperties = previewModel.getProperties();
+
         int borderSize = InplaceItemRenderer.BORDER_SIZE;
-        int unitSize = InplaceItemRenderer.UNIT_SIZE;
+        int unitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
         int editorOriginX = getData(ORIGIN_X);
         int editorOriginY = getData(ORIGIN_Y);
         int editorWidth = getData(WIDTH);
@@ -108,11 +113,6 @@ public class InplaceEditor implements Item {
         BlockNode node = getData(BLOCKNODE);
         Item item = node.getItem();
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
-
-        // get the preview properties to make the changes get reflected
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-        PreviewProperties previewProperties = previewModel.getProperties();
 
         // find out which element has been clicked based on the click-coordinates and element coordinates
         Element selectedElem = null;
@@ -245,7 +245,7 @@ public class InplaceEditor implements Item {
                             previewProperties.putValue(prop.getName(), file);
                         }
                         break;
-                        
+
                     case FUNCTION:
                         InplaceClickResponse responder = (InplaceClickResponse) elementData[0];
                         responder.performAction(this);
