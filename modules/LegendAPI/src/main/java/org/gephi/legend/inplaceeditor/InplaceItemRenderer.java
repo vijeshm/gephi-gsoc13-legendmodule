@@ -43,15 +43,15 @@ public class InplaceItemRenderer implements Renderer {
 
     // all these values should be made as final. They are temporarily not final because of debugging purposes
     public static Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
-    public static Font LABEL_FONT = new Font("Arial", Font.PLAIN, 30);
+    public static Font DEFAULT_LABEL_FONT = new Font("Arial", Font.PLAIN, 30);
     public static Color LABEL_COLOR = Color.BLACK;
     public static Color BORDER_COLOR = Color.BLACK;
     public static int BORDER_SIZE = 1;
     public static float COLOR_MARGIN = 0.2f;
     public static Map<Integer, String> fontLookup = new HashMap<Integer, String>();
-    public static Font FONT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 20);
+    public static Font DEFAULT_FONT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 20);
     public static Color FONT_DISPLAY_COLOR = Color.BLACK;
-    public static Font NUMBER_FONT = new Font("Arial", Font.PLAIN, 20);
+    public static Font DEFAULT_NUMBER_FONT = new Font("Arial", Font.PLAIN, 20);
     public static Color NUMBER_COLOR = Color.BLACK;
 
     @Override
@@ -140,18 +140,29 @@ public class InplaceItemRenderer implements Renderer {
                         int fontHeight;
                         int numberOfBlocks;
                         String displayString;
-
+                        float usableFraction = 0.8f;
+                        int stepSize = 1;
+                        float fontSize; // reset to zero in every case clause
+                        int desiredNumberOfBlocks;
+                        Font tempFont;
+                        
                         switch (type) {
                             case LABEL:
-                                graphics2d.setFont(LABEL_FONT);
-                                fontWidth = getFontWidth(graphics2d, (String) data[0]);
+                                fontSize = 0;
+                                desiredNumberOfBlocks = (Integer) data[1];
+                                tempFont = new Font(DEFAULT_LABEL_FONT.getName(), DEFAULT_LABEL_FONT.getStyle(), (int) fontSize);
+                                graphics2d.setFont(tempFont);
+                                while(getFontWidth(graphics2d, (String) data[0]) < desiredNumberOfBlocks * blockUnitSize * usableFraction && getFontHeight(graphics2d) < blockUnitSize * usableFraction) {
+                                    fontSize += stepSize;
+                                    tempFont = tempFont.deriveFont((float) fontSize);
+                                    graphics2d.setFont(tempFont);
+                                }
+                                
                                 fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-
                                 graphics2d.setColor(BACKGROUND);
                                 graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks + 1,
+                                        blockUnitSize * desiredNumberOfBlocks + 1,
                                         blockUnitSize + 1);
 
                                 graphics2d.setColor(LABEL_COLOR);
@@ -161,10 +172,10 @@ public class InplaceItemRenderer implements Renderer {
 
                                 elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks,
+                                        blockUnitSize * desiredNumberOfBlocks,
                                         blockUnitSize);
 
-                                currentElementsCount += numberOfBlocks;
+                                currentElementsCount += desiredNumberOfBlocks;
                                 break;
 
                             case CHECKBOX:
@@ -227,30 +238,37 @@ public class InplaceItemRenderer implements Renderer {
 
                             case FONT:
                                 Font font = prop.getValue();
-
+                                fontSize = 0;
+                                desiredNumberOfBlocks = (Integer) data[0];
+                                tempFont = new Font(DEFAULT_FONT_DISPLAY_FONT.getName(), DEFAULT_FONT_DISPLAY_FONT.getStyle(), (int) fontSize);
+                                graphics2d.setFont(tempFont);
                                 displayString = font.getFontName() + " " + font.getSize();
-                                graphics2d.setFont(FONT_DISPLAY_FONT);
+                                while(getFontWidth(graphics2d, displayString) < desiredNumberOfBlocks * blockUnitSize * usableFraction && getFontHeight(graphics2d) < blockUnitSize * usableFraction) {
+                                    fontSize += stepSize;
+                                    tempFont = tempFont.deriveFont((float) fontSize);
+                                    graphics2d.setFont(tempFont);
+                                }
+                                
                                 fontWidth = getFontWidth(graphics2d, displayString);
                                 fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
 
                                 graphics2d.setColor(BACKGROUND);
                                 graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks + 1,
+                                        blockUnitSize * desiredNumberOfBlocks + 1,
                                         blockUnitSize + 1);
 
                                 graphics2d.setColor(FONT_DISPLAY_COLOR);
                                 graphics2d.drawString(displayString,
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + desiredNumberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
 
                                 elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks,
+                                        blockUnitSize * desiredNumberOfBlocks,
                                         blockUnitSize);
 
-                                currentElementsCount += numberOfBlocks;
+                                currentElementsCount += desiredNumberOfBlocks;
                                 break;
 
                             case IMAGE:
@@ -290,29 +308,37 @@ public class InplaceItemRenderer implements Renderer {
                                 break;
 
                             case NUMBER:
-                                graphics2d.setFont(NUMBER_FONT);
+                                fontSize = 0;
+                                desiredNumberOfBlocks = (Integer) data[0];
+                                tempFont = new Font(DEFAULT_NUMBER_FONT.getName(), DEFAULT_NUMBER_FONT.getStyle(), (int) fontSize);
+                                graphics2d.setFont(tempFont);
                                 displayString = "" + prop.getValue();
+                                while(getFontWidth(graphics2d, displayString) < desiredNumberOfBlocks * blockUnitSize * usableFraction && getFontHeight(graphics2d) < blockUnitSize * usableFraction) {
+                                    fontSize += stepSize;
+                                    tempFont = tempFont.deriveFont((float) fontSize);
+                                    graphics2d.setFont(tempFont);
+                                }
+                                
                                 fontWidth = getFontWidth(graphics2d, (String) displayString);
                                 fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
 
                                 graphics2d.setColor(BACKGROUND);
                                 graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks + 1,
+                                        blockUnitSize * desiredNumberOfBlocks + 1,
                                         blockUnitSize + 1);
 
                                 graphics2d.setColor(NUMBER_COLOR);
                                 graphics2d.drawString(displayString,
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
+                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + desiredNumberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
 
                                 elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
                                         (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks,
+                                        blockUnitSize * desiredNumberOfBlocks,
                                         blockUnitSize);
 
-                                currentElementsCount += numberOfBlocks;
+                                currentElementsCount += desiredNumberOfBlocks;
                                 break;
 
                             case TEXT:

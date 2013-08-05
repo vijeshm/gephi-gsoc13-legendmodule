@@ -277,8 +277,9 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 // Cell Properties
                 r = ipeditor.addRow();
                 col = r.addColumn();
-                Object[] data = new Object[1];
+                Object[] data = new Object[2];
                 data[0] = "Cell:";
+                data[1] = 2;
                 col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
                 col = r.addColumn();
@@ -299,7 +300,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
 
                 col = r.addColumn();
-                data = new Object[0];
+                data = new Object[1];
+                data[0] = 3;
                 col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
 
                 r = ipeditor.addRow();
@@ -437,8 +439,9 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         // modify inplace editors
         r = ipeditor.addRow();
         col = r.addColumn();
-        Object[] data = new Object[1];
+        Object[] data = new Object[2];
         data[0] = "Table:";
+        data[1] = 2;
         col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         // cell spacing
@@ -452,7 +455,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[0];
+        data = new Object[1];
+        data[0] = 1;
         col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
 
         // cell padding
@@ -464,7 +468,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[0];
+        data = new Object[1];
+        data[0] = 1;
         col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
 
         // border size
@@ -476,7 +481,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[0];
+        data = new Object[1];
+        data[0] = 1;
         col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
 
         r = ipeditor.addRow();
@@ -484,7 +490,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col = r.addColumn();
         data = new Object[0];
         col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], data);
-        
+
         // border color
         col = r.addColumn();
         data = new Object[2];

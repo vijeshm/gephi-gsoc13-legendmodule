@@ -57,7 +57,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        
+
         body = properties.getStringValue(LegendModel.getProperty(TextProperty.OWN_PROPERTIES, itemIndex, TextProperty.TEXT_BODY));
         bodyFont = properties.getFontValue(LegendModel.getProperty(TextProperty.OWN_PROPERTIES, itemIndex, TextProperty.TEXT_BODY_FONT));
         bodyFontColor = properties.getColorValue(LegendModel.getProperty(TextProperty.OWN_PROPERTIES, itemIndex, TextProperty.TEXT_BODY_FONT_COLOR));
@@ -112,13 +112,14 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         col = r.addColumn();
         Object[] data = new Object[0];
         col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data);
-        
+
         col = r.addColumn();
         data = new Object[0];
         col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data);
 
         col = r.addColumn();
-        data = new Object[0];
+        data = new Object[1];
+        data[0] = 3;
         col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data);
 
         r = ipeditor.addRow();

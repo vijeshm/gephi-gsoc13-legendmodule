@@ -214,13 +214,13 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
 
         /*
-        if (currentIsBeingTransformed) {
-            renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
-            drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
-        } else {
-            render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
-        }
-        */
+         if (currentIsBeingTransformed) {
+         renderTransformed(graphics2D, originTranslation, currentWidth, currentHeight);
+         drawScaleAnchors(graphics2D, originTranslation, currentWidth, currentHeight);
+         } else {
+         render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
+         }
+         */
         render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
 
         graphics2D.setTransform(saveState);
@@ -420,8 +420,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[1];
+            Object[] data = new Object[2];
             data[0] = "Border: ";
+            data[1] = 2;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             col = r.addColumn();
@@ -436,7 +437,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
 
             col = r.addColumn();
-            data = new Object[0]; // for a numerical property, extra data isnt needed.
+            data = new Object[1];
+            data[0] = 1;
             col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data);
 
             root.setInplaceEditor(ipeditor);
@@ -463,8 +465,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // add the row that controls background properties
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[1];
+            Object[] data = new Object[2];
             data[0] = "Background: ";
+            data[1] = 3;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             col = r.addColumn();
@@ -487,8 +490,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         Row r = ipeditor.addRow();
 
         Column col = r.addColumn();
-        Object[] data = new Object[1];
+        Object[] data = new Object[2];
         data[0] = displayString;
+        data[1] = 2;
         col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
         col = r.addColumn();
@@ -520,8 +524,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[1];
-            data[0] = "Title: ";
+            Object[] data = new Object[2];
+            data[0] = "Title:  ";
+            data[1] = 2;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             // we could have another property for title background.
@@ -536,7 +541,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
 
             col = r.addColumn();
-            data = new Object[0];
+            data = new Object[1];
+            data[0] = 3;
             col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);
 
             r = ipeditor.addRow();
@@ -598,8 +604,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[1];
+            Object[] data = new Object[2];
             data[0] = "Description: ";
+            data[1] = 3;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             // we could have another property for title background.
@@ -614,7 +621,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data);
 
             col = r.addColumn();
-            data = new Object[0];
+            data = new Object[1];
+            data[0] = 3;
             col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
 
             r = ipeditor.addRow();
@@ -756,19 +764,19 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
                     case LEFT: {
                         break;
                     }
-                        
+
                     case RIGHT: {
                         Rectangle2D bounds = layout.getBounds();
                         xText = (float) ((x + width - bounds.getWidth()) - bounds.getX());
                         break;
                     }
-                        
+
                     case CENTER: {
                         Rectangle2D bounds = layout.getBounds();
                         xText = (float) ((x + width / 2 - bounds.getWidth() / 2) - bounds.getX());
                         break;
                     }
-                        
+
                     case JUSTIFIED: {
                         if (measurer.getPosition() < end) {
                             layout = layout.getJustifiedLayout(width);

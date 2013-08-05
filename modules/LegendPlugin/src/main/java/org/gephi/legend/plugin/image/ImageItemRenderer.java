@@ -146,7 +146,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
                 float messageHeight = graphics2D.getFontMetrics().getHeight();
                 float messageWidth = graphics2D.getFontMetrics().stringWidth(noImageMessage);
-                graphics2D.drawString(noImageMessage, canvasOriginX + canvasWidth / 2 - messageWidth / 2, canvasOriginY + canvasHeight / 2 - messageHeight / 2);
+                graphics2D.drawString(noImageMessage, canvasOriginX + canvasWidth / 2 - messageWidth / 2 - currentRealOriginX, canvasOriginY + canvasHeight / 2 - messageHeight / 2 - currentRealOriginY);
             }
         } catch (Exception e) {
             Logger.getLogger(ImageItemRenderer.class.getName()).log(Level.WARNING, e.getMessage());
@@ -167,8 +167,9 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        Object[] data = new Object[1];
+        Object[] data = new Object[2];
         data[0] = "Source:";
+        data[1] = 2;
         col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();
@@ -177,18 +178,21 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        data = new Object[1];
+        data = new Object[2];
         data[0] = "Margin:";
+        data[1] = 2;
         col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[0];
+        data = new Object[1];
+        data[0] = 1;
         col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data);
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        data = new Object[1];
+        data = new Object[2];
         data[0] = "Scale:";
+        data[1] = 2;
         col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();

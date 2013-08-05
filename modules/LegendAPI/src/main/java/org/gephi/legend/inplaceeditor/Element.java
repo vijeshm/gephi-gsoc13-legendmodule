@@ -69,9 +69,15 @@ public class Element {
         this.property = property;
         switch (type) {
             case LABEL:
+                // data[0] = the label itself
+                // data[1] = the number of blocks that the label needs to occupy
             case TEXT:
             case IMAGE:
             case CHECKBOX:
+            case NUMBER:
+                // data[0] = number of blocks that the number needs to occupy
+            case FONT:
+                // data[0] = number of blocks that the font text needs to occupy
             case FUNCTION:
                 // data[0] = reference to an object that implements the inplaceClickResponse interface
                 // data[1] = image to be used during rendering
@@ -79,7 +85,7 @@ public class Element {
                 this.data = data;
                 break;
                 
-            // no extra data is required for number, alignments, font, color and file
+            // no extra data is required for alignments, color, file and functions
         }
     }
 
