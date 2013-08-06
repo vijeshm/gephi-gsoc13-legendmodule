@@ -202,7 +202,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, tableNode);
-        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
 
@@ -270,39 +269,31 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellPreviewProperties = cell.getPreviewProperties();
 
                 InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
-                ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
                 // modify inplace editors
 
                 // Cell Properties
                 r = ipeditor.addRow();
                 col = r.addColumn();
-                Object[] data = new Object[2];
+                Object[] data = new Object[1];
                 data[0] = "Cell:";
-                data[1] = 2;
                 col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
                 col = r.addColumn();
-                data = new Object[0]; // for a color property, extra data isnt needed.
-                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data);
+                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], null);
 
                 col = r.addColumn();
-                data = new Object[0];
-                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data);
+                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], null);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
-                data = new Object[0];
-                col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data);
+                col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], null);
 
                 col = r.addColumn();
-                data = new Object[0];
-                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data);
+                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], null);
 
                 col = r.addColumn();
-                data = new Object[1];
-                data[0] = 3;
-                col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data);
+                col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], null);
 
                 r = ipeditor.addRow();
                 col = r.addColumn();
@@ -439,9 +430,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         // modify inplace editors
         r = ipeditor.addRow();
         col = r.addColumn();
-        Object[] data = new Object[2];
+        Object[] data = new Object[1];
         data[0] = "Table:";
-        data[1] = 2;
         col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         // cell spacing
@@ -455,9 +445,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[1];
-        data[0] = 1;
-        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data);
+        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], null);
 
         // cell padding
         col = r.addColumn();
@@ -468,9 +456,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[1];
-        data[0] = 1;
-        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data);
+        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], null);
 
         // border size
         col = r.addColumn();
@@ -481,15 +467,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[1];
-        data[0] = 1;
-        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data);
+        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], null);
 
         r = ipeditor.addRow();
         //background color
         col = r.addColumn();
-        data = new Object[0];
-        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], data);
+        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], null);
 
         // border color
         col = r.addColumn();

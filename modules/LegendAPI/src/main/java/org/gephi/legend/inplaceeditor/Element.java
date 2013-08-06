@@ -68,14 +68,13 @@ public class Element {
         switch (type) {
             case LABEL:
                 // data[0] = the label itself
-                // data[1] = the number of blocks that the label needs to occupy
-            case TEXT:
             case IMAGE:
+                // data[0] = default boolean values
+                // data[1] = path of image to be displayed when data[0] is false
+                // data[2] = path of image to be displayed when data[0] is true
+                // data[3] = ?? (to be filled later)
             case CHECKBOX:
-            case NUMBER:
-                // data[0] = number of blocks that the number needs to occupy
-            case FONT:
-                // data[0] = number of blocks that the font text needs to occupy
+                // data[0] = default boolean value
             case FUNCTION:
                 // data[0] = reference to an object that implements the inplaceClickResponse interface
                 // data[1] = image to be used during rendering
@@ -83,7 +82,7 @@ public class Element {
                 this.data = data;
                 break;
                 
-            // no extra data is required for alignments, color, file and functions
+            // no extra data is required for font, number, alignments, color, file
         }
     }
 

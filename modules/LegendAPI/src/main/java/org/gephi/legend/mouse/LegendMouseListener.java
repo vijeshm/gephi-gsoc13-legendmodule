@@ -1,28 +1,19 @@
 package org.gephi.legend.mouse;
 
-import java.awt.Graphics2D;
 import java.util.ArrayList;
-import org.gephi.desktop.preview.PreviewTopComponent;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
-import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_HEIGHT;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_WIDTH;
 import static org.gephi.legend.spi.LegendItem.TRANSFORMATION_ANCHOR_SIZE;
-import org.gephi.preview.G2DRenderTargetBuilder;
-import org.gephi.preview.PreviewControllerImpl;
-import org.gephi.preview.PreviewModelImpl;
-import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewMouseEvent;
 import org.gephi.preview.api.PreviewProperties;
-import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
@@ -171,6 +162,9 @@ public class LegendMouseListener implements PreviewMouseListener {
 
                     BlockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
                     BlockNode clickedBlock = root.getClickedBlock(event.x, event.y);
+                    InplaceEditor ipeditor = clickedBlock.getInplaceEditor();
+                    ipeditor.setData(InplaceEditor.ORIGIN_X, (int) (event.x));
+                    ipeditor.setData(InplaceEditor.ORIGIN_Y, (int) (event.y));
                     legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
                     break;
                 }
@@ -280,6 +274,7 @@ public class LegendMouseListener implements PreviewMouseListener {
         Item item = legendModel.getSelectedItem();
 
         if (item != null) {
+            legendModel.setInplaceEditor(null);
             Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
             Boolean isBeingTransformed = (Boolean) item.getData(LegendItem.IS_BEING_TRANSFORMED);
             if (isBeingTransformed) {
