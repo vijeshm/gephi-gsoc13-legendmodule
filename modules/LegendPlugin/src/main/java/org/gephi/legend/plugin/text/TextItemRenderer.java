@@ -100,7 +100,6 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, textNode);
-        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
         Row r;
         Column col;
@@ -110,22 +109,18 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        Object[] data = new Object[0];
-        col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data);
+        col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], null);
 
         col = r.addColumn();
-        data = new Object[0];
-        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data);
+        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], null);
 
         col = r.addColumn();
-        data = new Object[1];
-        data[0] = 3;
-        col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data);
+        col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], null);
 
         r = ipeditor.addRow();
         col = r.addColumn();
         // left-alignment
-        data = new Object[4];
+        Object[] data = new Object[4];
         data[0] = previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.LEFT;
         data[1] = "/org/gephi/legend/graphics/left_unselected.png";
         data[2] = "/org/gephi/legend/graphics/left_selected.png";

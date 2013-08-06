@@ -41,6 +41,7 @@
  */
 package org.gephi.desktop.preview;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -151,9 +152,11 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             return;
         }
         float way = -e.getUnitsToScroll() / Math.abs(e.getUnitsToScroll());
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
-        target.setScaling(target.getScaling() * (way > 0 ? scalingFactor : 1 / scalingFactor));
-        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize * (way > 0 ? 1 / scalingFactor : scalingFactor));
+        if (way > 0) {
+            zoomPlus();
+        } else {
+            zoomMinus();
+        }
 
         setMoving(true);
         if (wheelTimer != null) {
@@ -169,7 +172,6 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
                 wheelTimer = null;
             }
         }, WHEEL_TIMER);
-        refreshLoop.refreshSketch();
     }
 
     @Override
@@ -191,22 +193,37 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     }
 
     public void zoomPlus() {
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        float inplaceBlockUnitSize = previewProperties.getFloatValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        float minInplaceBlockUnitSize = previewProperties.getFloatValue(PreviewProperty.INPLACE_MIN_BLOCK_UNIT_SIZE);
         previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize / scalingFactor);
+        if (inplaceBlockUnitSize / scalingFactor > minInplaceBlockUnitSize) {
+            // change the block size and font size only if the scaled down size is still larger than the miniumum
+            Font inplaceFont = previewProperties.getFontValue(PreviewProperty.INPLACE_DISPLAY_FONT);
+            Font newDefaultInplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() / scalingFactor);
+            previewProperties.putValue(PreviewProperty.INPLACE_DISPLAY_FONT, newDefaultInplaceFont);
+        }
         target.setScaling(target.getScaling() * scalingFactor);
         refreshLoop.refreshSketch();
     }
 
     public void zoomMinus() {
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        float inplaceBlockUnitSize = previewProperties.getFloatValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
+        float minInplaceBlockUnitSize = previewProperties.getFloatValue(PreviewProperty.INPLACE_MIN_BLOCK_UNIT_SIZE);
         previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize * scalingFactor);
+        if (inplaceBlockUnitSize > minInplaceBlockUnitSize) {
+            Font inplaceFont = previewProperties.getFontValue(PreviewProperty.INPLACE_DISPLAY_FONT);
+            Font newDefaultInplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() * scalingFactor);
+            previewProperties.putValue(PreviewProperty.INPLACE_DISPLAY_FONT, newDefaultInplaceFont);
+        }
         target.setScaling(target.getScaling() / scalingFactor);
         refreshLoop.refreshSketch();
     }
 
     public void resetZoom() {
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        float inplaceBlockUnitSize = previewProperties.getFloatValue(PreviewProperty.INPLACE_DEFAULT_BLOCK_UNIT_SIZE);
+        Font defaultInplaceFont = previewProperties.getFontValue(PreviewProperty.INPLACE_DEFAULT_DISPLAY_FONT);
         previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize);
+        previewProperties.putValue(PreviewProperty.INPLACE_DISPLAY_FONT, defaultInplaceFont);
         target.reset();
         refreshLoop.refreshSketch();
     }

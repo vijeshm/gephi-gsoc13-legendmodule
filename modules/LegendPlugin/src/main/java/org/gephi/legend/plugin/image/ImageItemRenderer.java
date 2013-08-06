@@ -157,7 +157,6 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, imageNode);
-        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
         Row r;
         Column col;
@@ -167,32 +166,26 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        Object[] data = new Object[2];
-        data[0] = "Source:";
-        data[1] = 2;
+        Object[] data = new Object[1];
+        data[0] = "Source: ";
         col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();
-        data = new Object[0];
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data);
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], null);
 
         r = ipeditor.addRow();
-        col = r.addColumn();
-        data = new Object[2];
-        data[0] = "Margin:";
-        data[1] = 2;
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-
         col = r.addColumn();
         data = new Object[1];
-        data[0] = 1;
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data);
+        data[0] = "Margin: ";
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+
+        col = r.addColumn();
+        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], null);
 
         r = ipeditor.addRow();
         col = r.addColumn();
-        data = new Object[2];
-        data[0] = "Scale:";
-        data[1] = 2;
+        data = new Object[1];
+        data[0] = "Scale: ";
         col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
 
         col = r.addColumn();

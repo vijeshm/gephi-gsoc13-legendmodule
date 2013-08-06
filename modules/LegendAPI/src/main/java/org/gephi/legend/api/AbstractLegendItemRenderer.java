@@ -410,7 +410,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Graph graph = null;
             InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
             InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, root);
-            ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
             Row r;
             Column col;
@@ -420,9 +419,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[2];
+            Object[] data = new Object[1];
             data[0] = "Border: ";
-            data[1] = 2;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             col = r.addColumn();
@@ -433,13 +431,10 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
 
             col = r.addColumn();
-            data = new Object[0]; // for a color propoerty, extra data isnt needed.
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], null);
 
             col = r.addColumn();
-            data = new Object[1];
-            data[0] = 1;
-            col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data);
+            col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], null);
 
             root.setInplaceEditor(ipeditor);
         }
@@ -465,9 +460,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // add the row that controls background properties
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[2];
+            Object[] data = new Object[1];
             data[0] = "Background: ";
-            data[1] = 3;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             col = r.addColumn();
@@ -478,8 +472,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
 
             col = r.addColumn();
-            data = new Object[0];
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], null);
         }
     }
 
@@ -490,9 +483,8 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         Row r = ipeditor.addRow();
 
         Column col = r.addColumn();
-        Object[] data = new Object[2];
+        Object[] data = new Object[1];
         data[0] = displayString;
-        data[1] = 2;
         col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
         col = r.addColumn();
@@ -514,7 +506,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Graph graph = null;
             InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
             InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, titleNode);
-            ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
             Row r;
             Column col;
@@ -524,26 +515,21 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[2];
-            data[0] = "Title:  ";
-            data[1] = 2;
+            Object[] data = new Object[1];
+            data[0] = "Title: ";
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             // we could have another property for title background.
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            data = new Object[0];
-            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data);
+            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], null);
 
             col = r.addColumn();
-            data = new Object[0];
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], null);
 
             col = r.addColumn();
-            data = new Object[1];
-            data[0] = 3;
-            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data);
+            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], null);
 
             r = ipeditor.addRow();
             col = r.addColumn();
@@ -594,7 +580,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Graph graph = null;
             InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
             InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, descNode);
-            ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, (float) (TRANSFORMATION_ANCHOR_SIZE * 3.0 / 4.0));
 
             Row r;
             Column col;
@@ -604,26 +589,21 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            Object[] data = new Object[2];
+            Object[] data = new Object[1];
             data[0] = "Description: ";
-            data[1] = 3;
             col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
 
             // we could have another property for title background.
 
             r = ipeditor.addRow();
             col = r.addColumn();
-            data = new Object[0];
-            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data);
+            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], null);
 
             col = r.addColumn();
-            data = new Object[0];
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data);
+            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], null);
 
             col = r.addColumn();
-            data = new Object[1];
-            data[0] = 3;
-            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data);
+            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], null);
 
             r = ipeditor.addRow();
             col = r.addColumn();

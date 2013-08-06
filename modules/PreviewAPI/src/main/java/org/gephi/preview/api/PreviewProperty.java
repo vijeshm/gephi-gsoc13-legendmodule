@@ -68,9 +68,21 @@ public class PreviewProperty {
 
     //Constants global
     /**
+     * General <code>Font</code> property which specifies the default font to be used for rendering inplace editors
+     */
+    public static final String INPLACE_DEFAULT_DISPLAY_FONT = "inplace.display-font-default";
+    /**
+     * General <code>Font</code> property which specifies the font to be used for rendering inplace editors
+     */
+    public static final String INPLACE_DISPLAY_FONT = "inplace.display";
+    /**
      * General <code>Integer</code> property which specifies the default size of a block of inplace editor.
      */
-    public static final String DEFAULT_INPLACE_BLOCK_UNIT_SIZE = "inplace.block-unit-size-default";
+    public static final String INPLACE_DEFAULT_BLOCK_UNIT_SIZE = "inplace.block-unit-size-default";
+    /**
+     * General <code>Integer</code> property which specifies the minimum size of a block of inplace editor.
+     */
+    public static final String INPLACE_MIN_BLOCK_UNIT_SIZE = "inplace.block-unit-size-min";
     /**
      * General <code>Integer</code> property which specifies the size of a block of inplace editor.
      */

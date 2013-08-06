@@ -171,6 +171,9 @@ public class LegendMouseListener implements PreviewMouseListener {
 
                     BlockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
                     BlockNode clickedBlock = root.getClickedBlock(event.x, event.y);
+                    InplaceEditor ipeditor = clickedBlock.getInplaceEditor();
+                    ipeditor.setData(InplaceEditor.ORIGIN_X, (int) (event.x));
+                    ipeditor.setData(InplaceEditor.ORIGIN_Y, (int) (event.y));
                     legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
                     break;
                 }
@@ -280,6 +283,7 @@ public class LegendMouseListener implements PreviewMouseListener {
         Item item = legendModel.getSelectedItem();
 
         if (item != null) {
+            legendModel.setInplaceEditor(null);
             Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
             Boolean isBeingTransformed = (Boolean) item.getData(LegendItem.IS_BEING_TRANSFORMED);
             if (isBeingTransformed) {

@@ -42,6 +42,7 @@
 package org.gephi.preview;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.beans.PropertyEditorManager;
 import java.util.*;
@@ -174,8 +175,11 @@ public class PreviewModelImpl implements PreviewModel {
 
             //Defaut values
             properties.putValue(PreviewProperty.VISIBILITY_RATIO, 1f);
-            properties.putValue(PreviewProperty.DEFAULT_INPLACE_BLOCK_UNIT_SIZE, 50);
-            properties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, 50);
+            properties.putValue(PreviewProperty.INPLACE_DEFAULT_BLOCK_UNIT_SIZE, 50f);
+            properties.putValue(PreviewProperty.INPLACE_MIN_BLOCK_UNIT_SIZE, 5f);
+            properties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, 50f);
+            properties.putValue(PreviewProperty.INPLACE_DISPLAY_FONT, new Font("Arial", Font.PLAIN, 32));
+            properties.putValue(PreviewProperty.INPLACE_DEFAULT_DISPLAY_FONT, new Font("Arial", Font.PLAIN, 32));
         }
     }
 

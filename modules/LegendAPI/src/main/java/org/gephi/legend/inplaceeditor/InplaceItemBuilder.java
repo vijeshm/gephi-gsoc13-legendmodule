@@ -39,9 +39,6 @@ public class InplaceItemBuilder implements ItemBuilder {
         ipeditor.setData(InplaceEditor.BORDER_THICK, borderLineThickness);
         ipeditor.setData(InplaceEditor.BACKGROUND_COLOR, backgroundColor);
         ipeditor.setData(InplaceEditor.BLOCKNODE, node);
-        // the gap between the block and its inplace editor must be atleast half the width of the anchor to avoid overlapping.
-        // By default, its set to 0. Hence, this property must be reset in the AbstractLegendItemRenderer's render method, since it is a private property.
-        ipeditor.setData(InplaceEditor.BLOCK_INPLACEEDITOR_GAP, 0);
         return ipeditor;
     }
 
