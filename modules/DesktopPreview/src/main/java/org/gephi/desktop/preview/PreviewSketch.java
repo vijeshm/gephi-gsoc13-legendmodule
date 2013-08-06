@@ -112,6 +112,11 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         target.setMoving(moving);
     }
 
+	public void setScaling(float scaling) {
+		target.setScaling(scaling);
+		previewProperties.putValue(PreviewProperty.ZOOM_LEVEL, scaling);
+	}
+	
     @Override
     public void mouseClicked(MouseEvent e) {
         if (previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.CLICKED))) {
@@ -151,9 +156,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             return;
         }
         float way = -e.getUnitsToScroll() / Math.abs(e.getUnitsToScroll());
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
-        target.setScaling(target.getScaling() * (way > 0 ? scalingFactor : 1 / scalingFactor));
-        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize * (way > 0 ? 1 / scalingFactor : scalingFactor));
+        setScaling(target.getScaling() * (way > 0 ? scalingFactor : 1 / scalingFactor));
 
         setMoving(true);
         if (wheelTimer != null) {
@@ -181,7 +184,6 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             trans.sub(ref);
             trans.div(target.getScaling()); // ensure const. moving speed whatever the zoom is
             trans.add(lastMove);
-
         }
         refreshLoop.refreshSketch();
     }
@@ -191,25 +193,20 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     }
 
     public void zoomPlus() {
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
-        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize / scalingFactor);
-        target.setScaling(target.getScaling() * scalingFactor);
+        setScaling(target.getScaling() * scalingFactor);
         refreshLoop.refreshSketch();
     }
 
     public void zoomMinus() {
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
-        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize * scalingFactor);
-        target.setScaling(target.getScaling() / scalingFactor);
+        setScaling(target.getScaling() / scalingFactor);
         refreshLoop.refreshSketch();
     }
 
     public void resetZoom() {
-        int inplaceBlockUnitSize = previewProperties.getIntValue(PreviewProperty.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        previewProperties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, inplaceBlockUnitSize);
-        target.reset();
-        refreshLoop.refreshSketch();
-    }
+		target.reset();
+		setScaling(target.getScaling());
+		refreshLoop.refreshSketch();
+	}
 
     private Vector screenPositionToModelPosition(Vector screenPos) {
         Vector center = new Vector(getWidth() / 2f, getHeight() / 2f);

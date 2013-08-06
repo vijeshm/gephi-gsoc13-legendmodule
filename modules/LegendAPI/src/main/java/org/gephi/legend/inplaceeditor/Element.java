@@ -4,8 +4,6 @@
  */
 package org.gephi.legend.inplaceeditor;
 
-import java.awt.Font;
-import java.awt.Image;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
@@ -107,6 +105,13 @@ public class Element {
 
     public Integer getItemIndex() {
         return itemIndex;
+    }
+    
+    /**
+     * Note: Refactor to a Map<String, Object>
+     */
+    public void setAssociatedData(int index, Object value){
+        data[index] = value;
     }
 
     public Object[] getAssociatedData() {

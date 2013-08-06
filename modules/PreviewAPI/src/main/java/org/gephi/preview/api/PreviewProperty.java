@@ -68,14 +68,6 @@ public class PreviewProperty {
 
     //Constants global
     /**
-     * General <code>Integer</code> property which specifies the default size of a block of inplace editor.
-     */
-    public static final String DEFAULT_INPLACE_BLOCK_UNIT_SIZE = "inplace.block-unit-size-default";
-    /**
-     * General <code>Integer</code> property which specifies the size of a block of inplace editor.
-     */
-    public static final String INPLACE_BLOCK_UNIT_SIZE = "inplace.block-unit-size";
-    /**
      * General <code>Boolean</code> property which indicates wheter the graph is directed
      */
     public static final String DIRECTED = "directed";
@@ -233,13 +225,22 @@ public class PreviewProperty {
      * The color can be the edge's color or a custom color.
      */
     public static final String EDGE_LABEL_OUTLINE_COLOR = "edge.label.outline.color";
+	
     //Constants UI helps
     /**
      * General <code>Boolean</code> property set as <code>true</code> when the user
      * is panning the canvas. Helps to conditionally hide elements while moving to
      * speed things up.
+	 * Only for usage with interactive preview visualization
      */
     public static final String MOVING = "canvas.moving";
+	/**
+     * General <code>Float</code> property which specifies the level of zoom applied in the preview canvas.
+	 * Helps to draw size independent controls for user interaction.
+	 * Only for usage with interactive preview visualization.
+     */
+    public static final String ZOOM_LEVEL = "zoom-level";
+	
     //Constants categories
     /**
      * Node category

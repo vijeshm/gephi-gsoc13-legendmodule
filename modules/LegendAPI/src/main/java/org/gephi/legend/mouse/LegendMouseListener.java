@@ -51,8 +51,8 @@ public class LegendMouseListener implements PreviewMouseListener {
         if (ipeditor != null) {
             int originX = ipeditor.getData(InplaceEditor.ORIGIN_X);
             int originY = ipeditor.getData(InplaceEditor.ORIGIN_Y);
-            int width = ipeditor.getData(InplaceEditor.WIDTH);
-            int height = ipeditor.getData(InplaceEditor.HEIGHT);
+            float width = ipeditor.getData(InplaceEditor.WIDTH);
+            float height = ipeditor.getData(InplaceEditor.HEIGHT);
 
             if ((pointX >= originX && pointX < (originX + width))
                     && (pointY >= originY && pointY < (originY + height))) {

@@ -174,8 +174,6 @@ public class PreviewModelImpl implements PreviewModel {
 
             //Defaut values
             properties.putValue(PreviewProperty.VISIBILITY_RATIO, 1f);
-            properties.putValue(PreviewProperty.DEFAULT_INPLACE_BLOCK_UNIT_SIZE, 50);
-            properties.putValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE, 50);
         }
     }
 

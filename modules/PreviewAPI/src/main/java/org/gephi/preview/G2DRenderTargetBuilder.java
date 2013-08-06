@@ -245,11 +245,11 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
 
         public void reset() {
             inited = false;
+            initAppletLayout();//Recalculate scaling etc.
         }
 
         /**
-         * Initializes the preview applet layout according to the graph's
-         * dimension.
+         * Initializes the preview applet layout according to the graph's dimension.
          */
         private void initAppletLayout() {
 //            graphSheet.setMargin(MARGIN);

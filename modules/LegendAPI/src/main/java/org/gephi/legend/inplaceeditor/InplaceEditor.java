@@ -8,35 +8,20 @@ import com.bric.swing.ColorPicker;
 import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Window;
-import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import org.gephi.legend.api.LegendController;
-import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.api.BlockNode;
-import org.gephi.legend.spi.LegendItem;
-import org.gephi.legend.spi.LegendItemBuilder;
-import org.gephi.preview.G2DRenderTargetBuilder;
-import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
-import org.gephi.preview.api.RenderTarget;
 import org.openide.util.Lookup;
-import sun.awt.RepaintArea;
-import sun.reflect.generics.tree.Tree;
 
 /**
  *
@@ -102,17 +87,9 @@ public class InplaceEditor implements Item {
         PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
 
-        int borderSize = InplaceItemRenderer.BORDER_SIZE;
-        int unitSize = previewProperties.getIntValue(PreviewProperty.INPLACE_BLOCK_UNIT_SIZE);
-        int editorOriginX = getData(ORIGIN_X);
-        int editorOriginY = getData(ORIGIN_Y);
-        int editorWidth = getData(WIDTH);
-        int editorHeight = getData(HEIGHT);
-
         // get the item associated with the inplace editor
         BlockNode node = getData(BLOCKNODE);
         Item item = node.getItem();
-        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         // find out which element has been clicked based on the click-coordinates and element coordinates
         Element selectedElem = null;
@@ -152,7 +129,7 @@ public class InplaceEditor implements Item {
                 Boolean uniform = true;
                 PreviewProperty prop = elements.get(0).getProperty();
                 for (Element e : elements) {
-                    if (e.getProperty().getDisplayName() != prop.getDisplayName()) {
+                    if (!e.getProperty().getDisplayName().equals(prop.getDisplayName())) {
                         uniform = false;
                         break;
                     }
@@ -161,8 +138,7 @@ public class InplaceEditor implements Item {
                 if (uniform) {
                     // for all the elements, set data[0] as unselected. for the selectedItem, set data[0] as selected.
                     for (Element e : elements) {
-                        Object[] elementData = e.getAssociatedData();
-                        elementData[0] = false;
+                        e.setAssociatedData(0, false);
                     }
 
                     Object[] elementData = selectedElem.getAssociatedData();
@@ -183,8 +159,7 @@ public class InplaceEditor implements Item {
                         break;
 
                     case FONT:
-                        JFontChooser chooser = new JFontChooser((Font) prop.getValue());
-                        Font chosenFont = chooser.showDialog(new JFrame("choose a font"), (Font) prop.getValue());
+                        Font chosenFont = JFontChooser.showDialog(new JFrame("choose a font"), (Font) prop.getValue());
                         if (chosenFont != null) {
                             prop.setValue(chosenFont);
                             previewProperties.putValue(prop.getName(), chosenFont);
