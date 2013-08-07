@@ -52,19 +52,16 @@ public class InplaceItemRenderer implements Renderer {
 
     // all these values should be made as final. They are temporarily not final because of debugging purposes
     public static Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
-    public static Font DEFAULT_LABEL_FONT = new Font("Arial", Font.PLAIN, 30);
     public static Color LABEL_COLOR = Color.BLACK;
     public static Color BORDER_COLOR = Color.BLACK;
     public static int BORDER_SIZE = 1;
     public static float COLOR_MARGIN = 0.2f;
     public static Map<Integer, String> fontLookup = new HashMap<Integer, String>();
-    public static Font DEFAULT_FONT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 20);
     public static Color FONT_DISPLAY_COLOR = Color.BLACK;
-    public static Font DEFAULT_NUMBER_FONT = new Font("Arial", Font.PLAIN, 20);
     public static Color NUMBER_COLOR = Color.BLACK;
-    public static int DEFAULT_INPLACE_BLOCK_UNIT_SIZE = 50;
+    public static int DEFAULT_INPLACE_BLOCK_UNIT_SIZE = 25;
     public static int INPLACE_MIN_BLOCK_UNIT_SIZE = 5;
-    public static Font INPLACE_DEFAULT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 32);
+    public static Font INPLACE_DEFAULT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 16);
 
     @Override
     public String getDisplayName() {
@@ -89,62 +86,48 @@ public class InplaceItemRenderer implements Renderer {
 
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
-        G2DTarget g2dtarget = (G2DTarget) target;
-        Graphics2D graphics2d = g2dtarget.getGraphics();
-
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
         InplaceEditor ipeditor = legendModel.getInplaceEditor();
 
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-
-        float scalingFactor = 1;
-        if (properties.hasProperty(PreviewProperty.ZOOM_LEVEL)) {
-            scalingFactor = properties.getFloatValue(PreviewProperty.ZOOM_LEVEL);
-        }
-
-        //Calculate block and border size taking zoom factor into account.
-        //We want to make in place editors size independent of zoom.
-        float blockUnitSizeFloat = ((float) DEFAULT_INPLACE_BLOCK_UNIT_SIZE / scalingFactor);
-        int blockUnitSize = (int) blockUnitSizeFloat;
-        if (blockUnitSize < INPLACE_MIN_BLOCK_UNIT_SIZE) {
-            blockUnitSizeFloat = INPLACE_MIN_BLOCK_UNIT_SIZE;
-            blockUnitSize = INPLACE_MIN_BLOCK_UNIT_SIZE;
-        }
-
-        float borderSizeFloat = ((float) BORDER_SIZE / scalingFactor);
-        int borderSize = (int) borderSizeFloat;
-        if (borderSize <= 0) {
-            borderSize = 1;//At least 1 pixel
-        }
-
-
-        // change the block size and font size only if the scaled down size is still larger than the miniumum
-        Font inplaceFont = INPLACE_DEFAULT_DISPLAY_FONT;
-        //if (blockUnitSizeFloat > INPLACE_MIN_BLOCK_UNIT_SIZE) {//Commented out, otherwise it doesn't work well with high zoom
-            inplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() / scalingFactor);
-        //}
-
-        Font labelFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-        Font numberFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-        Font fontFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-
         if (ipeditor != null) {
-            // get the geometry of the block associated with the current inplace item.
-            BlockNode node = ipeditor.getData(InplaceEditor.BLOCKNODE);
-            float blockOriginX = node.getOriginX();
-            float blockOriginY = node.getOriginY();
-            float blockWidth = node.getBlockWidth();
-            float blockHeight = node.getBlockHeight();
+            G2DTarget g2dtarget = (G2DTarget) target;
+            Graphics2D graphics2d = g2dtarget.getGraphics();
+
+            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+            PreviewModel previewModel = previewController.getModel();
+
+            float zoomLevel = properties.getFloatValue(PreviewProperty.ZOOM_LEVEL);
+
+            //Calculate block and border size taking zoom factor into account.
+            //We want to make in place editors size independent of zoom.
+            float blockUnitSizeFloat = ((float) DEFAULT_INPLACE_BLOCK_UNIT_SIZE / zoomLevel);
+            int blockUnitSize = (int) blockUnitSizeFloat;
+            if (blockUnitSize < INPLACE_MIN_BLOCK_UNIT_SIZE) {
+                blockUnitSize = INPLACE_MIN_BLOCK_UNIT_SIZE;
+                blockUnitSizeFloat = INPLACE_MIN_BLOCK_UNIT_SIZE;
+            }
+
+            float borderSizeFloat = ((float) BORDER_SIZE / zoomLevel);
+            int borderSize = (int) borderSizeFloat;
+            if (borderSize <= 0) {
+                borderSize = 1; // at least 1 pixel
+            }
+
+            Font inplaceFont = INPLACE_DEFAULT_DISPLAY_FONT;
+            inplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() / zoomLevel);
+
+            Font labelFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
+            Font numberFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
+            Font fontFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
 
             // save current states and restore it later
             Color saveColorState = graphics2d.getColor();
             Font saveFontState = graphics2d.getFont();
 
             // border cant be drawn now, since the height and width is unknown. Hence set the pseudo origin
-            int editorOriginX = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_X); // (blockOriginX + blockWidth + gap);
-            int editorOriginY = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_Y); // (blockOriginY);
+            int editorOriginX = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_X);
+            int editorOriginY = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_Y);
             float editorWidth; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
             float editorHeight; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
 
@@ -172,7 +155,6 @@ public class InplaceItemRenderer implements Renderer {
             ////////////////////
             ////////////////////
 
-
             //First iterate elements for precalculating editor elements and size so we can draw background:
             maxElementsCount = 0;
             for (Row row : rows) {
@@ -183,7 +165,7 @@ public class InplaceItemRenderer implements Renderer {
                         Object[] data = elem.getAssociatedData();
                         Element.ELEMENT_TYPE type = elem.getElementType();
                         PreviewProperty prop = elem.getProperty();
-                        
+
                         int fontWidth;
                         int numberOfBlocks;
                         String displayString;
@@ -193,6 +175,7 @@ public class InplaceItemRenderer implements Renderer {
                                 fontWidth = getFontWidth(graphics2d, (String) data[0]);
                                 numberOfBlocks = fontWidth / blockUnitSize + 1;
                                 break;
+
                             case FONT:
                                 Font font = prop.getValue();
                                 graphics2d.setFont(fontFont);
@@ -200,37 +183,33 @@ public class InplaceItemRenderer implements Renderer {
                                 fontWidth = getFontWidth(graphics2d, displayString);
                                 numberOfBlocks = fontWidth / blockUnitSize + 1;
                                 break;
+
                             case NUMBER:
                                 graphics2d.setFont(numberFont);
                                 displayString = "" + prop.getValue();
                                 fontWidth = getFontWidth(graphics2d, (String) displayString);
                                 numberOfBlocks = fontWidth / blockUnitSize + 1;
                                 break;
+
                             default:
                                 numberOfBlocks = 1;
                         }
                         currentElementsCount += numberOfBlocks;
                     }
-
                 }
-
                 maxElementsCount = Math.max(maxElementsCount, currentElementsCount);
             }
 
-            editorWidth = maxElementsCount * blockUnitSize + 2 * borderSizeFloat;
-            editorHeight = rows.size() * blockUnitSize + 2 * borderSizeFloat;
+            editorWidth = maxElementsCount * blockUnitSize + 2 * borderSize;
+            editorHeight = rows.size() * blockUnitSize + 2 * borderSize;
 
             //Fill the background at once for the whole editor
             graphics2d.setColor(BACKGROUND);
             fillRect(graphics2d, editorOriginX, editorOriginY, editorWidth, editorHeight);
 
-
             // iterate through all the rows, corresponding columns and their corresponding elements. 
             // based on the type of element, render accordingly.
             // editorHeight is trivial. its just the block size times the number of rows.
-            // along the way, keep a count on how many element blocks have been defined per row. This is needed to find out the editorWidth.
-            // This info is also needed to fill in the "empty" areas later on.
-            // while filling, add 1 to width and height, to avoid gaps between elements.
             for (rowBlock = 0; rowBlock < rows.size(); rowBlock++) {
                 int currentElementsCount = 0;
                 ArrayList<Column> columns = rows.get(rowBlock).getColumns();
@@ -248,13 +227,6 @@ public class InplaceItemRenderer implements Renderer {
                         int fontHeight;
                         int numberOfBlocks;
                         String displayString;
-                        /*
-                         float usableFraction = 0.8f;
-                         int stepSize = 1;
-                         float fontSize; // reset to zero in every case clause
-                         int desiredNumberOfBlocks;
-                         Font tempFont;
-                         */
 
                         switch (type) {
                             case LABEL:
@@ -262,12 +234,6 @@ public class InplaceItemRenderer implements Renderer {
                                 fontWidth = getFontWidth(graphics2d, (String) data[0]);
                                 fontHeight = getFontHeight(graphics2d);
                                 numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-                                graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks + 1,
-                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(LABEL_COLOR);
                                 graphics2d.drawString((String) data[0],
@@ -281,6 +247,7 @@ public class InplaceItemRenderer implements Renderer {
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
+
                             case CHECKBOX:
                                 try {
                                     BufferedImage img;
@@ -309,6 +276,7 @@ public class InplaceItemRenderer implements Renderer {
                                 } catch (IOException e) {
                                 }
                                 break;
+
                             case COLOR:
                                 Color color = prop.getValue();
 
@@ -326,6 +294,7 @@ public class InplaceItemRenderer implements Renderer {
 
                                 currentElementsCount += 1;
                                 break;
+
                             case FONT:
                                 Font font = prop.getValue();
                                 graphics2d.setFont(fontFont);
@@ -333,12 +302,6 @@ public class InplaceItemRenderer implements Renderer {
                                 fontWidth = getFontWidth(graphics2d, displayString);
                                 fontHeight = getFontHeight(graphics2d);
                                 numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-                                graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks + 1,
-                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(FONT_DISPLAY_COLOR);
                                 graphics2d.drawString(displayString,
@@ -352,6 +315,7 @@ public class InplaceItemRenderer implements Renderer {
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
+
                             case IMAGE:
                                 try {
                                     // load the default image (unselected)
@@ -382,18 +346,13 @@ public class InplaceItemRenderer implements Renderer {
                                 } catch (IOException e) {
                                 }
                                 break;
+
                             case NUMBER:
                                 graphics2d.setFont(numberFont);
                                 displayString = "" + prop.getValue();
                                 fontWidth = getFontWidth(graphics2d, (String) displayString);
                                 fontHeight = getFontHeight(graphics2d);
                                 numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-                                graphics2d.setColor(BACKGROUND);
-                                graphics2d.fillRect((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks + 1,
-                                        blockUnitSize + 1);
 
                                 graphics2d.setColor(NUMBER_COLOR);
                                 graphics2d.drawString(displayString,
@@ -407,6 +366,7 @@ public class InplaceItemRenderer implements Renderer {
 
                                 currentElementsCount += numberOfBlocks;
                                 break;
+
                             case TEXT:
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/edit.png"));
@@ -430,6 +390,7 @@ public class InplaceItemRenderer implements Renderer {
                                 } catch (IOException e) {
                                 }
                                 break;
+
                             case FILE:
                                 try {
                                     BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/file.png"));
@@ -480,10 +441,6 @@ public class InplaceItemRenderer implements Renderer {
                 }
             }
 
-
-
-
-
             // rendering borders
             graphics2d.setColor(BORDER_COLOR);
             // top
@@ -507,7 +464,9 @@ public class InplaceItemRenderer implements Renderer {
     }
 
     /**
-     * Helper method to fill rectangles with float precision. We use float precision specially for inPlace editor since they are kept the same size in screen independently of zoom factor.
+     * Helper method to fill rectangles with float precision. We use float
+     * precision specially for inPlace editor since they are kept the same size
+     * in screen independently of zoom factor.
      */
     private void fillRect(Graphics2D graphics2d, float x, float y, float width, float height) {
         Rectangle2D.Float rect = new Rectangle2D.Float(x, y, width, height);

@@ -191,6 +191,7 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
             if (model != null) {
                 background = model.getProperties().getColorValue(PreviewProperty.BACKGROUND_COLOR);
                 initAppletLayout();
+                model.getProperties().putValue(PreviewProperty.ZOOM_LEVEL, scaling);
 
                 g2.clearRect(0, 0, width, height);
                 g2.setTransform(new AffineTransform());

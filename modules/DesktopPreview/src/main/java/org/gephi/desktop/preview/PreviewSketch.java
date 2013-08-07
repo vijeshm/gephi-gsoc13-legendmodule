@@ -112,11 +112,11 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         target.setMoving(moving);
     }
 
-	public void setScaling(float scaling) {
-		target.setScaling(scaling);
-		previewProperties.putValue(PreviewProperty.ZOOM_LEVEL, scaling);
-	}
-	
+    public void setScaling(float scaling) {
+        target.setScaling(scaling);
+        previewProperties.putValue(PreviewProperty.ZOOM_LEVEL, scaling);
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         if (previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.CLICKED))) {
@@ -203,10 +203,10 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     }
 
     public void resetZoom() {
-		target.reset();
-		setScaling(target.getScaling());
-		refreshLoop.refreshSketch();
-	}
+        target.reset();
+        setScaling(target.getScaling());
+        refreshLoop.refreshSketch();
+    }
 
     private Vector screenPositionToModelPosition(Vector screenPos) {
         Vector center = new Vector(getWidth() / 2f, getHeight() / 2f);
