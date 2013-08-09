@@ -586,34 +586,34 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn(true);
             // left-alignment
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.LEFT);
+            data.put(ElementImage.IMAGE_BOOL, titleAlignment == Alignment.LEFT);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, false, Alignment.LEFT);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.LEFT, Alignment.LEFT);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // center-alignment
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.CENTER);
+            data.put(ElementImage.IMAGE_BOOL, titleAlignment == Alignment.CENTER);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, true, Alignment.CENTER);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.CENTER, Alignment.CENTER);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // right alignment
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.RIGHT);
+            data.put(ElementImage.IMAGE_BOOL, titleAlignment == Alignment.RIGHT);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, true, Alignment.RIGHT);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.RIGHT, Alignment.RIGHT);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // justified
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+            data.put(ElementImage.IMAGE_BOOL, titleAlignment == Alignment.JUSTIFIED);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, true, Alignment.JUSTIFIED);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.JUSTIFIED, Alignment.JUSTIFIED);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             titleNode.setInplaceEditor(ipeditor);
@@ -674,34 +674,34 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             col = r.addColumn(true);
             // left-alignment
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.LEFT);
+            data.put(ElementImage.IMAGE_BOOL, descriptionAlignment == Alignment.LEFT);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, false, Alignment.LEFT);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.LEFT, Alignment.LEFT);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // center-alignment
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.CENTER);
+            data.put(ElementImage.IMAGE_BOOL, descriptionAlignment == Alignment.CENTER);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, true, Alignment.CENTER);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.CENTER, Alignment.CENTER);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // right alignment
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.RIGHT);
+            data.put(ElementImage.IMAGE_BOOL, descriptionAlignment == Alignment.RIGHT);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, true, Alignment.RIGHT);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.RIGHT, Alignment.RIGHT);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // justified
             data = new HashMap<String, Object>();
-            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+            data.put(ElementImage.IMAGE_BOOL, descriptionAlignment == Alignment.JUSTIFIED);
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
-            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, true, Alignment.JUSTIFIED);
+            addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.JUSTIFIED, Alignment.JUSTIFIED);
             addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             descNode.setInplaceEditor(ipeditor);
