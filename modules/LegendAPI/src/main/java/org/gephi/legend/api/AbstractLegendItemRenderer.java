@@ -8,7 +8,6 @@ import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.pdf.PdfContentByte;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -16,16 +15,25 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.batik.svggen.DefaultExtensionHandler;
 import org.apache.batik.svggen.ImageHandlerBase64Encoder;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.inplaceeditor.Column;
-import org.gephi.legend.inplaceeditor.Element;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.InplaceItemRenderer;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementColor;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementFont;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementImage;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementLabel;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementNumber;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementText;
 import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
@@ -414,27 +422,34 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Row r;
             Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
-            PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+            Map<String, Object> data;
 
             r = ipeditor.addRow();
-            col = r.addColumn();
-            Object[] data = new Object[1];
-            data[0] = "Border: ";
-            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementLabel.LABEL_TEXT, "Border: ");
+            data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+            data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
-            col = r.addColumn();
-            data = new Object[3];
-            data[0] = borderIsDisplaying;
-            data[1] = "/org/gephi/legend/graphics/invisible.png";
-            data[2] = "/org/gephi/legend/graphics/visible.png";
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, borderIsDisplaying);
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/invisible.png");
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/visible.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data, false, null);
 
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], null);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+            col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data, false, null);
 
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], null);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+            data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data, false, null);
 
             root.setInplaceEditor(ipeditor);
         }
@@ -454,25 +469,30 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Row r;
             Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
-            PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+            Map<String, Object> data;
 
             // add the row that controls background properties
             r = ipeditor.addRow();
-            col = r.addColumn();
-            Object[] data = new Object[1];
-            data[0] = "Background: ";
-            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementLabel.LABEL_TEXT, "Background: ");
+            data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+            data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null); // the last two arguments are related to grouped items. 
+            //For an element not belonging to any group, its values do not matter.
 
-            col = r.addColumn();
-            data = new Object[3];
-            data[0] = backgroundIsDisplaying;
-            data[1] = "/org/gephi/legend/graphics/invisible.png";
-            data[2] = "/org/gephi/legend/graphics/visible.png";
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, backgroundIsDisplaying);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/visible.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/invisible.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data, false, null);
 
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], null);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+            col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data, false, null);
         }
     }
 
@@ -481,18 +501,21 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
         Row r = ipeditor.addRow();
+        Map<String, Object> data;
 
-        Column col = r.addColumn();
-        Object[] data = new Object[1];
-        data[0] = displayString;
-        col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+        Column col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementLabel.LABEL_TEXT, displayString);
+        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
-        col = r.addColumn();
-        data = new Object[3];
-        data[0] = defaultVal;
-        data[1] = "/org/gephi/legend/graphics/invisible.png";
-        data[2] = "/org/gephi/legend/graphics/visible.png";
-        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, prop, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementImage.IMAGE_BOOL, defaultVal);
+        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/visible.png");
+        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/invisible.png");
+        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, prop, data, false, null);
     }
 
     private void renderTitle(Graphics2D graphics2D, Integer boundaryWidth, Integer boundaryHeight) {
@@ -510,60 +533,65 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Row r;
             Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
-            PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+            Map<String, Object> data;
 
             r = ipeditor.addRow();
-            col = r.addColumn();
-            Object[] data = new Object[1];
-            data[0] = "Title: ";
-            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementLabel.LABEL_TEXT, "Title :");
+            data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+            data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
             // we could have another property for title background.
 
             r = ipeditor.addRow();
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], null);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data, false, null);
 
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], null);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+            col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data, false, null);
 
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], null);
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
+            col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data, false, null);
 
             r = ipeditor.addRow();
-            col = r.addColumn();
+            col = r.addColumn(true);
             // left-alignment
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.LEFT;
-            data[1] = "/org/gephi/legend/graphics/left_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/left_selected.png";
-            data[3] = Alignment.LEFT;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.LEFT);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, false, Alignment.LEFT);
 
-            // center alignment
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.CENTER;
-            data[1] = "/org/gephi/legend/graphics/center_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/center_selected.png";
-            data[3] = Alignment.CENTER;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            // center-alignment
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.CENTER);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, true, Alignment.CENTER);
 
             // right alignment
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.RIGHT;
-            data[1] = "/org/gephi/legend/graphics/right_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/right_selected.png";
-            data[3] = Alignment.RIGHT;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.RIGHT);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, true, Alignment.RIGHT);
 
             // justified
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
-            data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/justified_selected.png";
-            data[3] = Alignment.JUSTIFIED;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, true, Alignment.JUSTIFIED);
 
             titleNode.setInplaceEditor(ipeditor);
         }
@@ -584,60 +612,65 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             Row r;
             Column col;
             PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
-            PreviewProperty prop;
             int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+            Map<String, Object> data;
 
             r = ipeditor.addRow();
-            col = r.addColumn();
-            Object[] data = new Object[1];
-            data[0] = "Description: ";
-            col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data); //if its a label, property must be null.
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementLabel.LABEL_TEXT, "Description:");
+            data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+            data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
-            // we could have another property for title background.
-
-            r = ipeditor.addRow();
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], null);
-
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], null);
-
-            col = r.addColumn();
-            col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], null);
+            // we could have another property for description background.
 
             r = ipeditor.addRow();
-            col = r.addColumn();
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data, false, null);
+            
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+            col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data, false, null);
+
+            col = r.addColumn(false);
+            data = new HashMap<String, Object>();
+            data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+            data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
+            col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data, false, null);
+
+            r = ipeditor.addRow();
+            col = r.addColumn(true);
             // left-alignment
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.LEFT;
-            data[1] = "/org/gephi/legend/graphics/left_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/left_selected.png";
-            data[3] = Alignment.LEFT;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.LEFT);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, false, Alignment.LEFT);
 
-            // center alignment
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.CENTER;
-            data[1] = "/org/gephi/legend/graphics/center_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/center_selected.png";
-            data[3] = Alignment.CENTER;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            // center-alignment
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.CENTER);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, true, Alignment.CENTER);
 
             // right alignment
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.RIGHT;;
-            data[1] = "/org/gephi/legend/graphics/right_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/right_selected.png";
-            data[3] = Alignment.RIGHT;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.RIGHT);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, true, Alignment.RIGHT);
 
             // justified
-            data = new Object[4];
-            data[0] = previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
-            data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
-            data[2] = "/org/gephi/legend/graphics/justified_selected.png";
-            data[3] = Alignment.JUSTIFIED;
-            col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data);
+            data = new HashMap<String, Object>();
+            data.put(ElementImage.IMAGE_BOOL, previewProperties[LegendProperty.TITLE_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+            data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
+            data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
+            col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, true, Alignment.JUSTIFIED);
 
             descNode.setInplaceEditor(ipeditor);
         }

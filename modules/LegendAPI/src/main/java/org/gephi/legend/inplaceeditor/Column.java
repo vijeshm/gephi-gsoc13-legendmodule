@@ -4,7 +4,10 @@
  */
 package org.gephi.legend.inplaceeditor;
 
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
 import java.util.ArrayList;
+import java.util.Map;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
@@ -12,23 +15,39 @@ import org.gephi.preview.api.PreviewProperty;
  * @author mvvijesh
  */
 public class Column {
-    Row r;
-    InplaceEditor ipeditor;
-    ArrayList<Element> elements;
+    private Row r;
+    private InplaceEditor ipeditor;
+    private ArrayList<BaseElement> elements;
+    private Boolean isGrouped;
+    private Boolean isGroupDefaultPicked;
     
-    public Column(InplaceEditor ipeditor, Row r)    {
+    public Column(InplaceEditor ipeditor, Row r, Boolean isGrouped)    {
         this.r = r;
         this.ipeditor = ipeditor;
-        elements = new ArrayList<Element>();
+        this.isGrouped = isGrouped;
+        this.isGroupDefaultPicked = false;
+        elements = new ArrayList<BaseElement>();
     }
     
-    public Element addElement(Element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
-        Element elem = new Element(type, itemIndex, property, data);
+    public BaseElement addElement(BaseElement.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Map<String, Object> data, Boolean isDefault, Object propertyValue) {
+        BaseElement elem = BaseElement.createElement(type, itemIndex, property, ipeditor, r, this, data, isGrouped, isDefault, propertyValue);
         elements.add(elem);
         return elem;
     }
     
-    public void deleteElement(Element e)    {
+    public Boolean isDefaultPicked() {
+        return isGroupDefaultPicked;
+    }
+    
+    public void setIsDefaultPicked(Boolean picked) {
+        isGroupDefaultPicked = picked;
+    }
+    
+    public Boolean isGrouped() {
+        return isGrouped;
+    }
+    
+    public void deleteElement(BaseElement e)    {
         elements.remove(e);
     }
     
@@ -41,7 +60,7 @@ public class Column {
         return ipeditor;
     }
     
-    public ArrayList<Element> getElements()   {
+    public ArrayList<BaseElement> getElements()   {
         return elements;
     }
     

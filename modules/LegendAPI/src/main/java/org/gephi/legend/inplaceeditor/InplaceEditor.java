@@ -16,6 +16,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
@@ -61,8 +62,8 @@ public class InplaceEditor implements Item {
         rows.remove(r);
     }
 
-    public Column addColumn(Row r) {
-        Column col = r.addColumn();
+    public Column addColumn(Row r, Boolean isGrouped) {
+        Column col = r.addColumn(isGrouped);
         return col;
     }
 
@@ -70,8 +71,8 @@ public class InplaceEditor implements Item {
         r.deleteColumn(col);
     }
 
-    public Element addElement(Row r, Column col, Element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
-        Element elem = r.addElement(col, type, itemIndex, property, data);
+    public BaseElement addElement(Row r, Column col, BaseElement.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Map<String, Object> data, Boolean isDefault, Object propertyValue) {
+        BaseElement elem = r.addElement(col, type, itemIndex, property, data, isDefault, propertyValue);
         return elem;
     }
 
@@ -91,13 +92,13 @@ public class InplaceEditor implements Item {
         Item item = node.getItem();
 
         // find out which element has been clicked based on the click-coordinates and element coordinates
-        Element selectedElem = null;
+        BaseElement selectedElem = null;
         Column selectedColumn = null;
         for (Row r : rows) {
             ArrayList<Column> columns = r.getColumns();
             for (Column c : columns) {
-                ArrayList<Element> elements = c.getElements();
-                for (Element elem : elements) {
+                ArrayList<BaseElement> elements = c.getElements();
+                for (BaseElement elem : elements) {
                     // check the condition excluding the left border. this is to avoid overlapping between elements
                     if ((x > elem.getOriginX() && x <= elem.getOriginX() + elem.getElementWidth())
                             && (y > elem.getOriginY() && y <= elem.getOriginY() + elem.getElementHeight())) {
@@ -118,16 +119,15 @@ public class InplaceEditor implements Item {
         // if the click is on a color, display a color box popup. the new is set to the corresponding property
         // if the click is on a number, then display a popup to change the number and display its name on the top.
         if (selectedColumn != null && selectedElem != null) {
-            if (selectedColumn.elements.size() > 1) {
+            if (selectedColumn.isGrouped()) {
                 // if the column that you've selected has multiple elements, each should represent the same property
                 // the value of the selected element should be set as the value of the common property.
-                // Object[] data: data[0] says whether it is selected. data[1] says what value to set as the property.
-                ArrayList<Element> elements = selectedColumn.elements;
+                ArrayList<BaseElement> elements = selectedColumn.getElements();
 
                 // checking if all the properties are the same
                 Boolean uniform = true;
                 PreviewProperty prop = elements.get(0).getProperty();
-                for (Element e : elements) {
+                for (BaseElement e : elements) {
                     if (!e.getProperty().getDisplayName().equals(prop.getDisplayName())) {
                         uniform = false;
                         break;
@@ -135,95 +135,19 @@ public class InplaceEditor implements Item {
                 }
 
                 if (uniform) {
-                    // for all the elements, set data[0] as unselected. for the selectedItem, set data[0] as selected.
-                    for (Element e : elements) {
-                        e.setAssociatedData(0, false);
+                    // for all the elements, deselect every element within the group
+                    for (BaseElement e : elements) {
+                        e.setAssociatedData(BaseElement.SELECTED_WITHIN_GROUP, false);
                     }
 
-                    Object[] elementData = selectedElem.getAssociatedData();
-                    elementData[0] = true;
-                    prop.setValue(elementData[3]);
-                    previewProperties.putValue(prop.getName(), elementData[3]);
+                    selectedElem.setAssociatedData(BaseElement.SELECTED_WITHIN_GROUP, true);
+                    previewProperties.putValue(prop.getName(), selectedElem.getAssociatedData(BaseElement.GROUP_PROPERTY_VALUE));
                 } else {
                     prop.setValue(null);
                 }
 
             } else {
-
-                PreviewProperty prop = selectedElem.getProperty();
-                Object[] elementData = selectedElem.getAssociatedData();
-
-                switch (selectedElem.getElementType()) {
-                    case LABEL:
-                        break;
-
-                    case FONT:
-                        Font chosenFont = JFontChooser.showDialog(new JFrame("choose a font"), (Font) prop.getValue());
-                        if (chosenFont != null) {
-                            prop.setValue(chosenFont);
-                            previewProperties.putValue(prop.getName(), chosenFont);
-                        }
-                        break;
-
-                    case TEXT:
-                        String newValue = (String) JOptionPane.showInputDialog(null, "Enter new text:", (String) prop.getValue());
-                        if (newValue != null) {
-                            prop.setValue(newValue);
-                            previewProperties.putValue(prop.getName(), newValue);
-                        }
-                        break;
-
-                    case CHECKBOX:
-                        Boolean currentState = (Boolean) prop.getValue();
-                        elementData[0] = !currentState;
-                        prop.setValue(!currentState);
-                        previewProperties.putValue(prop.getName(), !currentState);
-                        break;
-
-                    case IMAGE:
-                        if (prop != null) { // prop is null when providing support for static images.
-                            Boolean isSelected = (Boolean) elementData[0];
-                            elementData[0] = !isSelected;
-                            prop.setValue(!isSelected);
-                            previewProperties.putValue(prop.getName(), !isSelected);
-                        }
-                        break;
-
-                    case COLOR:
-                        Color selectedColor = ColorPicker.showDialog(null, (Color) prop.getValue(), true);
-                        if (selectedColor != null) {
-                            prop.setValue(selectedColor);
-                            previewProperties.putValue(prop.getName(), selectedColor);
-                        }
-                        break;
-
-                    case NUMBER:
-                        // String newValueString = (String) JOptionPane.showInputDialog(null, "New Value", "" + prop.getValue());
-                        String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, prop.getValue());
-                        // newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", prop.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, null);
-                        if (newValueString != null) {
-                            try {
-                                Integer newNumber = Integer.parseInt(newValueString);
-                                prop.setValue(newNumber);
-                                previewProperties.putValue(prop.getName(), newNumber);
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-                        break;
-
-                    case FILE:
-                        JFileChooser fc = new JFileChooser();
-                        int returnVal = fc.showOpenDialog(null);
-                        if (returnVal == JFileChooser.APPROVE_OPTION) {
-                            File file = fc.getSelectedFile();
-                            previewProperties.putValue(prop.getName(), file);
-                        }
-                        break;
-
-                    case FUNCTION:
-                        InplaceClickResponse responder = (InplaceClickResponse) elementData[0];
-                        responder.performAction(this);
-                }
+                selectedElem.onSelect();
             }
         }
     }

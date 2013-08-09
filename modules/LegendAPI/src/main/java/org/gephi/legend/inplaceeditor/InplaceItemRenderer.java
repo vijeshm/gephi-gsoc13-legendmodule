@@ -9,24 +9,12 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.imageio.ImageIO;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.BlockNode;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.CHECKBOX;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.COLOR;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FILE;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FONT;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FUNCTION;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.IMAGE;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.NUMBER;
-import static org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.TEXT;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
@@ -160,41 +148,8 @@ public class InplaceItemRenderer implements Renderer {
             for (Row row : rows) {
                 int currentElementsCount = 0;
                 for (Column column : row.getColumns()) {
-                    for (Element elem : column.getElements()) {
-                        //!!Read refactoring notes up for reducing this to one line (elem.NumberOfBlocks):
-                        Object[] data = elem.getAssociatedData();
-                        Element.ELEMENT_TYPE type = elem.getElementType();
-                        PreviewProperty prop = elem.getProperty();
-
-                        int fontWidth;
-                        int numberOfBlocks;
-                        String displayString;
-                        switch (type) {
-                            case LABEL:
-                                graphics2d.setFont(labelFont);
-                                fontWidth = getFontWidth(graphics2d, (String) data[0]);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-                                break;
-
-                            case FONT:
-                                Font font = prop.getValue();
-                                graphics2d.setFont(fontFont);
-                                displayString = font.getFontName() + " " + font.getSize();
-                                fontWidth = getFontWidth(graphics2d, displayString);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-                                break;
-
-                            case NUMBER:
-                                graphics2d.setFont(numberFont);
-                                displayString = "" + prop.getValue();
-                                fontWidth = getFontWidth(graphics2d, (String) displayString);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-                                break;
-
-                            default:
-                                numberOfBlocks = 1;
-                        }
-                        currentElementsCount += numberOfBlocks;
+                    for (BaseElement elem : column.getElements()) {
+                        currentElementsCount += elem.getNumberOfBlocks();
                     }
                 }
                 maxElementsCount = Math.max(maxElementsCount, currentElementsCount);
@@ -214,229 +169,11 @@ public class InplaceItemRenderer implements Renderer {
                 int currentElementsCount = 0;
                 ArrayList<Column> columns = rows.get(rowBlock).getColumns();
                 for (colBlock = 0; colBlock < columns.size(); colBlock++) {
-                    ArrayList<Element> elements = columns.get(colBlock).getElements();
-                    selected = false;
+                    ArrayList<BaseElement> elements = columns.get(colBlock).getElements();
                     for (elemBlock = 0; elemBlock < elements.size(); elemBlock++) {
-                        Element elem = elements.get(elemBlock);
-                        Object[] data = elem.getAssociatedData();
-                        Element.ELEMENT_TYPE type = elem.getElementType();
-                        PreviewProperty prop = elem.getProperty();
-
-                        // temporary computational variables
-                        int fontWidth;
-                        int fontHeight;
-                        int numberOfBlocks;
-                        String displayString;
-
-                        switch (type) {
-                            case LABEL:
-                                graphics2d.setFont(labelFont);
-                                fontWidth = getFontWidth(graphics2d, (String) data[0]);
-                                fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-                                graphics2d.setColor(LABEL_COLOR);
-                                graphics2d.drawString((String) data[0],
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
-
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks,
-                                        blockUnitSize);
-
-                                currentElementsCount += numberOfBlocks;
-                                break;
-
-                            case CHECKBOX:
-                                try {
-                                    BufferedImage img;
-                                    if ((Boolean) data[0]) {
-                                        img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/checked.png"));
-                                    } else {
-                                        img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/unchecked.png"));
-                                    }
-
-                                    graphics2d.drawImage(img,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize + blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize + blockUnitSize,
-                                            0,
-                                            0,
-                                            img.getWidth(),
-                                            img.getHeight(), null);
-
-                                    elem.setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            blockUnitSize,
-                                            blockUnitSize);
-
-                                    currentElementsCount += 1;
-                                } catch (IOException e) {
-                                }
-                                break;
-
-                            case COLOR:
-                                Color color = prop.getValue();
-
-                                graphics2d.setColor(color);
-                                // some margin on all sides of the element
-                                graphics2d.fillRect((int) ((editorOriginX + borderSize) + currentElementsCount * blockUnitSize + COLOR_MARGIN * blockUnitSize),
-                                        (int) ((editorOriginY + borderSize) + rowBlock * blockUnitSize + COLOR_MARGIN * blockUnitSize),
-                                        (int) ((1 - 2 * COLOR_MARGIN) * blockUnitSize),
-                                        (int) ((1 - 2 * COLOR_MARGIN) * blockUnitSize));
-
-                                elem.setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                        blockUnitSize,
-                                        blockUnitSize);
-
-                                currentElementsCount += 1;
-                                break;
-
-                            case FONT:
-                                Font font = prop.getValue();
-                                graphics2d.setFont(fontFont);
-                                displayString = font.getFontName() + " " + font.getSize();
-                                fontWidth = getFontWidth(graphics2d, displayString);
-                                fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-                                graphics2d.setColor(FONT_DISPLAY_COLOR);
-                                graphics2d.drawString(displayString,
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
-
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks,
-                                        blockUnitSize);
-
-                                currentElementsCount += numberOfBlocks;
-                                break;
-
-                            case IMAGE:
-                                try {
-                                    // load the default image (unselected)
-                                    BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
-                                    // if atleast one element is selected, the first one is taken into consideration
-                                    // if no elements are selected, the last one is NOT forcibly selected
-                                    if (!selected && (Boolean) data[0]) {
-                                        img = ImageIO.read(getClass().getResourceAsStream((String) data[2]));
-                                        selected = true;
-                                    }
-
-                                    graphics2d.drawImage(img,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize + blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize + blockUnitSize,
-                                            0,
-                                            0,
-                                            img.getWidth(),
-                                            img.getHeight(), null);
-
-                                    elem.setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            blockUnitSize,
-                                            blockUnitSize);
-
-                                    currentElementsCount += 1;
-                                } catch (IOException e) {
-                                }
-                                break;
-
-                            case NUMBER:
-                                graphics2d.setFont(numberFont);
-                                displayString = "" + prop.getValue();
-                                fontWidth = getFontWidth(graphics2d, (String) displayString);
-                                fontHeight = getFontHeight(graphics2d);
-                                numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-                                graphics2d.setColor(NUMBER_COLOR);
-                                graphics2d.drawString(displayString,
-                                        (editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
-
-                                elem.setGeometry((editorOriginX + BORDER_SIZE) + currentElementsCount * blockUnitSize,
-                                        (editorOriginY + BORDER_SIZE) + rowBlock * blockUnitSize,
-                                        blockUnitSize * numberOfBlocks,
-                                        blockUnitSize);
-
-                                currentElementsCount += numberOfBlocks;
-                                break;
-
-                            case TEXT:
-                                try {
-                                    BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/edit.png"));
-
-                                    graphics2d.drawImage(img,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize + blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize + blockUnitSize,
-                                            0,
-                                            0,
-                                            img.getWidth(),
-                                            img.getHeight(), null);
-
-                                    elem.setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            blockUnitSize,
-                                            blockUnitSize);
-
-                                    currentElementsCount += 1;
-                                } catch (IOException e) {
-                                }
-                                break;
-
-                            case FILE:
-                                try {
-                                    BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/file.png"));
-                                    graphics2d.drawImage(img,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize + blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize + blockUnitSize,
-                                            0,
-                                            0,
-                                            img.getWidth(),
-                                            img.getHeight(), null);
-
-                                    elem.setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            blockUnitSize,
-                                            blockUnitSize);
-
-                                    currentElementsCount += 1;
-                                } catch (IOException e) {
-                                }
-                                break;
-
-                            case FUNCTION:
-                                try {
-                                    BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data[1]));
-                                    graphics2d.drawImage(img,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            (editorOriginX + borderSize) + currentElementsCount * blockUnitSize + blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize + blockUnitSize,
-                                            0,
-                                            0,
-                                            img.getWidth(),
-                                            img.getHeight(), null);
-
-                                    elem.setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
-                                            (editorOriginY + borderSize) + rowBlock * blockUnitSize,
-                                            blockUnitSize,
-                                            blockUnitSize);
-
-                                    currentElementsCount += 1;
-                                } catch (IOException e) {
-                                }
-                                break;
-                        }
+                        BaseElement elem = elements.get(elemBlock);
+                        elem.renderElement(graphics2d, blockUnitSize, editorOriginX, editorOriginY, borderSize, rowBlock, currentElementsCount);
+                        currentElementsCount += elem.getNumberOfBlocks();
                     }
                 }
             }

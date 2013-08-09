@@ -12,6 +12,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.gephi.graph.api.Graph;
@@ -19,12 +21,21 @@ import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.inplaceeditor.Column;
-import org.gephi.legend.inplaceeditor.Element;
 import org.gephi.legend.inplaceeditor.InplaceClickResponse;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.InplaceItemRenderer;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementColor;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementFont;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementFunction;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementImage;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementLabel;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementNumber;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementText;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
@@ -269,71 +280,81 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellPreviewProperties = cell.getPreviewProperties();
 
                 InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, cellNode);
-
+                Map<String, Object> data;
                 // modify inplace editors
 
                 // Cell Properties
                 r = ipeditor.addRow();
-                col = r.addColumn();
-                Object[] data = new Object[1];
-                data[0] = "Cell:";
-                col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementLabel.LABEL_TEXT, "Cell: ");
+                data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
-                col = r.addColumn();
-                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], null);
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+                col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data, false, null);
 
-                col = r.addColumn();
-                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], null);
-
-                r = ipeditor.addRow();
-                col = r.addColumn();
-                col.addElement(Element.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], null);
-
-                col = r.addColumn();
-                col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], null);
-
-                col = r.addColumn();
-                col.addElement(Element.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], null);
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+                col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data, false, null);
 
                 r = ipeditor.addRow();
-                col = r.addColumn();
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
+                col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data, false, null);
+
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+                col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data, false, null);
+
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
+                col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data, false, null);
+
+                r = ipeditor.addRow();
+                col = r.addColumn(true);
                 // left-alignment
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT;
-                data[1] = "/org/gephi/legend/graphics/left_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/left_selected.png";
-                data[3] = Alignment.LEFT;
-                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                data = new HashMap<String, Object>();
+                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT);
+                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
+                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
+                col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, false, Alignment.LEFT);
 
-                // center alignment
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER;
-                data[1] = "/org/gephi/legend/graphics/center_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/center_selected.png";
-                data[3] = Alignment.CENTER;
-                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                // center-alignment
+                data = new HashMap<String, Object>();
+                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER);
+                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
+                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
+                col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.CENTER);
 
                 // right alignment
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT;
-                data[1] = "/org/gephi/legend/graphics/right_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/right_selected.png";
-                data[3] = Alignment.RIGHT;
-                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                data = new HashMap<String, Object>();
+                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT);
+                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
+                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
+                col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.RIGHT);
 
                 // justified
-                data = new Object[4];
-                data[0] = cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED;
-                data[1] = "/org/gephi/legend/graphics/justified_unselected.png";
-                data[2] = "/org/gephi/legend/graphics/justified_selected.png";
-                data[3] = Alignment.JUSTIFIED;
-                col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data);
+                data = new HashMap<String, Object>();
+                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
+                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
+                col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.JUSTIFIED);
 
                 r = ipeditor.addRow();
                 // insert_row button
-                col = r.addColumn();
-                data = new Object[2];
-                data[0] = new InplaceClickResponse() {
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/insert_row.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
                     @Override
                     public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to add a row?", "Confirm Row Addition", JOptionPane.YES_NO_OPTION);
@@ -344,14 +365,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
                         }
                     }
-                };
-                data[1] = "/org/gephi/legend/graphics/insert_row.png";
-                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                });
+                col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
                 // insert_column button
-                col = r.addColumn();
-                data = new Object[2];
-                data[0] = new InplaceClickResponse() {
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/insert_row.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
                     @Override
                     public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to add a column?", "Confirm Column Addition", JOptionPane.YES_NO_OPTION);
@@ -362,14 +383,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
                         }
                     }
-                };
-                data[1] = "/org/gephi/legend/graphics/insert_column.png";
-                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                });
+                col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
                 // delete_row button
-                col = r.addColumn();
-                data = new Object[2];
-                data[0] = new InplaceClickResponse() {
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/delete_row.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
                     @Override
                     public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to delete this row?", "Confirm Row Deletion", JOptionPane.YES_NO_OPTION);
@@ -380,14 +401,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             tableItem.deleteRow(cellRowNumber);
                         }
                     }
-                };
-                data[1] = "/org/gephi/legend/graphics/delete_row.png";
-                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                });
+                col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
                 // delete_column button
-                col = r.addColumn();
-                data = new Object[2];
-                data[0] = new InplaceClickResponse() {
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/delete_column.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
                     @Override
                     public void performAction(InplaceEditor ipeditor) {
                         int confirmation = JOptionPane.showConfirmDialog(null, "Do you really want to delete this column?", "Confirm Column Deletion", JOptionPane.YES_NO_OPTION);
@@ -398,9 +419,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             tableItem.deleteColumn(cellColNumber);
                         }
                     }
-                };
-                data[1] = "/org/gephi/legend/graphics/delete_column.png";
-                col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+                });
+                col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
                 cellNode.setInplaceEditor(ipeditor);
 
@@ -426,58 +446,72 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private void buildTableProperties(InplaceEditor ipeditor, int itemIndex, PreviewProperty[] tablePreviewProperties) {
         Row r;
         Column col;
+        Map<String, Object> data;
 
         // modify inplace editors
         r = ipeditor.addRow();
-        col = r.addColumn();
-        Object[] data = new Object[1];
-        data[0] = "Table:";
-        col.addElement(Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementLabel.LABEL_TEXT, "Table :");
+        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
         // cell spacing
         r = ipeditor.addRow();
-        col = r.addColumn();
-        data = new Object[3];
-        // to display a static image, set data[0] to true or false, data[1] and data[2] to same image.
-        data[0] = true;
-        data[1] = "/org/gephi/legend/graphics/cell_spacing.png";
-        data[2] = "/org/gephi/legend/graphics/cell_spacing.png";
-        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementImage.IMAGE_BOOL, true);
+        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/cell_spacing.png");
+        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/cell_spacing.png");
+        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, null, data, false, null);
 
-        col = r.addColumn();
-        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], null);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data, false, null);
 
         // cell padding
-        col = r.addColumn();
-        data = new Object[3];
-        data[0] = true;
-        data[1] = "/org/gephi/legend/graphics/cell_padding.png";
-        data[2] = "/org/gephi/legend/graphics/cell_padding.png";
-        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementImage.IMAGE_BOOL, true);
+        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/cell_padding.png");
+        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/cell_padding.png");
+        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, null, data, false, null);
 
-        col = r.addColumn();
-        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], null);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data, false, null);
 
         // border size
-        col = r.addColumn();
-        data = new Object[3];
-        data[0] = true;
-        data[1] = "/org/gephi/legend/graphics/cell_border.png";
-        data[2] = "/org/gephi/legend/graphics/cell_border.png";
-        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, null, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementImage.IMAGE_BOOL, true);
+        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/cell_border.png");
+        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/cell_border.png");
+        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, null, data, false, null);
 
-        col = r.addColumn();
-        col.addElement(Element.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], null);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_COLOR], data, false, null);
 
         r = ipeditor.addRow();
         //background color
-        col = r.addColumn();
-        col.addElement(Element.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], null);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+        col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], data, false, null);
 
         // border color
-        col = r.addColumn();
-        data = new Object[2];
-        data[0] = new InplaceClickResponse() {
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/table_cell_border_color.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
             @Override
             public void performAction(InplaceEditor ipeditor) {
                 int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the border color of all cells?", "Confirm Border Color Change", JOptionPane.YES_NO_OPTION);
@@ -503,14 +537,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 }
             }
-        };
-        data[1] = "/org/gephi/legend/graphics/table_cell_border_color.png";
-        col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        });
+        col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
         // table font
-        col = r.addColumn();
-        data = new Object[2];
-        data[0] = new InplaceClickResponse() {
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/table_font.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
             @Override
             public void performAction(InplaceEditor ipeditor) {
                 int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font for all cells?", "Confirm Font Change", JOptionPane.YES_NO_OPTION);
@@ -537,14 +571,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 }
             }
-        };
-        data[1] = "/org/gephi/legend/graphics/table_font.png";
-        col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        });
+        col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
         // table font color
-        col = r.addColumn();
-        data = new Object[2];
-        data[0] = new InplaceClickResponse() {
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/table_font_color.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
             @Override
             public void performAction(InplaceEditor ipeditor) {
                 int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the font color for all cells?", "Confirm Font Color Change", JOptionPane.YES_NO_OPTION);
@@ -570,17 +604,16 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 }
             }
-        };
-        data[1] = "/org/gephi/legend/graphics/table_font_color.png";
-        col.addElement(Element.ELEMENT_TYPE.FUNCTION, itemIndex, null, data);
+        });
+        col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
 
         // border size
-        col = r.addColumn();
-        data = new Object[3];
-        data[0] = (Boolean) tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue();
-        data[1] = "/org/gephi/legend/graphics/column_expand.png";
-        data[2] = "/org/gephi/legend/graphics/column_collapse.png";
-        col.addElement(Element.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementImage.IMAGE_BOOL, (Boolean) tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue());
+        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/column_collapse.png");
+        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/column_expand.png");
+        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data, false, Alignment.LEFT);
     }
 
     private void updateCellGeometry(BlockNode tableNode, int rowHeight, int[] colWidths) {

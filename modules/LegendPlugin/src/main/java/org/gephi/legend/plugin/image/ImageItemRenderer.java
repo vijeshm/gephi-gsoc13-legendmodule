@@ -13,6 +13,8 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -27,7 +29,14 @@ import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.InplaceItemRenderer;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementCheckbox;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementFile;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementFont;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementLabel;
+import org.gephi.legend.inplaceeditor.inplaceElements.ElementNumber;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
@@ -161,37 +170,48 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         Row r;
         Column col;
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
-        PreviewProperty prop;
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        Map<String, Object> data;
 
         r = ipeditor.addRow();
-        col = r.addColumn();
-        Object[] data = new Object[1];
-        data[0] = "Source: ";
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementLabel.LABEL_TEXT, "Source: ");
+        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
-        col = r.addColumn();
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], null);
-
-        r = ipeditor.addRow();
-        col = r.addColumn();
-        data = new Object[1];
-        data[0] = "Margin: ";
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
-
-        col = r.addColumn();
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], null);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementFile.FILE_PATH, "/org/gephi/legend/graphics/file.png");
+        col.addElement(BaseElement.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data, false, null);
 
         r = ipeditor.addRow();
-        col = r.addColumn();
-        data = new Object[1];
-        data[0] = "Scale: ";
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.LABEL, itemIndex, null, data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementLabel.LABEL_TEXT, "Margin: ");
+        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
 
-        col = r.addColumn();
-        data = new Object[1];
-        data[0] = useImageAspectRatio;
-        col.addElement(org.gephi.legend.inplaceeditor.Element.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data);
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data, false, null);
+
+        r = ipeditor.addRow();
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementLabel.LABEL_TEXT, "Scale: ");
+        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementCheckbox.IS_CHECKED, useImageAspectRatio);
+        col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data, false, null);
 
         imageNode.setInplaceEditor(ipeditor);
     }

@@ -5,6 +5,8 @@
 package org.gephi.legend.inplaceeditor;
 
 import java.util.ArrayList;
+import java.util.Map;
+import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
@@ -21,8 +23,8 @@ public class Row {
         this.columns = new ArrayList<Column>();
     }
 
-    public Column addColumn() {
-        Column newCol = new Column(ipeditor, this);
+    public Column addColumn(Boolean isGrouped) {
+        Column newCol = new Column(ipeditor, this, isGrouped);
         columns.add(newCol);
         return newCol;
     }
@@ -31,12 +33,12 @@ public class Row {
         columns.remove(col);
     }
 
-    public Element addElement(Column col, Element.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Object[] data) {
-        Element elem = col.addElement(type, itemIndex, property, data);
+    public BaseElement addElement(Column col, BaseElement.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Map<String, Object> data, Boolean isDefault, Object propertyValue) {
+        BaseElement elem = col.addElement(type, itemIndex, property, data, isDefault, propertyValue);
         return elem;
     }
 
-    public void deleteElement(Column col, Element e) {
+    public void deleteElement(Column col, BaseElement e) {
         col.deleteElement(e);
     }
 
