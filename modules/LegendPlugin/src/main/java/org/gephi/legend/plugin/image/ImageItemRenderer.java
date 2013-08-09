@@ -6,7 +6,6 @@ package org.gephi.legend.plugin.image;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -23,9 +22,8 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.commons.codec.binary.Base64;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
-import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
@@ -34,11 +32,9 @@ import org.gephi.legend.inplaceeditor.Row;
 import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.legend.inplaceelements.ElementCheckbox;
 import org.gephi.legend.inplaceelements.ElementFile;
-import org.gephi.legend.inplaceelements.ElementFont;
 import org.gephi.legend.inplaceelements.ElementLabel;
 import org.gephi.legend.inplaceelements.ElementNumber;
 import org.gephi.legend.spi.LegendItem;
-import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
@@ -87,11 +83,10 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
             BlockNode imageNode = legendNode.getChild(IMAGENODE);
             if (imageNode == null) {
                 imageNode = legendNode.addChild(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin, IMAGENODE);
-                buildInplaceImage(imageNode, item);
+                buildInplaceImage(imageNode, item, graphics2D);
             }
 
             imageNode.updateGeometry(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin);
-            drawBlockBoundary(graphics2D, imageNode);
 
             int canvasOriginX = (int) imageNode.getOriginX();
             int canvasOriginY = (int) imageNode.getOriginY();
@@ -162,7 +157,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    private void buildInplaceImage(BlockNode imageNode, Item item) {
+    private void buildInplaceImage(BlockNode imageNode, Item item, Graphics2D graphics2d) {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, imageNode);
@@ -172,19 +167,22 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         Map<String, Object> data;
-
+        BaseElement addedElement;
+        
         r = ipeditor.addRow();
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Source: ");
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFile.FILE_PATH, "/org/gephi/legend/graphics/file.png");
-        col.addElement(BaseElement.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
         col = r.addColumn(false);
@@ -192,13 +190,15 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementLabel.LABEL_TEXT, "Margin: ");
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-        col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
         col = r.addColumn(false);
@@ -206,12 +206,14 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementLabel.LABEL_TEXT, "Scale: ");
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-        col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementCheckbox.IS_CHECKED, useImageAspectRatio);
-        col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         imageNode.setInplaceEditor(ipeditor);
     }

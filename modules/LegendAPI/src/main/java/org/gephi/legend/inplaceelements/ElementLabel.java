@@ -26,22 +26,35 @@ public class ElementLabel extends BaseElement {
     public ElementLabel(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
         super(type, itemIndex, property, ipeditor, row, col, data, isGrouped, isDefault, propertyValue);
     }
-    
+
     @Override
     public void onSelect() {
         // do nothing for a label
     }
 
     @Override
-    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
         Font labelFont = (Font) data.get(LABEL_FONT);
-        Color labelColor = (Color) data.get(LABEL_COLOR);
         String labelText = (String) data.get(LABEL_TEXT);
         
         graphics2d.setFont(labelFont);
         int fontWidth = getFontWidth(graphics2d, labelText);
         int fontHeight = getFontHeight(graphics2d);
         numberOfBlocks = fontWidth / blockUnitSize + 1;
+        
+        return numberOfBlocks;
+    }
+
+    @Override
+    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+        setNumberOfBlocks(graphics2d, blockUnitSize);
+        
+        Font labelFont = (Font) data.get(LABEL_FONT);
+        Color labelColor = (Color) data.get(LABEL_COLOR);
+        String labelText = (String) data.get(LABEL_TEXT);
+        
+        graphics2d.setFont(labelFont);
+        int fontHeight = getFontHeight(graphics2d);
 
         graphics2d.setColor(labelColor);
         graphics2d.drawString(labelText,

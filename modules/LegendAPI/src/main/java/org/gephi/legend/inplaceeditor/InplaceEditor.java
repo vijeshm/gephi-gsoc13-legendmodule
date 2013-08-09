@@ -82,11 +82,6 @@ public class InplaceEditor implements Item {
     }
 
     public void reflectAction(int x, int y) {
-        // get the preview properties to make the changes get reflected
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-        PreviewProperties previewProperties = previewModel.getProperties();
-
         // get the item associated with the inplace editor
         BlockNode node = getData(BLOCKNODE);
         Item item = node.getItem();
@@ -141,7 +136,7 @@ public class InplaceEditor implements Item {
                     }
 
                     selectedElem.setAssociatedData(BaseElement.SELECTED_WITHIN_GROUP, true);
-                    previewProperties.putValue(prop.getName(), selectedElem.getAssociatedData(BaseElement.GROUP_PROPERTY_VALUE));
+                    selectedElem.onSelect();
                 } else {
                     prop.setValue(null);
                 }

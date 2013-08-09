@@ -21,6 +21,7 @@ import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.legend.spi.LegendItemRenderer;
 import org.gephi.preview.api.*;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -353,21 +354,38 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
             updateDefaultValues();
         }
 
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        PreviewProperties previewProperties = previewModel.getProperties();
+        
+        String propertyName;
+        PreviewProperty property;
         int[] properties = LegendProperty.LIST_OF_PROPERTIES;
 
-        PreviewProperty[] previewProperties = new PreviewProperty[defaultValuesArrayList.size()];
+        PreviewProperty[] itemPreviewProperties = new PreviewProperty[defaultValuesArrayList.size()];
 
         // creating label
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        previewProperties[LegendProperty.LABEL] = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " [" + item.getType() + "]"); //setting the label
-        previewProperties[LegendProperty.USER_LEGEND_NAME] = createLegendProperty(item, LegendProperty.USER_LEGEND_NAME, defaultLabel + itemIndex + " [" + item.getType() + "]"); //setting the legend name
-        for (int i = 0; i < previewProperties.length - 1; i++) {
+        
+        // setting the label
+        property = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " [" + item.getType() + "]");
+        previewProperties.addProperty(property);
+        itemPreviewProperties[LegendProperty.LABEL] = property;
+        
+        // setting the legend name
+        property = createLegendProperty(item, LegendProperty.USER_LEGEND_NAME, defaultLabel + itemIndex + " [" + item.getType() + "]");
+        previewProperties.addProperty(property);
+        itemPreviewProperties[LegendProperty.USER_LEGEND_NAME] = property;
+        
+        for (int i = 0; i < itemPreviewProperties.length - 1; i++) {
             if (i != LegendProperty.LABEL && i != LegendProperty.USER_LEGEND_NAME) {
-                previewProperties[i] = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
+                property = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
+                previewProperties.addProperty(property);
+                itemPreviewProperties[i] = property;
             }
         }
 
-        return previewProperties;
+        return itemPreviewProperties;
     }
 
     @Override

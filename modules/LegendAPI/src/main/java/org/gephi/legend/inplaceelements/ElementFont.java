@@ -37,7 +37,7 @@ public class ElementFont extends BaseElement {
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
-        
+
         Font chosenFont = JFontChooser.showDialog(new JFrame("choose a font"), (Font) property.getValue());
         if (chosenFont != null) {
             property.setValue(chosenFont);
@@ -46,7 +46,21 @@ public class ElementFont extends BaseElement {
     }
 
     @Override
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+        Font displayFont = (Font) data.get(DISPLAY_FONT);
+        Font font = property.getValue();
+        graphics2d.setFont(displayFont);
+        String displayString = font.getFontName() + " " + font.getSize();
+        int fontWidth = getFontWidth(graphics2d, displayString);
+        numberOfBlocks = fontWidth / blockUnitSize + 1;
+
+        return numberOfBlocks;
+    }
+
+    @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+        setNumberOfBlocks(graphics2d, blockUnitSize);
+
         Font displayFont = (Font) data.get(DISPLAY_FONT);
         Color displayFontColor = (Color) data.get(DISPLAY_FONT_COLOR);
 
@@ -55,7 +69,6 @@ public class ElementFont extends BaseElement {
         String displayString = font.getFontName() + " " + font.getSize();
         int fontWidth = getFontWidth(graphics2d, displayString);
         int fontHeight = getFontHeight(graphics2d);
-        numberOfBlocks = fontWidth / blockUnitSize + 1;
 
         graphics2d.setColor(displayFontColor);
         graphics2d.drawString(displayString,

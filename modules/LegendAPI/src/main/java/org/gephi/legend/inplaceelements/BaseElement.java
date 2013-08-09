@@ -58,7 +58,7 @@ abstract public class BaseElement {
         this.property = property;
         this.data = data;
         
-        // in case the element appears in a group, the value of the property that it represents must be set.
+        // in case elemthe element appears in a group, the value of the property that it represents must be set.
         if(isGrouped) {
             data.put(GROUP_PROPERTY_VALUE, propertyValue);
         } else {
@@ -146,6 +146,8 @@ abstract public class BaseElement {
     
     abstract public void onSelect();
 
+    abstract public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize);
+    
     protected int getFontWidth(Graphics2D graphics2d, String str) {
         return graphics2d.getFontMetrics().stringWidth(str);
     }

@@ -43,8 +43,15 @@ public class ElementColor extends BaseElement {
     }
 
     @Override
-    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
         numberOfBlocks = 1;
+        return numberOfBlocks;
+    }
+
+    @Override
+    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+        setNumberOfBlocks(graphics2d, blockUnitSize);
+        
         Color color = property.getValue();
         Float colorMargin = (Float) data.get(COLOR_MARGIN);
 

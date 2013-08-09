@@ -27,7 +27,7 @@ import org.openide.util.Lookup;
 public class ElementFile extends BaseElement {
 
     public static String FILE_PATH = "element.file.path";
-    
+
     public ElementFile(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
         super(type, itemIndex, property, ipeditor, row, col, data, isGrouped, isDefault, propertyValue);
     }
@@ -47,10 +47,17 @@ public class ElementFile extends BaseElement {
     }
 
     @Override
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+        numberOfBlocks = 1;
+        return numberOfBlocks;
+    }
+
+    @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            numberOfBlocks = 1;
-            BufferedImage img = ImageIO.read(getClass().getResourceAsStream(FILE_PATH));
+            setNumberOfBlocks(graphics2d, blockUnitSize);
+            
+            BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data.get(FILE_PATH)));
             graphics2d.drawImage(img,
                     (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
                     (editorOriginY + borderSize) + rowBlock * blockUnitSize,

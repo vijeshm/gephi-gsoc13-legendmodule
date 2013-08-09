@@ -35,9 +35,16 @@ public class ElementFunction extends BaseElement {
     }
 
     @Override
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+        numberOfBlocks = 1;
+        return numberOfBlocks;
+    }
+
+    @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            numberOfBlocks = 1;
+            setNumberOfBlocks(graphics2d, blockUnitSize);
+            
             String functionImage = (String) data.get(FUNCTION_IMAGE);
             BufferedImage img = ImageIO.read(getClass().getResourceAsStream(functionImage));
             graphics2d.drawImage(img,

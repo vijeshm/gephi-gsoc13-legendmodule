@@ -77,32 +77,31 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode) {
+    protected void renderToGraphics(Graphics2D graphics2d, BlockNode legendNode) {
         // draw the text
         int blockOriginX = (int) (legendNode.getOriginX());
         int blockOriginY = (int) (legendNode.getOriginY());
         int blockWidth = (int) legendNode.getBlockWidth();
         int blockHeight = (int) legendNode.getBlockHeight();
-        legendDrawText(graphics2D, body, bodyFont, bodyFontColor, blockOriginX - currentRealOriginX, blockOriginY - currentRealOriginY, blockWidth, blockHeight, bodyAlignment);
+        legendDrawText(graphics2d, body, bodyFont, bodyFontColor, blockOriginX - currentRealOriginX, blockOriginY - currentRealOriginY, blockWidth, blockHeight, bodyAlignment);
 
         // create a text node, create a corresponding inplace editor and attach it as the legendNode's child
         int textWidth = blockWidth;
-        int textHeight = (int) legendDrawText(graphics2D, body, bodyFont, bodyFontColor, blockOriginX, blockOriginY, blockWidth, blockHeight, bodyAlignment, true);
+        int textHeight = (int) legendDrawText(graphics2d, body, bodyFont, bodyFontColor, blockOriginX, blockOriginY, blockWidth, blockHeight, bodyAlignment, true);
         int textOriginX = blockOriginX;
         int textOriginY = blockOriginY + blockHeight / 2 - textHeight / 2;
         Item item = legendNode.getItem();
         BlockNode textNode = legendNode.getChild(TEXTNODE);
         if (textNode == null) {
             textNode = legendNode.addChild(textOriginX, textOriginY, textWidth, textHeight, TEXTNODE);
-            buildInplaceText(textNode, item);
+            buildInplaceText(textNode, item, graphics2d);
         }
 
         // update the geometry and draw the geometric dimensions
         textNode.updateGeometry(textOriginX, textOriginY, textWidth, textHeight);
-        drawBlockBoundary(graphics2D, textNode);
     }
 
-    private void buildInplaceText(BlockNode textNode, Item item) {
+    private void buildInplaceText(BlockNode textNode, Item item, Graphics2D graphics2d) {
         // associate an inplace renderer with the textNode
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
@@ -113,24 +112,28 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         Map<String, Object> data;
-
+        BaseElement addedElement;
+        
         r = ipeditor.addRow();
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
-        col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data, false, null);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[TextProperty.TEXT_BODY], data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
-        col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data, false, null);
-
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
-        col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data, false, null);
-
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data, false, null);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
         r = ipeditor.addRow();
         col = r.addColumn(true);
         // left-alignment
@@ -138,28 +141,32 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.LEFT);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
-        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, false, Alignment.LEFT);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, false, Alignment.LEFT);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // center-alignment
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.CENTER);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
-        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.CENTER);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.CENTER);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // right alignment
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.RIGHT);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
-        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.RIGHT);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.RIGHT);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // justified
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
-        col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.JUSTIFIED);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.JUSTIFIED);
+        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         textNode.setInplaceEditor(ipeditor);
     }

@@ -165,7 +165,7 @@ public class LegendMouseListener implements PreviewMouseListener {
                     InplaceEditor ipeditor = clickedBlock.getInplaceEditor();
                     ipeditor.setData(InplaceEditor.ORIGIN_X, (int) (event.x));
                     ipeditor.setData(InplaceEditor.ORIGIN_Y, (int) (event.y));
-                    legendModel.setInplaceEditor(clickedBlock.getInplaceEditor());
+                    legendModel.setInplaceEditor(ipeditor);
                     break;
                 }
             }

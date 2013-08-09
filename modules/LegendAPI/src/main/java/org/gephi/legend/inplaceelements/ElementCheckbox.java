@@ -41,11 +41,18 @@ public class ElementCheckbox extends BaseElement {
         property.setValue(!currentState);
         previewProperties.putValue(property.getName(), !currentState);
     }
+    
+    @Override
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+        numberOfBlocks = 1;
+        return numberOfBlocks;
+    }
 
     @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            numberOfBlocks = 1;
+            setNumberOfBlocks(graphics2d, blockUnitSize);
+            
             Boolean isSelected = (Boolean) data.get(IS_CHECKED);
             BufferedImage img;
             if (isSelected) {

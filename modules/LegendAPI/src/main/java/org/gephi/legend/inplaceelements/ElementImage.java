@@ -7,6 +7,7 @@ package org.gephi.legend.inplaceelements;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.gephi.legend.inplaceeditor.Column;
@@ -35,30 +36,46 @@ public class ElementImage extends BaseElement {
     @Override
     public void onSelect() {
         if (property != null) { // prop is null when providing support for static images.
-            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-            PreviewModel previewModel = previewController.getModel();
-            PreviewProperties previewProperties = previewModel.getProperties();
-
-            Boolean isPicked = (Boolean) data.get(IMAGE_BOOL);
-            data.put(IMAGE_BOOL, !isPicked);
-            property.setValue(!isPicked);
-            previewProperties.putValue(property.getName(), !isPicked);
+            if (isGrouped) {
+                property.setValue(data.get(GROUP_PROPERTY_VALUE));
+                
+                // turn off the switch for all the elements. 
+                ArrayList<BaseElement> groupElements = col.getElements();
+                for(BaseElement element : groupElements) {
+                    element.getAssociatedData().put(IMAGE_BOOL, false);
+                }
+                
+                // turn on the switch for this element
+                data.put(IMAGE_BOOL, true);
+            } else {
+                Boolean isPicked = (Boolean) data.get(IMAGE_BOOL);
+                data.put(IMAGE_BOOL, !isPicked);
+                property.setValue(!isPicked);
+            }
         }
+    }
+
+    @Override
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+        numberOfBlocks = 1;
+        return numberOfBlocks;
     }
 
     @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            numberOfBlocks = 1;
+            setNumberOfBlocks(graphics2d, blockUnitSize);
+
             String imgTrue = (String) data.get(IMAGE_IF_TRUE);
             String imgFalse = (String) data.get(IMAGE_IF_FALSE);
-            Boolean defaultPropertyValue = (Boolean) data.get(IMAGE_BOOL);
-
+            Boolean propertyValue = (Boolean) data.get(IMAGE_BOOL);
+            Boolean isSelectedWithinGroup = (Boolean) data.get(SELECTED_WITHIN_GROUP);
+            
             // load the default image (unselected)
             BufferedImage img = ImageIO.read(getClass().getResourceAsStream(imgFalse));
             // if atleast one element is selected, the first one is taken into consideration
             // if no elements are selected, the last one is NOT forcibly selected
-            if (defaultPropertyValue) {
+            if (isGrouped && isSelectedWithinGroup || !isGrouped && propertyValue) {
                 img = ImageIO.read(getClass().getResourceAsStream(imgTrue));
             }
 

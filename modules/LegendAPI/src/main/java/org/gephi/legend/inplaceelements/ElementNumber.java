@@ -49,7 +49,20 @@ public class ElementNumber extends BaseElement {
     }
 
     @Override
+    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+        Font numberFont = (Font) data.get(NUMBER_FONT);
+        graphics2d.setFont(numberFont);
+        String displayString = "" + property.getValue();
+        int fontWidth = getFontWidth(graphics2d, (String) displayString);
+        numberOfBlocks = fontWidth / blockUnitSize + 1;
+        
+        return numberOfBlocks;
+    }
+
+    @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+        setNumberOfBlocks(graphics2d, blockUnitSize);
+        
         Font numberFont = (Font) data.get(NUMBER_FONT);
         Color numberColor = (Color) data.get(NUMBER_COLOR);
 
@@ -57,7 +70,6 @@ public class ElementNumber extends BaseElement {
         String displayString = "" + property.getValue();
         int fontWidth = getFontWidth(graphics2d, (String) displayString);
         int fontHeight = getFontHeight(graphics2d);
-        numberOfBlocks = fontWidth / blockUnitSize + 1;
 
         graphics2d.setColor(numberColor);
         graphics2d.drawString(displayString,
