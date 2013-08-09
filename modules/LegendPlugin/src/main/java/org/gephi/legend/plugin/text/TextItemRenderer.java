@@ -29,6 +29,8 @@ import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
@@ -108,7 +110,7 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, textNode);
-
+        
         Row r;
         Column col;
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
@@ -140,34 +142,34 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         col = r.addColumn(true);
         // left-alignment
         data = new HashMap<String, Object>();
-        data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.LEFT);
+        data.put(ElementImage.IMAGE_BOOL, bodyAlignment == Alignment.LEFT);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
-        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, false, Alignment.LEFT);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, bodyAlignment == Alignment.LEFT, Alignment.LEFT);
         addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // center-alignment
         data = new HashMap<String, Object>();
-        data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.CENTER);
+        data.put(ElementImage.IMAGE_BOOL, bodyAlignment == Alignment.CENTER);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
-        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.CENTER);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, bodyAlignment == Alignment.CENTER, Alignment.CENTER);
         addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // right alignment
         data = new HashMap<String, Object>();
-        data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.RIGHT);
+        data.put(ElementImage.IMAGE_BOOL, bodyAlignment == Alignment.RIGHT);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
-        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.RIGHT);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, bodyAlignment == Alignment.RIGHT, Alignment.RIGHT);
         addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // justified
         data = new HashMap<String, Object>();
-        data.put(ElementImage.IMAGE_BOOL, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+        data.put(ElementImage.IMAGE_BOOL, bodyAlignment == Alignment.JUSTIFIED);
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
-        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, true, Alignment.JUSTIFIED);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_ALIGNMENT], data, bodyAlignment == Alignment.JUSTIFIED, Alignment.JUSTIFIED);
         addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         textNode.setInplaceEditor(ipeditor);

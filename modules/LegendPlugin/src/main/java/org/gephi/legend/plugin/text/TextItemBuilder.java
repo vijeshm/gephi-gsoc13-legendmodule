@@ -20,6 +20,8 @@ import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
@@ -140,15 +142,22 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
     
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
-
+        
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        PreviewProperties previewProperties = previewModel.getProperties();
+        
+        PreviewProperty property;
         int[] properties = TextProperty.LIST_OF_PROPERTIES;
 
-        PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
+        PreviewProperty[] legendPreviewProperties = new PreviewProperty[defaultValues.length];
         for (int i = 0; i < defaultValues.length; i++) {
-            previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
+            property = createLegendProperty(item, properties[i], defaultValues[i]);
+            previewProperties.addProperty(property);
+            legendPreviewProperties[i] = property;
         }
 
-        return previewProperties;
+        return legendPreviewProperties;
     }
     
     @Override
