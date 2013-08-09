@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.inplaceeditor.inplaceElements;
+package org.gephi.legend.inplaceelements;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -22,36 +22,44 @@ import org.openide.util.Lookup;
  *
  * @author mvvijesh
  */
-public class ElementCheckbox extends BaseElement {
+public class ElementImage extends BaseElement {
 
-    public static final String IS_CHECKED = "element.checkbox.checked";
+    public static final String IMAGE_BOOL = "element.image.boolean";
+    public static final String IMAGE_IF_TRUE = "element.image.true";
+    public static final String IMAGE_IF_FALSE = "element.image.false";
 
-    public ElementCheckbox(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
+    public ElementImage(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
         super(type, itemIndex, property, ipeditor, row, col, data, isGrouped, isDefault, propertyValue);
     }
 
     @Override
     public void onSelect() {
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-        PreviewProperties previewProperties = previewModel.getProperties();
+        if (property != null) { // prop is null when providing support for static images.
+            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+            PreviewModel previewModel = previewController.getModel();
+            PreviewProperties previewProperties = previewModel.getProperties();
 
-        Boolean currentState = (Boolean) property.getValue();
-        data.put(IS_CHECKED, !currentState);
-        property.setValue(!currentState);
-        previewProperties.putValue(property.getName(), !currentState);
+            Boolean isPicked = (Boolean) data.get(IMAGE_BOOL);
+            data.put(IMAGE_BOOL, !isPicked);
+            property.setValue(!isPicked);
+            previewProperties.putValue(property.getName(), !isPicked);
+        }
     }
 
     @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
             numberOfBlocks = 1;
-            Boolean isSelected = (Boolean) data.get(IS_CHECKED);
-            BufferedImage img;
-            if (isSelected) {
-                img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/checked.png"));
-            } else {
-                img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/unchecked.png"));
+            String imgTrue = (String) data.get(IMAGE_IF_TRUE);
+            String imgFalse = (String) data.get(IMAGE_IF_FALSE);
+            Boolean defaultPropertyValue = (Boolean) data.get(IMAGE_BOOL);
+
+            // load the default image (unselected)
+            BufferedImage img = ImageIO.read(getClass().getResourceAsStream(imgFalse));
+            // if atleast one element is selected, the first one is taken into consideration
+            // if no elements are selected, the last one is NOT forcibly selected
+            if (defaultPropertyValue) {
+                img = ImageIO.read(getClass().getResourceAsStream(imgTrue));
             }
 
             graphics2d.drawImage(img,

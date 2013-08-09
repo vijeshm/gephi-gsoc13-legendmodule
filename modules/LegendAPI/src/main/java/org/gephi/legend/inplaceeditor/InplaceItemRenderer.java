@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
+import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;

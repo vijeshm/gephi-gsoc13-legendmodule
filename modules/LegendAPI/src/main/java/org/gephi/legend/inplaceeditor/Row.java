@@ -6,7 +6,7 @@ package org.gephi.legend.inplaceeditor;
 
 import java.util.ArrayList;
 import java.util.Map;
-import org.gephi.legend.inplaceeditor.inplaceElements.BaseElement;
+import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.PreviewProperty;
 
 /**

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.inplaceeditor.inplaceElements;
+package org.gephi.legend.inplaceelements;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -10,36 +10,50 @@ import java.io.IOException;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.gephi.legend.inplaceeditor.Column;
-import org.gephi.legend.inplaceeditor.InplaceClickResponse;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author mvvijesh
  */
-public class ElementFunction extends BaseElement {
+public class ElementCheckbox extends BaseElement {
 
-    public static final String FUNCTION_IMAGE = "element.function.image";
-    public static final String FUNCTION_CLICK_RESPONDER = "element.function.click.responder";
+    public static final String IS_CHECKED = "element.checkbox.checked";
 
-    public ElementFunction(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
+    public ElementCheckbox(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
         super(type, itemIndex, property, ipeditor, row, col, data, isGrouped, isDefault, propertyValue);
     }
 
     @Override
     public void onSelect() {
-        InplaceClickResponse responder = (InplaceClickResponse) data.get(FUNCTION_CLICK_RESPONDER);
-        responder.performAction(ipeditor);
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewController.getModel();
+        PreviewProperties previewProperties = previewModel.getProperties();
+
+        Boolean currentState = (Boolean) property.getValue();
+        data.put(IS_CHECKED, !currentState);
+        property.setValue(!currentState);
+        previewProperties.putValue(property.getName(), !currentState);
     }
 
     @Override
     public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
             numberOfBlocks = 1;
-            String functionImage = (String) data.get(FUNCTION_IMAGE);
-            BufferedImage img = ImageIO.read(getClass().getResourceAsStream(functionImage));
+            Boolean isSelected = (Boolean) data.get(IS_CHECKED);
+            BufferedImage img;
+            if (isSelected) {
+                img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/checked.png"));
+            } else {
+                img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/unchecked.png"));
+            }
+
             graphics2d.drawImage(img,
                     (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
                     (editorOriginY + borderSize) + rowBlock * blockUnitSize,
@@ -54,8 +68,6 @@ public class ElementFunction extends BaseElement {
                     (editorOriginY + borderSize) + rowBlock * blockUnitSize,
                     blockUnitSize,
                     blockUnitSize);
-
-            currentElementsCount += 1;
         } catch (IOException e) {
         }
     }

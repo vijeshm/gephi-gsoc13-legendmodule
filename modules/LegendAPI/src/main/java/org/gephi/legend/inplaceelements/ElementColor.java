@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.inplaceeditor.inplaceElements;
+package org.gephi.legend.inplaceelements;
 
 import com.bric.swing.ColorPicker;
 import java.awt.Color;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.legend.inplaceeditor.inplaceElements;
+package org.gephi.legend.inplaceelements;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -16,7 +16,7 @@ import org.gephi.preview.api.PreviewProperty;
  *
  * @author mvvijesh
  */
-public class BaseElement {
+abstract public class BaseElement {
     
     public static String SELECTED_WITHIN_GROUP = "element.selected.within.group";
     public static String GROUP_PROPERTY_VALUE = "element.representative.value"; // indicates the value of the property that this particular item is representing
@@ -142,13 +142,9 @@ public class BaseElement {
         return ipeditor;
     }
 
-    public void renderElement(Graphics2D graphics2D, int currentUnitBlockSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        System.out.println("from the renderElement method");
-    }
+    abstract public void renderElement(Graphics2D graphics2D, int currentUnitBlockSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount);
     
-    public void onSelect() {
-        System.out.println("from the onSelect method..");
-    }
+    abstract public void onSelect();
 
     protected int getFontWidth(Graphics2D graphics2d, String str) {
         return graphics2d.getFontMetrics().stringWidth(str);
