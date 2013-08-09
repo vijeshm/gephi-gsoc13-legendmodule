@@ -69,6 +69,7 @@
                         <publicPackage>org.gephi.legend.mouse</publicPackage>
                         <publicPackage>org.gephi.legend.spi</publicPackage>
                         <publicPackage>org.gephi.legend.inplaceeditor</publicPackage>
+                        <publicPackage>org.gephi.legend.inplaceelements</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
