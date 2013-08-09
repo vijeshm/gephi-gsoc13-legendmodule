@@ -172,7 +172,7 @@ public class InplaceItemRenderer implements Renderer {
                     ArrayList<BaseElement> elements = columns.get(colBlock).getElements();
                     for (elemBlock = 0; elemBlock < elements.size(); elemBlock++) {
                         BaseElement elem = elements.get(elemBlock);
-                        elem.renderElement(graphics2d, blockUnitSize, editorOriginX, editorOriginY, borderSize, rowBlock, currentElementsCount);
+                        elem.renderElement(graphics2d, (G2DTarget) target, blockUnitSize, editorOriginX, editorOriginY, borderSize, rowBlock, currentElementsCount);
                         currentElementsCount += elem.getNumberOfBlocks();
                     }
                 }

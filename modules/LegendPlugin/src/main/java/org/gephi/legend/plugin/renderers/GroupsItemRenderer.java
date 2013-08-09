@@ -19,6 +19,7 @@ import org.gephi.legend.spi.LegendItem.Direction;
 import org.gephi.legend.spi.LegendItem.Shape;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
+import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.NbBundle;
@@ -37,7 +38,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
     }
     
     @Override
-    protected void renderToGraphics(Graphics2D graphics2d, BlockNode legenNode) {
+    protected void renderToGraphics(Graphics2D graphics2d,  RenderTarget target, BlockNode legenNode) {
         // fill this with the functionality of the other renderToGraphics function
     }
 

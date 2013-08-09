@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
@@ -43,15 +44,15 @@ public class ElementCheckbox extends BaseElement {
     }
     
     @Override
-    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+    public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target,int blockUnitSize) {
         numberOfBlocks = 1;
         return numberOfBlocks;
     }
 
     @Override
-    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+    public void renderElement(Graphics2D graphics2d, G2DTarget target,int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            setNumberOfBlocks(graphics2d, blockUnitSize);
+            setNumberOfBlocks(graphics2d, target, blockUnitSize);
             
             Boolean isSelected = (Boolean) data.get(IS_CHECKED);
             BufferedImage img;

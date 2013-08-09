@@ -11,6 +11,7 @@ import java.util.Map;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
@@ -33,23 +34,23 @@ public class ElementLabel extends BaseElement {
     }
 
     @Override
-    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+    public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
         Font labelFont = (Font) data.get(LABEL_FONT);
         String labelText = (String) data.get(LABEL_TEXT);
-        
-        graphics2d.setFont(labelFont);
+        Font scaledFont = labelFont.deriveFont((float)(labelFont.getSize() / target.getScaling()));
+        graphics2d.setFont(scaledFont);
         int fontWidth = getFontWidth(graphics2d, labelText);
-        int fontHeight = getFontHeight(graphics2d);
         numberOfBlocks = fontWidth / blockUnitSize + 1;
         
         return numberOfBlocks;
     }
 
     @Override
-    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        setNumberOfBlocks(graphics2d, blockUnitSize);
+    public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+        setNumberOfBlocks(graphics2d, target, blockUnitSize);
         
         Font labelFont = (Font) data.get(LABEL_FONT);
+        labelFont = labelFont.deriveFont((float)(labelFont.getSize() / target.getScaling()));
         Color labelColor = (Color) data.get(LABEL_COLOR);
         String labelText = (String) data.get(LABEL_TEXT);
         

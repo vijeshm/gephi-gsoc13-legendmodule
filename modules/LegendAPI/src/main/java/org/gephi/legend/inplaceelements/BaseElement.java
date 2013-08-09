@@ -10,6 +10,7 @@ import java.util.Map;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
@@ -142,11 +143,11 @@ abstract public class BaseElement {
         return ipeditor;
     }
 
-    abstract public void renderElement(Graphics2D graphics2D, int currentUnitBlockSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount);
+    abstract public void renderElement(Graphics2D graphics2D, G2DTarget target, int currentUnitBlockSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount);
     
     abstract public void onSelect();
 
-    abstract public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize);
+    abstract public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize);
     
     protected int getFontWidth(Graphics2D graphics2d, String str) {
         return graphics2d.getFontMetrics().stringWidth(str);

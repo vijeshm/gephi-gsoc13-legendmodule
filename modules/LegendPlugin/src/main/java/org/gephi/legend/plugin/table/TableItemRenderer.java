@@ -38,9 +38,11 @@ import org.gephi.legend.inplaceelements.ElementNumber;
 import org.gephi.legend.inplaceelements.ElementText;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.netbeans.swing.tabcontrol.event.TabActionEvent;
@@ -105,7 +107,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode) {
+    protected void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode) {
         int blockOriginX = (int) (legendNode.getOriginX());
         int blockOriginY = (int) (legendNode.getOriginY());
         int blockWidth = (int) legendNode.getBlockWidth();
@@ -173,7 +175,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         BlockNode tableNode = legendNode.getChild(TABLENODE);
         if (tableNode == null) {
             tableNode = legendNode.addChild(tableOriginX, tableOriginY, tableWidth, tableHeight, TABLENODE);
-            buildInplaceTable(tableNode, item, graphics2D);
+            buildInplaceTable(tableNode, item, graphics2D, target);
         }
 
         // update the geometry of the table node - this is redundant only when the first time the legend is created.
@@ -185,7 +187,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
         // cells are re-constructed only when the structure (i.e, number of rows and columns) of the table is changed
         if (structureChanged) {
-            buildCellNodes(tableNode, item, rowHeight, colWidths, graphics2D);
+            buildCellNodes(tableNode, item, rowHeight, colWidths, graphics2D, target);
             // once the cells are built, change the flag to false to indicate that the block nodes are built.
             item.setStructureChanged(false);
             tableNode.getInplaceEditor().setData(TABLE_PROPERTIES_ADDED, false);
@@ -195,7 +197,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             // The table properties must be added only once, to avoid the chain of properties.
             // check if the table properties has been added.
             if (!(Boolean) tableNode.getInplaceEditor().getData(TABLE_PROPERTIES_ADDED)) {
-                addTablePropertiesToCells(tableNode, item, graphics2D);
+                addTablePropertiesToCells(tableNode, item, graphics2D, target);
                 tableNode.getInplaceEditor().setData(TABLE_PROPERTIES_ADDED, true);
             }
         }
@@ -207,7 +209,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         renderCells(graphics2D, tableNode, (TableItem) item);
     }
 
-    private void buildInplaceTable(BlockNode tableNode, Item item, Graphics2D graphics2d) {
+    private void buildInplaceTable(BlockNode tableNode, Item item, Graphics2D graphics2d, RenderTarget target) {
         // associate an inplace renderer with the table node
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
@@ -215,12 +217,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
 
-        buildTableProperties(ipeditor, itemIndex, tablePreviewProperties, graphics2d);
+        buildTableProperties(ipeditor, itemIndex, tablePreviewProperties, graphics2d, target);
 
         tableNode.setInplaceEditor(ipeditor);
     }
 
-    private void buildCellNodes(BlockNode tableNode, Item item, int rowHeight, int[] colWidths, Graphics2D graphics2d) {
+    private void buildCellNodes(BlockNode tableNode, Item item, int rowHeight, int[] colWidths, Graphics2D graphics2d, RenderTarget target) {
         // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
@@ -291,39 +293,39 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
                 data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target,  InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                 
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                 
                 r = ipeditor.addRow();
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                 
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                 
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                 data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                 
                 r = ipeditor.addRow();
                 col = r.addColumn(true);
@@ -333,7 +335,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
                 data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, false, Alignment.LEFT);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // center-alignment
                 data = new HashMap<String, Object>();
@@ -341,7 +343,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
                 data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.CENTER);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // right alignment
                 data = new HashMap<String, Object>();
@@ -349,7 +351,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
                 data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.RIGHT);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // justified
                 data = new HashMap<String, Object>();
@@ -357,7 +359,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
                 data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.JUSTIFIED);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = ipeditor.addRow();
                 // insert_row button
@@ -377,7 +379,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // insert_column button
                 col = r.addColumn(false);
@@ -396,7 +398,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // delete_row button
                 col = r.addColumn(false);
@@ -415,7 +417,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // delete_column button
                 col = r.addColumn(false);
@@ -434,7 +436,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-                addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 cellNode.setInplaceEditor(ipeditor);
 
@@ -450,18 +452,18 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    private void addTablePropertiesToCells(BlockNode tableNode, TableItem item, Graphics2D graphics2d) {
+    private void addTablePropertiesToCells(BlockNode tableNode, TableItem item, Graphics2D graphics2d, RenderTarget target) {
         PreviewProperty[] tablePreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         ArrayList<BlockNode> cellNodes = tableNode.getChildren();
         for (BlockNode cellNode : cellNodes) {
             InplaceEditor ipeditor = cellNode.getInplaceEditor();
             // build controls for general properties of the table
-            buildTableProperties(ipeditor, itemIndex, tablePreviewProperties, graphics2d);
+            buildTableProperties(ipeditor, itemIndex, tablePreviewProperties, graphics2d, target);
         }
     }
 
-    private void buildTableProperties(InplaceEditor ipeditor, int itemIndex, PreviewProperty[] tablePreviewProperties, Graphics2D graphics2d) {
+    private void buildTableProperties(InplaceEditor ipeditor, int itemIndex, PreviewProperty[] tablePreviewProperties, Graphics2D graphics2d, RenderTarget target) {
         Row r;
         Column col;
         Map<String, Object> data;
@@ -475,7 +477,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // cell spacing
         r = ipeditor.addRow();
@@ -485,14 +487,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/cell_spacing.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/cell_spacing.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_SPACING], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // cell padding
         col = r.addColumn(false);
@@ -501,14 +503,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/cell_padding.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/cell_padding.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_CELL_PADDING], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // border size
         col = r.addColumn(false);
@@ -517,14 +519,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/cell_border.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/cell_border.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, tablePreviewProperties[TableProperty.TABLE_BORDER_SIZE], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
         //background color
@@ -532,7 +534,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data = new HashMap<String, Object>();
         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, tablePreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // border color
         col = r.addColumn(false);
@@ -566,7 +568,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             }
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // table font
         col = r.addColumn(false);
@@ -601,7 +603,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             }
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // table font color
         col = r.addColumn(false);
@@ -635,7 +637,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             }
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // border size
         col = r.addColumn(false);
@@ -644,7 +646,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/column_collapse.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/column_expand.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data, false, Alignment.LEFT);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
     }
 
     private void updateCellGeometry(BlockNode tableNode, int rowHeight, int[] colWidths) {

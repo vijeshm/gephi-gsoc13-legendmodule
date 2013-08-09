@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
@@ -49,9 +50,11 @@ public class ElementNumber extends BaseElement {
     }
 
     @Override
-    public int setNumberOfBlocks(Graphics2D graphics2d, int blockUnitSize) {
+    public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
         Font numberFont = (Font) data.get(NUMBER_FONT);
-        graphics2d.setFont(numberFont);
+        Font scaledFont = numberFont.deriveFont((float)(numberFont.getSize() / target.getScaling()));
+        graphics2d.setFont(scaledFont);        
+        
         String displayString = "" + property.getValue();
         int fontWidth = getFontWidth(graphics2d, (String) displayString);
         numberOfBlocks = fontWidth / blockUnitSize + 1;
@@ -60,10 +63,11 @@ public class ElementNumber extends BaseElement {
     }
 
     @Override
-    public void renderElement(Graphics2D graphics2d, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        setNumberOfBlocks(graphics2d, blockUnitSize);
+    public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
+        setNumberOfBlocks(graphics2d, target, blockUnitSize);
         
         Font numberFont = (Font) data.get(NUMBER_FONT);
+        numberFont = numberFont.deriveFont((float) (numberFont.getSize() / target.getScaling()));
         Color numberColor = (Color) data.get(NUMBER_COLOR);
 
         graphics2d.setFont(numberFont);

@@ -106,7 +106,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      */
     protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
-    protected abstract void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode);
+    protected abstract void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode);
 
     /**
      * Function that reads the custom properties values from the
@@ -185,7 +185,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         originTranslation = new AffineTransform();
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
-        render(graphics2D, originTranslation, currentWidth, currentHeight, currentItemIndex);
+        render(graphics2D, target, originTranslation, currentWidth, currentHeight, currentItemIndex);
 
         //appending
         org.w3c.dom.Element svgRoot = document.getDocumentElement();
@@ -207,7 +207,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         originTranslation.translate(-graphOriginX, -graphOriginY);
         originTranslation.translate(currentRealOriginX, currentRealOriginY);
-        render(graphics2D, originTranslation, currentWidth, currentHeight, currentItemIndex);
+        render(graphics2D, target, originTranslation, currentWidth, currentHeight, currentItemIndex);
         graphics2D.dispose();
         pdfContentByte.restoreState();
     }
@@ -229,7 +229,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
          render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
          }
          */
-        render(graphics2D, originTranslation, currentWidth, currentHeight, itemIndex);
+        render(graphics2D, target, originTranslation, currentWidth, currentHeight, itemIndex);
 
         graphics2D.setTransform(saveState);
     }
@@ -267,7 +267,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         graphics2D.drawString(TRANSFORMATION_LEGEND_LABEL, (width - draggedLegendLabelWidth) / 2, height / 2);
     }
 
-    private void render(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height, int itemIndex) {
+    private void render(Graphics2D graphics2D, RenderTarget target, AffineTransform origin, Integer width, Integer height, int itemIndex) {
 
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -285,17 +285,17 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         // The rendering takes place from the outermost block to innermost block
         // BORDER - border is external
         BlockNode root = legendModel.getBlockTree(itemIndex); // root node corresponds to the entire area occupied by the legend, including the border.        
-        renderBorder(graphics2D, width, height, borderLineThick, borderColor, item, root);
+        renderBorder(graphics2D, target, width, height, borderLineThick, borderColor, item, root);
 
         // The background properties must also be included as a part of the root block.
         // BACKGROUND
-        renderBackground(graphics2D, width, height, item, root);
+        renderBackground(graphics2D, target, width, height, item, root);
 
         // add more options to the root block - control the visibility of title and description
         PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
         if (root.getInplaceEditor().getRows().size() == 2) {
-            addVisibilityControls("Title:", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item, graphics2D);
-            addVisibilityControls("Description:", previewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item, graphics2D);
+            addVisibilityControls("Title:", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item, graphics2D, target);
+            addVisibilityControls("Description:", previewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item, graphics2D, target);
         }
 
         root.updateGeometry(currentRealOriginX, currentRealOriginY, width, height);
@@ -318,7 +318,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // the following code ensures that there is only one title node at any point in time.
             if (titleNode == null) {
                 titleNode = root.addChild(0, 0, titleBoundaryWidth, titleBoundaryHeight, BlockNode.TITLE);
-                buildInplaceTitle(titleNode, item, graphics2D);
+                buildInplaceTitle(titleNode, item, graphics2D, target);
             }
 
             titleNode.updateGeometry(currentRealOriginX, currentRealOriginY, titleBoundaryWidth, titleBoundaryHeight);
@@ -345,7 +345,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             // the following code ensures that there is only one description node at any point in time.
             if (descNode == null) {
                 descNode = root.addChild(0, height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight, BlockNode.DESC);
-                buildInplaceDesc(descNode, item, graphics2D);
+                buildInplaceDesc(descNode, item, graphics2D, target);
             }
 
             descNode.updateGeometry(currentRealOriginX, currentRealOriginY + height - descBoundaryHeight, descBoundaryWidth, descBoundaryHeight);
@@ -363,7 +363,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
 
         legendNode.updateGeometry(currentRealOriginX, currentRealOriginY + titleBoundaryHeight, width, height - titleBoundaryHeight - descBoundaryHeight);
         // drawBlockBoundary(graphics2D, legendNode);
-        renderToGraphics(graphics2D, legendNode);
+        renderToGraphics(graphics2D, target, legendNode);
 
         // draw the anchors if the item is selected
         if (currentIsSelected) {
@@ -396,7 +396,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         }
     }
 
-    private void renderBorder(Graphics2D graphics2D, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, BlockNode root) {
+    private void renderBorder(Graphics2D graphics2D, RenderTarget target, Integer width, Integer height, Integer borderThick, Color borderColor, Item item, BlockNode root) {
         if (borderIsDisplaying) {
             graphics2D.setColor(borderColor);
 
@@ -433,7 +433,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
             data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
@@ -441,26 +441,26 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/invisible.png");
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/visible.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BORDER_IS_DISPLAYING], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BORDER_COLOR], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
             data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[LegendProperty.BORDER_LINE_THICK], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             root.setInplaceEditor(ipeditor);
         }
     }
 
-    private void renderBackground(Graphics2D graphics2D, Integer width, Integer height, Item item, BlockNode root) {
+    private void renderBackground(Graphics2D graphics2D, RenderTarget target, Integer width, Integer height, Item item, BlockNode root) {
         // this part of the code will get executed only after the border is rendered. Hence, an inplaceeditor will already be set.
         if (backgroundIsDisplaying) {
             graphics2D.setColor(backgroundColor);
@@ -487,7 +487,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null); // the last two arguments are related to grouped items. 
             //For an element not belonging to any group, its values do not matter.
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
@@ -495,17 +495,17 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/visible.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/invisible.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.BACKGROUND_COLOR], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2D, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2D, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
         }
     }
 
-    private void addVisibilityControls(String displayString, PreviewProperty prop, Boolean defaultVal, BlockNode root, Item item, Graphics2D graphics2d) {
+    private void addVisibilityControls(String displayString, PreviewProperty prop, Boolean defaultVal, BlockNode root, Item item, Graphics2D graphics2d, RenderTarget target) {
         InplaceEditor ipeditor = root.getInplaceEditor();
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
@@ -519,7 +519,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
@@ -527,7 +527,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/visible.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/invisible.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, prop, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
     }
 
     private void renderTitle(Graphics2D graphics2D, Integer boundaryWidth, Integer boundaryHeight) {
@@ -536,7 +536,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         legendDrawText(graphics2D, title, titleFont, titleFontColor, 0, 0, boundaryWidth, boundaryHeight, titleAlignment, false);
     }
 
-    private void buildInplaceTitle(BlockNode titleNode, Item item, Graphics2D graphics2d) {
+    private void buildInplaceTitle(BlockNode titleNode, Item item, Graphics2D graphics2d, RenderTarget target) {
         if (titleNode.getInplaceEditor() == null) {
             Graph graph = null;
             InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
@@ -558,7 +558,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
             data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // we could have another property for title background.
 
@@ -567,20 +567,20 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data = new HashMap<String, Object>();
             data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.TITLE], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.TITLE_FONT_COLOR], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.TITLE_FONT], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             r = ipeditor.addRow();
             col = r.addColumn(true);
@@ -590,7 +590,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.LEFT, Alignment.LEFT);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // center-alignment
             data = new HashMap<String, Object>();
@@ -598,7 +598,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.CENTER, Alignment.CENTER);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // right alignment
             data = new HashMap<String, Object>();
@@ -606,7 +606,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.RIGHT, Alignment.RIGHT);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // justified
             data = new HashMap<String, Object>();
@@ -614,7 +614,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.TITLE_ALIGNMENT], data, titleAlignment == Alignment.JUSTIFIED, Alignment.JUSTIFIED);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             titleNode.setInplaceEditor(ipeditor);
         }
@@ -624,7 +624,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         legendDrawText(graphics2D, description, descriptionFont, descriptionFontColor, x, y, width, height, descriptionAlignment);
     }
 
-    private void buildInplaceDesc(BlockNode descNode, Item item, Graphics2D graphics2d) {
+    private void buildInplaceDesc(BlockNode descNode, Item item, Graphics2D graphics2d, RenderTarget target) {
         // the flow of this method is the same as the buildInplaceTitle method. 
         // The flow is repeated keeping in mind that there might be some special treatment give to description in the future.
         if (descNode.getInplaceEditor() == null) {
@@ -646,7 +646,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
             data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // we could have another property for description background.
 
@@ -655,20 +655,20 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data = new HashMap<String, Object>();
             data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, previewProperties[LegendProperty.DESCRIPTION], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT_COLOR], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             col = r.addColumn(false);
             data = new HashMap<String, Object>();
             data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
             data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[LegendProperty.DESCRIPTION_FONT], data, false, null);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             r = ipeditor.addRow();
             col = r.addColumn(true);
@@ -678,7 +678,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.LEFT, Alignment.LEFT);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // center-alignment
             data = new HashMap<String, Object>();
@@ -686,7 +686,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.CENTER, Alignment.CENTER);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // right alignment
             data = new HashMap<String, Object>();
@@ -694,7 +694,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.RIGHT, Alignment.RIGHT);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             // justified
             data = new HashMap<String, Object>();
@@ -702,7 +702,7 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
             data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
             data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
             addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, previewProperties[LegendProperty.DESCRIPTION_ALIGNMENT], data, descriptionAlignment == Alignment.JUSTIFIED, Alignment.JUSTIFIED);
-            addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+            addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
             descNode.setInplaceEditor(ipeditor);
         }

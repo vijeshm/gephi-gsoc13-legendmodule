@@ -35,9 +35,11 @@ import org.gephi.legend.inplaceelements.ElementFile;
 import org.gephi.legend.inplaceelements.ElementLabel;
 import org.gephi.legend.inplaceelements.ElementNumber;
 import org.gephi.legend.spi.LegendItem;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
@@ -71,7 +73,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
     }
 
     @Override
-    protected void renderToGraphics(Graphics2D graphics2D, BlockNode legendNode) {
+    protected void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode) {
         try {
             // get the legendNode Geometry
             int blockOriginX = (int) (legendNode.getOriginX());
@@ -83,7 +85,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
             BlockNode imageNode = legendNode.getChild(IMAGENODE);
             if (imageNode == null) {
                 imageNode = legendNode.addChild(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin, IMAGENODE);
-                buildInplaceImage(imageNode, item, graphics2D);
+                buildInplaceImage(imageNode, item, graphics2D, target);
             }
 
             imageNode.updateGeometry(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin);
@@ -157,7 +159,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    private void buildInplaceImage(BlockNode imageNode, Item item, Graphics2D graphics2d) {
+    private void buildInplaceImage(BlockNode imageNode, Item item, Graphics2D graphics2d, RenderTarget target) {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, imageNode);
@@ -176,13 +178,13 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFile.FILE_PATH, "/org/gephi/legend/graphics/file.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FILE, itemIndex, previewProperties[ImageProperty.IMAGE_URL], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
         col = r.addColumn(false);
@@ -191,14 +193,14 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, previewProperties[ImageProperty.IMAGE_MARGIN], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
         col = r.addColumn(false);
@@ -207,13 +209,13 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementCheckbox.IS_CHECKED, useImageAspectRatio);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data, false, null);
-        addedElement.setNumberOfBlocks(graphics2d, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        addedElement.setNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         imageNode.setInplaceEditor(ipeditor);
     }
