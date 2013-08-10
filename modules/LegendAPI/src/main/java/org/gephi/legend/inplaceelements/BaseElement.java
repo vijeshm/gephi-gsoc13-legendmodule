@@ -147,7 +147,7 @@ abstract public class BaseElement {
     
     abstract public void onSelect();
 
-    abstract public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize);
+    abstract public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize);
     
     protected int getFontWidth(Graphics2D graphics2d, String str) {
         return graphics2d.getFontMetrics().stringWidth(str);

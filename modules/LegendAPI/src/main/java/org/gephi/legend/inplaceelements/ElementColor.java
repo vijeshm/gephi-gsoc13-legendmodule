@@ -44,14 +44,13 @@ public class ElementColor extends BaseElement {
     }
 
     @Override
-    public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target,int blockUnitSize) {
+    public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target,int blockUnitSize) {
         numberOfBlocks = 1;
-        return numberOfBlocks;
     }
 
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target,int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        setNumberOfBlocks(graphics2d, target, blockUnitSize);
+        computeNumberOfBlocks(graphics2d, target, blockUnitSize);
         
         Color color = property.getValue();
         Float colorMargin = (Float) data.get(COLOR_MARGIN);

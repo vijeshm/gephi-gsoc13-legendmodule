@@ -149,6 +149,8 @@ public class InplaceItemRenderer implements Renderer {
                 int currentElementsCount = 0;
                 for (Column column : row.getColumns()) {
                     for (BaseElement elem : column.getElements()) {
+                        // for the current target and font scenarios, compute the number of blocks and get them.
+                        elem.computeNumberOfBlocks(graphics2d, g2dtarget, blockUnitSize);
                         currentElementsCount += elem.getNumberOfBlocks();
                     }
                 }

@@ -48,15 +48,14 @@ public class ElementFile extends BaseElement {
     }
 
     @Override
-    public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
+    public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
         numberOfBlocks = 1;
-        return numberOfBlocks;
     }
 
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            setNumberOfBlocks(graphics2d, target, blockUnitSize);
+            computeNumberOfBlocks(graphics2d, target, blockUnitSize);
             
             BufferedImage img = ImageIO.read(getClass().getResourceAsStream((String) data.get(FILE_PATH)));
             graphics2d.drawImage(img,

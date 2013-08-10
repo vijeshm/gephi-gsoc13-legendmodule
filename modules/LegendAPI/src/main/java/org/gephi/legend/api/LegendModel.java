@@ -159,6 +159,8 @@ public class LegendModel {
             numberOfActiveItems += 1;
             pickedLegendIndex = numberOfActiveItems - 1;
             nextItemIndex += 1;
+            
+            ipeditor = null;
         }
     }
 

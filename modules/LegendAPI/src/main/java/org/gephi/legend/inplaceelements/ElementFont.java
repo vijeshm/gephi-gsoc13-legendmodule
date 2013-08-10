@@ -47,7 +47,7 @@ public class ElementFont extends BaseElement {
     }
 
     @Override
-    public int setNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
+    public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
         Font displayFont = (Font) data.get(DISPLAY_FONT);
         Font font = property.getValue();
         Font scaledFont = displayFont.deriveFont((float) (displayFont.getSize() / target.getScaling()));
@@ -55,13 +55,11 @@ public class ElementFont extends BaseElement {
         String displayString = font.getFontName() + " " + font.getSize();
         int fontWidth = getFontWidth(graphics2d, displayString);
         numberOfBlocks = fontWidth / blockUnitSize + 1;
-
-        return numberOfBlocks;
     }
 
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        setNumberOfBlocks(graphics2d, target, blockUnitSize);
+        computeNumberOfBlocks(graphics2d, target, blockUnitSize);
 
         Font displayFont = (Font) data.get(DISPLAY_FONT);
         displayFont = displayFont.deriveFont((float) (displayFont.getSize() / target.getScaling()));
