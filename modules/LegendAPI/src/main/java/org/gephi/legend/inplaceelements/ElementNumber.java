@@ -52,9 +52,9 @@ public class ElementNumber extends BaseElement {
     @Override
     public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
         Font numberFont = (Font) data.get(NUMBER_FONT);
-        Font scaledFont = numberFont.deriveFont((float)(numberFont.getSize() / target.getScaling()));
-        graphics2d.setFont(scaledFont);        
-        
+        Font scaledFont = numberFont.deriveFont((float) (numberFont.getSize() / target.getScaling()));
+        graphics2d.setFont(scaledFont);
+
         String displayString = "" + property.getValue();
         int fontWidth = getFontWidth(graphics2d, (String) displayString);
         numberOfBlocks = fontWidth / blockUnitSize + 1;
@@ -62,8 +62,6 @@ public class ElementNumber extends BaseElement {
 
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        computeNumberOfBlocks(graphics2d, target, blockUnitSize);
-        
         Font numberFont = (Font) data.get(NUMBER_FONT);
         numberFont = numberFont.deriveFont((float) (numberFont.getSize() / target.getScaling()));
         Color numberColor = (Color) data.get(NUMBER_COLOR);

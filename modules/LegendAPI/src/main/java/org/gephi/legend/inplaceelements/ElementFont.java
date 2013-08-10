@@ -59,8 +59,6 @@ public class ElementFont extends BaseElement {
 
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
-        computeNumberOfBlocks(graphics2d, target, blockUnitSize);
-
         Font displayFont = (Font) data.get(DISPLAY_FONT);
         displayFont = displayFont.deriveFont((float) (displayFont.getSize() / target.getScaling()));
         Color displayFontColor = (Color) data.get(DISPLAY_FONT_COLOR);

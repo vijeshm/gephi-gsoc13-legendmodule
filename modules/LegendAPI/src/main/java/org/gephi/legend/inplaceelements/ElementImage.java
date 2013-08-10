@@ -39,13 +39,13 @@ public class ElementImage extends BaseElement {
         if (property != null) { // prop is null when providing support for static images.
             if (isGrouped) {
                 property.setValue(data.get(GROUP_PROPERTY_VALUE));
-                
+
                 // turn off the switch for all the elements. 
                 ArrayList<BaseElement> groupElements = col.getElements();
-                for(BaseElement element : groupElements) {
+                for (BaseElement element : groupElements) {
                     element.getAssociatedData().put(IMAGE_BOOL, false);
                 }
-                
+
                 // turn on the switch for this element
                 data.put(IMAGE_BOOL, true);
             } else {
@@ -64,13 +64,11 @@ public class ElementImage extends BaseElement {
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
-            computeNumberOfBlocks(graphics2d, target, blockUnitSize);
-
             String imgTrue = (String) data.get(IMAGE_IF_TRUE);
             String imgFalse = (String) data.get(IMAGE_IF_FALSE);
             Boolean propertyValue = (Boolean) data.get(IMAGE_BOOL);
             Boolean isSelectedWithinGroup = (Boolean) data.get(SELECTED_WITHIN_GROUP);
-            
+
             // load the default image (unselected)
             BufferedImage img = ImageIO.read(getClass().getResourceAsStream(imgFalse));
             // if atleast one element is selected, the first one is taken into consideration
