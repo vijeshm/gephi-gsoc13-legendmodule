@@ -17,6 +17,7 @@ import org.gephi.legend.api.AbstractLegendItemBuilder;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
+import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -36,6 +37,27 @@ import org.openide.util.lookup.ServiceProviders;
     @ServiceProvider(service = LegendItemBuilder.class, position = 107)
 })
 public class GroupsItemBuilder extends AbstractLegendItemBuilder {
+
+    private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
+    private Boolean defaultIsScalingShapes = Boolean.TRUE;
+    private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.DOWN;
+    private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 15);
+    private Color defaultLabelFontColor = Color.BLACK;
+    private Alignment defaultLabelFontAlignment = Alignment.CENTER;
+    private Integer defaultPaddingBetweenTextAndShape = 5;
+    private Integer defaultPaddingBetweenElements = 5;
+    private Color defaultBackgroundColor = new Color(0.7f, 0.7f, 0.7f, 0.5f);
+    private final Object[] defaultValues = {
+        defaultShape,
+        defaultIsScalingShapes,
+        defaultLabelPosition,
+        defaultLabelFont,
+        defaultLabelFontColor,
+        defaultLabelFontAlignment,
+        defaultPaddingBetweenTextAndShape,
+        defaultPaddingBetweenElements,
+        defaultBackgroundColor
+    };
 
     @Override
     public boolean setDefaultValues() {
@@ -64,14 +86,24 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
         switch (property) {
 
-
-            case GroupsProperty.GROUPS_NUMBER_COLUMNS: {
+            case GroupsProperty.GROUPS_SHAPE: {
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
-                        Integer.class,
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.numColumns.displayName"),
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.numColumns.description"),
+                        LegendItem.Shape.class,
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.shape.displayName"),
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.shape.description"),
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+            }
+
+            case GroupsProperty.GROUPS_SCALE_SHAPE: {
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Boolean.class,
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.scaleShape.displayName"),
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.scaleShape.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
@@ -109,13 +141,13 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
                 break;
             }
 
-            case GroupsProperty.GROUPS_SHAPE: {
+            case GroupsProperty.GROUPS_LABEL_FONT_ALIGNMENT: {
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
-                        LegendItem.Shape.class,
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.shape.displayName"),
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.shape.description"),
+                        Alignment.class,
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.label.font.alignment.displayName"),
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.label.font.alignment.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
@@ -142,50 +174,22 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
                 break;
             }
 
-            case GroupsProperty.GROUPS_SCALE_SHAPE: {
+            case GroupsProperty.GROUPS_BACKGROUND: {
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
-                        Boolean.class,
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.scaleShape.displayName"),
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.scaleShape.description"),
+                        Color.class,
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.background.color.displayName"),
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.background.color.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
-
-
         }
-
         return previewProperty;
-    }
-
-    private PreviewProperty createLegendLabelProperty(Item item, int numberOfLabel, Object value) {
-
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        String propertyString = GroupsProperty.getLabelProperty(itemIndex, numberOfLabel);
-
-        PreviewProperty property = PreviewProperty.createProperty(
-                this,
-                propertyString,
-                String.class,
-                NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.labels.displayName") + " " + numberOfLabel,
-                NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.labels.description") + " " + numberOfLabel,
-                PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
-
-        return property;
     }
 
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
-
-
-        // creating one property for each label
-        ArrayList<StringBuilder> labelsGroup = item.getData(GroupsItem.LABELS_IDS);
-        PreviewProperty[] labelProperties = new PreviewProperty[labelsGroup.size()];
-        for (int i = 0; i < labelProperties.length; i++) {
-            labelProperties[i] = createLegendLabelProperty(item, i, labelsGroup.get(i).toString());
-        }
-
         int[] properties = GroupsProperty.LIST_OF_PROPERTIES;
 
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
@@ -193,12 +197,15 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
 
+        CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder) item.getData(LegendItem.CUSTOM_BUILDER);
+        ArrayList<GroupElement> groups = new ArrayList<GroupElement>();
+        customGroupsBuilder.retrieveData(item, groups);
 
-        PreviewProperty[] propertiesWithLabels = new PreviewProperty[labelProperties.length + previewProperties.length];
-        System.arraycopy(labelProperties, 0, propertiesWithLabels, 0, labelProperties.length);
-        System.arraycopy(previewProperties, 0, propertiesWithLabels, labelProperties.length, previewProperties.length);
-        return propertiesWithLabels;
-
+        // setting the groups data
+        GroupsItem groupsItem = (GroupsItem) item;
+        groupsItem.setGroups(groups);
+        
+        return previewProperties;
     }
 
     @Override
@@ -208,29 +215,13 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
-
         Item item = createNewLegendItem(graph);
-
-        ArrayList<Color> colors = new ArrayList<Color>();
-        ArrayList<Float> values = new ArrayList<Float>();
-
-        CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder) builder;
-        ArrayList<String> labels = new ArrayList<String>();
-        customGroupsBuilder.retrieveData(labels, colors, values);
-
-        ArrayList<StringBuilder> labelsStringBuilder = new ArrayList<StringBuilder>();
-        for (String label : labels) {
-            labelsStringBuilder.add(new StringBuilder(label));
-        }
-
-
-        item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
-        item.setData(GroupsItem.COLORS, colors);
-        item.setData(GroupsItem.LABELS_IDS, labelsStringBuilder);
-        item.setData(GroupsItem.VALUES, values);
 
         // setting default renderer
         item.setData(LegendItem.RENDERER, GroupsItemRenderer.class);
+        
+        // setting the custombuilder builder - this data is being set only for this module. Make it consistent with all the other legends.
+        item.setData(LegendItem.CUSTOM_BUILDER, (CustomGroupsItemBuilder) builder);
         return item;
     }
 
@@ -246,94 +237,95 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
     @Override
     public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
+        /* disabled to avoid compilation errors. This part will be taken care of during serialization
 
-        String name = null;
-        String text = null;
+         String name = null;
+         String text = null;
 
-        // write number of items
-        Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
-        text = numberOfGroups.toString();
-        name = GroupsItem.NUMBER_OF_GROUPS;
-        writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute(XML_NAME, name);
-        writer.writeCharacters(text);
-        writer.writeEndElement();
+         // write number of items
+         Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
+         text = numberOfGroups.toString();
+         name = GroupsItem.NUMBER_OF_GROUPS;
+         writer.writeStartElement(LegendItem.DATA);
+         writer.writeAttribute(XML_NAME, name);
+         writer.writeCharacters(text);
+         writer.writeEndElement();
 
-        // writing labels
-        ArrayList<StringBuilder> labels = item.getData(GroupsItem.LABELS_IDS);
-        text = labels.toString();
-        name = GroupsItem.LABELS_IDS;
-        writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute(XML_NAME, name);
-        writer.writeCharacters(text);
-        writer.writeEndElement();
+         // writing labels
+         ArrayList<StringBuilder> labels = item.getData(GroupsItem.LABELS_IDS);
+         text = labels.toString();
+         name = GroupsItem.LABELS_IDS;
+         writer.writeStartElement(LegendItem.DATA);
+         writer.writeAttribute(XML_NAME, name);
+         writer.writeCharacters(text);
+         writer.writeEndElement();
 
 
-        // writing colors
-        ArrayList<Color> colors = item.getData(GroupsItem.COLORS);
-        name = GroupsItem.COLORS;
-        ArrayList<Integer> colorsIntegerArrayList = new ArrayList<Integer>();
-        for (Color color : colors) {
-            colorsIntegerArrayList.add(color.getRGB());
-        }
-        text = colorsIntegerArrayList.toString();
-        writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute(XML_NAME, name);
-        writer.writeCharacters(text);
-        writer.writeEndElement();
+         // writing colors
+         ArrayList<Color> colors = item.getData(GroupsItem.COLORS);
+         name = GroupsItem.COLORS;
+         ArrayList<Integer> colorsIntegerArrayList = new ArrayList<Integer>();
+         for (Color color : colors) {
+         colorsIntegerArrayList.add(color.getRGB());
+         }
+         text = colorsIntegerArrayList.toString();
+         writer.writeStartElement(LegendItem.DATA);
+         writer.writeAttribute(XML_NAME, name);
+         writer.writeCharacters(text);
+         writer.writeEndElement();
 
-        // writing values
-        ArrayList<Float> values = item.getData(GroupsItem.VALUES);
-        text = values.toString();
-        name = GroupsItem.VALUES;
-        writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute(XML_NAME, name);
-        writer.writeCharacters(text);
-        writer.writeEndElement();
-
+         // writing values
+         ArrayList<Float> values = item.getData(GroupsItem.VALUES);
+         text = values.toString();
+         name = GroupsItem.VALUES;
+         writer.writeStartElement(LegendItem.DATA);
+         writer.writeAttribute(XML_NAME, name);
+         writer.writeCharacters(text);
+         writer.writeEndElement();
+         */
     }
 
     @Override
     public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
-        // read number of items
-        reader.next();
-        Integer numberOfItems = Integer.parseInt(reader.getElementText());
+        /* disabled to avoid compilation errors. This part will be taken care of during serialization
+         // read number of items
+         reader.next();
+         Integer numberOfItems = Integer.parseInt(reader.getElementText());
 
-        // reading labels
-        reader.next();
-        String labelsString = reader.getElementText();
-        String[] labelsArray = labelsString.replace("[", "").replace("]", "").split(", ");
-        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
-        for (int i = 0; i < numberOfItems; i++) {
-            labels.add(new StringBuilder(labelsArray[i]));
-        }
+         // reading labels
+         reader.next();
+         String labelsString = reader.getElementText();
+         String[] labelsArray = labelsString.replace("[", "").replace("]", "").split(", ");
+         ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
+         for (int i = 0; i < numberOfItems; i++) {
+         labels.add(new StringBuilder(labelsArray[i]));
+         }
 
-        // reading colors
-        reader.next();
-        String colorsString = reader.getElementText();
-        String[] colorsArray = colorsString.replace("[", "").replace("]", "").split(", ");
-        ArrayList<Color> colors = new ArrayList<Color>();
-        for (int i = 0; i < numberOfItems; i++) {
-            colors.add(new Color(Integer.parseInt(colorsArray[i])));
-        }
-
-
-        // reading values
-        reader.next();
-        String valuesString = reader.getElementText();
-        String[] valuesArray = valuesString.replace("[", "").replace("]", "").split(", ");
-        ArrayList<Float> values = new ArrayList<Float>();
-        for (int i = 0; i < numberOfItems; i++) {
-            values.add(Float.parseFloat(valuesArray[i]));
-        }
+         // reading colors
+         reader.next();
+         String colorsString = reader.getElementText();
+         String[] colorsArray = colorsString.replace("[", "").replace("]", "").split(", ");
+         ArrayList<Color> colors = new ArrayList<Color>();
+         for (int i = 0; i < numberOfItems; i++) {
+         colors.add(new Color(Integer.parseInt(colorsArray[i])));
+         }
 
 
+         // reading values
+         reader.next();
+         String valuesString = reader.getElementText();
+         String[] valuesArray = valuesString.replace("[", "").replace("]", "").split(", ");
+         ArrayList<Float> values = new ArrayList<Float>();
+         for (int i = 0; i < numberOfItems; i++) {
+         values.add(Float.parseFloat(valuesArray[i]));
+         }
 
-        item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
-        item.setData(GroupsItem.COLORS, colors);
-        item.setData(GroupsItem.VALUES, values);
 
 
+         item.setData(GroupsItem.NUMBER_OF_GROUPS, labels.size());
+         item.setData(GroupsItem.COLORS, colors);
+         item.setData(GroupsItem.VALUES, values);
+         */
     }
 
     @Override
@@ -343,66 +335,68 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
     @Override
     public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
+        /* disabled to avoid compilation errors. This part will be taken care of during serialization
+         // write number of items
+         Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
+         String text = numberOfGroups.toString();
+         String name = GroupsItem.NUMBER_OF_GROUPS;
+         writer.writeStartElement(LegendItem.DATA);
+         writer.writeAttribute(XML_NAME, name);
+         writer.writeCharacters(text);
+         writer.writeEndElement();
 
-        // write number of items
-        Integer numberOfGroups = item.getData(GroupsItem.NUMBER_OF_GROUPS);
-        String text = numberOfGroups.toString();
-        String name = GroupsItem.NUMBER_OF_GROUPS;
-        writer.writeStartElement(LegendItem.DATA);
-        writer.writeAttribute(XML_NAME, name);
-        writer.writeCharacters(text);
-        writer.writeEndElement();
-
-        PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
-        for (PreviewProperty property : ownProperties) {
-            writeXMLFromSingleProperty(writer, property, previewProperties);
-        }
+         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
+         for (PreviewProperty property : ownProperties) {
+         writeXMLFromSingleProperty(writer, property, previewProperties);
+         }
+         */
     }
 
     @Override
     public ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
+        /* disabled to avoid compilation errors. This part will be taken care of during serialization
+         ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
 
-        ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
+         // read number of items
+         reader.next();
+         Integer numberOfItems = Integer.parseInt(reader.getElementText());
 
-        // read number of items
-        reader.next();
-        Integer numberOfItems = Integer.parseInt(reader.getElementText());
+         // reading labels
+         ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
+         for (int i = 0; i < numberOfItems; i++) {
+         reader.next();
+         StringBuilder valueStringBuilder = new StringBuilder(reader.getElementText());
+         labels.add(valueStringBuilder);
+         PreviewProperty property = createLegendLabelProperty(item, i, valueStringBuilder.toString());
+         properties.add(property);
+         }
+         item.setData(GroupsItem.LABELS_IDS, labels);
 
-        // reading labels
-        ArrayList<StringBuilder> labels = new ArrayList<StringBuilder>();
-        for (int i = 0; i < numberOfItems; i++) {
-            reader.next();
-            StringBuilder valueStringBuilder = new StringBuilder(reader.getElementText());
-            labels.add(valueStringBuilder);
-            PreviewProperty property = createLegendLabelProperty(item, i, valueStringBuilder.toString());
-            properties.add(property);
-        }
-        item.setData(GroupsItem.LABELS_IDS, labels);
+         // own properties
+         boolean end = false;
+         while (reader.hasNext() && !end) {
+         int type = reader.next();
 
-        // own properties
-        boolean end = false;
-        while (reader.hasNext() && !end) {
-            int type = reader.next();
+         switch (type) {
+         case XMLStreamReader.START_ELEMENT: {
+         PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
+         properties.add(property);
+         break;
+         }
+         case XMLStreamReader.CHARACTERS: {
+         break;
+         }
+         case XMLStreamReader.END_ELEMENT: {
+         end = true;
+         break;
+         }
+         }
+         }
 
-            switch (type) {
-                case XMLStreamReader.START_ELEMENT: {
-                    PreviewProperty property = readXMLToSingleOwnProperty(reader, item);
-                    properties.add(property);
-                    break;
-                }
-                case XMLStreamReader.CHARACTERS: {
-                    break;
-                }
-                case XMLStreamReader.END_ELEMENT: {
-                    end = true;
-                    break;
-                }
-            }
-        }
+         return properties;
+         */
 
-        return properties;
-
-
+        return new ArrayList<PreviewProperty>();
     }
 
     public PreviewProperty readXMLToSingleOwnProperty(XMLStreamReader reader, Item item) throws XMLStreamException {
@@ -414,23 +408,4 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         PreviewProperty property = createLegendProperty(item, propertyIndex, value);
         return property;
     }
-    // DEFAULT PROPERTIES
-    private Integer defaultNumColumns = 5;
-    private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.DOWN;
-    private Color defaultLabelFontColor = Color.BLACK;
-    private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 15);
-    private Integer defaultPaddingBetweenTextAndShape = 5;
-    private Integer defaultPaddingBetweenElements = 5;
-    private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
-    private Boolean defaultIsScalingShapes = Boolean.TRUE;
-    private final Object[] defaultValues = {
-        defaultNumColumns,
-        defaultShape,
-        defaultIsScalingShapes,
-        defaultLabelPosition,
-        defaultLabelFont,
-        defaultLabelFontColor,
-        defaultPaddingBetweenTextAndShape,
-        defaultPaddingBetweenElements
-    };
 }

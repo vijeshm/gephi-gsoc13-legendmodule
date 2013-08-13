@@ -7,6 +7,7 @@ package org.gephi.legend.plugin.groups;
 import java.awt.Color;
 import java.util.ArrayList;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
+import org.gephi.preview.api.Item;
 
 /**
  *
@@ -21,6 +22,6 @@ public interface CustomGroupsItemBuilder extends CustomLegendItemBuilder {
      * @param colors
      * @param values 
      */
-    public void retrieveData(ArrayList<String> labels, ArrayList<Color> colors, ArrayList<Float> values);
+    public void retrieveData(Item item, ArrayList<GroupElement> groups);
 
 }

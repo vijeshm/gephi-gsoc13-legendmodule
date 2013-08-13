@@ -4,6 +4,7 @@
  */
 package org.gephi.legend.plugin.groups;
 
+import java.util.ArrayList;
 import org.gephi.legend.api.AbstractItem;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
@@ -16,11 +17,8 @@ import org.gephi.preview.api.PreviewProperty;
 public class GroupsItem extends AbstractItem implements LegendItem {
 
     public static final String LEGEND_TYPE = "new Groups Item";
-    public static final String LABELS_IDS = "labels group";
-    public static final String COLORS = "colors group";
-    public static final String VALUES = "values group";
-    public static final String NUMBER_OF_GROUPS = "number of groups";
 
+    protected ArrayList<GroupElement> groups;
     //BODY
     public GroupsItem(Object source) {
         super(source, LEGEND_TYPE);
@@ -29,5 +27,13 @@ public class GroupsItem extends AbstractItem implements LegendItem {
     @Override
     public String toString() {
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
+    }
+    
+    public ArrayList<GroupElement> getGroups() {
+        return groups;
+    }
+    
+    public void setGroups(ArrayList<GroupElement> groups) {
+        this.groups = groups;
     }
 }

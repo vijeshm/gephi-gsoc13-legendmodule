@@ -8,17 +8,31 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.BlockNode;
+import org.gephi.legend.inplaceeditor.Column;
+import org.gephi.legend.inplaceeditor.InplaceEditor;
+import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
+import org.gephi.legend.inplaceeditor.InplaceItemRenderer;
+import org.gephi.legend.inplaceeditor.Row;
+import org.gephi.legend.inplaceelements.BaseElement;
+import org.gephi.legend.inplaceelements.ElementLabel;
 import org.gephi.legend.spi.LegendItem;
+import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.legend.spi.LegendItem.Direction;
 import org.gephi.legend.spi.LegendItem.Shape;
+import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -28,126 +42,230 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = Renderer.class, position = 507)
 public class GroupsItemRenderer extends AbstractLegendItemRenderer {
-    
+
+    public static String GROUP_NODE = "group node";
+    public static String GROUP_ELEMENT_NODE = "group element node";
+    //PROPERTIES
+    protected Shape shape;
+    protected Boolean isScalingShapes;
+    protected Direction labelPosition;
+    protected Font labelFont;
+    protected Color labelFontColor;
+    protected Alignment labelFontAlignment;
+    protected Integer paddingBetweenTextAndShape;
+    protected Integer paddingBetweenElements;
+    protected Color Background;
+    // min shape size
+    protected Float MINIMUM_SHAPE_SIZE = 10f;
+
     @Override
     public boolean isAnAvailableRenderer(Item item) {
         return item instanceof GroupsItem;
     }
-    
+
     @Override
-    protected void renderToGraphics(Graphics2D graphics2d,  RenderTarget target, BlockNode legenNode) {
-        // fill this with the functionality of the other renderToGraphics function
-        System.out.println("Hello World!");
+    protected void renderToGraphics(Graphics2D graphics2d, RenderTarget target, BlockNode legendNode) {
+        // doesnt support multiple rows yet
+
+        int blockOriginX = (int) (legendNode.getOriginX());
+        int blockOriginY = (int) (legendNode.getOriginY());
+        int blockWidth = (int) legendNode.getBlockWidth();
+        int blockHeight = (int) legendNode.getBlockHeight();
+
+        GroupsItem item = (GroupsItem) legendNode.getItem();
+        PreviewProperty[] itemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        ArrayList<GroupElement> groups = item.getGroups();
+        int numberOfGroups = groups.size();
+        int itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+        // currently the group legend occupies the entire block.
+        int groupOriginX = blockOriginX;
+        int groupOriginY = blockOriginY;
+        int groupWidth = blockWidth;
+        int groupHeight = blockHeight;
+
+        BlockNode groupNode = legendNode.getChild(GROUP_NODE);
+        if (groupNode == null) {
+            groupNode = legendNode.addChild(groupOriginX, groupOriginY, groupWidth, groupHeight, GROUP_NODE);
+            // buildInplaceGroup(legendNode, item, graphics2d, target);
+        }
+
+        groupNode.updateGeometry(groupOriginX, groupOriginY, groupWidth, groupHeight);
+
+        // render background
+        graphics2d.setColor(Background);
+        graphics2d.fillRect((int) (groupOriginX - currentRealOriginX), (int) (groupOriginY - currentRealOriginY), groupWidth, groupHeight);
+
+        int elementWidth = (groupWidth - (numberOfGroups + 1) * paddingBetweenElements) / paddingBetweenElements;
+        int elementHeight = groupHeight;
+
+        // check if the group elements have already been built
+        BlockNode groupElement = legendNode.getChild(GROUP_ELEMENT_NODE); // gets the first instance of group element node
+        if (groupElement == null) {
+            // build group elements only for the first time
+
+            // utility variables
+            Graph graph = null;
+            PreviewProperty[] elementPreviewProperties;
+            BlockNode elementNode;
+            Map<String, Object> data;
+            Row r;
+            Column col;
+            BaseElement addedElement;
+
+            int elementOriginX;
+            int elementOriginY;
+            for (int i = 0; i < groups.size(); i++) {
+                elementOriginX = blockOriginX + i * elementWidth + (i + 1) * paddingBetweenElements;
+                elementOriginY = blockOriginY;
+
+                elementNode = groupNode.addChild(elementOriginX, elementOriginY, elementWidth, elementHeight, GROUP_ELEMENT_NODE);
+                elementPreviewProperties = groups.get(i).getPreviewProperties();
+
+                InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
+                InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, elementNode);
+
+                r = ipeditor.addRow();
+                col = r.addColumn(false);
+                data = new HashMap<String, Object>();
+                data.put(ElementLabel.LABEL_TEXT, "Group: ");
+                data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                elementNode.setInplaceEditor(ipeditor);
+            }
+        }
+
+        renderGroupElements(graphics2d, groups, groupNode.getChildren());
     }
 
-    @Override
-    protected void renderToGraphics(Graphics2D graphics2D,
-                                    AffineTransform origin,
-                                    Integer width,
-                                    Integer height) {
+    private void renderGroupElements(Graphics2D graphics2D, ArrayList<GroupElement> groups, ArrayList<BlockNode> groupElementNodes) {
+        // according to the data from the groups and geometry information from the groupElementNodes, render the groups        
 
-        if (labels.isEmpty()) {
-            return;
+        int elementOriginX;
+        int elementOriginY;
+        int elementWidth;
+        int elementHeight;
+        BlockNode groupElementNode;
+        GroupElement groupElement;
+        PreviewProperty[] elementPreviewProperties;
+        String elementLabelText;
+        Font elementLabelFont;
+        Color elementLabelFontColor;
+        Alignment elementLabelFontAlignment;
+        Direction elementLabelPosition;
+        float elementValue;
+        Shape elementShape;
+        Color elementShapeColor;
+        FontMetrics fontMetrics;
+
+        int shapeOriginX, shapeOriginY, shapeWidth, shapeHeight;
+        int labelOriginX, labelOriginY, labelWidth, labelHeight;
+
+        ArrayList<Float> normalizedValues = new ArrayList<Float>(); //do not change the original data. instead, compute a new array
+        float maxValue = Integer.MIN_VALUE;
+        for (GroupElement group : groups) {
+            maxValue = Math.max(maxValue, (Float) group.getPreviewProperty(GroupElement.VALUE).getValue());
         }
 
-        graphics2D.setTransform(origin);
-
-        int numGroups = labels.size();
-        int numRows = (int) Math.ceil((double) numGroups / numColumns);
-
-        // max label length
-        graphics2D.setFont(labelFont);
-        FontMetrics fontMetrics = graphics2D.getFontMetrics();
-
-
-//        int elementHeight = (height - (numRows - 1) * paddingBetweenElements) / numRows;
-//        int elementWidth = (width - (numColumns - 1) * paddingBetweenElements) / numColumns;
-        int elementWidth = width / numColumns - paddingBetweenElements;
-        int elementHeight = height / numRows - paddingBetweenElements;
-
-        int maxLabelWidth = Integer.MIN_VALUE;
-        int maxLabelHeight = Integer.MIN_VALUE;
-
-        // computing max label height
-        for (StringBuilder label : labels) {
-            maxLabelHeight = (int) Math.max(maxLabelHeight, getFontHeight(graphics2D, label.toString(), labelFont, elementWidth, height)); //temporary soln. gotto rethink the height part.
-
+        for (GroupElement group : groups) {
+            normalizedValues.add((Float) group.getPreviewProperty(GroupElement.VALUE).getValue() / maxValue);
         }
+        
+        for (int i = 0; i < groups.size(); i++) {
+            groupElementNode = groupElementNodes.get(i);
+            groupElement = groups.get(i);
 
-        // computing max label width
-        for (StringBuilder label : labels) {
-            maxLabelWidth = Math.max(maxLabelWidth, fontMetrics.stringWidth(label.toString()));
-        }
+            elementOriginX = (int) groupElementNode.getOriginX();
+            elementOriginY = (int) groupElementNode.getOriginY();
+            elementWidth = (int) groupElementNode.getBlockWidth();
+            elementHeight = (int) groupElementNode.getBlockHeight();
+            elementPreviewProperties = groupElement.getPreviewProperties();
 
+            elementLabelText = elementPreviewProperties[GroupElement.LABEL_TEXT].getValue();
+            elementLabelFont = elementPreviewProperties[GroupElement.LABEL_FONT].getValue();
+            elementLabelFontColor = elementPreviewProperties[GroupElement.LABEL_COLOR].getValue();
+            elementLabelFontAlignment = elementPreviewProperties[GroupElement.LABEL_ALIGNMENT].getValue();
+            elementLabelPosition = elementPreviewProperties[GroupElement.LABEL_POSITION].getValue();
+            elementValue = elementPreviewProperties[GroupElement.VALUE].getValue();
+            elementShape = elementPreviewProperties[GroupElement.SHAPE].getValue();
+            elementShapeColor = elementPreviewProperties[GroupElement.SHAPE_COLOR].getValue();
 
+            graphics2D.setFont(elementLabelFont);
+            fontMetrics = graphics2D.getFontMetrics();
 
+            shapeOriginX = 0;
+            shapeOriginY = 0;
+            shapeWidth = 0;
+            shapeHeight = 0;
+            labelOriginX = 0;
+            labelOriginY = 0;
+            labelWidth = 0;
+            labelHeight = 0;
 
-        int shapeWidth = 0, shapeHeight = 0, labelHeight = 0, labelWidth = 0;
-        if (labelPosition == Direction.RIGHT || labelPosition == Direction.LEFT) {
-            shapeWidth = elementWidth - maxLabelWidth - paddingBetweenTextAndShape;
-            shapeHeight = elementHeight - paddingBetweenElements;
-            labelWidth = maxLabelWidth;
-            labelHeight = shapeHeight;
-        }
-        else if (labelPosition == Direction.UP || labelPosition == Direction.DOWN) {
-            shapeWidth = elementWidth - paddingBetweenElements;
-            shapeHeight = elementHeight - maxLabelHeight - paddingBetweenTextAndShape;
-            labelWidth = shapeWidth;
-            labelHeight = maxLabelHeight;
-        }
-
-//        // 
-//        ArrayList<Float> valuesNormalized = new ArrayList<Float>();
-//        if (isScalingShapes) {
-//            float maxValue = Collections.max(values);
-//            for (Float value : values) {
-//                valuesNormalized.add(value / maxValue);
-//            }
-//        }
-//        else {
-//            for (Float value : values) {
-//                valuesNormalized.add(1f);
-//            }
-//        }
-
-        for (int i = 0; i < labels.size(); i++) {
-            int x = (i % numColumns) * (elementWidth + paddingBetweenElements);
-            int y = (i / numColumns) * (elementHeight + paddingBetweenElements);
-            int xShape = 0, yShape = 0, xLabel = 0, yLabel = 0;
             switch (labelPosition) {
-                case RIGHT: {
-                    xShape = x;
-                    yShape = y;
-                    xLabel = x + shapeWidth + paddingBetweenTextAndShape;
-                    yLabel = y;
+                case UP:
+                    labelOriginX = elementOriginX;
+                    labelOriginY = elementOriginY;
+                    labelWidth = elementWidth;
+                    labelHeight = fontMetrics.getHeight();
+                    
+                    shapeOriginX = elementOriginX;
+                    shapeOriginY = elementOriginY + fontMetrics.getHeight();
+                    shapeWidth = elementWidth;
+                    shapeHeight = elementHeight - fontMetrics.getHeight() - paddingBetweenTextAndShape;
                     break;
-                }
-                case LEFT: {
-                    xShape = x + labelWidth + paddingBetweenTextAndShape;
-                    yShape = y;
-                    xLabel = x;
-                    yLabel = y;
+                    
+                case LEFT:
+                    labelOriginX = elementOriginX;
+                    labelOriginY = elementOriginY;
+                    labelWidth = fontMetrics.stringWidth(elementLabelText);
+                    int thresholdWidth = elementWidth / 2;
+                    if(labelWidth > thresholdWidth) {
+                        labelWidth = thresholdWidth;
+                    }
+                    labelHeight = elementHeight;
+                    
+                    shapeOriginX = elementOriginX + labelWidth;
+                    shapeOriginY = elementOriginY;
+                    shapeWidth = elementWidth - labelWidth - paddingBetweenTextAndShape;
+                    shapeHeight = elementHeight;
                     break;
-                }
-                case UP: {
-                    xShape = x;
-                    yShape = y + labelHeight + paddingBetweenTextAndShape;
-                    xLabel = x;
-                    yLabel = y;
-                    break;
-                }
-                case DOWN: {
-                    xShape = x;
-                    yShape = y;
-                    xLabel = x;
-                    yLabel = y + shapeHeight;
-                    break;
-                }
-            }
+                    
+                case DOWN:
+                    labelOriginX = elementOriginX;
+                    labelOriginY = elementOriginY + elementHeight - fontMetrics.getHeight();
+                    labelWidth = elementWidth;
+                    labelHeight = fontMetrics.getHeight();
 
-            drawShape(graphics2D, shape, colors.get(i), xShape, yShape, shapeWidth, shapeHeight, values.get(i));
-            drawElementLabel(graphics2D, labels.get(i).toString(), labelFont, colors.get(i), xLabel, yLabel, labelWidth, labelHeight);
+                    shapeOriginX = elementOriginX;
+                    shapeOriginY = elementOriginY;
+                    shapeWidth = elementWidth;
+                    shapeHeight = elementHeight - fontMetrics.getHeight() - paddingBetweenTextAndShape;
+                    break;
+                    
+                case RIGHT:
+                    labelWidth = fontMetrics.stringWidth(elementLabelText);
+                    labelHeight = fontMetrics.getHeight();
+                    labelOriginX = elementOriginX + elementWidth - labelWidth;
+                    labelOriginY = elementHeight;
+                    
+                    shapeOriginX = elementOriginX;
+                    shapeOriginY = elementOriginY;
+                    shapeWidth = elementWidth - labelWidth - paddingBetweenTextAndShape;
+                    shapeHeight = elementHeight;
+                    break;
+            }
+            
+            drawShape(graphics2D, elementShape, elementShapeColor, shapeOriginX, shapeOriginY, shapeWidth, shapeHeight, normalizedValues.get(i));
+            drawElementLabel(graphics2D, elementLabelText, elementLabelFont, elementLabelFontColor, labelOriginX, labelOriginY, labelWidth, labelHeight);
         }
+    }
+
+    @Override // to be deprecated
+    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
     }
 
     /**
@@ -164,14 +282,14 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
      *
      */
     protected void drawElementLabel(Graphics2D graphics2D,
-                                    String label,
-                                    Font labelFont,
-                                    Color labelColor,
-                                    int x,
-                                    int y,
-                                    Integer width,
-                                    Integer height) {
-        
+            String label,
+            Font labelFont,
+            Color labelColor,
+            int x,
+            int y,
+            Integer width,
+            Integer height) {
+
 //        AffineTransform restore = graphics2D.getTransform();
 //        AffineTransform arrange = new AffineTransform(graphics2D.getTransform());
 //        arrange.translate(x, y);
@@ -187,30 +305,19 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
      * @param graphics2D the Graphics object to draw to
      * @param shape shape specified by the user, it could be one the three
      * values:
-     * @param value value to express as a shape
-     * @param valueColor rendering color for the value
+     * @param shape the shape that needs to be drawn
      * @param x the x coordinate of the area containing the label
      * @param y the y coordinate of the area containing the label
      * @param width the width of the area containing the label
      * @param height the height of the area containing the label
+     * @param scale the scaling factor for the width and height.
      */
-    protected void drawElementShape(Graphics2D graphics2D,
-                                    Shape shape,
-                                    Float value,
-                                    Color valueColor,
-                                    int x,
-                                    int y,
-                                    Integer width,
-                                    Integer height) {
-        drawShape(graphics2D, shape, valueColor, x, y, width, height, value);
-    }
-
     private void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height, float scale) {
 
         int shapeWidth = (int) (width * scale);
         int shapeHeight = (int) (height * scale);
         x = (x + (width - shapeWidth) / 2);
-        y = (y + (height - shapeHeight) / 2);
+        y = y + height - shapeHeight;
         graphics2D.setColor(color);
         switch (shape) {
             case RECTANGLE: {
@@ -232,49 +339,16 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
-
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-
-
-        // READING LABELS
-        labels = item.getData(GroupsItem.LABELS_IDS);
-        for (int i = 0; i < labels.size(); i++) {
-            StringBuilder label = labels.get(i);
-            String newLabel = properties.getStringValue(GroupsProperty.getLabelProperty(itemIndex, i));
-            label.replace(0, newLabel.length(), newLabel);
-        }
-
-
-        colors = item.getData(GroupsItem.COLORS);
-        values = item.getData(GroupsItem.VALUES);
-
-        // properties
-        numColumns = properties.getIntValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_NUMBER_COLUMNS));
-        numColumns = Math.min(numColumns, labels.size());
-        labelPosition = (LegendItem.Direction) properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_POSITION));
-        shape = (LegendItem.Shape) properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
-        labelFont = properties.getFontValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
-        isScalingShapes = properties.getBooleanValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SCALE_SHAPE));
-
-        // 
-        ArrayList<Float> valuesNormalized = new ArrayList<Float>();
-        if (isScalingShapes) {
-            float maxValue = Collections.max(values);
-            for (Float value : values) {
-                valuesNormalized.add(value / maxValue);
-            }
-        }
-        else {
-            for (Float value : values) {
-                valuesNormalized.add(1f);
-            }
-        }
-
-        values = valuesNormalized;
-
-        paddingBetweenTextAndShape = properties.getIntValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
-        paddingBetweenElements = properties.getIntValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
-
+        shape = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
+        isScalingShapes = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SCALE_SHAPE));
+        labelPosition = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_POSITION));
+        labelFont = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
+        labelFontColor = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_COLOR));
+        labelFontAlignment = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_ALIGNMENT));
+        paddingBetweenTextAndShape = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
+        paddingBetweenElements = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
+        Background = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_BACKGROUND));
     }
 
     @Override
@@ -286,20 +360,4 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof GroupsItemBuilder;
     }
-
-    //PROPERTIES
-    protected Integer numColumns;
-    protected Integer paddingBetweenTextAndShape;
-    protected Integer paddingBetweenElements;
-    protected Font labelFont;
-    protected Direction labelPosition;
-    protected Shape shape;
-    // TO ADD
-    protected Boolean isScalingShapes;
-    //VALUES
-    protected ArrayList<StringBuilder> labels;
-    protected ArrayList<Color> colors;
-    protected ArrayList<Float> values;
-    // min shape size
-    protected Float MINIMUM_SHAPE_SIZE = 10f;
 }

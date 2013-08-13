@@ -16,6 +16,8 @@ import org.openide.util.NbBundle;
  */
 public interface LegendItem extends Item {
 
+    // BUILDER
+    public static final String CUSTOM_BUILDER = "builder";
     // RENDERER
     public static final String RENDERER = "renderer";
     // DATA
