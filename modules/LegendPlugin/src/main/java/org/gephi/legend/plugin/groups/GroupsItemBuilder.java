@@ -18,6 +18,7 @@ import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
+import org.gephi.legend.spi.LegendItem.Direction;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -40,7 +41,7 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
     private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
     private Float defaultShapeWidthFraction = 0.8f;
-    private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.DOWN;
+    private LegendItem.Direction defaultLabelPosition = Direction.DOWN;
     private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 15);
     private Color defaultLabelFontColor = Color.BLACK;
     private Alignment defaultLabelFontAlignment = Alignment.CENTER;

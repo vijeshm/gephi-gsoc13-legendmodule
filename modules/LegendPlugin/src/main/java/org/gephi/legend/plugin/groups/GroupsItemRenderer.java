@@ -97,7 +97,6 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         }
 
         groupNode.updateGeometry(groupOriginX, groupOriginY, groupWidth, groupHeight);
-        drawBlockBoundary(graphics2d, groupNode);
 
         // render background
         graphics2d.setColor(Background);
@@ -135,21 +134,13 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 r = ipeditor.addRow();
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
-                data.put(ElementLabel.LABEL_TEXT, "Group:");
-                data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
-                data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-
-                r = ipeditor.addRow();
-                col = r.addColumn(false);
-                data = new HashMap<String, Object>();
                 data.put(ElementLabel.LABEL_TEXT, "Shape:");
                 data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
                 data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                r = ipeditor.addRow();
                 col = r.addColumn(true);
                 // rectangle
                 data = new HashMap<String, Object>();
@@ -251,7 +242,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementImage.IMAGE_BOOL, elementPreviewProperties[GroupElement.LABEL_POSITION].getValue() == Direction.UP);
                 data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/groups_label_position_up_selected.png");
                 data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/groups_label_position_up_unselected.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, elementPreviewProperties[GroupElement.LABEL_POSITION], data, true, Direction.UP);
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, elementPreviewProperties[GroupElement.LABEL_POSITION], data, elementPreviewProperties[GroupElement.LABEL_POSITION].getValue() == Direction.UP, Direction.UP);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // position down
@@ -259,7 +250,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementImage.IMAGE_BOOL, elementPreviewProperties[GroupElement.LABEL_POSITION].getValue() == Direction.DOWN);
                 data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/groups_label_position_down_selected.png");
                 data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/groups_label_position_down_unselected.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, elementPreviewProperties[GroupElement.LABEL_POSITION], data, false, Direction.DOWN);
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, elementPreviewProperties[GroupElement.LABEL_POSITION], data, elementPreviewProperties[GroupElement.LABEL_POSITION].getValue() == Direction.DOWN, Direction.DOWN);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = ipeditor.addRow();
@@ -427,7 +418,6 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
             drawShape(graphics2D, elementShape, elementShapeColor, shapeOriginX, shapeOriginY, shapeWidth, shapeHeight, normalizedValues.get(i));
             drawElementLabel(graphics2D, elementLabelText, elementLabelFont, elementLabelFontColor, labelOriginX, labelOriginY, labelWidth, labelHeight, elementLabelFontAlignment);
-            drawBlockBoundary(graphics2D, groupElementNode);
         }
     }
 

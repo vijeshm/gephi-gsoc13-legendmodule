@@ -28,7 +28,6 @@ public class GroupElement {
     public static final int VALUE = 5;
     public static final int SHAPE = 6;
     public static final int SHAPE_COLOR = 7;
-    public static final int IS_DISPLAYING = 8;
     public static String[] OWN_PROPERTIES = {
         ".element.label.text",
         ".element.label.font",
@@ -38,18 +37,16 @@ public class GroupElement {
         ".element.value",
         ".element.shape",
         ".element.shape.color",
-        ".element.is.displaying"
     };
     private Item item = null;
     public static final String labelText = "Label";
     public static final Font labelFont = new Font("Arial", Font.PLAIN, 25);
     public static final Color labelColor = Color.BLACK;
     public static final Alignment labelAlignment = Alignment.CENTER;
-    public static final Direction labelPosition = Direction.UP;
+    public static final Direction labelPosition = Direction.DOWN;
     public static final Float value = 1f;
     public static final Shape shape = Shape.RECTANGLE;
     public static final Color shapeColor = Color.BLACK;
-    public static final Boolean isDisplaying = Boolean.TRUE;
     public static final Object[] defaultValues = {
         labelText,
         labelFont,
@@ -59,7 +56,6 @@ public class GroupElement {
         value,
         shape,
         shapeColor,
-        isDisplaying
     };
     private PreviewProperty[] previewProperties = new PreviewProperty[OWN_PROPERTIES.length];
 
@@ -82,7 +78,6 @@ public class GroupElement {
         defaultValues[VALUE] = value;
         defaultValues[SHAPE] = shape;
         defaultValues[SHAPE_COLOR] = shapeColor;
-        defaultValues[IS_DISPLAYING] = isDisplaying;
 
         for (int i = 0; i < OWN_PROPERTIES.length; i++) {
             addElementProperty(i, defaultValues[i]);
@@ -170,16 +165,6 @@ public class GroupElement {
                         Color.class,
                         "GroupItem" + OWN_PROPERTIES[SHAPE_COLOR],
                         "GroupItem" + OWN_PROPERTIES[SHAPE_COLOR],
-                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
-                break;
-                
-                case IS_DISPLAYING: 
-                previewProperty = PreviewProperty.createProperty(
-                        this,
-                        propertyString,
-                        Boolean.class,
-                        "GroupItem" + OWN_PROPERTIES[IS_DISPLAYING],
-                        "GroupItem" + OWN_PROPERTIES[IS_DISPLAYING],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
         }
