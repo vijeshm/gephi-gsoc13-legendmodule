@@ -33,13 +33,13 @@ import org.openide.util.lookup.ServiceProviders;
  * @author mvvijesh, edubecks
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = ItemBuilder.class, position = 107),
-    @ServiceProvider(service = LegendItemBuilder.class, position = 107)
+    @ServiceProvider(service = ItemBuilder.class, position = 102),
+    @ServiceProvider(service = LegendItemBuilder.class, position = 102)
 })
 public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
     private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
-    private Boolean defaultIsScalingShapes = Boolean.TRUE;
+    private Float defaultShapeWidthFraction = 0.8f;
     private LegendItem.Direction defaultLabelPosition = LegendItem.Direction.DOWN;
     private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 15);
     private Color defaultLabelFontColor = Color.BLACK;
@@ -49,7 +49,7 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
     private Color defaultBackgroundColor = new Color(0.7f, 0.7f, 0.7f, 0.5f);
     private final Object[] defaultValues = {
         defaultShape,
-        defaultIsScalingShapes,
+        defaultShapeWidthFraction,
         defaultLabelPosition,
         defaultLabelFont,
         defaultLabelFontColor,
@@ -96,14 +96,14 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
-
-            case GroupsProperty.GROUPS_SCALE_SHAPE: {
+                
+                case GroupsProperty.GROUPS_SHAPE_WIDTH_FRACTION: {
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
-                        Boolean.class,
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.scaleShape.displayName"),
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.scaleShape.description"),
+                        Float.class,
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.shape.width.fraction.displayName"),
+                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.shape.width.fraction.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }

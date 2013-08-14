@@ -39,9 +39,9 @@ public class Default implements CustomGroupsItemBuilder {
 
     @Override
     public void retrieveData(Item item, ArrayList<GroupElement> groups) {
-        String[] labels = {"group 1", "group 2", "group 3", "group 4"};
+        String[] labels = {"Group 1", "Group 2", "Group 3", "Group 4"};
         Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
-        Float[] values = {0.8f, 0.3f, 0.9f, 0.5f};
+        Float[] values = {1f, 2f, 1.5f, 1f};
 
         for (int i = 0; i < labels.length; i++) {
             GroupElement groupElement = new GroupElement(item, labels[i], GroupElement.labelFont, GroupElement.labelColor, GroupElement.labelAlignment, GroupElement.labelPosition, values[i], GroupElement.shape, colors[i], true);

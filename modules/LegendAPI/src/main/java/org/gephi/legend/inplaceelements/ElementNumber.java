@@ -41,7 +41,7 @@ public class ElementNumber extends BaseElement {
         String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", property.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, property.getValue());
         if (newValueString != null) {
             try {
-                Integer newNumber = Integer.parseInt(newValueString);
+                Float newNumber = Float.parseFloat(newValueString);
                 property.setValue(newNumber);
                 previewProperties.putValue(property.getName(), newNumber);
             } catch (NumberFormatException e) {
