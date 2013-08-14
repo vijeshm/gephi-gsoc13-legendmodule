@@ -99,12 +99,9 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      * the Function that actually renders the legend using the Graphics2D Object
      *
      * @param graphics2D Graphics2D instance used to render legend
-     * @param origin transformation that contains the origin and level zoom of
-     * the legend
-     * @param width width of the legend to be rendered
-     * @param height height of the legend to be rendered
+     * @param target the rendering target - can be G2D, PDF or SVG
+     * @param legendNode the node onto which the legend data must be rendered
      */
-    protected abstract void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height);
 
     protected abstract void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode);
 

@@ -110,14 +110,14 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, textNode);
-        
+
         Row r;
         Column col;
         PreviewProperty[] previewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         Map<String, Object> data;
         BaseElement addedElement;
-        
+
         r = ipeditor.addRow();
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
@@ -130,14 +130,14 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT_COLOR], data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
         data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, previewProperties[TextProperty.TEXT_BODY_FONT], data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         r = ipeditor.addRow();
         col = r.addColumn(true);
         // left-alignment
@@ -173,26 +173,6 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         textNode.setInplaceEditor(ipeditor);
-    }
-
-    @Override // to be deprecated
-    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        if (!body.isEmpty()) {
-            graphics2D.setTransform(origin);
-
-            // resizing text
-
-//            float currentSize = computeVerticalTextSpaceUsed(graphics2D, body, bodyFont, width);
-////            float currentSize = legendDrawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment, computeSpace);
-//            while (currentSize > height) {
-//                bodyFont = new Font(bodyFont.getName(), bodyFont.getStyle(), bodyFont.getSize() - 1);
-//                currentSize = computeVerticalTextSpaceUsed(graphics2D, body, bodyFont, width);
-////                currentSize = legendDrawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment, computeSpace);
-//            }
-
-
-            drawText(graphics2D, body, bodyFont, bodyFontColor, 0, 0, width, height, bodyAlignment);
-        }
     }
 
     protected void drawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, LegendItem.Alignment alignment) {

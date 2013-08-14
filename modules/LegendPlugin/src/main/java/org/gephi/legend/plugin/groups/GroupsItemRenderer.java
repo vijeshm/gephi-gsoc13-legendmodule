@@ -431,10 +431,6 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
-    @Override // to be deprecated
-    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-    }
-
     /**
      * Override this function to draw each element label in a different way.
      *

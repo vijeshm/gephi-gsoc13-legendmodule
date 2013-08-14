@@ -220,54 +220,6 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         imageNode.setInplaceEditor(ipeditor);
     }
 
-    @Override // - to be deprecated
-    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-        try {
-            graphics2D.setTransform(origin);
-            if (imageFile.exists() && imageFile.isFile()) {
-                BufferedImage before = ImageIO.read(imageFile);
-
-                if (before.getWidth() == width && before.getHeight() == height) {
-                    graphics2D.drawImage(before, 0, 0, null);
-                } else {
-                    if (useImageAspectRatio) {
-                        float aspectRatio = (float) before.getWidth() / (float) before.getHeight();
-                        height = (int) (width / aspectRatio);
-                    }
-
-                    // SCALING
-                    BufferedImage after = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                    double scaleHeight = height / ((double) before.getHeight());
-                    double scaleWidth = width / ((double) before.getWidth());
-
-                    AffineTransform scaleTransform = new AffineTransform();
-                    scaleTransform.scale(scaleWidth, scaleHeight);
-                    AffineTransformOp scaleOperation = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BILINEAR);
-                    after = scaleOperation.filter(before, after);
-
-//                    // EXPORTING TO SVG
-                    if (graphics2D instanceof SVGGraphics2D) {
-                        int x = (int) origin.getTranslateX();
-                        int y = (int) origin.getTranslateY();
-
-                        renderImageToSVGGraphics(graphics2D, after, x, y);
-
-                    } else {
-                        graphics2D.drawImage(after, 0, 0, null);
-                    }
-
-                }
-            } else {
-                String noImageMessage = NbBundle.getMessage(ImageItemRenderer.class, "ImageItemRenderer.no.image.message");
-
-                float messageHeight = getFontHeight(graphics2D, noImageMessage, titleFont, width, height); //temporary solution. gotto rethink this further.
-                legendDrawText(graphics2D, noImageMessage, titleFont, Color.BLACK, 0, 0, width, (int) messageHeight, LegendItem.Alignment.CENTER);
-            }
-        } catch (Exception e) {
-            Logger.getLogger(ImageItemRenderer.class.getName()).log(Level.WARNING, e.getMessage());
-        }
-    }
-
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);

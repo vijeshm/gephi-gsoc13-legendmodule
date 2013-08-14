@@ -746,10 +746,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         graphics2D.setFont(saveFont);
     }
 
-    @Override // to be deprecated
-    protected void renderToGraphics(Graphics2D graphics2D, AffineTransform origin, Integer width, Integer height) {
-    }
-
     @Override
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof TableItemBuilder;
