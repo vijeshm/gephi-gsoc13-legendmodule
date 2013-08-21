@@ -16,7 +16,7 @@ import org.gephi.preview.api.PreviewProperty;
  */
 public class GroupsItem extends AbstractItem implements LegendItem {
 
-    public static final String LEGEND_TYPE = "new Groups Item";
+    public static final String LEGEND_TYPE = "Groups Item";
 
     protected ArrayList<GroupElement> groups;
     //BODY

@@ -46,8 +46,7 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
     private Color defaultLabelFontColor = Color.BLACK;
     private Alignment defaultLabelFontAlignment = Alignment.CENTER;
     private Integer defaultPaddingBetweenTextAndShape = 5;
-    private Integer defaultPaddingBetweenElements = 5;
-    private Color defaultBackgroundColor = new Color(0.7f, 0.7f, 0.7f, 0.5f);
+    private Integer defaultPaddingBetweenElements = 20;
     private final Object[] defaultValues = {
         defaultShape,
         defaultShapeWidthFraction,
@@ -57,7 +56,6 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         defaultLabelFontAlignment,
         defaultPaddingBetweenTextAndShape,
         defaultPaddingBetweenElements,
-        defaultBackgroundColor
     };
 
     @Override
@@ -171,17 +169,6 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
                         Integer.class,
                         NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.paddingBetweenElements.displayName"),
                         NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.paddingBetweenElements.description"),
-                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
-                break;
-            }
-
-            case GroupsProperty.GROUPS_BACKGROUND: {
-                previewProperty = PreviewProperty.createProperty(
-                        this,
-                        propertyString,
-                        Color.class,
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.background.color.displayName"),
-                        NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.property.background.color.description"),
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }

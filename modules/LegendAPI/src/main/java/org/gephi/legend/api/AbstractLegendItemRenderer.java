@@ -289,10 +289,10 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
         renderBackground(graphics2D, target, width, height, item, root);
 
         // add more options to the root block - control the visibility of title and description
-        PreviewProperty[] previewProperties = item.getData(LegendItem.PROPERTIES);
+        PreviewProperty[] legendItemPreviewProperties = item.getData(LegendItem.PROPERTIES);
         if (root.getInplaceEditor().getRows().size() == 2) {
-            addVisibilityControls("Title:", previewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item, graphics2D, target);
-            addVisibilityControls("Description:", previewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item, graphics2D, target);
+            addVisibilityControls("Title:", legendItemPreviewProperties[LegendProperty.TITLE_IS_DISPLAYING], isDisplayingTitle, root, item, graphics2D, target);
+            addVisibilityControls("Description:", legendItemPreviewProperties[LegendProperty.DESCRIPTION_IS_DISPLAYING], isDisplayingDescription, root, item, graphics2D, target);
         }
 
         root.updateGeometry(currentRealOriginX, currentRealOriginY, width, height);

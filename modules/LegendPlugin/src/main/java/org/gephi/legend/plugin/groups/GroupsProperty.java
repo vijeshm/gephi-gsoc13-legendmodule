@@ -23,7 +23,6 @@ public class GroupsProperty {
     public static final int GROUPS_LABEL_FONT_ALIGNMENT = 5;
     public static final int GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE = 6;
     public static final int GROUPS_PADDING_BETWEEN_ELEMENTS = 7;
-    public static final int GROUPS_BACKGROUND = 8;
     
     public static final String[] OWN_PROPERTIES = {
         ".shape",
@@ -34,7 +33,6 @@ public class GroupsProperty {
         ".label.font.alignment",
         ".paddingBetweenTextAndShape",
         ".paddingBetweenElements",
-        "background.color"
     };
     
     public static final int[] LIST_OF_PROPERTIES = {
@@ -46,7 +44,6 @@ public class GroupsProperty {
         GROUPS_LABEL_FONT_ALIGNMENT,
         GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE,
         GROUPS_PADDING_BETWEEN_ELEMENTS,
-        GROUPS_BACKGROUND
     };
 
     /*
