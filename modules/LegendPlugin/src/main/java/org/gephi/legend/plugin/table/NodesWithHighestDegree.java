@@ -7,10 +7,17 @@ package org.gephi.legend.plugin.table;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 import javax.swing.JOptionPane;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.gephi.graph.api.NodeIterable;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.preview.api.PreviewProperty;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -37,11 +44,53 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
         String[] nodeNames = new String[numberOfNodes];
         Integer[] nodeDegrees = new Integer[numberOfNodes];
 
-        // create a random array of node degrees
-        Random randomGenerator = new Random();
-        for (int i = 0; i < numberOfNodes; i++) {
-            nodeNames[i] = "Node " + (i + 1);
-            nodeDegrees[i] = randomGenerator.nextInt(100);
+        // find the top N nodes, wrt degree
+        GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
+        GraphModel graphModel = graphController.getGraphModel();
+        Graph graph = graphModel.getGraph();
+
+        NodeIterable nodeIterable = graph.getNodes();
+        Iterator<Node> nodeIter = nodeIterable.iterator();
+        Node node;
+        int degree;
+        while (nodeIter.hasNext()) {
+            node = nodeIter.next();
+            degree = graph.getDegree(node);
+            int moveIndex = -1;
+            
+            // To find the top N node with the max degree, the degrees could be sorted and top N could be chosen.
+            // But that is computationally complex [ O(n * logn) ]
+            // The following approach is a linear time algorithm wrt number of nodes, times the top number of nodes N. [ O(n * N)]
+            
+            for (int i = 0; i < numberOfNodes; i++) {
+                // check if the element fits at the position i
+                // if it fits, move the lower elements one block down and assign this to the position
+                if (nodeDegrees[i] == null) {
+                    nodeDegrees[i] = numberOfNodes;
+                    nodeNames[i] = node.getLabel();
+                    break;
+                }
+
+                if (i == 0) {
+                    if (degree >= nodeDegrees[i]) {
+                        moveIndex = 0;
+                        break;
+                    }
+                } else if (nodeDegrees[i - 1] > degree && nodeDegrees[i] <= degree) {
+                    moveIndex = i;
+                }
+            }
+
+            if (moveIndex != -1) {
+                // move the entries from moveIndex one step down and set the
+                for (int i = numberOfNodes - 1; i > moveIndex; i--) {
+                    nodeDegrees[i] = nodeDegrees[i - 1];
+                    nodeNames[i] = nodeNames[i - 1];
+                }
+
+                nodeDegrees[moveIndex] = degree;
+                nodeNames[moveIndex] = node.getLabel();
+            }
         }
 
         // build the default table and later customize according to the data
