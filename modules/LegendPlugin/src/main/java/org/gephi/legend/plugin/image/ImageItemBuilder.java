@@ -110,7 +110,7 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
-                
+
             case ImageProperty.IMAGE_MARGIN: {
                 previewProperty = PreviewProperty.createProperty(
                         this,
@@ -170,11 +170,12 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
     }
 
     @Override
-    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
 
-        // setting default renderer
+        // setting default renderer and item index
         item.setData(LegendItem.RENDERER, ImageItemRenderer.class);
+        item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         return item;
     }
 
@@ -189,7 +190,7 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
         this.defaultDescriptionIsDisplaying = Boolean.FALSE;
         return true;
     }
-    
+
     @Override
     public String getType() {
         return ImageItem.LEGEND_TYPE;

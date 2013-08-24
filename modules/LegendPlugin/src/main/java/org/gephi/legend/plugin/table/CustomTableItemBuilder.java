@@ -11,4 +11,6 @@ import org.gephi.legend.spi.CustomLegendItemBuilder;
  * @author mvvijesh
  */
 public interface CustomTableItemBuilder extends CustomLegendItemBuilder {
+
+    public void populateTable(TableItem item);
 }

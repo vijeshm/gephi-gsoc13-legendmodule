@@ -54,7 +54,8 @@ public interface LegendItemBuilder extends ItemBuilder {
      */
     public Item buildCustomItem(CustomLegendItemBuilder builder,
             Graph graph,
-            AttributeModel attributeModel);
+            AttributeModel attributeModel,
+            Integer newItemIndex);
 
     /**
      * Used to determine if the

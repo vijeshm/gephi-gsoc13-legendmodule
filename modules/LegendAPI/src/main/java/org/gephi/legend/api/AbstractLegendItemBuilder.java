@@ -85,13 +85,12 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @return
      */
     public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
-        Item item = buildCustomItem(builder, graph, attributeModel);
-        createDefaultProperties(newItemIndex, item);
+        Item item = buildCustomItem(builder, graph, attributeModel, newItemIndex);
+        createDefaultProperties(item);
         return item;
     }
 
-    private void createDefaultProperties(Integer newItemIndex, Item item) {
-        item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+    private void createDefaultProperties(Item item) {
         item.setData(LegendItem.PROPERTIES, createLegendProperties(item));
         item.setData(LegendItem.OWN_PROPERTIES, createLegendOwnProperties(item));
         item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);

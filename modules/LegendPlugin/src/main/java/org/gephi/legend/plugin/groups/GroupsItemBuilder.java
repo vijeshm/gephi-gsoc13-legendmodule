@@ -55,8 +55,7 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         defaultLabelFontColor,
         defaultLabelFontAlignment,
         defaultPaddingBetweenTextAndShape,
-        defaultPaddingBetweenElements,
-    };
+        defaultPaddingBetweenElements,};
 
     @Override
     public boolean setDefaultValues() {
@@ -95,8 +94,8 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
             }
-                
-                case GroupsProperty.GROUPS_SHAPE_WIDTH_FRACTION: {
+
+            case GroupsProperty.GROUPS_SHAPE_WIDTH_FRACTION: {
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
@@ -192,7 +191,7 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         // setting the groups data
         GroupsItem groupsItem = (GroupsItem) item;
         groupsItem.setGroups(groups);
-        
+
         return previewProperties;
     }
 
@@ -202,12 +201,13 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
     }
 
     @Override
-    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
 
-        // setting default renderer
+        // setting default renderer and item index
         item.setData(LegendItem.RENDERER, GroupsItemRenderer.class);
-        
+        item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+
         // setting the custombuilder builder - this data is being set only for this module. Make it consistent with all the other legends.
         item.setData(LegendItem.CUSTOM_BUILDER, (CustomGroupsItemBuilder) builder);
         return item;

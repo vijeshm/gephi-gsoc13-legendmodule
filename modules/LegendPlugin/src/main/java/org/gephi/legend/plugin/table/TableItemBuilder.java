@@ -50,8 +50,6 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
     protected final Color defaultTableBorderColor = Cell.borderColor;
     protected final Color defaultTableBackgroundColor = new Color(0f, 0.35f, 1f, 0.5f);
     protected final Boolean defaultTableWidthFull = false;
-    protected final int defaultTableNumberOfRows = 2;
-    protected final int defaultTableNumberOfColumns = 3;
     protected final Object[] defaultValues = {
         defaultFont,
         defaultFontColor,
@@ -71,11 +69,16 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
     }
 
     @Override
-    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         TableItem item = (TableItem) createNewLegendItem(graph);
+        CustomTableItemBuilder tableItemBuilder = (CustomTableItemBuilder) builder;
 
-        // setting default renderer
+        // setting default renderer and item index
         item.setData(LegendItem.RENDERER, TableItemRenderer.class);
+        item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+
+        tableItemBuilder.populateTable(item);
+
         return item;
     }
 
@@ -197,14 +200,6 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         ArrayList<PreviewProperty> previewProperties = new ArrayList<PreviewProperty>();
         for (int i = 0; i < defaultValues.length; i++) {
             previewProperties.add(createLegendProperty(tableItem, properties[i], defaultValues[i]));
-        }
-
-        //build the basic default table
-        for (int i = 0; i < defaultTableNumberOfRows; i++) {
-            tableItem.addRow(i, defaultBackgroundColor, defaultBorderColor, defaultFont, defaultFontAlignment, defaultFontColor, content);
-        }
-        for (int i = 0; i < defaultTableNumberOfColumns; i++) {
-            tableItem.addColumn(i, defaultBackgroundColor, defaultBorderColor, defaultFont, defaultFontAlignment, defaultFontColor, content);
         }
 
         /*

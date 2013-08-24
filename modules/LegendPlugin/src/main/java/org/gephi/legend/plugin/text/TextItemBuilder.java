@@ -39,7 +39,7 @@ import org.openide.util.lookup.ServiceProviders;
     @ServiceProvider(service = LegendItemBuilder.class, position = 105)
 })
 public class TextItemBuilder extends AbstractLegendItemBuilder {
-    
+
     // DEFAULT VALUES
     protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
     protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
@@ -56,37 +56,38 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
     public boolean setDefaultValues() {
         return false;
     }
-    
+
     @Override
     public boolean isBuilderForItem(Item item) {
         return item instanceof TextItem;
     }
-    
+
     @Override
     public String getType() {
         return TextItem.LEGEND_TYPE;
     }
-    
+
     @Override
     public String getTitle() {
         return NbBundle.getMessage(TextItemBuilder.class, "TextItem.name");
     }
-    
+
     @Override
     public Item createNewLegendItem(Graph graph) {
         return new TextItem(graph);
     }
-    
+
     @Override
-    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel) {
+    public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
         Item item = createNewLegendItem(graph);
-        
-        // setting default renderer
+
+        // setting default renderer and item index
         item.setData(LegendItem.RENDERER, TextItemRenderer.class);
+        item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         return item;
     }
-    
+
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -139,14 +140,14 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         }
         return previewProperty;
     }
-    
+
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
-        
+
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
-        
+
         PreviewProperty property;
         int[] properties = TextProperty.LIST_OF_PROPERTIES;
 
@@ -159,12 +160,12 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
 
         return legendPreviewProperties;
     }
-    
+
     @Override
     public Boolean hasDynamicProperties() {
         return Boolean.FALSE;
     }
-    
+
     @Override
     public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
         Collection<? extends CustomTextItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTextItemBuilder.class);
@@ -174,7 +175,7 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         }
         return availableBuilders;
     }
-    
+
     @Override
     public void writeXMLFromItemOwnProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
@@ -183,7 +184,7 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
             writeXMLFromSingleProperty(writer, property, previewProperties);
         }
     }
-    
+
     @Override
     public ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
 
