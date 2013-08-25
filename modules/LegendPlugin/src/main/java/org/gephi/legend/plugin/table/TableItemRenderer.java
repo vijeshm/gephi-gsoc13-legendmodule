@@ -10,8 +10,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
@@ -38,6 +40,7 @@ import org.gephi.legend.inplaceelements.ElementNumber;
 import org.gephi.legend.inplaceelements.ElementText;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
+import org.gephi.legend.spi.LegendItem.Shape;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -142,7 +145,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 for (int row = 0; row < numberOfRows; row++) {
                     cellPreviewProperties = table.get(row).get(col).getPreviewProperties();
                     cellFont = (Font) cellPreviewProperties[Cell.CELL_FONT].getValue();
-                    cellContent = (String) cellPreviewProperties[Cell.CELL_CONTENT].getValue();
+                    cellContent = (String) cellPreviewProperties[Cell.CELL_TEXT_CONTENT].getValue();
 
                     graphics2D.setFont(cellFont);
                     fontMetrics = graphics2D.getFontMetrics(cellFont);
@@ -293,72 +296,198 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
                 data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
-                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target,  InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-                
+
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BORDER_COLOR], data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-                
+
+                switch ((Integer) cellPreviewProperties[Cell.CELL_TYPE].getValue()) {
+                    case Cell.TYPE_TEXT:
+                        r = ipeditor.addRow();
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_TEXT_CONTENT], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        r = ipeditor.addRow();
+                        col = r.addColumn(true);
+                        // left-alignment
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT, Alignment.LEFT);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        // center-alignment
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER, Alignment.CENTER);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        // right alignment
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT, Alignment.RIGHT);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        // justified
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED, Alignment.JUSTIFIED);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                        break;
+
+                    case Cell.TYPE_SHAPE:
+                        r = ipeditor.addRow();
+                        col = r.addColumn(true);
+                        // rectangle
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.RECTANGLE);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/group_rectangle_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/group_rectangle_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE], data, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.RECTANGLE, LegendItem.Shape.RECTANGLE);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        // circle
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.CIRCLE);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/group_circle_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/group_circle_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE], data, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.CIRCLE, LegendItem.Shape.CIRCLE);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        // triangle
+                        data = new HashMap<String, Object>();
+                        data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.TRIANGLE);
+                        data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/group_triangle_selected.png");
+                        data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/group_triangle_unselected.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE], data, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.TRIANGLE, LegendItem.Shape.TRIANGLE);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_COLOR], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        r = ipeditor.addRow();
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementLabel.LABEL_TEXT, "Value:");
+                        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+                        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_VALUE], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                }
+
+                // switching between cell types
                 r = ipeditor.addRow();
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
-                data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_CONTENT], data, false, null);
+                data.put(ElementLabel.LABEL_TEXT, "Cell Type:");
+                data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-                
+
                 col = r.addColumn(false);
+                // text type
                 data = new HashMap<String, Object>();
-                data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data, false, null);
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/type_text_unselected.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+                    @Override
+                    public void performAction(InplaceEditor ipeditor) {
+                        BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                        TableItem tableItem = (TableItem) cellNode.getItem();
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        int rowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
+                        int colNumber = cellNode.getData(CELLNODE_COL_NUMBER);
+                        Cell cell = table.get(rowNumber).get(colNumber);
+                        PreviewProperty[] previewProperties = cell.getPreviewProperties();
+                        previewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_TEXT);
+                        tableItem.setStructureChanged(true);
+                    }
+                });
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-                
+
                 col = r.addColumn(false);
+                // shape type
                 data = new HashMap<String, Object>();
-                data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-                data.put(ElementFont.DISPLAY_FONT_COLOR, InplaceItemRenderer.FONT_DISPLAY_COLOR);
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FONT, itemIndex, cellPreviewProperties[Cell.CELL_FONT], data, false, null);
-                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-                
-                r = ipeditor.addRow();
-                col = r.addColumn(true);
-                // left-alignment
-                data = new HashMap<String, Object>();
-                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.LEFT);
-                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/left_selected.png");
-                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/left_unselected.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, false, Alignment.LEFT);
-                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-
-                // center-alignment
-                data = new HashMap<String, Object>();
-                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.CENTER);
-                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/center_selected.png");
-                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/center_unselected.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.CENTER);
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/type_shape_unselected.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+                    @Override
+                    public void performAction(InplaceEditor ipeditor) {
+                        BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                        TableItem tableItem = (TableItem) cellNode.getItem();
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        int rowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
+                        int colNumber = cellNode.getData(CELLNODE_COL_NUMBER);
+                        Cell cell = table.get(rowNumber).get(colNumber);
+                        PreviewProperty[] previewProperties = cell.getPreviewProperties();
+                        previewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_SHAPE);
+                        tableItem.setStructureChanged(true);
+                    }
+                });
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
-                // right alignment
+                col = r.addColumn(false);
+                // image type
                 data = new HashMap<String, Object>();
-                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.RIGHT);
-                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/right_selected.png");
-                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/right_unselected.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.RIGHT);
-                addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-
-                // justified
-                data = new HashMap<String, Object>();
-                data.put(ElementImage.IMAGE_BOOL, cellPreviewProperties[Cell.CELL_ALIGNMENT].getValue() == Alignment.JUSTIFIED);
-                data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/justified_selected.png");
-                data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/justified_unselected.png");
-                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_ALIGNMENT], data, true, Alignment.JUSTIFIED);
+                data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/type_image_unselected.png");
+                data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+                    @Override
+                    public void performAction(InplaceEditor ipeditor) {
+                        BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                        TableItem tableItem = (TableItem) cellNode.getItem();
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        int rowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
+                        int colNumber = cellNode.getData(CELLNODE_COL_NUMBER);
+                        Cell cell = table.get(rowNumber).get(colNumber);
+                        PreviewProperty[] previewProperties = cell.getPreviewProperties();
+                        previewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_IMAGE);
+                        tableItem.setStructureChanged(true);
+                    }
+                });
+                addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = ipeditor.addRow();
@@ -374,7 +503,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
-                            tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
+                            tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageURL, Cell.cellImageIsScaling, Cell.cellType);
                         }
                     }
                 });
@@ -393,7 +522,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
-                            tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellContent);
+                            tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageURL, Cell.cellImageIsScaling, Cell.cellType);
                         }
                     }
                 });
@@ -468,7 +597,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Column col;
         Map<String, Object> data;
         BaseElement addedElement;
-        
+
         // modify inplace editors
         r = ipeditor.addRow();
         col = r.addColumn(false);
@@ -680,7 +809,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
         ArrayList<BlockNode> cellNodes = tableNode.getChildren();
         PreviewProperty[] previewProperties = null;
-        // ArrayList<ArrayList<Cell>> table = item.getTable();
+
         BlockNode cellNode;
         Cell cell;
         Color cellBackgroundColor;
@@ -688,17 +817,50 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Font cellFont;
         Alignment cellAlignment;;
         Color cellFontColor;
-        String cellContent;
+        String cellTextContent;
+        Shape cellShapeShape;
+        Color cellShapeColor;
+        Float cellShapeNormalizedValue;
+        String cellImageURL;
+        Boolean cellImageIsScaling;
+        Integer cellType;
+
         int cellOriginX;
         int cellOriginY;
         int cellWidth;
         int cellHeight;
 
-        /*
-         // CELLSPACING
-         graphics2D.setColor(Color.RED);
-         graphics2D.fillRect((int) (tableOriginX - currentRealOriginX), (int) (tableOriginY - currentRealOriginY), tableWidth, tableHeight);
-         */
+        // compute all the normalized values for rendering shapes
+        Float[] normalizedValues = new Float[tableNumberOfRows * tableNumberOfColumns];
+        // utility variables
+        Cell tempCell;
+        PreviewProperty[] tempPreviewProperties;
+        Integer tempCellType;
+        for (int rowNumber = 0; rowNumber < tableNumberOfRows; rowNumber++) {
+            for (int colNumber = 0; colNumber < tableNumberOfColumns; colNumber++) {
+                tempCell = table.get(rowNumber).get(colNumber); // the properties of the cell can be found here
+                tempPreviewProperties = tempCell.getPreviewProperties();
+                tempCellType = (Integer) tempPreviewProperties[Cell.CELL_TYPE].getValue();
+                // compute the maximum value only from those cells which have their shapes displaying
+                if (tempCellType == Cell.TYPE_SHAPE) {
+                    normalizedValues[rowNumber * tableNumberOfColumns + colNumber] = (Float) tempCell.getPreviewProperties()[Cell.CELL_SHAPE_VALUE].getValue();
+                } else {
+                    normalizedValues[rowNumber * tableNumberOfColumns + colNumber] = 0f;
+                }
+            }
+        }
+        // find the maximum value of all the shape typed cells
+        Float maxValue = Float.MIN_VALUE;
+        for (int i = 0; i < normalizedValues.length; i++) {
+            if (maxValue < normalizedValues[i]) {
+                maxValue = normalizedValues[i];
+            }
+        }
+
+        // normalize the values: divide each element by the maximum
+        for (int i = 0; i < normalizedValues.length; i++) {
+            normalizedValues[i] /= maxValue;
+        }
 
         for (int rowNumber = 0; rowNumber < tableNumberOfRows; rowNumber++) {
             for (int colNumber = 0; colNumber < tableNumberOfColumns; colNumber++) {
@@ -713,18 +875,18 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellHeight = (int) cellNode.getBlockHeight();
 
                 // cell properties
-                cellBackgroundColor = (Color) previewProperties[Cell.BACKGROUND_COLOR].getValue(); // cell.getBackgroundColor();
-                cellBorderColor = (Color) previewProperties[Cell.BORDER_COLOR].getValue(); // cell.getBorderColor();
-                cellFont = (Font) previewProperties[Cell.CELL_FONT].getValue(); // cell.getCellFont();
-                cellAlignment = (Alignment) previewProperties[Cell.CELL_ALIGNMENT].getValue(); // cell.getCellAlignment();
-                cellFontColor = (Color) previewProperties[Cell.CELL_FONT_COLOR].getValue();// cell.getCellFontColor();
-                cellContent = (String) previewProperties[Cell.CELL_CONTENT].getValue(); // cell.getCellContent();
-
-                /*
-                 // CELLPADDING
-                 graphics2D.setColor(Color.GREEN);
-                 graphics2D.fillRect(cellOriginX - tableCellPadding, cellOriginY - tableCellPadding, cellWidth + 2 * tableCellPadding, cellHeight + 2 * tableCellPadding);
-                 */
+                cellBackgroundColor = (Color) previewProperties[Cell.BACKGROUND_COLOR].getValue();
+                cellBorderColor = (Color) previewProperties[Cell.BORDER_COLOR].getValue();
+                cellFont = (Font) previewProperties[Cell.CELL_FONT].getValue();
+                cellAlignment = (Alignment) previewProperties[Cell.CELL_ALIGNMENT].getValue();
+                cellFontColor = (Color) previewProperties[Cell.CELL_FONT_COLOR].getValue();
+                cellTextContent = (String) previewProperties[Cell.CELL_TEXT_CONTENT].getValue();
+                cellShapeShape = (Shape) previewProperties[Cell.CELL_SHAPE_SHAPE].getValue();
+                cellShapeColor = (Color) previewProperties[Cell.CELL_SHAPE_COLOR].getValue();
+                cellShapeNormalizedValue = normalizedValues[rowNumber * tableNumberOfColumns + colNumber];
+                cellImageURL = (String) previewProperties[Cell.CELL_IMAGE_URL].getValue();
+                cellImageIsScaling = (Boolean) previewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue();
+                cellType = (Integer) previewProperties[Cell.CELL_TYPE].getValue();
 
                 // BACKGROUND - render the background first, then go with the border
                 graphics2D.setColor(cellBackgroundColor);
@@ -737,13 +899,45 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 graphics2D.fillRect(cellOriginX - tableCellBorderSize, cellOriginY, tableCellBorderSize, cellHeight);
                 graphics2D.fillRect(cellOriginX + cellWidth, cellOriginY, tableCellBorderSize, cellHeight); // left
 
-                // TEXT
-                legendDrawText(graphics2D, cellContent, cellFont, cellFontColor, cellOriginX, cellOriginY, cellWidth, cellHeight, cellAlignment);
+                switch (cellType) {
+                    case Cell.TYPE_SHAPE:
+                        graphics2D.setColor(cellShapeColor);
+                        drawShape(graphics2D, cellShapeShape, cellShapeColor, cellOriginX, (int) (cellOriginY + (1 - cellShapeNormalizedValue) * cellHeight), cellWidth, (int) (cellShapeNormalizedValue * cellHeight));
+                        break;
+
+                    case Cell.TYPE_TEXT:
+                        legendDrawText(graphics2D, cellTextContent, cellFont, cellFontColor, cellOriginX, cellOriginY, cellWidth, cellHeight, cellAlignment);
+                        break;
+
+                    case Cell.TYPE_IMAGE:
+                        // draw image based on the scaling condition
+                        break;
+                }
             }
         }
 
         graphics2D.setColor(saveColor);
         graphics2D.setFont(saveFont);
+    }
+
+    private void drawShape(Graphics2D graphics2D, Shape shape, Color color, int x, int y, Integer width, Integer height) {
+        graphics2D.setColor(color);
+        switch (shape) {
+            case RECTANGLE: {
+                graphics2D.fillRect(x, y, width, height);
+                break;
+            }
+            case CIRCLE: {
+                graphics2D.fillOval(x, y, width, height);
+                break;
+            }
+            case TRIANGLE: {
+                int[] xpoints = {x, x + width, x + width / 2};
+                int[] ypoints = {y + height, y + height, y};
+                Polygon triangle = new Polygon(xpoints, ypoints, xpoints.length);
+                graphics2D.fillPolygon(triangle);
+            }
+        }
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
 import org.gephi.legend.spi.LegendItem;
+import org.gephi.legend.spi.LegendItem.Shape;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -27,12 +28,18 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = CustomTableItemBuilder.class, position = 2)
 public class NodesWithHighestDegree implements CustomTableItemBuilder {
 
-    protected String cellContent = Cell.cellContent;
     protected Font cellFont = Cell.cellFont;
     protected Color cellFontColor = Cell.cellFontColor;
     protected LegendItem.Alignment cellFontAlignment = Cell.cellAlignment;
     protected Color cellBackgroundColor = Cell.backgroundColor;
     protected Color cellBorderColor = Cell.borderColor;
+    protected String cellTextContent = Cell.cellTextContent;
+    protected Shape cellShapeShape = Cell.cellShapeShape;
+    protected Color cellShapeColor = Cell.cellShapeColor;    
+    protected Float cellShapeValue = Cell.cellShapeValue;
+    protected String cellImageURL = Cell.cellImageURL;
+    protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
+    protected int cellType = Cell.cellType;
 
     @Override
     public void populateTable(TableItem tableItem) {
@@ -95,23 +102,23 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
 
         // build the default table and later customize according to the data
         for (int i = 0; i < tableNumberOfRows; i++) {
-            tableItem.addRow(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellContent);
+            tableItem.addRow(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageURL, cellImageIsScaling, cellType);
         }
         for (int i = 0; i < tableNumberOfColumns; i++) {
-            tableItem.addColumn(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellContent);
+            tableItem.addColumn(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageURL, cellImageIsScaling, cellType);
         }
 
         ArrayList<ArrayList<Cell>> table = tableItem.getTable();
 
         Cell headerNodeNameCell = table.get(0).get(0);
         PreviewProperty[] headerNodeNameCellPreviewProp = headerNodeNameCell.getPreviewProperties();
-        headerNodeNameCellPreviewProp[Cell.CELL_CONTENT].setValue("Node");
+        headerNodeNameCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue("Node");
         headerNodeNameCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerNodeNameCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
         Cell headerNodeDegreeCell = table.get(0).get(1);
         PreviewProperty[] headerNodeDegreeCellPreviewProp = headerNodeDegreeCell.getPreviewProperties();
-        headerNodeDegreeCellPreviewProp[Cell.CELL_CONTENT].setValue("Degree");
+        headerNodeDegreeCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue("Degree");
         headerNodeDegreeCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerNodeDegreeCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
@@ -122,11 +129,11 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
         for (int i = 0; i < numberOfNodes; i++) {
             nodeNameCell = table.get(i + 1).get(0);
             nodeNameCellPreviewProp = nodeNameCell.getPreviewProperties();
-            nodeNameCellPreviewProp[Cell.CELL_CONTENT].setValue(nodeNames[i]);
+            nodeNameCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(nodeNames[i]);
 
             nodeDegreeCell = table.get(i + 1).get(1);
             nodeDegreeCellPreviewProp = nodeDegreeCell.getPreviewProperties();
-            nodeDegreeCellPreviewProp[Cell.CELL_CONTENT].setValue(nodeDegrees[i].toString());
+            nodeDegreeCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(nodeDegrees[i].toString());
         }
     }
 

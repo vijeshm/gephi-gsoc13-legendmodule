@@ -39,7 +39,7 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class TableItemBuilder extends AbstractLegendItemBuilder {
 
-    protected final String content = Cell.cellContent;
+    protected final String content = Cell.cellTextContent;
     // default Values
     protected final Font defaultFont = Cell.cellFont;
     protected final Color defaultFontColor = Cell.cellFontColor;

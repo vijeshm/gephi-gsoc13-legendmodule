@@ -49,7 +49,7 @@ public class TableItem extends AbstractItem implements LegendItem {
         return 0;
     }
 
-    public void addRow(int pos, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent) {
+    public void addRow(int pos, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellTextContent, Shape cellShapeShape, Color cellShapeColor, Float cellShapeValue, String cellImageURL, Boolean cellImageIsScaling, int cellType) {
         int numberOfRows = table.size();
         int numberOfColumns = 0;
         if (numberOfRows > 1) {
@@ -59,7 +59,7 @@ public class TableItem extends AbstractItem implements LegendItem {
         ArrayList<Cell> row = new ArrayList<Cell>();
         for (int colNumber = 0; colNumber < numberOfColumns; colNumber++) {
             // the item's own properties are updated during creation of the cell
-            Cell cell = new Cell(this, pos, colNumber, backgroundColor, borderColor, cellFont, cellAlignment, cellFontColor, cellContent);
+            Cell cell = new Cell(this, pos, colNumber, backgroundColor, borderColor, cellFont, cellAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageURL, cellImageIsScaling, cellType);
             row.add(cell);
         }
 
@@ -106,11 +106,11 @@ public class TableItem extends AbstractItem implements LegendItem {
         structureChanged = true;
     }
 
-    public void addColumn(int columnNumber, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent) {
+    public void addColumn(int columnNumber, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent, Shape cellShapeShape, Color cellShapeColor, Float cellShapeValue, String cellImageURL, Boolean cellImageIsScaling, int cellType) {
         int numberOfRows = table.size();
         for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
             // the item's own properties are updated during creation of the cell
-            Cell cell = new Cell(this, rowNumber, columnNumber, backgroundColor, borderColor, cellFont, cellAlignment, cellFontColor, cellContent);
+            Cell cell = new Cell(this, rowNumber, columnNumber, backgroundColor, borderColor, cellFont, cellAlignment, cellFontColor, cellContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageURL, cellImageIsScaling, cellType);
             table.get(rowNumber).add(columnNumber, cell);
         }
 
