@@ -223,9 +223,10 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        imageFile = properties.getValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.IMAGE_URL));
-        useImageAspectRatio = properties.getValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.LOCK_ASPECT_RATIO));
-        imageMargin = properties.getIntValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.IMAGE_MARGIN));
+        PreviewProperty[] ownPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        imageFile = (File) ownPreviewProperties[ImageProperty.IMAGE_URL].getValue(); // properties.getValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.IMAGE_URL));
+        useImageAspectRatio = (Boolean) ownPreviewProperties[ImageProperty.LOCK_ASPECT_RATIO].getValue(); // properties.getValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.LOCK_ASPECT_RATIO));
+        imageMargin = (Integer) ownPreviewProperties[ImageProperty.IMAGE_MARGIN].getValue(); // properties.getIntValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.IMAGE_MARGIN));
     }
 
     @Override

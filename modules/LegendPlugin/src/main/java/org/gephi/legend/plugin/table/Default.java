@@ -6,6 +6,7 @@ package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Shape;
 import org.openide.util.lookup.ServiceProvider;
@@ -31,7 +32,7 @@ public class Default implements CustomTableItemBuilder {
     protected Shape cellShapeShape = Cell.cellShapeShape;
     protected Color cellShapeColor = Cell.cellShapeColor;
     protected Float cellShapeValue = Cell.cellShapeValue;
-    protected String cellImageURL = Cell.cellImageURL;
+    protected File cellImageFile = Cell.cellImageFile;
     protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
     protected int cellType = Cell.cellType;
 
@@ -39,11 +40,11 @@ public class Default implements CustomTableItemBuilder {
     public void populateTable(TableItem tableItem) {
         //build the basic default table
         for (int i = 0; i < tableNumberOfRows; i++) {
-            tableItem.addRow(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageURL, cellImageIsScaling, cellType);
+            tableItem.addRow(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageFile, cellImageIsScaling, cellType);
         }
 
         for (int i = 0; i < tableNumberOfColumns; i++) {
-            tableItem.addColumn(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageURL, cellImageIsScaling, cellType);
+            tableItem.addColumn(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageFile, cellImageIsScaling, cellType);
         }
     }
 

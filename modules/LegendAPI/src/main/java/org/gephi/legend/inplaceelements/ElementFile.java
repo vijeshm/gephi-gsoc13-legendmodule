@@ -35,15 +35,11 @@ public class ElementFile extends BaseElement {
 
     @Override
     public void onSelect() {
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-        PreviewProperties previewProperties = previewModel.getProperties();
-
         JFileChooser fc = new JFileChooser();
         int returnVal = fc.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-            previewProperties.putValue(property.getName(), file);
+            property.setValue(file);
         }
     }
 

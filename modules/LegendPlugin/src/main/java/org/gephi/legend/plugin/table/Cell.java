@@ -6,6 +6,7 @@ package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.gephi.legend.api.AbstractItem;
@@ -37,7 +38,7 @@ public class Cell {
     public static final int CELL_SHAPE_SHAPE = 6;
     public static final int CELL_SHAPE_COLOR = 7;
     public static final int CELL_SHAPE_VALUE = 8;
-    public static final int CELL_IMAGE_URL = 9;
+    public static final int CELL_IMAGE_FILE = 9;
     public static final int CELL_IMAGE_IS_SCALING = 10;
     public static final int CELL_TYPE = 11;
     public static String[] OWN_PROPERTIES = {
@@ -50,7 +51,7 @@ public class Cell {
         ".cell.shape.shape",
         ".cell.shape.color",
         ".cell.shape.value",
-        ".cell.image.url",
+        ".cell.image.file",
         ".cell.image.is.scaling",
         ",cell.type"
     };
@@ -67,7 +68,7 @@ public class Cell {
     public static final Shape cellShapeShape = Shape.RECTANGLE;
     public static final Color cellShapeColor = new Color(0f, 0f, 0f, 0.75f);
     public static final Float cellShapeValue = 1f;
-    public static final String cellImageURL = "/org/gephi/legend/graphics/invisible.png";
+    public static final File cellImageFile = new File("/");
     public static final Boolean cellImageIsScaling = true;
     public static final int cellType = TYPE_TEXT;
     public static final Object[] defaultValues = {
@@ -80,7 +81,7 @@ public class Cell {
         cellShapeShape,
         cellShapeColor,
         cellShapeValue,
-        cellImageURL,
+        cellImageFile,
         cellImageIsScaling,
         cellType
     };
@@ -97,7 +98,7 @@ public class Cell {
         }
     }
 
-    Cell(Item item, int row, int column, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellTextContent, Shape cellShapeShape, Color cellShapeColor, float cellShapeValue, String cellImageURL, Boolean cellImageIsScaling, int cellType) {
+    Cell(Item item, int row, int column, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellTextContent, Shape cellShapeShape, Color cellShapeColor, float cellShapeValue, File cellImageFile, Boolean cellImageIsScaling, int cellType) {
         this.item = item;
         this.row = row;
         this.column = column;
@@ -110,7 +111,7 @@ public class Cell {
         defaultValues[CELL_SHAPE_SHAPE] = cellShapeShape;
         defaultValues[CELL_SHAPE_COLOR] = cellShapeColor;
         defaultValues[CELL_SHAPE_VALUE] = cellShapeValue;
-        defaultValues[CELL_IMAGE_URL] = cellImageURL;
+        defaultValues[CELL_IMAGE_FILE] = cellImageFile;
         defaultValues[CELL_IMAGE_IS_SCALING] = cellImageIsScaling;
         defaultValues[CELL_TYPE] = cellType;
 
@@ -227,13 +228,13 @@ public class Cell {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
-            case CELL_IMAGE_URL:
+            case CELL_IMAGE_FILE:
                 previewProperty = PreviewProperty.createProperty(
                         this,
                         propertyString,
-                        String.class,
-                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_URL],
-                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_URL],
+                        File.class,
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_FILE],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_FILE],
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 

@@ -12,10 +12,14 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.gephi.graph.api.Graph;
@@ -31,7 +35,9 @@ import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
 import org.gephi.legend.inplaceeditor.InplaceItemRenderer;
 import org.gephi.legend.inplaceeditor.Row;
 import org.gephi.legend.inplaceelements.BaseElement;
+import org.gephi.legend.inplaceelements.ElementCheckbox;
 import org.gephi.legend.inplaceelements.ElementColor;
+import org.gephi.legend.inplaceelements.ElementFile;
 import org.gephi.legend.inplaceelements.ElementFont;
 import org.gephi.legend.inplaceelements.ElementFunction;
 import org.gephi.legend.inplaceelements.ElementImage;
@@ -49,6 +55,7 @@ import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.netbeans.swing.tabcontrol.event.TabActionEvent;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -82,6 +89,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int cellSpacingLowerLimit = 5;
     private int cellPaddingLowerLimit = 5;
     private int cellBorderLowerLimit = 5;
+    private float cellShapeWidthFraction = 0.8f;
     private Boolean insufficientEmptySpace;
 
     @Override
@@ -415,6 +423,39 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_VALUE], data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                        break;
+
+                    case Cell.TYPE_IMAGE:
+                        r = ipeditor.addRow();
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementLabel.LABEL_TEXT, "Source: ");
+                        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementFile.FILE_PATH, "/org/gephi/legend/graphics/file.png");
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FILE, itemIndex, cellPreviewProperties[Cell.CELL_IMAGE_FILE], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        r = ipeditor.addRow();
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementLabel.LABEL_TEXT, "Scale: ");
+                        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementCheckbox.IS_CHECKED, (Boolean) cellPreviewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue());
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, cellPreviewProperties[Cell.CELL_IMAGE_IS_SCALING], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                        break;
                 }
 
                 // switching between cell types
@@ -503,7 +544,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
-                            tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageURL, Cell.cellImageIsScaling, Cell.cellType);
+                            tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageFile, Cell.cellImageIsScaling, Cell.cellType);
                         }
                     }
                 });
@@ -522,7 +563,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
-                            tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageURL, Cell.cellImageIsScaling, Cell.cellType);
+                            tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageFile, Cell.cellImageIsScaling, Cell.cellType);
                         }
                     }
                 });
@@ -821,7 +862,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Shape cellShapeShape;
         Color cellShapeColor;
         Float cellShapeNormalizedValue;
-        String cellImageURL;
+        File cellImageFile;
         Boolean cellImageIsScaling;
         Integer cellType;
 
@@ -884,7 +925,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellShapeShape = (Shape) previewProperties[Cell.CELL_SHAPE_SHAPE].getValue();
                 cellShapeColor = (Color) previewProperties[Cell.CELL_SHAPE_COLOR].getValue();
                 cellShapeNormalizedValue = normalizedValues[rowNumber * tableNumberOfColumns + colNumber];
-                cellImageURL = (String) previewProperties[Cell.CELL_IMAGE_URL].getValue();
+                cellImageFile = (File) previewProperties[Cell.CELL_IMAGE_FILE].getValue();
                 cellImageIsScaling = (Boolean) previewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue();
                 cellType = (Integer) previewProperties[Cell.CELL_TYPE].getValue();
 
@@ -902,7 +943,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 switch (cellType) {
                     case Cell.TYPE_SHAPE:
                         graphics2D.setColor(cellShapeColor);
-                        drawShape(graphics2D, cellShapeShape, cellShapeColor, cellOriginX, (int) (cellOriginY + (1 - cellShapeNormalizedValue) * cellHeight), cellWidth, (int) (cellShapeNormalizedValue * cellHeight));
+                        drawShape(graphics2D, cellShapeShape, cellShapeColor, (int) (cellOriginX + (1 - cellShapeWidthFraction) * cellWidth / 2), (int) (cellOriginY + (1 - cellShapeNormalizedValue) * cellHeight), (int) (cellWidth * cellShapeWidthFraction), (int) (cellShapeNormalizedValue * cellHeight));
                         break;
 
                     case Cell.TYPE_TEXT:
@@ -911,6 +952,48 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                     case Cell.TYPE_IMAGE:
                         // draw image based on the scaling condition
+                        try {
+                            if (cellImageFile.exists() && cellImageFile.isFile()) {
+                                BufferedImage image;
+                                image = ImageIO.read(cellImageFile);
+                                int scaledOriginX = cellOriginX;
+                                int scaledOriginY = cellOriginY;
+                                int scaledWidth = cellWidth;
+                                int scaledHeight = cellHeight;
+
+                                int imageWidth = image.getWidth();
+                                int imageHeight = image.getHeight();
+
+                                if (cellImageIsScaling) {
+                                    // if aspect ratio needs to be maintained, originX, originY, width and height must be set appropriately
+                                    scaledHeight = cellWidth * imageHeight / imageWidth;
+                                    if (scaledHeight <= cellHeight) {
+                                        // width fits completely. height is either perfect or shorter.
+                                        scaledWidth = cellWidth;
+                                        scaledHeight = cellWidth * imageHeight / imageWidth; //not necessary, since the calue isnt changed. added for readability and consistency.
+                                    } else {
+                                        // height fits completely. width is short perfect or shorter.
+                                        scaledWidth = cellHeight * imageWidth / imageHeight;
+                                        scaledHeight = cellHeight;
+                                    }
+
+                                    scaledOriginX = cellOriginX + cellWidth / 2 - scaledWidth / 2;
+                                    scaledOriginY = cellOriginY + cellHeight / 2 - scaledHeight / 2;
+                                }
+
+                                graphics2D.drawImage(image,
+                                        scaledOriginX,
+                                        scaledOriginY,
+                                        scaledOriginX + scaledWidth,
+                                        scaledOriginY + scaledHeight,
+                                        0,
+                                        0,
+                                        imageWidth,
+                                        imageHeight, null);
+                            }
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
                         break;
                 }
             }
