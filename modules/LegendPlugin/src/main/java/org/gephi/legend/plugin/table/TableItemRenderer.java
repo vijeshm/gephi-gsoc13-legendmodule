@@ -880,7 +880,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         col = r.addColumn(false);
         // shape type
         data = new HashMap<String, Object>();
@@ -909,7 +909,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         col = r.addColumn(false);
         // image type
         data = new HashMap<String, Object>();
@@ -917,7 +917,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
             @Override
             public void performAction(InplaceEditor ipeditor) {
-                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the cell type to iamge for all cells?", "Confirm Cell Type Change", JOptionPane.YES_NO_OPTION);
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the cell type to image for all cells?", "Confirm Cell Type Change", JOptionPane.YES_NO_OPTION);
                 if (confirmation == JOptionPane.YES_NO_OPTION) {
                     BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                     TableItem tableItem = (TableItem) cellNode.getItem();
@@ -933,6 +933,90 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         }
                     }
                     tableItem.setStructureChanged(true);
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+        col = r.addColumn(false);
+        // shape - rectangle type
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/group_rectangle_unselected.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the shape type to rectangle for all cells?", "Confirm Shape Type Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                    PreviewProperty[] cellPreviewProperties = null;
+                    int numberOfRows = tableItem.getNumberOfRows();
+                    int numberOfCols = tableItem.getNumberOfColumns();
+                    for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                        for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                            Cell cell = table.get(rowNumber).get(colNumber);
+                            cellPreviewProperties = cell.getPreviewProperties();
+                            cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].setValue(Shape.RECTANGLE);
+                        }
+                    }
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
+        col = r.addColumn(false);
+        // shape - circle type
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/group_circle_unselected.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the shape type to circle for all cells?", "Confirm Shape Type Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                    PreviewProperty[] cellPreviewProperties = null;
+                    int numberOfRows = tableItem.getNumberOfRows();
+                    int numberOfCols = tableItem.getNumberOfColumns();
+                    for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                        for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                            Cell cell = table.get(rowNumber).get(colNumber);
+                            cellPreviewProperties = cell.getPreviewProperties();
+                            cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].setValue(Shape.CIRCLE);
+                        }
+                    }
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
+        col = r.addColumn(false);
+        // shape - rectangle type
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/group_triangle_unselected.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the shape type to triangle for all cells?", "Confirm Shape Type Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                    PreviewProperty[] cellPreviewProperties = null;
+                    int numberOfRows = tableItem.getNumberOfRows();
+                    int numberOfCols = tableItem.getNumberOfColumns();
+                    for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                        for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                            Cell cell = table.get(rowNumber).get(colNumber);
+                            cellPreviewProperties = cell.getPreviewProperties();
+                            cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].setValue(Shape.TRIANGLE);
+                        }
+                    }
                 }
             }
         });
