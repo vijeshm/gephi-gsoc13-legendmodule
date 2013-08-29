@@ -739,6 +739,38 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
+        // background color
+        col = r.addColumn(false);
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/table_cell_background_color.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the background color of all cells?", "Confirm Background Color Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    PreviewProperty[] tablePreviewProperties = tableItem.getData(TableItem.OWN_PROPERTIES);
+                    Color selectedColor = ColorPicker.showDialog(null, new Color(1f, 1f, 1f, 0.8f), true);
+                    if (selectedColor != null) {
+                        ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                        PreviewProperty[] cellPreviewProperties = null;
+                        int numberOfRows = tableItem.getNumberOfRows();
+                        int numberOfCols = tableItem.getNumberOfColumns();
+                        for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                            for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                                Cell cell = table.get(rowNumber).get(colNumber);
+                                cellPreviewProperties = cell.getPreviewProperties();
+                                cellPreviewProperties[Cell.BACKGROUND_COLOR].setValue(selectedColor);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // table font
         col = r.addColumn(false);
