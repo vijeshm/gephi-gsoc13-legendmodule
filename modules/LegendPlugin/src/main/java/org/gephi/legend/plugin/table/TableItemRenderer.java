@@ -739,7 +739,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         // background color
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
@@ -841,13 +841,102 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
-        // border size
+        // occupy full width
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, (Boolean) tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue());
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/column_collapse.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/column_expand.png");
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data, false, Alignment.LEFT);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+        // making shape changes to all cells
+        r = ipeditor.addRow();
+        col = r.addColumn(false);
+        // text type
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/type_text_unselected.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the cell type to text for all cells?", "Confirm Cell Type Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                    PreviewProperty[] cellPreviewProperties = null;
+                    int numberOfRows = tableItem.getNumberOfRows();
+                    int numberOfCols = tableItem.getNumberOfColumns();
+                    for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                        for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                            Cell cell = table.get(rowNumber).get(colNumber);
+                            cellPreviewProperties = cell.getPreviewProperties();
+                            cellPreviewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_TEXT);
+                        }
+                    }
+                    tableItem.setStructureChanged(true);
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
+        col = r.addColumn(false);
+        // shape type
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/type_shape_unselected.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the cell type to shape for all cells?", "Confirm Cell Type Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                    PreviewProperty[] cellPreviewProperties = null;
+                    int numberOfRows = tableItem.getNumberOfRows();
+                    int numberOfCols = tableItem.getNumberOfColumns();
+                    for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                        for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                            Cell cell = table.get(rowNumber).get(colNumber);
+                            cellPreviewProperties = cell.getPreviewProperties();
+                            cellPreviewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_SHAPE);
+                        }
+                    }
+                    tableItem.setStructureChanged(true);
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
+        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+        
+        col = r.addColumn(false);
+        // image type
+        data = new HashMap<String, Object>();
+        data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/type_image_unselected.png");
+        data.put(ElementFunction.FUNCTION_CLICK_RESPONDER, new InplaceClickResponse() {
+            @Override
+            public void performAction(InplaceEditor ipeditor) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the cell type to iamge for all cells?", "Confirm Cell Type Change", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_NO_OPTION) {
+                    BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
+                    TableItem tableItem = (TableItem) cellNode.getItem();
+                    ArrayList<ArrayList<Cell>> table = tableItem.getTable();
+                    PreviewProperty[] cellPreviewProperties = null;
+                    int numberOfRows = tableItem.getNumberOfRows();
+                    int numberOfCols = tableItem.getNumberOfColumns();
+                    for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
+                        for (int colNumber = 0; colNumber < numberOfCols; colNumber++) {
+                            Cell cell = table.get(rowNumber).get(colNumber);
+                            cellPreviewProperties = cell.getPreviewProperties();
+                            cellPreviewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_IMAGE);
+                        }
+                    }
+                    tableItem.setStructureChanged(true);
+                }
+            }
+        });
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
     }
 
