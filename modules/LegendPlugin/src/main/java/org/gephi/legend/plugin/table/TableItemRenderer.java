@@ -124,20 +124,18 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int blockWidth = (int) legendNode.getBlockWidth();
         int blockHeight = (int) legendNode.getBlockHeight();
 
-        int numberOfRows = table.size();
-        int numberOfColumns = table.get(0).size();
-        int maxColWidth = (blockWidth - (numberOfColumns + 1) * tableCellSpacing - 2 * numberOfColumns * tableCellPadding - 2 * numberOfColumns * tableCellBorderSize) / numberOfColumns;
-        int rowHeight = (blockHeight - (numberOfRows + 1) * tableCellSpacing - 2 * numberOfRows * tableCellPadding - 2 * numberOfRows * tableCellBorderSize) / numberOfRows;
+        int maxColWidth = (blockWidth - (tableNumberOfColumns + 1) * tableCellSpacing - 2 * tableNumberOfColumns * tableCellPadding - 2 * tableNumberOfColumns * tableCellBorderSize) / tableNumberOfColumns;
+        int rowHeight = (blockHeight - (tableNumberOfRows + 1) * tableCellSpacing - 2 * tableNumberOfRows * tableCellPadding - 2 * tableNumberOfRows * tableCellBorderSize) / tableNumberOfRows;
 
         TableItem item = (TableItem) legendNode.getItem();
         PreviewProperty[] itemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
 
         // determine all the column widths
-        int[] colWidths = new int[numberOfColumns];
+        int[] colWidths = new int[tableNumberOfColumns];
 
         if ((Boolean) itemPreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue()) {
             // the table should occupy the entire width
-            for (int i = 0; i < numberOfColumns; i++) {
+            for (int i = 0; i < tableNumberOfColumns; i++) {
                 colWidths[i] = maxColWidth;
             }
         } else {
@@ -148,9 +146,9 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             PreviewProperty[] cellPreviewProperties = null;
             Font cellFont = null;
             String cellContent = null;
-            for (int col = 0; col < numberOfColumns; col++) {
+            for (int col = 0; col < tableNumberOfColumns; col++) {
                 int tempMaxColWidth = 0;
-                for (int row = 0; row < numberOfRows; row++) {
+                for (int row = 0; row < tableNumberOfRows; row++) {
                     cellPreviewProperties = table.get(row).get(col).getPreviewProperties();
                     cellFont = (Font) cellPreviewProperties[Cell.CELL_FONT].getValue();
                     cellContent = (String) cellPreviewProperties[Cell.CELL_TEXT_CONTENT].getValue();
@@ -174,12 +172,12 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         }
 
         int sumOfWidths = 0;
-        for (int col = 0; col < numberOfColumns; col++) {
+        for (int col = 0; col < tableNumberOfColumns; col++) {
             sumOfWidths += colWidths[col];
         }
 
         // create a table node, create a corresponding inplace editor and attach it as the legendNode's child
-        int tableWidth = sumOfWidths + (numberOfColumns + 1) * tableCellSpacing + 2 * numberOfColumns * tableCellPadding + 2 * numberOfColumns * tableCellBorderSize;
+        int tableWidth = sumOfWidths + (tableNumberOfColumns + 1) * tableCellSpacing + 2 * tableNumberOfColumns * tableCellPadding + 2 * tableNumberOfColumns * tableCellBorderSize;
         int tableHeight = blockHeight;
         int tableOriginX = blockOriginX + blockWidth / 2 - tableWidth / 2;
         int tableOriginY = blockOriginY + blockHeight / 2 - tableHeight / 2; //as of now, tableOriginY is same as blockOriginY

@@ -10,7 +10,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import javax.swing.JOptionPane;
 import org.gephi.legend.api.AbstractItem;
+import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
@@ -72,36 +74,17 @@ public class TableItem extends AbstractItem implements LegendItem {
     }
 
     public void deleteRow(int pos) {
-        // remove the preview properties before deletion of the row
         int numberOfRows = table.size();
-        int numberOfColumns = 0;
-        if (numberOfRows > 1) {
-            numberOfColumns = table.get(0).size();
+        if (numberOfRows == 1) {
+            JOptionPane.showConfirmDialog(null, "The table must contain atleast one row.", "Unable to delete row", JOptionPane.PLAIN_MESSAGE);
+            return;
         }
-
-        PreviewProperty[] previewPropertiesList = (PreviewProperty[]) this.getData(LegendItem.OWN_PROPERTIES);
-        ArrayList<PreviewProperty> previewProperties = new ArrayList<PreviewProperty>(Arrays.asList(previewPropertiesList));
-        ArrayList<PreviewProperty> newPreviewProperties = new ArrayList<PreviewProperty>();
-        for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++) {
-            /*
-             // this list must be modified on the fly. Hence, use an iterator.
-             for (Iterator<PreviewProperty> it = previewProperties.iterator(); it.hasNext(); ) {
-             if (it.next().getDisplayName().equals("TableItem.cell." + rowNumber + "." + columnNumber)) {
-             it.remove();
-             }
-             }
-             */
-
-            // create an empty array list and populate it with only the active properties
-            for (PreviewProperty prop : previewProperties) {
-                if (!prop.getDisplayName().startsWith("TableItem.cell." + pos + "." + columnNumber)) {
-                    newPreviewProperties.add(prop);
-                }
-            }
-        }
-        this.setData(LegendItem.OWN_PROPERTIES, newPreviewProperties.toArray());
-
         table.remove(pos);
+
+        // remove the currently active inplace editor (inplace editor of the deleted cell)
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        legendModel.setInplaceEditor(null);
 
         // indicate that the table structure has changed
         structureChanged = true;
@@ -120,19 +103,31 @@ public class TableItem extends AbstractItem implements LegendItem {
     }
 
     public void deleteColumn(int pos) {
+        int numberOfColums = table.get(0).size(); //there will be atleast one row, always
+
+        if (numberOfColums == 1) {
+            JOptionPane.showConfirmDialog(null, "The table must contain atleast one column.", "Unable to delete column", JOptionPane.PLAIN_MESSAGE);
+            return;
+        }
+
         int numberOfRows = table.size();
         for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
             table.get(rowNumber).remove(pos);
         }
 
+        // remove the currently active inplace editor (inplace editor of the deleted cell)
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        legendModel.setInplaceEditor(null);
+
         // indicate that the table structure has changed
         structureChanged = true;
     }
-    
+
     public Boolean getStructureChanged() {
         return structureChanged;
     }
-    
+
     public void setStructureChanged(Boolean change) {
         structureChanged = change;
     }
