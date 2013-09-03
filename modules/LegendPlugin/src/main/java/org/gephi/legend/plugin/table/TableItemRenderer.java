@@ -86,7 +86,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
     private Boolean structureChanged;
-    private float colWidthTolerance = 0.1f;
     private int cellSpacingLowerLimit = 5;
     private int cellPaddingLowerLimit = 5;
     private int cellBorderLowerLimit = 5;
@@ -154,7 +153,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 }
 
-                // maxRowWidthInColumn = (int) ((1 + colWidthTolerance) * maxRowWidthInColumn);
                 // the column width should be exactly the same as the width of the longest string in the column, since it causes rendering problems.
                 if (maxRowWidthInColumn < meanColWidth + extraSpace) {
                     tableColumnWidths[col] = maxRowWidthInColumn;
@@ -1104,13 +1102,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         Shape cellShapeShape;
         Color cellShapeColor;
         Integer cellShapeWidth;
-        Float cellShapeWidthFraction;
         Float cellShapeNormalizedValue;
         File cellImageFile;
         Boolean cellImageIsScaling;
         Integer cellImageWidth;
         Integer cellImageHeight;
-        Float cellImageWidthFraction;
         Integer cellType;
 
         int cellOriginX;
@@ -1172,13 +1168,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellShapeShape = (Shape) previewProperties[Cell.CELL_SHAPE_SHAPE].getValue();
                 cellShapeColor = (Color) previewProperties[Cell.CELL_SHAPE_COLOR].getValue();
                 cellShapeWidth = (Integer) previewProperties[Cell.CELL_SHAPE_WIDTH].getValue();
-                cellShapeWidthFraction = (Float) previewProperties[Cell.CELL_SHAPE_WIDTH_FRACTION].getValue();
                 cellShapeNormalizedValue = normalizedValues[rowNumber * tableNumberOfColumns + colNumber];
                 cellImageFile = (File) previewProperties[Cell.CELL_IMAGE_FILE].getValue();
                 cellImageIsScaling = (Boolean) previewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue();
                 cellImageWidth = (Integer) previewProperties[Cell.CELL_IMAGE_WIDTH].getValue();
                 cellImageHeight = (Integer) previewProperties[Cell.CELL_IMAGE_HEIGHT].getValue();
-                cellImageWidthFraction = (Float) previewProperties[Cell.CELL_IMAGE_WIDTH_FRACTION].getValue();
                 cellType = (Integer) previewProperties[Cell.CELL_TYPE].getValue();
 
                 // BACKGROUND - render the background first, then go with the border
