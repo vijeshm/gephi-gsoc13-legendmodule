@@ -6,6 +6,8 @@ package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,9 +40,14 @@ public class Cell {
     public static final int CELL_SHAPE_SHAPE = 6;
     public static final int CELL_SHAPE_COLOR = 7;
     public static final int CELL_SHAPE_VALUE = 8;
-    public static final int CELL_IMAGE_FILE = 9;
-    public static final int CELL_IMAGE_IS_SCALING = 10;
-    public static final int CELL_TYPE = 11;
+    public static final int CELL_SHAPE_WIDTH = 9;
+    public static final int CELL_SHAPE_WIDTH_FRACTION = 10;
+    public static final int CELL_IMAGE_FILE = 11;
+    public static final int CELL_IMAGE_IS_SCALING = 12;
+    public static final int CELL_IMAGE_WIDTH = 13;
+    public static final int CELL_IMAGE_HEIGHT = 14;
+    public static final int CELL_IMAGE_WIDTH_FRACTION = 15;
+    public static final int CELL_TYPE = 16;
     public static String[] OWN_PROPERTIES = {
         ".cell.background.color",
         ".cell.border.color",
@@ -51,8 +58,13 @@ public class Cell {
         ".cell.shape.shape",
         ".cell.shape.color",
         ".cell.shape.value",
+        ".cell.shape.width",
+        ".cell.shape.width.fraction",
         ".cell.image.file",
         ".cell.image.is.scaling",
+        ".cell.image.width",
+        ".cell.image.height",
+        ".cell.image.width.fraction",
         ",cell.type"
     };
     // define the default properties of the cell
@@ -68,8 +80,13 @@ public class Cell {
     public static final Shape cellShapeShape = Shape.RECTANGLE;
     public static final Color cellShapeColor = new Color(0f, 0f, 0f, 0.75f);
     public static final Float cellShapeValue = 1f;
+    public static final Integer cellShapeWidth = 100;
+    public static final Float cellShapeWidthFraction = 0.8f;
     public static final File cellImageFile = new File("/");
     public static final Boolean cellImageIsScaling = true;
+    public static final Integer cellImageWidth = 50;
+    public static final Integer cellImageHeight = 50;
+    public static final Float cellImageWidthFraction = 0.8f;
     public static final int cellType = TYPE_TEXT;
     public static final Object[] defaultValues = {
         backgroundColor,
@@ -81,8 +98,13 @@ public class Cell {
         cellShapeShape,
         cellShapeColor,
         cellShapeValue,
+        cellShapeWidth,
+        cellShapeWidthFraction,
         cellImageFile,
         cellImageIsScaling,
+        cellImageWidth,
+        cellImageHeight,
+        cellImageWidthFraction,
         cellType
     };
     private PreviewProperty[] previewProperties = new PreviewProperty[OWN_PROPERTIES.length];
@@ -228,6 +250,26 @@ public class Cell {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
+            case CELL_SHAPE_WIDTH:
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Integer.class,
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_SHAPE_WIDTH],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_SHAPE_WIDTH],
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+
+            case CELL_SHAPE_WIDTH_FRACTION:
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Float.class,
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_SHAPE_WIDTH_FRACTION],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_SHAPE_WIDTH_FRACTION],
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+
             case CELL_IMAGE_FILE:
                 previewProperty = PreviewProperty.createProperty(
                         this,
@@ -248,6 +290,36 @@ public class Cell {
                         PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
                 break;
 
+            case CELL_IMAGE_WIDTH:
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Integer.class,
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_WIDTH],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_WIDTH],
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+
+            case CELL_IMAGE_HEIGHT:
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Integer.class,
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_HEIGHT],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_HEIGHT],
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+
+            case CELL_IMAGE_WIDTH_FRACTION:
+                previewProperty = PreviewProperty.createProperty(
+                        this,
+                        propertyString,
+                        Float.class,
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_WIDTH_FRACTION],
+                        "TableItem.cell." + row + "." + column + OWN_PROPERTIES[CELL_IMAGE_WIDTH_FRACTION],
+                        PreviewProperty.CATEGORY_LEGEND_PROPERTY).setValue(value);
+                break;
+
             case CELL_TYPE:
                 previewProperty = PreviewProperty.createProperty(
                         this,
@@ -264,5 +336,44 @@ public class Cell {
 
     public PreviewProperty[] getPreviewProperties() {
         return previewProperties;
+    }
+
+    public Integer getActiveWidth(Graphics2D graphics2d) {
+        switch ((Integer) previewProperties[CELL_TYPE].getValue()) {
+            case TYPE_TEXT:
+                Font currentCellFont = (Font) previewProperties[CELL_FONT].getValue();
+                graphics2d.setFont(currentCellFont);
+                FontMetrics fontMetrics = graphics2d.getFontMetrics(currentCellFont);
+                return fontMetrics.stringWidth((String) previewProperties[CELL_TEXT_CONTENT].getValue());
+
+            case TYPE_IMAGE:
+                return (int) ((Integer) previewProperties[CELL_IMAGE_WIDTH].getValue()); // / (Float) previewProperties[CELL_IMAGE_WIDTH_FRACTION].getValue());
+
+            case TYPE_SHAPE:
+                return (int) ((Integer) previewProperties[CELL_SHAPE_WIDTH].getValue()); // / (Float) previewProperties[CELL_SHAPE_WIDTH_FRACTION].getValue());
+
+            default:
+                return -1;
+        }
+    }
+
+    public void updateWidthsHeights(int columnWidth, int columnHeight) {
+        PreviewProperty cellShapeWidth = previewProperties[CELL_SHAPE_WIDTH];
+        PreviewProperty cellShapeWidthFraction = previewProperties[CELL_SHAPE_WIDTH_FRACTION];
+        PreviewProperty cellImageWidth = previewProperties[CELL_IMAGE_WIDTH];
+        PreviewProperty cellImageWidthFraction = previewProperties[CELL_IMAGE_WIDTH_FRACTION];
+        PreviewProperty cellImageHeight = previewProperties[CELL_IMAGE_HEIGHT];
+
+        if ((int) ((Integer) cellShapeWidth.getValue()) > columnWidth) {
+            cellShapeWidth.setValue((int) (columnWidth));
+        }
+
+        if ((int) ((Integer) cellImageWidth.getValue()) > columnWidth) {
+            cellImageWidth.setValue((int) (columnWidth));
+        }
+        
+        if ((int) ((Integer) cellImageHeight.getValue()) > columnHeight) {
+            cellImageHeight.setValue((int) (columnHeight));
+        }
     }
 }

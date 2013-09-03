@@ -7,6 +7,7 @@ package org.gephi.legend.plugin.table;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -59,7 +60,7 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         defaultTableBorderSize,
         defaultTableBorderColor,
         defaultTableBackgroundColor,
-        defaultTableWidthFull
+        defaultTableWidthFull,
     };
 
     @Override

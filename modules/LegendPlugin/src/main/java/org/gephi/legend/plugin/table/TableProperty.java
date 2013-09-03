@@ -33,7 +33,7 @@ public class TableProperty {
         ".table.border.size",
         ".table.border.color",
         ".table.background.color",
-        ".table.width.full"
+        ".table.width.full",
     };
     
     public static final int[] LIST_OF_PROPERTIES = {
@@ -45,7 +45,7 @@ public class TableProperty {
         TABLE_BORDER_SIZE,
         TABLE_BORDER_COLOR,
         TABLE_BACKGROUND_COLOR,
-        TABLE_WIDTH_FULL
+        TABLE_WIDTH_FULL,
     };
     
     private static TableProperty instance = new TableProperty();

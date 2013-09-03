@@ -34,16 +34,16 @@ public class ElementNumber extends BaseElement {
 
     @Override
     public void onSelect() {
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-        PreviewProperties previewProperties = previewModel.getProperties();
-
         String newValueString = (String) JOptionPane.showInputDialog(null, "New Value:", property.getDisplayName(), JOptionPane.PLAIN_MESSAGE, null, null, property.getValue());
         if (newValueString != null) {
             try {
-                Float newNumber = Float.parseFloat(newValueString);
-                property.setValue(newNumber);
-                previewProperties.putValue(property.getName(), newNumber);
+                if(property.getType() == Integer.class) {
+                    Integer newIntNumber = Integer.parseInt(newValueString);
+                    property.setValue(newIntNumber);
+                } else if(property.getType() == Float.class) {
+                    Float newFloatNumber = Float.parseFloat(newValueString);
+                    property.setValue(newFloatNumber);
+                }
             } catch (NumberFormatException e) {
             }
         }

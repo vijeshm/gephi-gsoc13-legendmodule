@@ -30,7 +30,9 @@ public class TableItem extends AbstractItem implements LegendItem {
     // public static final String NUMBER_OF_ROWS = "Number of Rows";
     // public static final String NUMBER_OF_COLUMNS = "Number of Columns";
     private ArrayList<ArrayList<Cell>> table;
-    private Boolean structureChanged;
+    private Boolean rowChanged = true;
+    private Boolean columnChanged = true;
+    private Boolean ipeditorChanged = true;
 
     public TableItem(Object source) {
         super(source, LEGEND_TYPE);
@@ -70,7 +72,7 @@ public class TableItem extends AbstractItem implements LegendItem {
         table.add(pos, row);
 
         // indicate that the table structure has changed
-        structureChanged = true;
+        rowChanged = true;
     }
 
     public void deleteRow(int pos) {
@@ -87,7 +89,7 @@ public class TableItem extends AbstractItem implements LegendItem {
         legendModel.setInplaceEditor(null);
 
         // indicate that the table structure has changed
-        structureChanged = true;
+        rowChanged = true;
     }
 
     public void addColumn(int columnNumber, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent, Shape cellShapeShape, Color cellShapeColor, Float cellShapeValue, File cellImageFile, Boolean cellImageIsScaling, int cellType) {
@@ -99,7 +101,7 @@ public class TableItem extends AbstractItem implements LegendItem {
         }
 
         // indicate that the table structure has changed
-        structureChanged = true;
+        columnChanged = true;
     }
 
     public void deleteColumn(int pos) {
@@ -121,15 +123,27 @@ public class TableItem extends AbstractItem implements LegendItem {
         legendModel.setInplaceEditor(null);
 
         // indicate that the table structure has changed
-        structureChanged = true;
+        columnChanged = true;
     }
 
     public Boolean getStructureChanged() {
-        return structureChanged;
+        return rowChanged || columnChanged || ipeditorChanged;
     }
-
-    public void setStructureChanged(Boolean change) {
-        structureChanged = change;
+    
+    public void setRowChanged(Boolean change) {
+        rowChanged = change;
+    }
+    
+    public Boolean getColumnChanged() {
+        return columnChanged;
+    }
+    
+    public void setColumnChanged(Boolean change) {
+        columnChanged = change;
+    }
+    
+    public void setInplaceEditorChanged(Boolean change) {
+        ipeditorChanged = change;
     }
 
     @Override

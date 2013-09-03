@@ -81,6 +81,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableCellBorderSize;
     private Color tableCellBorderColor;
     private Color tableBackgroundColor;
+    private Boolean tableIsOccupyingFullWidth;
     private int tableNumberOfRows;
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
@@ -89,7 +90,6 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int cellSpacingLowerLimit = 5;
     private int cellPaddingLowerLimit = 5;
     private int cellBorderLowerLimit = 5;
-    private float cellShapeWidthFraction = 0.8f;
     private Boolean insufficientEmptySpace;
 
     @Override
@@ -109,6 +109,8 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableCellBorderSize = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_SIZE));
         tableCellBorderColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_COLOR));
         tableBackgroundColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BACKGROUND_COLOR));
+        tableIsOccupyingFullWidth = properties.getBooleanValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_WIDTH_FULL));
+
         tableNumberOfRows = ((TableItem) item).getNumberOfRows();
         tableNumberOfColumns = ((TableItem) item).getNumberOfColumns();
 
@@ -124,56 +126,52 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         int blockWidth = (int) legendNode.getBlockWidth();
         int blockHeight = (int) legendNode.getBlockHeight();
 
-        int maxColWidth = (blockWidth - (tableNumberOfColumns + 1) * tableCellSpacing - 2 * tableNumberOfColumns * tableCellPadding - 2 * tableNumberOfColumns * tableCellBorderSize) / tableNumberOfColumns;
+        int meanColWidth = (blockWidth - (tableNumberOfColumns + 1) * tableCellSpacing - 2 * tableNumberOfColumns * tableCellPadding - 2 * tableNumberOfColumns * tableCellBorderSize) / tableNumberOfColumns;
         int rowHeight = (blockHeight - (tableNumberOfRows + 1) * tableCellSpacing - 2 * tableNumberOfRows * tableCellPadding - 2 * tableNumberOfRows * tableCellBorderSize) / tableNumberOfRows;
 
         TableItem item = (TableItem) legendNode.getItem();
-        PreviewProperty[] itemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+        Integer[] tableColumnWidths = new Integer[tableNumberOfColumns];
 
-        // determine all the column widths
-        int[] colWidths = new int[tableNumberOfColumns];
-
-        if ((Boolean) itemPreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue()) {
+        if (tableIsOccupyingFullWidth) {
             // the table should occupy the entire width
             for (int i = 0; i < tableNumberOfColumns; i++) {
-                colWidths[i] = maxColWidth;
+                tableColumnWidths[i] = meanColWidth;
             }
         } else {
             // the table shouldnt occupy the entire width
             // Hence, compute and fill up the column widths appropriately
-            int stringWidth;
-            FontMetrics fontMetrics;
-            PreviewProperty[] cellPreviewProperties = null;
-            Font cellFont = null;
-            String cellContent = null;
+            Cell cell;
+            int cellActiveWidth;
+            int extraSpace = 0;
             for (int col = 0; col < tableNumberOfColumns; col++) {
-                int tempMaxColWidth = 0;
+                int maxRowWidthInColumn = 0;
                 for (int row = 0; row < tableNumberOfRows; row++) {
-                    cellPreviewProperties = table.get(row).get(col).getPreviewProperties();
-                    cellFont = (Font) cellPreviewProperties[Cell.CELL_FONT].getValue();
-                    cellContent = (String) cellPreviewProperties[Cell.CELL_TEXT_CONTENT].getValue();
+                    cell = table.get(row).get(col);
+                    cellActiveWidth = cell.getActiveWidth(graphics2D);
 
-                    graphics2D.setFont(cellFont);
-                    fontMetrics = graphics2D.getFontMetrics(cellFont);
-                    stringWidth = fontMetrics.stringWidth(cellContent);
-                    if (stringWidth > tempMaxColWidth) {
-                        tempMaxColWidth = stringWidth;
+                    if (cellActiveWidth > maxRowWidthInColumn) {
+                        maxRowWidthInColumn = cellActiveWidth;
                     }
                 }
 
-                tempMaxColWidth = (int) ((1 + colWidthTolerance) * tempMaxColWidth);
+                // maxRowWidthInColumn = (int) ((1 + colWidthTolerance) * maxRowWidthInColumn);
                 // the column width should be exactly the same as the width of the longest string in the column, since it causes rendering problems.
-                if (tempMaxColWidth > maxColWidth) {
-                    colWidths[col] = maxColWidth;
+                if (maxRowWidthInColumn < meanColWidth + extraSpace) {
+                    tableColumnWidths[col] = maxRowWidthInColumn;
+                    extraSpace += (meanColWidth - maxRowWidthInColumn);
                 } else {
-                    colWidths[col] = tempMaxColWidth;
+                    tableColumnWidths[col] = meanColWidth;
+                }
+
+                for (int row = 0; row < tableNumberOfRows; row++) {
+                    table.get(row).get(col).updateWidthsHeights(tableColumnWidths[col], rowHeight);
                 }
             }
         }
 
         int sumOfWidths = 0;
         for (int col = 0; col < tableNumberOfColumns; col++) {
-            sumOfWidths += colWidths[col];
+            sumOfWidths += tableColumnWidths[col];
         }
 
         // create a table node, create a corresponding inplace editor and attach it as the legendNode's child
@@ -196,9 +194,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
         // cells are re-constructed only when the structure (i.e, number of rows and columns) of the table is changed
         if (structureChanged) {
-            buildCellNodes(tableNode, item, rowHeight, colWidths, graphics2D, target);
+            buildCellNodes(tableNode, item, rowHeight, tableColumnWidths, graphics2D, target);
             // once the cells are built, change the flag to false to indicate that the block nodes are built.
-            item.setStructureChanged(false);
+            item.setRowChanged(false);
+            item.setColumnChanged(false);
+            item.setInplaceEditorChanged(false);
             tableNode.getInplaceEditor().setData(TABLE_PROPERTIES_ADDED, false);
         }
 
@@ -212,7 +212,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         }
 
         // update the geometry of the cell nodes - this is redundant only when the table structure changes
-        updateCellGeometry(tableNode, rowHeight, colWidths);
+        updateCellGeometry(tableNode, rowHeight, tableColumnWidths);
 
         // render the cells
         renderCells(graphics2D, tableNode, (TableItem) item);
@@ -231,7 +231,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableNode.setInplaceEditor(ipeditor);
     }
 
-    private void buildCellNodes(BlockNode tableNode, Item item, int rowHeight, int[] colWidths, Graphics2D graphics2d, RenderTarget target) {
+    private void buildCellNodes(BlockNode tableNode, Item item, int rowHeight, Integer[] colWidths, Graphics2D graphics2d, RenderTarget target) {
         // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
@@ -421,6 +421,22 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_VALUE], data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        r = ipeditor.addRow();
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementLabel.LABEL_TEXT, "Shape Width:");
+                        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+                        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_WIDTH], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                         break;
 
                     case Cell.TYPE_IMAGE:
@@ -453,6 +469,29 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         data.put(ElementCheckbox.IS_CHECKED, (Boolean) cellPreviewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue());
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, cellPreviewProperties[Cell.CELL_IMAGE_IS_SCALING], data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        r = ipeditor.addRow();
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementLabel.LABEL_TEXT, "Image Dimensions:");
+                        data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
+                        data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+                        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_IMAGE_WIDTH], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
+                        
+                        col = r.addColumn(false);
+                        data = new HashMap<String, Object>();
+                        data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
+                        data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
+                        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_IMAGE_HEIGHT], data, false, null);
+                        addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
                         break;
                 }
 
@@ -481,7 +520,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         Cell cell = table.get(rowNumber).get(colNumber);
                         PreviewProperty[] previewProperties = cell.getPreviewProperties();
                         previewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_TEXT);
-                        tableItem.setStructureChanged(true);
+                        tableItem.setInplaceEditorChanged(true);
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
@@ -502,7 +541,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         Cell cell = table.get(rowNumber).get(colNumber);
                         PreviewProperty[] previewProperties = cell.getPreviewProperties();
                         previewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_SHAPE);
-                        tableItem.setStructureChanged(true);
+                        tableItem.setInplaceEditorChanged(true);
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
@@ -523,7 +562,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         Cell cell = table.get(rowNumber).get(colNumber);
                         PreviewProperty[] previewProperties = cell.getPreviewProperties();
                         previewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_IMAGE);
-                        tableItem.setStructureChanged(true);
+                        tableItem.setInplaceEditorChanged(true);
                     }
                 });
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
@@ -872,7 +911,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             cellPreviewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_TEXT);
                         }
                     }
-                    tableItem.setStructureChanged(true);
+                    tableItem.setInplaceEditorChanged(true);
                 }
             }
         });
@@ -901,7 +940,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             cellPreviewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_SHAPE);
                         }
                     }
-                    tableItem.setStructureChanged(true);
+                    tableItem.setInplaceEditorChanged(true);
                 }
             }
         });
@@ -930,7 +969,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             cellPreviewProperties[Cell.CELL_TYPE].setValue(Cell.TYPE_IMAGE);
                         }
                     }
-                    tableItem.setStructureChanged(true);
+                    tableItem.setInplaceEditorChanged(true);
                 }
             }
         });
@@ -964,7 +1003,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         col = r.addColumn(false);
         // shape - circle type
         data = new HashMap<String, Object>();
@@ -992,7 +1031,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         col = r.addColumn(false);
         // shape - rectangle type
         data = new HashMap<String, Object>();
@@ -1022,7 +1061,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
     }
 
-    private void updateCellGeometry(BlockNode tableNode, int rowHeight, int[] colWidths) {
+    private void updateCellGeometry(BlockNode tableNode, int rowHeight, Integer[] colWidths) {
         ArrayList<BlockNode> cellNodes = tableNode.getChildren();
         int tableOriginX = (int) tableNode.getOriginX();
         int tableOriginY = (int) tableNode.getOriginY();
@@ -1064,9 +1103,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         String cellTextContent;
         Shape cellShapeShape;
         Color cellShapeColor;
+        Integer cellShapeWidth;
+        Float cellShapeWidthFraction;
         Float cellShapeNormalizedValue;
         File cellImageFile;
         Boolean cellImageIsScaling;
+        Integer cellImageWidth;
+        Integer cellImageHeight;
+        Float cellImageWidthFraction;
         Integer cellType;
 
         int cellOriginX;
@@ -1127,9 +1171,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 cellTextContent = (String) previewProperties[Cell.CELL_TEXT_CONTENT].getValue();
                 cellShapeShape = (Shape) previewProperties[Cell.CELL_SHAPE_SHAPE].getValue();
                 cellShapeColor = (Color) previewProperties[Cell.CELL_SHAPE_COLOR].getValue();
+                cellShapeWidth = (Integer) previewProperties[Cell.CELL_SHAPE_WIDTH].getValue();
+                cellShapeWidthFraction = (Float) previewProperties[Cell.CELL_SHAPE_WIDTH_FRACTION].getValue();
                 cellShapeNormalizedValue = normalizedValues[rowNumber * tableNumberOfColumns + colNumber];
                 cellImageFile = (File) previewProperties[Cell.CELL_IMAGE_FILE].getValue();
                 cellImageIsScaling = (Boolean) previewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue();
+                cellImageWidth = (Integer) previewProperties[Cell.CELL_IMAGE_WIDTH].getValue();
+                cellImageHeight = (Integer) previewProperties[Cell.CELL_IMAGE_HEIGHT].getValue();
+                cellImageWidthFraction = (Float) previewProperties[Cell.CELL_IMAGE_WIDTH_FRACTION].getValue();
                 cellType = (Integer) previewProperties[Cell.CELL_TYPE].getValue();
 
                 // BACKGROUND - render the background first, then go with the border
@@ -1146,7 +1195,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 switch (cellType) {
                     case Cell.TYPE_SHAPE:
                         graphics2D.setColor(cellShapeColor);
-                        drawShape(graphics2D, cellShapeShape, cellShapeColor, (int) (cellOriginX + (1 - cellShapeWidthFraction) * cellWidth / 2), (int) (cellOriginY + (1 - cellShapeNormalizedValue) * cellHeight), (int) (cellWidth * cellShapeWidthFraction), (int) (cellShapeNormalizedValue * cellHeight));
+                        drawShape(graphics2D, cellShapeShape, cellShapeColor, (int) (cellOriginX + cellWidth / 2 - cellShapeWidth / 2), (int) (cellOriginY + (1 - cellShapeNormalizedValue) * cellHeight), cellShapeWidth, (int) (cellShapeNormalizedValue * cellHeight));
                         break;
 
                     case Cell.TYPE_TEXT:
@@ -1159,10 +1208,10 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             if (cellImageFile.exists() && cellImageFile.isFile()) {
                                 BufferedImage image;
                                 image = ImageIO.read(cellImageFile);
-                                int scaledOriginX = cellOriginX;
-                                int scaledOriginY = cellOriginY;
-                                int scaledWidth = cellWidth;
-                                int scaledHeight = cellHeight;
+                                int scaledOriginX;
+                                int scaledOriginY;
+                                int scaledWidth = cellImageWidth;
+                                int scaledHeight = cellImageHeight;
 
                                 int imageWidth = image.getWidth();
                                 int imageHeight = image.getHeight();
@@ -1179,11 +1228,11 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                                         scaledWidth = cellHeight * imageWidth / imageHeight;
                                         scaledHeight = cellHeight;
                                     }
-
-                                    scaledOriginX = cellOriginX + cellWidth / 2 - scaledWidth / 2;
-                                    scaledOriginY = cellOriginY + cellHeight / 2 - scaledHeight / 2;
                                 }
 
+                                scaledOriginX = cellOriginX + cellWidth / 2 - scaledWidth / 2;
+                                scaledOriginY = cellOriginY + cellHeight / 2 - scaledHeight / 2;
+                                
                                 graphics2D.drawImage(image,
                                         scaledOriginX,
                                         scaledOriginY,
