@@ -36,7 +36,7 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
     protected Color cellBorderColor = Cell.borderColor;
     protected String cellTextContent = Cell.cellTextContent;
     protected Shape cellShapeShape = Cell.cellShapeShape;
-    protected Color cellShapeColor = Cell.cellShapeColor;    
+    protected Color cellShapeColor = Cell.cellShapeColor;
     protected Float cellShapeValue = Cell.cellShapeValue;
     protected File cellImageFile = Cell.cellImageFile;
     protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
@@ -45,7 +45,19 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
     @Override
     public void populateTable(TableItem tableItem) {
         String newValueString = (String) JOptionPane.showInputDialog(null, "Enter the top number of nodes:", "Number of Nodes", JOptionPane.PLAIN_MESSAGE, null, null, "");
-        Integer numberOfNodes = Integer.parseInt(newValueString); // make sure that this number is atleast one
+        Integer numberOfNodes;
+        try {
+            numberOfNodes = Integer.parseInt(newValueString);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid Entry. The number of nodes is set to 1.", "Invalid Entry", JOptionPane.PLAIN_MESSAGE);
+            numberOfNodes = 1;
+        }
+
+        if (numberOfNodes < 1) {
+            JOptionPane.showMessageDialog(null, "The minimum number of nodes is 1.", "Invalid Entry", JOptionPane.PLAIN_MESSAGE);
+            numberOfNodes = 1;
+        }
+
         Integer tableNumberOfRows = numberOfNodes + 1;
         Integer tableNumberOfColumns = 2;
 
@@ -65,11 +77,11 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
             node = nodeIter.next();
             degree = graph.getDegree(node);
             int moveIndex = -1;
-            
+
             // To find the top N node with the max degree, the degrees could be sorted and top N could be chosen.
             // But that is computationally complex [ O(n * logn) ]
             // The following approach is a linear time algorithm wrt number of nodes, times the top number of nodes N. [ O(n * N)]
-            
+
             for (int i = 0; i < numberOfNodes; i++) {
                 // check if the element fits at the position i
                 // if it fits, move the lower elements one block down and assign this to the position

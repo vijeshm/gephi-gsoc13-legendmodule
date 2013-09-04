@@ -86,6 +86,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int tableNumberOfColumns;
     private ArrayList<ArrayList<Cell>> table;
     private Boolean structureChanged;
+    private float colWidthTolerance = 0.05f;
     private int cellSpacingLowerLimit = 5;
     private int cellPaddingLowerLimit = 5;
     private int cellBorderLowerLimit = 5;
@@ -99,6 +100,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+        PreviewProperty[] tableItemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
 
         tableFont = properties.getFontValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_FONT));
         tableFontColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_FONT_COLOR));
@@ -108,8 +110,10 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableCellBorderSize = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_SIZE));
         tableCellBorderColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_COLOR));
         tableBackgroundColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BACKGROUND_COLOR));
-        tableIsOccupyingFullWidth = properties.getBooleanValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_WIDTH_FULL));
-
+        
+        // isOccupyingFullWidth is not a part of the global PreviewProperties object. It is a part of the OWN_PROPERTIES of the table item.
+        tableIsOccupyingFullWidth = tableItemPreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue();
+        
         tableNumberOfRows = ((TableItem) item).getNumberOfRows();
         tableNumberOfColumns = ((TableItem) item).getNumberOfColumns();
 
@@ -153,6 +157,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                     }
                 }
 
+                maxRowWidthInColumn = (int) ((1 + colWidthTolerance) * maxRowWidthInColumn);
                 // the column width should be exactly the same as the width of the longest string in the column, since it causes rendering problems.
                 if (maxRowWidthInColumn < meanColWidth + extraSpace) {
                     tableColumnWidths[col] = maxRowWidthInColumn;
@@ -882,7 +887,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         data.put(ElementImage.IMAGE_BOOL, (Boolean) tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue());
         data.put(ElementImage.IMAGE_IF_TRUE, "/org/gephi/legend/graphics/column_collapse.png");
         data.put(ElementImage.IMAGE_IF_FALSE, "/org/gephi/legend/graphics/column_expand.png");
-        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data, false, Alignment.LEFT);
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, tablePreviewProperties[TableProperty.TABLE_WIDTH_FULL], data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         // making shape changes to all cells

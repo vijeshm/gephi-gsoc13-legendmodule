@@ -49,9 +49,9 @@ public class ElementImage extends BaseElement {
                 // turn on the switch for this element
                 data.put(IMAGE_BOOL, true);
             } else {
-                Boolean isPicked = (Boolean) data.get(IMAGE_BOOL);
-                data.put(IMAGE_BOOL, !isPicked);
-                property.setValue(!isPicked);
+                Boolean currentStatus = property.getValue();
+                data.put(IMAGE_BOOL, !currentStatus);
+                property.setValue(!currentStatus);
             }
         }
     }
