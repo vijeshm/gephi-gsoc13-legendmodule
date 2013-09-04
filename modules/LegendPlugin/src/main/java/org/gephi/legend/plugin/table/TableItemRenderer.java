@@ -101,17 +101,15 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] tableItemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
-
-        tableFont = properties.getFontValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_FONT));
-        tableFontColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_FONT_COLOR));
-        tableFontAlignment = properties.getValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_FONT_ALIGNMENT));
-        tableCellSpacing = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_SPACING));
-        tableCellPadding = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_CELL_PADDING));
-        tableCellBorderSize = properties.getIntValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_SIZE));
-        tableCellBorderColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BORDER_COLOR));
-        tableBackgroundColor = properties.getColorValue(LegendModel.getProperty(TableProperty.OWN_PROPERTIES, itemIndex, TableProperty.TABLE_BACKGROUND_COLOR));
         
-        // isOccupyingFullWidth is not a part of the global PreviewProperties object. It is a part of the OWN_PROPERTIES of the table item.
+        tableFont = tableItemPreviewProperties[TableProperty.TABLE_FONT].getValue();
+        tableFontColor = tableItemPreviewProperties[TableProperty.TABLE_FONT_COLOR].getValue();
+        tableFontAlignment = tableItemPreviewProperties[TableProperty.TABLE_FONT_ALIGNMENT].getValue();
+        tableCellSpacing = tableItemPreviewProperties[TableProperty.TABLE_CELL_SPACING].getValue();
+        tableCellPadding = tableItemPreviewProperties[TableProperty.TABLE_CELL_PADDING].getValue();
+        tableCellBorderSize = tableItemPreviewProperties[TableProperty.TABLE_BORDER_SIZE].getValue();
+        tableCellBorderColor = tableItemPreviewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
+        tableBackgroundColor = tableItemPreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR].getValue();
         tableIsOccupyingFullWidth = tableItemPreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue();
         
         tableNumberOfRows = ((TableItem) item).getNumberOfRows();
