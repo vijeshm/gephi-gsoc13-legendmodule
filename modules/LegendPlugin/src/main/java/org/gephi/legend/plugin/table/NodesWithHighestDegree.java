@@ -26,7 +26,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author mvvijesh
  */
-@ServiceProvider(service = CustomTableItemBuilder.class, position = 2)
+@ServiceProvider(service = CustomTableItemBuilder.class, position = 3)
 public class NodesWithHighestDegree implements CustomTableItemBuilder {
 
     protected Font cellFont = Cell.cellFont;
@@ -41,6 +41,9 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
     protected File cellImageFile = Cell.cellImageFile;
     protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
     protected int cellType = Cell.cellType;
+    
+    protected String headerNodeName = "Node";
+    protected String headerNodeDegree = "Degree";
 
     @Override
     public void populateTable(TableItem tableItem) {
@@ -125,13 +128,13 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
 
         Cell headerNodeNameCell = table.get(0).get(0);
         PreviewProperty[] headerNodeNameCellPreviewProp = headerNodeNameCell.getPreviewProperties();
-        headerNodeNameCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue("Node");
+        headerNodeNameCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerNodeName);
         headerNodeNameCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerNodeNameCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
         Cell headerNodeDegreeCell = table.get(0).get(1);
         PreviewProperty[] headerNodeDegreeCellPreviewProp = headerNodeDegreeCell.getPreviewProperties();
-        headerNodeDegreeCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue("Degree");
+        headerNodeDegreeCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerNodeDegree);
         headerNodeDegreeCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerNodeDegreeCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
