@@ -64,7 +64,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author mvvijesh, edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 501)
+// @ServiceProvider(service = Renderer.class, position = 502)
 public class TableItemRenderer extends AbstractLegendItemRenderer {
 
     public static String TABLENODE = "table node";
@@ -91,6 +91,20 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int cellPaddingLowerLimit = 5;
     private int cellBorderLowerLimit = 5;
     private Boolean insufficientEmptySpace;
+    // Instance
+    private static TableItemRenderer instance = null;
+    
+    private TableItemRenderer() {
+        // private constructor is required to ensure singleton class
+    }
+    
+    public static TableItemRenderer getInstance() {
+        if(instance == null) {
+            instance = new TableItemRenderer();
+        }
+        
+        return instance;
+    }
 
     @Override
     public boolean isAnAvailableRenderer(Item item) {

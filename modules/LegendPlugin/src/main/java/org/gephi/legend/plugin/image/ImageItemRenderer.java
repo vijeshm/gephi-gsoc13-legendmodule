@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
  *
  * @author mvvijesh, edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 504)
+// @ServiceProvider(service = Renderer.class, position = 504)
 public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
     public static final String IMAGENODE = "image node";
@@ -66,6 +66,20 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
     private int imageMargin;
     // ENCODING
     public static final String DATA_PROTOCOL_PNG_PREFIX = "data:image/png;base64,";
+    // instance
+    private static ImageItemRenderer instance = null;
+    
+    private ImageItemRenderer() {
+        // private constructor is required to ensure singleton class
+    }
+    
+    public static ImageItemRenderer getInstance() {
+        if(instance == null) {
+            instance = new ImageItemRenderer();
+        }
+        
+        return instance;
+    }
 
     @Override
     public boolean isAnAvailableRenderer(Item item) {

@@ -25,7 +25,7 @@ import org.openide.util.NbBundle;
  */
 public class TableItem extends AbstractItem implements LegendItem {
 
-    public static final String LEGEND_TYPE = "Table Legend";
+    public static final String LEGEND_TYPE = "Table Item";
     public static final String CELL_PROPERTIES = "Cell Properties";
     // public static final String NUMBER_OF_ROWS = "Number of Rows";
     // public static final String NUMBER_OF_COLUMNS = "Number of Columns";

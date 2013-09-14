@@ -33,8 +33,8 @@ import org.openide.util.lookup.ServiceProviders;
  * @author mvvijesh
  */
 @ServiceProviders(value = {
-    @ServiceProvider(service = Renderer.class, position = 506),
-    @ServiceProvider(service = InplaceItemRenderer.class, position = 506)
+    @ServiceProvider(service = Renderer.class, position = 700),
+    @ServiceProvider(service = InplaceItemRenderer.class)
 })
 public class InplaceItemRenderer implements Renderer {
 

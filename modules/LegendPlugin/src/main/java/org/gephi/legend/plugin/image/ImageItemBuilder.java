@@ -13,6 +13,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.gephi.attribute.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemBuilder;
+import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
@@ -172,10 +173,20 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
+        
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        
+        // add the renderer to the legend model if it has not been added
+        ImageItemRenderer imageItemRenderer = ImageItemRenderer.getInstance();
+        if(!legendModel.isRendererAdded(imageItemRenderer)) {
+            legendModel.addRenderer(imageItemRenderer);
+        }
 
-        // setting default renderer and item index
-        item.setData(LegendItem.RENDERER, ImageItemRenderer.class);
+        // setting default renderer, item index and custom builder
+        item.setData(LegendItem.RENDERER, imageItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+        item.setData(LegendItem.CUSTOM_BUILDER, (CustomImageItemBuilder) builder);
         return item;
     }
 

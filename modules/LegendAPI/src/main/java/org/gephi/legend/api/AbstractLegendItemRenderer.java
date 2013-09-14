@@ -41,13 +41,14 @@ import org.gephi.legend.spi.LegendItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.MouseResponsiveRenderer;
 import org.gephi.preview.spi.PreviewMouseListener;
+import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author mvvijesh, edubecks
  */
-public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, MouseResponsiveRenderer {
+public abstract class AbstractLegendItemRenderer implements Renderer {
 
     protected Integer currentItemIndex;
     protected float graphOriginX = Float.MAX_VALUE;
@@ -102,7 +103,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      * @param target the rendering target - can be G2D, PDF or SVG
      * @param legendNode the node onto which the legend data must be rendered
      */
-
     protected abstract void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode);
 
     /**
@@ -114,6 +114,12 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
      */
     protected abstract void readOwnPropertiesAndValues(Item item, PreviewProperties properties);
 
+    /**
+     * Indicates if it is a legend item renderer for the given item.
+     *
+     * @param item Legend item
+     * @return True if it is a renderer for the item, false otherwise
+     */
     public abstract boolean isAnAvailableRenderer(Item item);
 
     private void readLocationProperties(Item item, PreviewProperties previewProperties) {
@@ -867,11 +873,6 @@ public abstract class AbstractLegendItemRenderer implements LegendItemRenderer, 
     public boolean isRendererForitem(Item item, PreviewProperties properties) {
         Class renderer = item.getData(LegendItem.RENDERER);
         return renderer != null && renderer.equals(getClass());
-    }
-
-    @Override
-    public boolean needsPreviewMouseListener(PreviewMouseListener previewMouseListener) {
-        return previewMouseListener instanceof LegendMouseListener;
     }
 
     @Override

@@ -15,6 +15,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.gephi.attribute.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemBuilder;
+import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
@@ -74,9 +75,19 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         TableItem item = (TableItem) createNewLegendItem(graph);
         CustomTableItemBuilder tableItemBuilder = (CustomTableItemBuilder) builder;
 
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        
+        // add the renderer to the legend model if it has not been added
+        TableItemRenderer tableItemRenderer = TableItemRenderer.getInstance();
+        if(!legendModel.isRendererAdded(tableItemRenderer)) {
+            legendModel.addRenderer(tableItemRenderer);
+        }
+        
         // setting default renderer and item index
-        item.setData(LegendItem.RENDERER, TableItemRenderer.class);
+        item.setData(LegendItem.RENDERER, tableItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+        item.setData(LegendItem.CUSTOM_BUILDER, (CustomTableItemBuilder) builder);
 
         tableItemBuilder.populateTable(item);
 

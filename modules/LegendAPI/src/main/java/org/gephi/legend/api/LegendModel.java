@@ -18,8 +18,10 @@ import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.spi.Renderer;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
+import sun.java2d.pipe.RenderBuffer;
 
 /**
  *
@@ -35,6 +37,7 @@ public class LegendModel {
     private ArrayList<Item> inactiveLegendItems;
     private Map<Integer, BlockNode> indexNodeMap;
     private InplaceEditor ipeditor;
+    private ArrayList<Renderer> renderers;
     private static final String LEGEND_DESCRIPTION = "legend";
     private static final String DYNAMIC = ".dynamic";
     private static final String ITEM_DESCRIPTION = ".item";
@@ -52,6 +55,24 @@ public class LegendModel {
         this.inactiveLegendItems = new ArrayList<Item>();
         this.indexNodeMap = new HashMap<Integer, BlockNode>();
         this.ipeditor = null;
+        this.renderers = new ArrayList<Renderer>();
+    }
+    
+    public void addRenderer(Renderer renderer) {
+        renderers.add(renderer);
+    }
+    
+    public ArrayList<Renderer> getRenderers () {
+        return renderers;
+    }
+    
+    public Boolean isRendererAdded(Renderer renderer) {
+        for(Renderer r : renderers) {
+            if(r.equals(renderer)) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
     }
 
     public Workspace getWorkspace() {

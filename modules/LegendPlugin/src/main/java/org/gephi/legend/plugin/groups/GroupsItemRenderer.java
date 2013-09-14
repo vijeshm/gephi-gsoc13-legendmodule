@@ -49,7 +49,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author mvvijesh, edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 502)
+// @ServiceProvider(service = Renderer.class, position = 503)
 public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
     public static String GROUP_NODE = "group node";
@@ -66,7 +66,20 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
     protected Integer paddingBetweenElements;
     // min shape size
     protected Float MINIMUM_SHAPE_SIZE = 10f;
+    // Instance
+    private static GroupsItemRenderer instance = null;
 
+    private GroupsItemRenderer() {
+        // private constructor is required to ensure singleton class
+    }
+    
+    public static GroupsItemRenderer getInstance() {
+        if(instance == null) {
+            instance = new GroupsItemRenderer();
+        }
+        return instance;
+    }
+    
     @Override
     public boolean isAnAvailableRenderer(Item item) {
         return item instanceof GroupsItem;

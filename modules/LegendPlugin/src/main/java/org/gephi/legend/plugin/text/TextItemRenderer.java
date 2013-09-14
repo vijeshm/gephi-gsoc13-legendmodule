@@ -43,8 +43,8 @@ import org.openide.util.lookup.ServiceProvider;
 /**
  *
  * @author mvvijesh
- */
-@ServiceProvider(service = Renderer.class, position = 505)
+*/
+// @ServiceProvider(service = Renderer.class, position = 505)
 public class TextItemRenderer extends AbstractLegendItemRenderer {
     // unique identifiers for some of the blocks (nodes). A similar definition is given in blockNode.java for root, title, description and legend.
 
@@ -54,6 +54,20 @@ public class TextItemRenderer extends AbstractLegendItemRenderer {
     private Font bodyFont;
     private Color bodyFontColor;
     private LegendItem.Alignment bodyAlignment;
+    // instance
+    private static TextItemRenderer instance = null;
+    
+    private TextItemRenderer() {
+        // private constructor is required to ensure singleton class
+    }
+    
+    public static TextItemRenderer getInstance() {
+        if(instance == null) {
+            instance = new TextItemRenderer();
+        }
+        
+        return instance;
+    }
 
     @Override
     public boolean isAnAvailableRenderer(Item item) {

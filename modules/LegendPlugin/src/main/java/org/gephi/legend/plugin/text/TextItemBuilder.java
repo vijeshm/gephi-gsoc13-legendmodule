@@ -14,6 +14,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.gephi.attribute.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemBuilder;
+import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
@@ -79,12 +80,21 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
 
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
-        CustomTextItemBuilder customBuilder = (CustomTextItemBuilder) builder;
         Item item = createNewLegendItem(graph);
 
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        
+        // add the renderer to the legend model if it has not been added
+        TextItemRenderer textItemRenderer = TextItemRenderer.getInstance();
+        if(!legendModel.isRendererAdded(textItemRenderer)) {
+            legendModel.addRenderer(textItemRenderer);
+        }
+        
         // setting default renderer and item index
-        item.setData(LegendItem.RENDERER, TextItemRenderer.class);
+        item.setData(LegendItem.RENDERER, textItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
+        item.setData(LegendItem.CUSTOM_BUILDER, (CustomTextItemBuilder) builder);
         return item;
     }
 

@@ -357,7 +357,6 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
         
-        String propertyName;
         PreviewProperty property;
         int[] properties = LegendProperty.LIST_OF_PROPERTIES;
 

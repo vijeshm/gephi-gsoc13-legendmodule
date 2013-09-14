@@ -14,6 +14,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.gephi.attribute.api.AttributeModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemBuilder;
+import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
@@ -204,11 +205,18 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
 
-        // setting default renderer and item index
-        item.setData(LegendItem.RENDERER, GroupsItemRenderer.class);
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        
+        // add the renderer to the legend model if it has not been added
+        GroupsItemRenderer groupsItemRenderer = GroupsItemRenderer.getInstance();
+        if(!legendModel.isRendererAdded(groupsItemRenderer)) {
+            legendModel.addRenderer(groupsItemRenderer);
+        }
+        
+        // setting default renderer, item index and custom builder
+        item.setData(LegendItem.RENDERER, groupsItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
-
-        // setting the custombuilder builder - this data is being set only for this module. Make it consistent with all the other legends.
         item.setData(LegendItem.CUSTOM_BUILDER, (CustomGroupsItemBuilder) builder);
         return item;
     }
