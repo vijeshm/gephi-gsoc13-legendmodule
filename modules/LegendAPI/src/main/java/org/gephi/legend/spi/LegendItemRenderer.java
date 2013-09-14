@@ -22,14 +22,24 @@ import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  * @author mvvijesh, edubecks
  */
-@ServiceProvider(service = Renderer.class, position = 600)
+@ServiceProviders(value = {
+    @ServiceProvider(service = Renderer.class, position = 600),
+    @ServiceProvider(service = LegendItemRenderer.class)
+})
 public class LegendItemRenderer implements Renderer, MouseResponsiveRenderer {
 
+    Integer numberOfItemsToBeRendered = 0;
     // Boolean allItemsRendered = false;
+
+    public void setNumberOfLegendItems(Integer numberOfItemsToBeRendered) {
+        this.numberOfItemsToBeRendered = numberOfItemsToBeRendered;
+    }
+
     @Override
     public String getDisplayName() {
         return "Legend Item Renderer";
@@ -41,9 +51,18 @@ public class LegendItemRenderer implements Renderer, MouseResponsiveRenderer {
 
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
+        LegendController legendController = LegendController.getInstance();
+        LegendModel legendModel = legendController.getLegendModel();
+        ArrayList<Item> legendItems = legendModel.getActiveItems();
+        Item legendItem = legendItems.get(legendItems.size() - numberOfItemsToBeRendered);
+        Renderer renderer = legendItem.getData(LegendItem.RENDERER);
+        renderer.render(legendItem, target, properties);
 
-        Renderer renderer = item.getData(LegendItem.RENDERER);
-        renderer.render(item, target, properties);
+        numberOfItemsToBeRendered -= 1;
+
+        if (numberOfItemsToBeRendered == 0) {
+            numberOfItemsToBeRendered = legendItems.size();
+        }
 
         /*
          // instead of rendering only this item, this method will render all the legend items currently active

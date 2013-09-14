@@ -32,6 +32,7 @@ import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.legend.spi.LegendItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.PreviewUI;
+import org.gephi.preview.spi.Renderer;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
@@ -179,6 +180,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             legendModel.setPickedLegend(previousActiveLegend);
             refreshLayers();
         }
+        
+        previewUIController.refreshPreview();
     }//GEN-LAST:event_moveDownActionPerformed
 
     private void addLegendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLegendButtonActionPerformed
@@ -205,12 +208,16 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             if (chosenLegendCustomBuilder != null) {
                 if (chosenLegendCustomBuilder.isAvailableToBuild()) {
                     // build the legend item
-                    LegendModel legendManager = legendController.getLegendModel();
-                    Integer newItemIndex = legendManager.getNextItemIndex();
+                    LegendModel legendModel = legendController.getLegendModel();
+                    Integer newItemIndex = legendModel.getNextItemIndex();
                     Item item = chosenLegend.createCustomItem(newItemIndex, null, null, chosenLegendCustomBuilder);
 
                     // adding item to legend model
                     legendController.addItemToLegendModel(item);
+
+                    //update the renderer about the number of items
+                    LegendItemRenderer legendItemRenderer = (LegendItemRenderer) Lookup.getDefault().lookup(LegendItemRenderer.class);
+                    legendItemRenderer.setNumberOfLegendItems(legendModel.getNumberOfActiveItems());
 
                     // the user must be notified that the legend was actually added. Hence, update the legend layers panel.
                     refreshLayers();
@@ -248,6 +255,11 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
                 }
 
                 legendModel.removeItem(indexOfPickedLegend);
+
+                //update the renderer about the number of items
+                LegendItemRenderer legendItemRenderer = (LegendItemRenderer) Lookup.getDefault().lookup(LegendItemRenderer.class);
+                legendItemRenderer.setNumberOfLegendItems(legendModel.getNumberOfActiveItems());
+
                 refreshLayers();
                 previewUIController.refreshPreview();
             }
@@ -267,6 +279,8 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             legendManager.setPickedLegend(nextActiveLegend);
             refreshLayers();
         }
+        
+        previewUIController.refreshPreview();
     }//GEN-LAST:event_moveUpActionPerformed
 
     private JTable getLegendLayerModel() {
