@@ -215,10 +215,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
                     // adding item to legend model
                     legendController.addItemToLegendModel(item);
 
-                    //update the renderer about the number of items
-                    LegendItemRenderer legendItemRenderer = (LegendItemRenderer) Lookup.getDefault().lookup(LegendItemRenderer.class);
-                    legendItemRenderer.setNumberOfLegendItems(legendModel.getNumberOfActiveItems());
-
                     // the user must be notified that the legend was actually added. Hence, update the legend layers panel.
                     refreshLayers();
                     previewUIController.refreshPreview();
@@ -255,10 +251,6 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
                 }
 
                 legendModel.removeItem(indexOfPickedLegend);
-
-                //update the renderer about the number of items
-                LegendItemRenderer legendItemRenderer = (LegendItemRenderer) Lookup.getDefault().lookup(LegendItemRenderer.class);
-                legendItemRenderer.setNumberOfLegendItems(legendModel.getNumberOfActiveItems());
 
                 refreshLayers();
                 previewUIController.refreshPreview();

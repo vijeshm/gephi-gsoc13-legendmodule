@@ -33,12 +33,7 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class LegendItemRenderer implements Renderer, MouseResponsiveRenderer {
 
-    Integer numberOfItemsToBeRendered = 0;
-    // Boolean allItemsRendered = false;
-
-    public void setNumberOfLegendItems(Integer numberOfItemsToBeRendered) {
-        this.numberOfItemsToBeRendered = numberOfItemsToBeRendered;
-    }
+    Integer nextRenderIndex = 0;
 
     @Override
     public String getDisplayName() {
@@ -54,36 +49,14 @@ public class LegendItemRenderer implements Renderer, MouseResponsiveRenderer {
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
         ArrayList<Item> legendItems = legendModel.getActiveItems();
-        Item legendItem = legendItems.get(legendItems.size() - numberOfItemsToBeRendered);
+        Item legendItem = legendItems.get(nextRenderIndex);
         Renderer renderer = legendItem.getData(LegendItem.RENDERER);
         renderer.render(legendItem, target, properties);
 
-        numberOfItemsToBeRendered -= 1;
-
-        if (numberOfItemsToBeRendered == 0) {
-            numberOfItemsToBeRendered = legendItems.size();
+        nextRenderIndex += 1;
+        if (nextRenderIndex == legendItems.size()) {
+            nextRenderIndex = 0;
         }
-
-        /*
-         // instead of rendering only this item, this method will render all the legend items currently active
-         // Reason:  The rendering technique that takes place in the preview controller gives priority to renderer, rather than items.
-         //          i.e, if nodeRenderer is activated first, all the nodes will be rendered, followed by other preview items.
-         //          This method cannot be applied if legend item layering is to be enabled. Item-order must be given higher priority for layering legends.
-         // Hence, all the legend items (in the order seen at the layers panel) are rendered and a flag is set.
-
-         if (!allItemsRendered) {
-         LegendController legendController = LegendController.getInstance();
-         LegendModel legendModel = legendController.getLegendModel();
-         ArrayList<Item> legendItems = legendModel.getActiveItems();
-
-         Renderer renderer;
-         for (Item legendItem : legendItems) {
-         renderer = legendItem.getData(LegendItem.RENDERER);
-         renderer.render(item, target, properties);
-         }
-         allItemsRendered = true;
-         }
-         */
     }
 
     @Override
