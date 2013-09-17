@@ -41,6 +41,7 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.preview.api;
 
+import java.awt.Rectangle;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 
@@ -99,4 +100,6 @@ public interface Item {
      * @return all keys
      */
     public String[] getKeys();
+    
+    public Rectangle getBoundingBox();
 }

@@ -4,10 +4,12 @@
  */
 package org.gephi.legend.plugin.groups;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import org.gephi.legend.api.AbstractItem;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
+import static org.gephi.legend.spi.LegendItem.PROPERTIES;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
@@ -17,9 +19,9 @@ import org.gephi.preview.api.PreviewProperty;
 public class GroupsItem extends AbstractItem implements LegendItem {
 
     public static final String LEGEND_TYPE = "Groups Item";
-
     protected ArrayList<GroupElement> groups;
     //BODY
+
     public GroupsItem(Object source) {
         super(source, LEGEND_TYPE);
     }
@@ -28,12 +30,22 @@ public class GroupsItem extends AbstractItem implements LegendItem {
     public String toString() {
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
     }
-    
+
     public ArrayList<GroupElement> getGroups() {
         return groups;
     }
-    
+
     public void setGroups(ArrayList<GroupElement> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public Rectangle getBoundingBox() {
+        PreviewProperty[] ownProperties = this.getData(PROPERTIES);
+        float originX = ownProperties[LegendProperty.USER_ORIGIN_X].getValue();
+        float originY = ownProperties[LegendProperty.USER_ORIGIN_Y].getValue();
+        float width = ownProperties[LegendProperty.WIDTH].getValue();
+        float height = ownProperties[LegendProperty.HEIGHT].getValue();
+        return new Rectangle((int) originX, (int) originY, (int) width, (int) height);
     }
 }

@@ -41,8 +41,10 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.preview.plugin.items;
 
+import java.awt.Rectangle;
 import org.gephi.graph.api.Node;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PreviewProperty;
 
 /**
  *
@@ -59,5 +61,11 @@ public class NodeLabelItem extends AbstractItem {
 
     public NodeLabelItem(Node source) {
         super(source, Item.NODE_LABEL);
+    }
+    
+    @Override
+    public Rectangle getBoundingBox() {
+        // this returns a dummy rectangle at (0,0) with dimensions 0x0 - come up with an approach to return proper coordinates
+        return new Rectangle(0, 0, 0, 0);
     }
 }

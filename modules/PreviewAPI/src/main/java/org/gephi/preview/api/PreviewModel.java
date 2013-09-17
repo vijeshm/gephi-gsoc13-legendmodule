@@ -70,6 +70,13 @@ public interface PreviewModel {
     public PreviewProperties getProperties();
 
     /**
+     * Returns all the items 
+     *
+     * @return all items
+     */
+    public Item[] getItems();
+    
+    /**
      * Returns all items with
      * <code>type</code> as type. <p> Default types are {@link Item#NODE}, {@link Item#EDGE}, {@link Item#NODE_LABEL} and {@link Item#EDGE_LABEL}.
      *

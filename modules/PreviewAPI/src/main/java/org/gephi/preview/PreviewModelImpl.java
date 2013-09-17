@@ -105,7 +105,8 @@ public class PreviewModelImpl implements PreviewModel {
     }
 
     /**
-     * Makes sure that, at least, basic property editors are available for serializing and deserializing
+     * Makes sure that, at least, basic property editors are available for
+     * serializing and deserializing
      */
     private void initBasicPropertyEditors() {
         if (PropertyEditorManager.findEditor(DependantColor.class) == null) {
@@ -120,7 +121,8 @@ public class PreviewModelImpl implements PreviewModel {
     }
 
     /**
-     * Makes sure that, if more than one plugin extends a default renderer, only the one with the lowest position is enabled initially.
+     * Makes sure that, if more than one plugin extends a default renderer, only
+     * the one with the lowest position is enabled initially.
      */
     private void initManagedRenderers() {
         Renderer[] registeredRenderers = previewController.getRegisteredRenderers();
@@ -181,6 +183,17 @@ public class PreviewModelImpl implements PreviewModel {
     public PreviewProperties getProperties() {
         initProperties();
         return properties;
+    }
+
+    @Override
+    public Item[] getItems() {
+        ArrayList<Item> items = new ArrayList<Item>();
+        for (String type : typeMap.keySet()) {
+            List<Item> itemsOfType = typeMap.get(type);
+            items.addAll(itemsOfType);
+        }
+
+        return items.toArray(new Item[0]);
     }
 
     @Override
@@ -304,8 +317,9 @@ public class PreviewModelImpl implements PreviewModel {
     }
 
     /**
-     * Makes sure that managedRenderers contains every renderer existing implementations. If some renderers are not in the list, they are added in default implementation order at the end of the list
-     * and not enabled.
+     * Makes sure that managedRenderers contains every renderer existing
+     * implementations. If some renderers are not in the list, they are added in
+     * default implementation order at the end of the list and not enabled.
      */
     private void completeManagedRenderersListIfNecessary() {
         if (managedRenderers != null) {
@@ -331,9 +345,9 @@ public class PreviewModelImpl implements PreviewModel {
      * Removes unnecessary properties from not enabled renderers
      */
     private void reloadProperties() {
-        if(properties == null){
+        if (properties == null) {
             initProperties();
-        }else{
+        } else {
             PreviewProperties newProperties = new PreviewProperties();//Ensure that the properties object doesn't change
 
             //Properties from renderers

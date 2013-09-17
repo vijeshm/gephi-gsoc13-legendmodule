@@ -6,6 +6,7 @@ package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
+import static org.gephi.legend.spi.LegendItem.PROPERTIES;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.NbBundle;
 
@@ -129,19 +131,19 @@ public class TableItem extends AbstractItem implements LegendItem {
     public Boolean getStructureChanged() {
         return rowChanged || columnChanged || ipeditorChanged;
     }
-    
+
     public void setRowChanged(Boolean change) {
         rowChanged = change;
     }
-    
+
     public Boolean getColumnChanged() {
         return columnChanged;
     }
-    
+
     public void setColumnChanged(Boolean change) {
         columnChanged = change;
     }
-    
+
     public void setInplaceEditorChanged(Boolean change) {
         ipeditorChanged = change;
     }
@@ -149,5 +151,15 @@ public class TableItem extends AbstractItem implements LegendItem {
     @Override
     public String toString() {
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
+    }
+
+    @Override
+    public Rectangle getBoundingBox() {
+        PreviewProperty[] ownProperties = this.getData(PROPERTIES);
+        float originX = ownProperties[LegendProperty.USER_ORIGIN_X].getValue();
+        float originY = ownProperties[LegendProperty.USER_ORIGIN_Y].getValue();
+        float width = ownProperties[LegendProperty.WIDTH].getValue();
+        float height = ownProperties[LegendProperty.HEIGHT].getValue();
+        return new Rectangle((int) originX, (int) originY, (int) width, (int) height);
     }
 }

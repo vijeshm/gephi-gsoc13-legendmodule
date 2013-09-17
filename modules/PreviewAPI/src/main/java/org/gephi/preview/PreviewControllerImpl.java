@@ -43,6 +43,7 @@ package org.gephi.preview;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.gephi.attribute.api.AttributeModel;
@@ -185,7 +186,7 @@ public class PreviewControllerImpl implements PreviewController {
         }
 
         //Refresh dimensions
-        updateDimensions(previewModel, previewModel.getItems(Item.NODE));
+        updateDimensions(previewModel, previewModel.getItems());
 
 
         //Pre process renderers
@@ -204,29 +205,31 @@ public class PreviewControllerImpl implements PreviewController {
         return false;
     }
 
-    public void updateDimensions(PreviewModelImpl model, Item[] nodeItems) {
+    public void updateDimensions(PreviewModelImpl model, Item[] items) {
         float margin = model.getProperties().getFloatValue(PreviewProperty.MARGIN);  //percentage
         float topLeftX = 0f;
         float topLeftY = 0f;
         float bottomRightX = 0f;
         float bottomRightY = 0f;
 
-        for (Item nodeItem : nodeItems) {
-            float x = (Float) nodeItem.getData("x");
-            float y = (Float) nodeItem.getData("y");
-            float s = ((Float) nodeItem.getData("size")) / 2f;
+        for (Item item : items) {
+            Rectangle boundingBox = item.getBoundingBox();
+            int x = boundingBox.x;
+            int y = boundingBox.y;
+            int width = boundingBox.width;
+            int height = boundingBox.height;
 
-            if (x - s < topLeftX) {
-                topLeftX = x - s;
+            if (x < topLeftX) {
+                topLeftX = x;
             }
-            if (y - s < topLeftY) {
-                topLeftY = y - s;
+            if (y < topLeftY) {
+                topLeftY = y;
             }
-            if (x + s > bottomRightX) {
-                bottomRightX = x + s;
+            if (x + width > bottomRightX) {
+                bottomRightX = x + width;
             }
-            if (y + s > bottomRightY) {
-                bottomRightY = y + s;
+            if (y + height > bottomRightY) {
+                bottomRightY = y + height;
             }
         }
 
