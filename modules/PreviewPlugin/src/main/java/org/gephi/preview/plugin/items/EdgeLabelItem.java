@@ -41,7 +41,6 @@
  */
 package org.gephi.preview.plugin.items;
 
-import java.awt.Rectangle;
 import org.gephi.graph.api.Edge;
 import org.gephi.preview.api.Item;
 
@@ -60,11 +59,5 @@ public class EdgeLabelItem extends AbstractItem {
 
     public EdgeLabelItem(Edge source) {
         super(source, Item.EDGE_LABEL);
-    }
-
-    @Override
-    public Rectangle getBoundingBox() {
-        // this returns a dummy rectangle at (0,0) with dimensions 0x0 - come up with an approach to return proper coordinates
-        return new Rectangle(0, 0, 0, 0);
     }
 }

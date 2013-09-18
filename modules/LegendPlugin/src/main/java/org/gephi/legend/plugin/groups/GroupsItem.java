@@ -10,13 +10,14 @@ import org.gephi.legend.api.AbstractItem;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.PROPERTIES;
+import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
  *
  * @author mvvijesh, edubecks
  */
-public class GroupsItem extends AbstractItem implements LegendItem {
+public class GroupsItem extends AbstractItem implements LegendItem, Item.BoundingBoxProvidingItem{
 
     public static final String LEGEND_TYPE = "Groups Item";
     protected ArrayList<GroupElement> groups;

@@ -17,11 +17,13 @@ import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
+import org.gephi.preview.api.PDFTarget;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
+import org.gephi.preview.api.SVGTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
@@ -71,134 +73,149 @@ public class InplaceItemRenderer implements Renderer {
         fontLookup.put(Font.TRUETYPE_FONT, "True Type Font");
         fontLookup.put(Font.TYPE1_FONT, "Type1 Font");
     }
+    
+    /**
+     * Determines if the current render is for an export.
+     * Used for not drawing in-place editors.
+     * @param target Rendering target
+     * @return 
+     */
+    private boolean isExport(PreviewProperties properties){
+        return properties.hasProperty(PreviewProperty.IS_EXPORT) && properties.getBooleanValue(PreviewProperty.IS_EXPORT);
+    }
 
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
-        LegendController legendController = LegendController.getInstance();
-        LegendModel legendModel = legendController.getLegendModel();
-        InplaceEditor ipeditor = legendModel.getInplaceEditor();
+        if(!isExport(properties)){
+            LegendController legendController = LegendController.getInstance();
+            LegendModel legendModel = legendController.getLegendModel();
+            InplaceEditor ipeditor = legendModel.getInplaceEditor();
 
-        if (ipeditor != null) {
-            G2DTarget g2dtarget = (G2DTarget) target;
-            Graphics2D graphics2d = g2dtarget.getGraphics();
+            if (ipeditor != null) {
+                G2DTarget g2dtarget = (G2DTarget) target;
+                Graphics2D graphics2d = g2dtarget.getGraphics();
 
-            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-            PreviewModel previewModel = previewController.getModel();
+                PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+                PreviewModel previewModel = previewController.getModel();
 
-            float zoomLevel = properties.getFloatValue(PreviewProperty.ZOOM_LEVEL);
+                float zoomLevel = 1.0f;
+                if(properties.hasProperty(PreviewProperty.ZOOM_LEVEL)){
+                    zoomLevel = properties.getFloatValue(PreviewProperty.ZOOM_LEVEL);
+                }
 
-            //Calculate block and border size taking zoom factor into account.
-            //We want to make in place editors size independent of zoom.
-            float blockUnitSizeFloat = ((float) DEFAULT_INPLACE_BLOCK_UNIT_SIZE / zoomLevel);
-            int blockUnitSize = (int) blockUnitSizeFloat;
-            if (blockUnitSize < INPLACE_MIN_BLOCK_UNIT_SIZE) {
-                blockUnitSize = INPLACE_MIN_BLOCK_UNIT_SIZE;
-                blockUnitSizeFloat = INPLACE_MIN_BLOCK_UNIT_SIZE;
-            }
+                //Calculate block and border size taking zoom factor into account.
+                //We want to make in place editors size independent of zoom.
+                float blockUnitSizeFloat = ((float) DEFAULT_INPLACE_BLOCK_UNIT_SIZE / zoomLevel);
+                int blockUnitSize = (int) blockUnitSizeFloat;
+                if (blockUnitSize < INPLACE_MIN_BLOCK_UNIT_SIZE) {
+                    blockUnitSize = INPLACE_MIN_BLOCK_UNIT_SIZE;
+                    blockUnitSizeFloat = INPLACE_MIN_BLOCK_UNIT_SIZE;
+                }
 
-            float borderSizeFloat = ((float) BORDER_SIZE / zoomLevel);
-            int borderSize = (int) borderSizeFloat;
-            if (borderSize <= 0) {
-                borderSize = 1; // at least 1 pixel
-            }
+                float borderSizeFloat = ((float) BORDER_SIZE / zoomLevel);
+                int borderSize = (int) borderSizeFloat;
+                if (borderSize <= 0) {
+                    borderSize = 1; // at least 1 pixel
+                }
 
-            Font inplaceFont = INPLACE_DEFAULT_DISPLAY_FONT;
-            inplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() / zoomLevel);
+                Font inplaceFont = INPLACE_DEFAULT_DISPLAY_FONT;
+                inplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() / zoomLevel);
 
-            Font labelFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-            Font numberFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-            Font fontFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
+                Font labelFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
+                Font numberFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
+                Font fontFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
 
-            // save current states and restore it later
-            Color saveColorState = graphics2d.getColor();
-            Font saveFontState = graphics2d.getFont();
+                // save current states and restore it later
+                Color saveColorState = graphics2d.getColor();
+                Font saveFontState = graphics2d.getFont();
 
-            // border cant be drawn now, since the height and width is unknown. Hence set the pseudo origin
-            int editorOriginX = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_X);
-            int editorOriginY = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_Y);
-            float editorWidth; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
-            float editorHeight; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
+                // border cant be drawn now, since the height and width is unknown. Hence set the pseudo origin
+                int editorOriginX = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_X);
+                int editorOriginY = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_Y);
+                float editorWidth; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
+                float editorHeight; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
 
-            // preparation for rendering the inplace editor
-            int rowBlock;
-            int colBlock;
-            int elemBlock;
-            int maxElementsCount;
-            boolean selected;
-            ArrayList<Row> rows = ipeditor.getRows();
+                // preparation for rendering the inplace editor
+                int rowBlock;
+                int colBlock;
+                int elemBlock;
+                int maxElementsCount;
+                boolean selected;
+                ArrayList<Row> rows = ipeditor.getRows();
 
 
-            ////////////////////
-            ////////////////////
-            //NOTE for refactor:
-            //Switch case needs to be completely removed.
-            //Elements/editors need to be subclassed in order to generally and, in a simple way, provide all data we need here for rendering them.
-            //Do not use Object array for associated data. This leads to hardcoded positions, use a Map<String, Object> instead.
-            //For numbers/strings to access this data, always create a constant, avoid copying values all over the code.
+                ////////////////////
+                ////////////////////
+                //NOTE for refactor:
+                //Switch case needs to be completely removed.
+                //Elements/editors need to be subclassed in order to generally and, in a simple way, provide all data we need here for rendering them.
+                //Do not use Object array for associated data. This leads to hardcoded positions, use a Map<String, Object> instead.
+                //For numbers/strings to access this data, always create a constant, avoid copying values all over the code.
 
-            //With a first analysis this will be probably needed:
-            //A render() method for elements that abstracts the drawing. Initially set the drawing origin for it if possible.
-            //Since In place editors keep same size with a lot of zoom, we need to use float precision for all inPlace editor rendering where possible.
-            //Elements should provide the desiredNumberOfBlocks field with a method or through the data Map. Since this is common to all elements, it can be directly a method
-            ////////////////////
-            ////////////////////
+                //With a first analysis this will be probably needed:
+                //A render() method for elements that abstracts the drawing. Initially set the drawing origin for it if possible.
+                //Since In place editors keep same size with a lot of zoom, we need to use float precision for all inPlace editor rendering where possible.
+                //Elements should provide the desiredNumberOfBlocks field with a method or through the data Map. Since this is common to all elements, it can be directly a method
+                ////////////////////
+                ////////////////////
 
-            //First iterate elements for precalculating editor elements and size so we can draw background:
-            maxElementsCount = 0;
-            for (Row row : rows) {
-                int currentElementsCount = 0;
-                for (Column column : row.getColumns()) {
-                    for (BaseElement elem : column.getElements()) {
-                        // for the current target and font scenarios, compute the number of blocks and get them.
-                        elem.computeNumberOfBlocks(graphics2d, g2dtarget, blockUnitSize);
-                        currentElementsCount += elem.getNumberOfBlocks();
+                //First iterate elements for precalculating editor elements and size so we can draw background:
+                maxElementsCount = 0;
+                for (Row row : rows) {
+                    int currentElementsCount = 0;
+                    for (Column column : row.getColumns()) {
+                        for (BaseElement elem : column.getElements()) {
+                            // for the current target and font scenarios, compute the number of blocks and get them.
+                            elem.computeNumberOfBlocks(graphics2d, g2dtarget, blockUnitSize);
+                            currentElementsCount += elem.getNumberOfBlocks();
+                        }
+                    }
+                    maxElementsCount = Math.max(maxElementsCount, currentElementsCount);
+                }
+
+                editorWidth = maxElementsCount * blockUnitSize + 2 * borderSize;
+                editorHeight = rows.size() * blockUnitSize + 2 * borderSize;
+
+                //Fill the background at once for the whole editor
+                graphics2d.setColor(BACKGROUND);
+                fillRect(graphics2d, editorOriginX, editorOriginY, editorWidth, editorHeight);
+
+                // iterate through all the rows, corresponding columns and their corresponding elements. 
+                // based on the type of element, render accordingly.
+                // editorHeight is trivial. its just the block size times the number of rows.
+                for (rowBlock = 0; rowBlock < rows.size(); rowBlock++) {
+                    int currentElementsCount = 0;
+                    ArrayList<Column> columns = rows.get(rowBlock).getColumns();
+                    for (colBlock = 0; colBlock < columns.size(); colBlock++) {
+                        ArrayList<BaseElement> elements = columns.get(colBlock).getElements();
+                        for (elemBlock = 0; elemBlock < elements.size(); elemBlock++) {
+                            BaseElement elem = elements.get(elemBlock);
+                            elem.renderElement(graphics2d, (G2DTarget) target, blockUnitSize, editorOriginX, editorOriginY, borderSize, rowBlock, currentElementsCount);
+                            currentElementsCount += elem.getNumberOfBlocks();
+                        }
                     }
                 }
-                maxElementsCount = Math.max(maxElementsCount, currentElementsCount);
+
+                // rendering borders
+                graphics2d.setColor(BORDER_COLOR);
+                // top
+                fillRect(graphics2d, editorOriginX, editorOriginY, editorWidth, borderSizeFloat);
+                // right
+                fillRect(graphics2d, editorOriginX + editorWidth - borderSizeFloat, editorOriginY, borderSizeFloat, editorHeight);
+                // bottom
+                fillRect(graphics2d, editorOriginX, editorOriginY + editorHeight - borderSizeFloat, editorWidth, borderSizeFloat);
+                // left
+                fillRect(graphics2d, editorOriginX, editorOriginY, borderSizeFloat, editorHeight);
+
+                // set back the saved states
+                graphics2d.setFont(saveFontState);
+                graphics2d.setColor(saveColorState);
+
+                ipeditor.setData(InplaceEditor.ORIGIN_X, editorOriginX);
+                ipeditor.setData(InplaceEditor.ORIGIN_Y, editorOriginY);
+                ipeditor.setData(InplaceEditor.WIDTH, editorWidth);
+                ipeditor.setData(InplaceEditor.HEIGHT, editorHeight);
             }
-
-            editorWidth = maxElementsCount * blockUnitSize + 2 * borderSize;
-            editorHeight = rows.size() * blockUnitSize + 2 * borderSize;
-
-            //Fill the background at once for the whole editor
-            graphics2d.setColor(BACKGROUND);
-            fillRect(graphics2d, editorOriginX, editorOriginY, editorWidth, editorHeight);
-
-            // iterate through all the rows, corresponding columns and their corresponding elements. 
-            // based on the type of element, render accordingly.
-            // editorHeight is trivial. its just the block size times the number of rows.
-            for (rowBlock = 0; rowBlock < rows.size(); rowBlock++) {
-                int currentElementsCount = 0;
-                ArrayList<Column> columns = rows.get(rowBlock).getColumns();
-                for (colBlock = 0; colBlock < columns.size(); colBlock++) {
-                    ArrayList<BaseElement> elements = columns.get(colBlock).getElements();
-                    for (elemBlock = 0; elemBlock < elements.size(); elemBlock++) {
-                        BaseElement elem = elements.get(elemBlock);
-                        elem.renderElement(graphics2d, (G2DTarget) target, blockUnitSize, editorOriginX, editorOriginY, borderSize, rowBlock, currentElementsCount);
-                        currentElementsCount += elem.getNumberOfBlocks();
-                    }
-                }
-            }
-
-            // rendering borders
-            graphics2d.setColor(BORDER_COLOR);
-            // top
-            fillRect(graphics2d, editorOriginX, editorOriginY, editorWidth, borderSizeFloat);
-            // right
-            fillRect(graphics2d, editorOriginX + editorWidth - borderSizeFloat, editorOriginY, borderSizeFloat, editorHeight);
-            // bottom
-            fillRect(graphics2d, editorOriginX, editorOriginY + editorHeight - borderSizeFloat, editorWidth, borderSizeFloat);
-            // left
-            fillRect(graphics2d, editorOriginX, editorOriginY, borderSizeFloat, editorHeight);
-
-            // set back the saved states
-            graphics2d.setFont(saveFontState);
-            graphics2d.setColor(saveColorState);
-
-            ipeditor.setData(InplaceEditor.ORIGIN_X, editorOriginX);
-            ipeditor.setData(InplaceEditor.ORIGIN_Y, editorOriginY);
-            ipeditor.setData(InplaceEditor.WIDTH, editorWidth);
-            ipeditor.setData(InplaceEditor.HEIGHT, editorHeight);
         }
     }
 

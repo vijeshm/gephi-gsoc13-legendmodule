@@ -84,6 +84,8 @@ public class SVGExporter implements CharacterExporter, VectorExporter, LongTask 
         controller.refreshPreview(workspace);
         
         PreviewProperties props = controller.getModel(workspace).getProperties();
+        
+        props.putValue(PreviewProperty.IS_EXPORT, true);
         props.putValue(SVGTarget.SCALE_STROKES, scaleStrokes);
         props.putValue(PreviewProperty.MARGIN, new Float((float) margin));
         target = (SVGTarget) controller.getRenderTarget(RenderTarget.SVG_TARGET, workspace);
@@ -108,6 +110,7 @@ public class SVGExporter implements CharacterExporter, VectorExporter, LongTask 
             } finally {
                 writer.close();
                 props.removeSimpleValue(PreviewProperty.MARGIN);
+                props.removeSimpleValue(PreviewProperty.IS_EXPORT);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -85,6 +85,7 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
         PreviewProperties props = controller.getModel(workspace).getProperties();
         props.putValue("width", width);
         props.putValue("height", height);
+        props.putValue(PreviewProperty.IS_EXPORT, true);
         Color oldColor = props.getColorValue(PreviewProperty.BACKGROUND_COLOR);
         if (transparentBackground) {
             props.putValue(PreviewProperty.BACKGROUND_COLOR, new Color(255, 255, 255, 0));//White transparent
@@ -95,11 +96,7 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
         if (target instanceof LongTask) {
             ((LongTask) target).setProgressTicket(progress);
         }
-        //Fix bug caused by keeping width and height in the workspace preview properties.
-        //When a .gephi file is loaded later with these properties PGraphics will be created instead of a PApplet
-        props.removeSimpleValue("width");
-        props.removeSimpleValue("height");
-        props.removeSimpleValue(PreviewProperty.MARGIN);
+        
 
         try {
             target.refresh();
@@ -112,9 +109,16 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
             ImageIO.write(img, "png", stream);
             stream.close();
 
-            props.putValue(PreviewProperty.BACKGROUND_COLOR, oldColor);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally{
+            //Fix bug caused by keeping width and height in the workspace preview properties.
+            //When a .gephi file is loaded later with these properties PGraphics will be created instead of a PApplet
+            props.removeSimpleValue("width");
+            props.removeSimpleValue("height");
+            props.removeSimpleValue(PreviewProperty.MARGIN);
+            props.removeSimpleValue(PreviewProperty.IS_EXPORT);
+            props.putValue(PreviewProperty.BACKGROUND_COLOR, oldColor);
         }
 
         Progress.finish(progress);

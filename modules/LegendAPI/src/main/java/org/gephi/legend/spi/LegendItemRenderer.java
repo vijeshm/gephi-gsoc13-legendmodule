@@ -5,9 +5,6 @@
 package org.gephi.legend.spi;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import javax.swing.LookAndFeel;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.mouse.LegendMouseListener;
@@ -20,7 +17,6 @@ import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.MouseResponsiveRenderer;
 import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.preview.spi.Renderer;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 

@@ -49,7 +49,7 @@ import org.gephi.preview.api.Item;
  *
  * @author Mathieu Bastian
  */
-public class EdgeItem extends AbstractItem {
+public class EdgeItem extends AbstractItem implements Item.BoundingBoxProvidingItem {
 
     public static final String WEIGHT = "weight";
     public static final String DIRECTED = "directed";

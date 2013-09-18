@@ -213,23 +213,27 @@ public class PreviewControllerImpl implements PreviewController {
         float bottomRightY = 0f;
 
         for (Item item : items) {
-            Rectangle boundingBox = item.getBoundingBox();
-            int x = boundingBox.x;
-            int y = boundingBox.y;
-            int width = boundingBox.width;
-            int height = boundingBox.height;
+            if(item instanceof Item.BoundingBoxProvidingItem){
+                Rectangle boundingBox = ((Item.BoundingBoxProvidingItem) item).getBoundingBox();
+                if(boundingBox != null){
+                    int x = boundingBox.x;
+                    int y = boundingBox.y;
+                    int width = boundingBox.width;
+                    int height = boundingBox.height;
 
-            if (x < topLeftX) {
-                topLeftX = x;
-            }
-            if (y < topLeftY) {
-                topLeftY = y;
-            }
-            if (x + width > bottomRightX) {
-                bottomRightX = x + width;
-            }
-            if (y + height > bottomRightY) {
-                bottomRightY = y + height;
+                    if (x < topLeftX) {
+                        topLeftX = x;
+                    }
+                    if (y < topLeftY) {
+                        topLeftY = y;
+                    }
+                    if (x + width > bottomRightX) {
+                        bottomRightX = x + width;
+                    }
+                    if (y + height > bottomRightY) {
+                        bottomRightY = y + height;
+                    }
+                }
             }
         }
 

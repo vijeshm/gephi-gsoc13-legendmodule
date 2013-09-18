@@ -101,5 +101,18 @@ public interface Item {
      */
     public String[] getKeys();
     
-    public Rectangle getBoundingBox();
+    /**
+     * <b>Optionally</b> implement this interface in an <code>Item</code> to provide Preview with the dimensions needed for drawing this item.
+     * This interface is specially needed for items that will be drawn out of the graph area. If not provided, these items would probably be placed 
+     * out of the bounds of an exported document such as PDF or SVG, and therefore, not visible or only partially visible.
+     * 
+     * An example of these kind of items is a Graph Legend.
+     */
+    public interface BoundingBoxProvidingItem {
+
+        /**
+         * @return Bounding box or null if not specified
+         */
+        public Rectangle getBoundingBox();
+    }
 }

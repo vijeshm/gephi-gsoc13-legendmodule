@@ -231,15 +231,24 @@ public class PreviewProperty {
      * General <code>Boolean</code> property set as <code>true</code> when the user
      * is panning the canvas. Helps to conditionally hide elements while moving to
      * speed things up.
-	 * Only for usage with interactive preview visualization
+	 * Only for usage with interactive preview visualization.
+     * 
+     * This is a simple value. PreviewProperties may not contain this property at all.
      */
     public static final String MOVING = "canvas.moving";
 	/**
      * General <code>Float</code> property which specifies the level of zoom applied in the preview canvas.
 	 * Helps to draw size independent controls for user interaction.
 	 * Only for usage with interactive preview visualization.
+     * 
+     * This is a simple value. PreviewProperties may not contain this property at all.
      */
     public static final String ZOOM_LEVEL = "zoom-level";
+	/**
+     * General <code>Boolean</code> property which determines if the current rendering is for an export (with any target) such as PDF, PNG or SVG.
+     * This is a simple value. PreviewProperties may not contain this property at all.
+     */
+    public static final String IS_EXPORT = "is.export";
 	
     //Constants categories
     /**

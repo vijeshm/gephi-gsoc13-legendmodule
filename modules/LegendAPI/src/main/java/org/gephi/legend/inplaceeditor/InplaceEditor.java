@@ -4,26 +4,13 @@
  */
 package org.gephi.legend.inplaceeditor;
 
-import com.bric.swing.ColorPicker;
-import com.connectina.swing.fontchooser.JFontChooser;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Rectangle;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.Item;
-import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.PreviewModel;
-import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -171,11 +158,5 @@ public class InplaceEditor implements Item {
     @Override
     public String[] getKeys() {
         return data.keySet().toArray(new String[0]);
-    }
-
-    @Override
-    public Rectangle getBoundingBox() {
-        // the inplace editor is logically not an item. Its just used to modify properties of items.
-        return new Rectangle(0, 0, 0, 0);
     }
 }

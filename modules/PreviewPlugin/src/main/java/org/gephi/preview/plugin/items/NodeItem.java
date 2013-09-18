@@ -49,7 +49,7 @@ import org.gephi.preview.api.Item;
  *
  * @author Mathieu Bastian
  */
-public class NodeItem extends AbstractItem {
+public class NodeItem extends AbstractItem implements Item.BoundingBoxProvidingItem {
 
     public static final String X = "x";
     public static final String Y = "y";

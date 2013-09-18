@@ -43,8 +43,6 @@ package org.gephi.preview.api;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.beans.PropertyEditor;
-import java.beans.PropertyEditorManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;

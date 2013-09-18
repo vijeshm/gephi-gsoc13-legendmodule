@@ -45,7 +45,6 @@ package org.gephi.io.exporter.preview;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -108,7 +107,6 @@ public class PDFExporter implements ByteExporter, VectorExporter, LongTask {
             pdfWriter = PdfWriter.getInstance(document, stream);
             pdfWriter.setPdfVersion(PdfWriter.PDF_VERSION_1_5);
             pdfWriter.setFullCompression();
-
         } catch (DocumentException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -116,6 +114,7 @@ public class PDFExporter implements ByteExporter, VectorExporter, LongTask {
         PdfContentByte cb = pdfWriter.getDirectContent();
         cb.saveState();
 
+        props.putValue(PreviewProperty.IS_EXPORT, true);
         props.putValue(PDFTarget.LANDSCAPE, landscape);
         props.putValue(PDFTarget.PAGESIZE, size);
         props.putValue(PDFTarget.MARGIN_TOP, new Float((float) marginTop));
@@ -139,6 +138,7 @@ public class PDFExporter implements ByteExporter, VectorExporter, LongTask {
 
         Progress.finish(progress);
 
+        props.removeSimpleValue(PreviewProperty.IS_EXPORT);
         props.putValue(PDFTarget.PDF_CONTENT_BYTE, null);
         props.putValue(PDFTarget.PAGESIZE, null);
 

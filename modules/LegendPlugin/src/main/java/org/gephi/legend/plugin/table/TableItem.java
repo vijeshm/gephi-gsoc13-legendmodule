@@ -18,6 +18,7 @@ import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.PROPERTIES;
+import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.NbBundle;
 
@@ -25,7 +26,7 @@ import org.openide.util.NbBundle;
  *
  * @author mvvijesh, edubecks
  */
-public class TableItem extends AbstractItem implements LegendItem {
+public class TableItem extends AbstractItem implements LegendItem, Item.BoundingBoxProvidingItem {
 
     public static final String LEGEND_TYPE = "Table Item";
     public static final String CELL_PROPERTIES = "Cell Properties";

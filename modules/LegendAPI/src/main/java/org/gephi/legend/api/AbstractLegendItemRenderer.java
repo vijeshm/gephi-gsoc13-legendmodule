@@ -34,13 +34,9 @@ import org.gephi.legend.inplaceelements.ElementImage;
 import org.gephi.legend.inplaceelements.ElementLabel;
 import org.gephi.legend.inplaceelements.ElementNumber;
 import org.gephi.legend.inplaceelements.ElementText;
-import org.gephi.legend.mouse.LegendMouseListener;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
-import org.gephi.legend.spi.LegendItemRenderer;
 import org.gephi.preview.api.*;
-import org.gephi.preview.spi.MouseResponsiveRenderer;
-import org.gephi.preview.spi.PreviewMouseListener;
 import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
 
@@ -50,6 +46,8 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractLegendItemRenderer implements Renderer {
 
+    protected boolean isExport;
+    
     protected Integer currentItemIndex;
     protected float graphOriginX = Float.MAX_VALUE;
     protected float graphOriginY = Float.MAX_VALUE;
@@ -269,9 +267,18 @@ public abstract class AbstractLegendItemRenderer implements Renderer {
         }
         graphics2D.drawString(TRANSFORMATION_LEGEND_LABEL, (width - draggedLegendLabelWidth) / 2, height / 2);
     }
+    
+    /**
+     * Determines if the current render is for an export.
+     * Used for not drawing certain things like legend anchors.
+     * @param target Rendering target
+     * @return 
+     */
+    private boolean isExport(PreviewProperties properties){
+        return properties.hasProperty(PreviewProperty.IS_EXPORT) && properties.getBooleanValue(PreviewProperty.IS_EXPORT);
+    }
 
     private void render(Graphics2D graphics2D, RenderTarget target, AffineTransform origin, Integer width, Integer height, int itemIndex) {
-
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics2D.setTransform(origin);
@@ -369,7 +376,7 @@ public abstract class AbstractLegendItemRenderer implements Renderer {
         renderToGraphics(graphics2D, target, legendNode);
 
         // draw the anchors if the item is selected
-        if (currentIsSelected) {
+        if (!isExport && currentIsSelected) {
             drawScaleAnchors(graphics2D, origin, width, height);
         }
     }
@@ -761,6 +768,8 @@ public abstract class AbstractLegendItemRenderer implements Renderer {
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
         if (item != null) {
+            this.isExport = isExport(properties);
+            
             readLegendPropertiesAndValues(item, properties);
             readOwnPropertiesAndValues(item, properties);
             if (isDisplayingLegend) {
