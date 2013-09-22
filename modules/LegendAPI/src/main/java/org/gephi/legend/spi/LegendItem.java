@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.spi;
 
 import org.gephi.preview.api.Item;
@@ -16,32 +12,32 @@ import org.openide.util.NbBundle;
  */
 public interface LegendItem extends Item {
 
-    // BUILDER
+    // builder
     public static final String CUSTOM_BUILDER = "builder";
-    // RENDERER
+    // renderer
     public static final String RENDERER = "renderer";
-    // DATA
+    // data
     public static final String LEGEND_ITEM = "legend item";
     public static final String DATA = "data";
-    // INDEX
+    // index
     public static final String ITEM_INDEX = "item index";
-    // LOCATION
+    // location
     public static final String ORIGIN = "origin";
-    //INDEX
+    // index
     public static final String PROPERTIES = "properties";
     public static final String OWN_PROPERTIES = "own properties";
-    // TYPE 
+    // type
     public static final String TYPE = "Legend Item";
-    // DESCRIPTION
+    // description
     public static final String LABEL = "label";
     public static final String HAS_DYNAMIC_PROPERTIES = "has dynamic properties";
     public static final String DYNAMIC_PROPERTIES = "dynamic properties";
     public static final String NUMBER_OF_DYNAMIC_PROPERTIES = "number of dynamic properties";
-    // MOUSE RESPONSIVE
+    // mouse responsive
     public static final String IS_SELECTED = "is selected";
     public static final String IS_BEING_TRANSFORMED = "is being transformed";
     public static final String CURRENT_TRANSFORMATION = "current transformation";
-    // ANCHOR CONSTANTS FOR ALL LEGEND ITEMS
+    // anchor constants for all legend items
     public static final int TRANSFORMATION_ANCHOR_SIZE = 20;
     public static final int TRANSFORMATION_ANCHOR_LINE_THICK = 3;
     public static final float LEGEND_MIN_WIDTH = 50;

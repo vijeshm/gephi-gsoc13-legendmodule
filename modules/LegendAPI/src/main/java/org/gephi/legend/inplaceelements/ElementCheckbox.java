@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.inplaceelements;
 
 import java.awt.Graphics2D;
@@ -20,6 +16,16 @@ import org.gephi.preview.api.PreviewProperty;
 import org.openide.util.Lookup;
 
 /**
+ * an inplace editor element to modify a boolean property of a block.
+ *
+ * Checkbox elements cannot be grouped. The data hashmap is expected to contain
+ * a single entry, IS_CHECKED. The added element should declare the number of
+ * unit-blocks that it would require. (see inplaceItemRenderer for more details
+ * on unit-blocks). The inplace item renderer uses the data hashmap and the
+ * number of unit-blocks it would require to render the content. Checkbox is a
+ * specialized form of Image element, where the images are fixed resources. This
+ * has been created as a separate type because a checkbox is semantically
+ * different from an image.
  *
  * @author mvvijesh
  */
@@ -33,21 +39,46 @@ public class ElementCheckbox extends BaseElement {
 
     @Override
     public void onSelect() {
+        // get the preview properties from the preview model
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
 
+        // invert the state of the property in the item, as well as preview properties.
         Boolean currentState = (Boolean) property.getValue();
         data.put(IS_CHECKED, !currentState);
         property.setValue(!currentState);
         previewProperties.putValue(property.getName(), !currentState);
     }
 
+    /**
+     *
+     * @param graphics2d - the graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     * @param blockUnitSize - unit size of a block, as defined in
+     * InplaceItemRenderer
+     */
     @Override
     public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
+        // a checkbox always takes one unit-block
         numberOfBlocks = 1;
     }
 
+    /**
+     *
+     * @param graphics2d - the graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     * @param blockUnitSize - unit size of a block, as defined in
+     * InplaceItemRenderer
+     * @param editorOriginX - x-coordinate of the inplace editor
+     * @param editorOriginY - y-coordinate of the inplace editor
+     * @param borderSize - size of the border, as defined in InplaceItemRenderer
+     * @param rowBlock - the row number
+     * @param currentElementsCount - the number of unit-blocks surpassed in the
+     * current row
+     */
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
         try {
@@ -59,6 +90,7 @@ public class ElementCheckbox extends BaseElement {
                 img = ImageIO.read(getClass().getResourceAsStream("/org/gephi/legend/graphics/unchecked.png"));
             }
 
+            // draw the checkboxes
             graphics2d.drawImage(img,
                     (editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
                     (editorOriginY + borderSize) + rowBlock * blockUnitSize,
@@ -69,6 +101,7 @@ public class ElementCheckbox extends BaseElement {
                     img.getWidth(),
                     img.getHeight(), null);
 
+            // update the geometry of the inplace editor
             setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
                     (editorOriginY + borderSize) + rowBlock * blockUnitSize,
                     blockUnitSize,

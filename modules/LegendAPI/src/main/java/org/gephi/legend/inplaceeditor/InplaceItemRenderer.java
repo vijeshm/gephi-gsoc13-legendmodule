@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.inplaceeditor;
 
 import java.awt.Color;
@@ -17,20 +13,29 @@ import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.Item;
-import org.gephi.preview.api.PDFTarget;
-import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
-import org.gephi.preview.api.SVGTarget;
 import org.gephi.preview.spi.ItemBuilder;
 import org.gephi.preview.spi.Renderer;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 /**
+ * a renderer class for inplace editor items.
+ *
+ * This class is exposed as a service. It is used to render the inplace editors.
+ * The layout for inplace editors is split into blocks of unit size. This block
+ * of unit size is called as a unit-block. The size of the unit block is defined
+ * by DEFAULT_INPLACE_BLOCK_UNIT_SIZE member. The inplace editor item organizes
+ * the editor as a set of rows, columns and elements. A row contains a set of
+ * columns, and a column contains a set of elements. The rows need not contain
+ * equal number of columns, and the columns need not contain equal number of
+ * elements. The elements declare the number of blocks that they require for
+ * them to be rendered. Although this can be computed on-the-fly during
+ * rendering, we use this approach to make the procedure clearer and avoid
+ * having a 2-pass technique.
  *
  * @author mvvijesh
  */
@@ -40,18 +45,17 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class InplaceItemRenderer implements Renderer {
 
-    // all these values should be made as final. They are temporarily not final because of debugging purposes
-    public static Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
-    public static Color LABEL_COLOR = Color.BLACK;
-    public static Color BORDER_COLOR = Color.BLACK;
-    public static int BORDER_SIZE = 1;
-    public static float COLOR_MARGIN = 0.2f;
-    public static Map<Integer, String> fontLookup = new HashMap<Integer, String>();
-    public static Color FONT_DISPLAY_COLOR = Color.BLACK;
-    public static Color NUMBER_COLOR = Color.BLACK;
-    public static int DEFAULT_INPLACE_BLOCK_UNIT_SIZE = 25;
-    public static int INPLACE_MIN_BLOCK_UNIT_SIZE = 5;
-    public static Font INPLACE_DEFAULT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 16);
+    public static final Color BACKGROUND = new Color(0.8f, 0.8f, 0.8f, 1f); // whatever color you choose, ensure that the opacity is 1. else, you'll get lines between elements due to overlapping of renderings.
+    public static final Color LABEL_COLOR = Color.BLACK;
+    public static final Color BORDER_COLOR = Color.BLACK;
+    public static final int BORDER_SIZE = 1;
+    public static final float COLOR_MARGIN = 0.2f;
+    public static final Map<Integer, String> fontLookup = new HashMap<Integer, String>();
+    public static final Color FONT_DISPLAY_COLOR = Color.BLACK;
+    public static final Color NUMBER_COLOR = Color.BLACK;
+    public static final int DEFAULT_INPLACE_BLOCK_UNIT_SIZE = 25;
+    public static final int INPLACE_MIN_BLOCK_UNIT_SIZE = 5;
+    public static final Font INPLACE_DEFAULT_DISPLAY_FONT = new Font("Arial", Font.PLAIN, 16);
 
     @Override
     public String getDisplayName() {
@@ -73,33 +77,42 @@ public class InplaceItemRenderer implements Renderer {
         fontLookup.put(Font.TRUETYPE_FONT, "True Type Font");
         fontLookup.put(Font.TYPE1_FONT, "Type1 Font");
     }
-    
+
     /**
-     * Determines if the current render is for an export.
+     * determines if the current render is for an export.
+     *
      * Used for not drawing in-place editors.
+     *
      * @param target Rendering target
-     * @return 
+     * @return
      */
-    private boolean isExport(PreviewProperties properties){
+    private boolean isExport(PreviewProperties properties) {
         return properties.hasProperty(PreviewProperty.IS_EXPORT) && properties.getBooleanValue(PreviewProperty.IS_EXPORT);
     }
 
+    /**
+     * method to render the inplace editor.
+     *
+     * @param item - the inplace item to the rendered
+     * @param target - the target onto which the inplace item must be rendered
+     * @param properties - preview model's preview properties
+     */
     @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
-        if(!isExport(properties)){
+        // if the item is being exported, dont render the inplace editors
+        if (!isExport(properties)) {
+            // get the currently active inplace editor
             LegendController legendController = LegendController.getInstance();
             LegendModel legendModel = legendController.getLegendModel();
             InplaceEditor ipeditor = legendModel.getInplaceEditor();
 
+            // when the user clicks outside all of the items or drags an item, the inplace editor will be set to null.
             if (ipeditor != null) {
                 G2DTarget g2dtarget = (G2DTarget) target;
                 Graphics2D graphics2d = g2dtarget.getGraphics();
 
-                PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-                PreviewModel previewModel = previewController.getModel();
-
                 float zoomLevel = 1.0f;
-                if(properties.hasProperty(PreviewProperty.ZOOM_LEVEL)){
+                if (properties.hasProperty(PreviewProperty.ZOOM_LEVEL)) {
                     zoomLevel = properties.getFloatValue(PreviewProperty.ZOOM_LEVEL);
                 }
 
@@ -118,48 +131,18 @@ public class InplaceItemRenderer implements Renderer {
                     borderSize = 1; // at least 1 pixel
                 }
 
-                Font inplaceFont = INPLACE_DEFAULT_DISPLAY_FONT;
-                inplaceFont = inplaceFont.deriveFont((float) inplaceFont.getSize() / zoomLevel);
-
-                Font labelFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-                Font numberFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-                Font fontFont = new Font(inplaceFont.getName(), inplaceFont.getStyle(), inplaceFont.getSize());
-
                 // save current states and restore it later
                 Color saveColorState = graphics2d.getColor();
                 Font saveFontState = graphics2d.getFont();
-
-                // border cant be drawn now, since the height and width is unknown. Hence set the pseudo origin
-                int editorOriginX = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_X);
-                int editorOriginY = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_Y);
-                float editorWidth; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
-                float editorHeight; // this will be set after rendering the elements, because its inefficient to traverse the rows, columns and elements twice.
 
                 // preparation for rendering the inplace editor
                 int rowBlock;
                 int colBlock;
                 int elemBlock;
                 int maxElementsCount;
-                boolean selected;
                 ArrayList<Row> rows = ipeditor.getRows();
 
-
-                ////////////////////
-                ////////////////////
-                //NOTE for refactor:
-                //Switch case needs to be completely removed.
-                //Elements/editors need to be subclassed in order to generally and, in a simple way, provide all data we need here for rendering them.
-                //Do not use Object array for associated data. This leads to hardcoded positions, use a Map<String, Object> instead.
-                //For numbers/strings to access this data, always create a constant, avoid copying values all over the code.
-
-                //With a first analysis this will be probably needed:
-                //A render() method for elements that abstracts the drawing. Initially set the drawing origin for it if possible.
-                //Since In place editors keep same size with a lot of zoom, we need to use float precision for all inPlace editor rendering where possible.
-                //Elements should provide the desiredNumberOfBlocks field with a method or through the data Map. Since this is common to all elements, it can be directly a method
-                ////////////////////
-                ////////////////////
-
-                //First iterate elements for precalculating editor elements and size so we can draw background:
+                // iterate elements for precalculating editor elements and size and draw the background
                 maxElementsCount = 0;
                 for (Row row : rows) {
                     int currentElementsCount = 0;
@@ -173,8 +156,11 @@ public class InplaceItemRenderer implements Renderer {
                     maxElementsCount = Math.max(maxElementsCount, currentElementsCount);
                 }
 
-                editorWidth = maxElementsCount * blockUnitSize + 2 * borderSize;
-                editorHeight = rows.size() * blockUnitSize + 2 * borderSize;
+                // determine the dimensions of the inplace editor
+                int editorOriginX = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_X);
+                int editorOriginY = (Integer) ipeditor.getData(InplaceEditor.ORIGIN_Y);
+                float editorWidth = maxElementsCount * blockUnitSize + 2 * borderSize;
+                float editorHeight = rows.size() * blockUnitSize + 2 * borderSize;
 
                 //Fill the background at once for the whole editor
                 graphics2d.setColor(BACKGROUND);
@@ -211,6 +197,7 @@ public class InplaceItemRenderer implements Renderer {
                 graphics2d.setFont(saveFontState);
                 graphics2d.setColor(saveColorState);
 
+                // populate the inplace editor object with the dimensions info
                 ipeditor.setData(InplaceEditor.ORIGIN_X, editorOriginX);
                 ipeditor.setData(InplaceEditor.ORIGIN_Y, editorOriginY);
                 ipeditor.setData(InplaceEditor.WIDTH, editorWidth);
@@ -220,19 +207,39 @@ public class InplaceItemRenderer implements Renderer {
     }
 
     /**
-     * Helper method to fill rectangles with float precision. We use float
-     * precision specially for inPlace editor since they are kept the same size
-     * in screen independently of zoom factor.
+     * Helper method to fill rectangles with float precision.
+     *
+     * We use float precision specially for inPlace editor since they are kept
+     * the same size in screen independently of zoom factor.
+     *
+     * @param graphics2d - a graphics object used for rendering
+     * @param x - x-coordinate of the rectangle
+     * @param y - y-coordinate of the rectangle
+     * @param width - width of the rectangle
+     * @param height - height of the rectangle
      */
     private void fillRect(Graphics2D graphics2d, float x, float y, float width, float height) {
         Rectangle2D.Float rect = new Rectangle2D.Float(x, y, width, height);
         graphics2d.fill(rect);
     }
 
+    /**
+     *
+     * @param graphics2d - the graphics object for the target
+     * @param str - the string whose width is to be computed
+     * @return width of the string, under the current configuration of the
+     * Graphics2D object
+     */
     private int getFontWidth(Graphics2D graphics2d, String str) {
         return graphics2d.getFontMetrics().stringWidth(str);
     }
 
+    /**
+     *
+     * @param graphics2d - the graphics object for the target
+     * @return height of the text, assuming that the rendering takes place on a
+     * single line
+     */
     private int getFontHeight(Graphics2D graphics2d) {
         FontMetrics metric = graphics2d.getFontMetrics();
         return metric.getHeight() - metric.getDescent();
@@ -243,12 +250,27 @@ public class InplaceItemRenderer implements Renderer {
         return new PreviewProperty[0];
     }
 
+    /**
+     *
+     * @param item - the item being check against the renderer
+     * @param properties - preview properties of the preview model
+     * @return True if the item can be rendered using this renderer, False
+     * otherwise
+     */
     @Override
     public boolean isRendererForitem(Item item, PreviewProperties properties) {
+        // each item knows which renderer can render it
         Class renderer = item.getData(InplaceEditor.RENDERER);
         return renderer != null && renderer.equals(getClass());
     }
 
+    /**
+     *
+     * @param itemBuilder - the custom item builder being checked against
+     * @param properties - preview properties of the preview model
+     * @return True if the custom item builder can be built with
+     * InplaceItemBuilder
+     */
     @Override
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof InplaceItemBuilder;

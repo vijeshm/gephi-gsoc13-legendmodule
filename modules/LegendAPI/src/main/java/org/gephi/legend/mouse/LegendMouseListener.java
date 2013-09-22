@@ -1,10 +1,10 @@
 package org.gephi.legend.mouse;
 
 import java.util.ArrayList;
+import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.LEGEND_MIN_HEIGHT;
@@ -34,11 +34,20 @@ public class LegendMouseListener implements PreviewMouseListener {
     private final String TRANSFORMATION_SCALE_OPERATION = "Scale operation";
     private final String TRANSFORMATION_TRANSLATE_OPERATION = "Translate operation";
 
+    /**
+     *
+     * @param pointX - x-coordinate of the click
+     * @param pointY - y-coordinate of the click
+     * @return True if the click coordinates fall within the boundaries of the
+     * currently active inplace editor
+     */
     private boolean isClickingInInplaceEditor(int pointX, int pointY) {
+        // get the currently active inplace editor
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-
         InplaceEditor ipeditor = legendModel.getInplaceEditor();
+
+        // if there an active inplace editor, check whether the click coordinates are within its boundaries
         if (ipeditor != null) {
             int originX = ipeditor.getData(InplaceEditor.ORIGIN_X);
             int originY = ipeditor.getData(InplaceEditor.ORIGIN_Y);
@@ -50,34 +59,52 @@ public class LegendMouseListener implements PreviewMouseListener {
                 return true;
             }
         }
+
         return false;
     }
 
+    /**
+     *
+     * @param pointX - x-coordinate of the click
+     * @param pointY - y-coordinate of the click
+     * @param item - the legend item
+     * @param previewProperties - preview properties of the preview model
+     * @return -1 if the click isnt on an anchor, {0,1,2,3} if click is on an
+     * anchor, correspondingly
+     */
     private int isClickingInAnchor(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
+
+        // get the origin and the dimensions
         float realOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
         float realOriginY = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
         int width = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
         int height = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
+
+        // compute the bounding boxes of the anchors
         float[][] anchorLocations = {
+            // top left
             {
                 -TRANSFORMATION_ANCHOR_SIZE / 2,
                 -TRANSFORMATION_ANCHOR_SIZE / 2,
                 TRANSFORMATION_ANCHOR_SIZE,
                 TRANSFORMATION_ANCHOR_SIZE
             },
+            // top right
             {
                 width - TRANSFORMATION_ANCHOR_SIZE / 2,
                 -TRANSFORMATION_ANCHOR_SIZE / 2,
                 TRANSFORMATION_ANCHOR_SIZE,
                 TRANSFORMATION_ANCHOR_SIZE
             },
+            // bottom left
             {
                 -TRANSFORMATION_ANCHOR_SIZE / 2,
                 height - TRANSFORMATION_ANCHOR_SIZE / 2,
                 TRANSFORMATION_ANCHOR_SIZE,
                 TRANSFORMATION_ANCHOR_SIZE
             },
+            // bottom right
             {
                 width - TRANSFORMATION_ANCHOR_SIZE / 2,
                 height - TRANSFORMATION_ANCHOR_SIZE / 2,
@@ -89,6 +116,7 @@ public class LegendMouseListener implements PreviewMouseListener {
         pointX -= realOriginX;
         pointY -= realOriginY;
 
+        // check if the click is on anchor, and return the index accordingly
         for (int i = 0; i < anchorLocations.length; i++) {
             if ((pointX >= anchorLocations[i][0]
                     && pointX < (anchorLocations[i][0] + anchorLocations[i][2]))
@@ -100,30 +128,38 @@ public class LegendMouseListener implements PreviewMouseListener {
         return -1;
     }
 
+    /**
+     *
+     * @param pointX - x-coordinate of the click
+     * @param pointY - y-coordinate of the click
+     * @param item - the legend item under consideration
+     * @param previewProperties - preview properties of the preview model
+     * @return True if the click is within legend, otherwise False.
+     */
     private boolean isClickingInLegend(int pointX, int pointY, Item item, PreviewProperties previewProperties) {
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        int borderThickness = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.BORDER_LINE_THICK));
+        // get the origin and dimensions
         float realOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
         float realOriginY = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));
         int width = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.WIDTH));
         int height = previewProperties.getIntValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.HEIGHT));
 
-        /*
-         // adjustment in order to include border as a part of the legend as well
-         realOriginX = realOriginX - borderThickness;
-         realOriginY = realOriginY - borderThickness;
-         width = width + 2 * borderThickness;
-         height = height + 2 * borderThickness;
-         */
-
+        // check if the click point is within the legend item boundaries
         if ((pointX >= realOriginX && pointX < (realOriginX + width))
                 && (pointY >= realOriginY && pointY < (realOriginY + height))) {
             return true;
         }
+
         return false;
     }
 
+    /**
+     *
+     * @param event - the mouse event object
+     * @param previewProperties - preview properties of the preview model
+     * @param workspace - the current workspace
+     */
     @Override
     public void mouseClicked(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
         // when mouse is clicked on the canvas, any of the following can take place.
@@ -135,8 +171,12 @@ public class LegendMouseListener implements PreviewMouseListener {
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
 
+        // first priority is given to a click within inplace editor
+        // second priority is given to a click withing the legend        
         if (isClickingInInplaceEditor(event.x, event.y)) {
             InplaceEditor currentEditor = legendModel.getInplaceEditor();
+
+            // null condition need not be checked, since we know that the click was within the inplace editor
             currentEditor.reflectAction(event.x, event.y);
 
             // the corresponding legend shouldnt be deselected. hence, reselect it.
@@ -161,10 +201,13 @@ public class LegendMouseListener implements PreviewMouseListener {
                     legendController.selectItem(items.get(i));
 
                     BlockNode root = legendModel.getBlockTree((Integer) items.get(i).getData(LegendItem.ITEM_INDEX));
-                    BlockNode clickedBlock = root.getClickedBlock(event.x, event.y);
+                    BlockNode clickedBlock = root.getClickedBlock(event.x, event.y); // this method recursively dives down returns the innermost BlockNode on which the click event occured
                     InplaceEditor ipeditor = clickedBlock.getInplaceEditor();
+
+                    // the coordinates of the inplace editor are set to the click coordinates
                     ipeditor.setData(InplaceEditor.ORIGIN_X, (int) (event.x));
                     ipeditor.setData(InplaceEditor.ORIGIN_Y, (int) (event.y));
+
                     legendModel.setInplaceEditor(ipeditor);
                     break;
                 }
@@ -177,6 +220,12 @@ public class LegendMouseListener implements PreviewMouseListener {
         event.setConsumed(true);
     }
 
+    /**
+     *
+     * @param event - the mouse event object
+     * @param previewProperties - preview properties of the preview model
+     * @param workspace - the current workspace
+     */
     @Override
     public void mousePressed(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
         // enable direct interaction with the legend. i.e, the user need not click first and then drag.
@@ -267,14 +316,21 @@ public class LegendMouseListener implements PreviewMouseListener {
         }
     }
 
+    /**
+     *
+     * @param event - the mouse event object
+     * @param previewProperties - preview properties of the preview model
+     * @param workspace - the current workspace
+     */
     @Override
     public void mouseDragged(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
+        // fetch the selected item
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
         Item item = legendModel.getSelectedItem();
 
         if (item != null) {
-            legendModel.setInplaceEditor(null);
+            legendModel.setInplaceEditor(null); // disable the inplace editor from showing
             Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
             Boolean isBeingTransformed = (Boolean) item.getData(LegendItem.IS_BEING_TRANSFORMED);
             if (isBeingTransformed) {
@@ -383,8 +439,6 @@ public class LegendMouseListener implements PreviewMouseListener {
                             }
                         }
 
-                        // root.updateGeometry(newOriginX - realOriginX, newOriginY - realOriginY, newWidth / width, newHeight / height);
-
                         // change for key event
                         boolean isCtrlKeyPressed = event.keyEvent != null && event.keyEvent.isControlDown();
                         if (isCtrlKeyPressed) {
@@ -410,14 +464,23 @@ public class LegendMouseListener implements PreviewMouseListener {
         }
     }
 
+    /**
+     *
+     * @param event - the mouse event object
+     * @param previewProperties - preview properties of the preview model
+     * @param workspace - the current workspace
+     */
     @Override
     public void mouseReleased(PreviewMouseEvent event, PreviewProperties previewProperties, Workspace workspace) {
+        // fetch the selected legend
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
         Item item = legendModel.getSelectedItem();
-        if (item != null) {
-            item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE);
 
+        if (item != null) {
+            item.setData(LegendItem.IS_BEING_TRANSFORMED, Boolean.FALSE); // reset the transformation flag
+
+            // get the dimensions of the legend
             Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
             float realOriginX = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_X));
             float realOriginY = previewProperties.getFloatValue(LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, LegendProperty.USER_ORIGIN_Y));

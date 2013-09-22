@@ -9,32 +9,23 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import org.gephi.attribute.api.AttributeModel;
 import org.gephi.desktop.preview.api.PreviewUIController;
-import org.gephi.graph.api.Graph;
+import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.LegendProperty;
-import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItemBuilder;
-import org.gephi.legend.spi.LegendItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.PreviewUI;
-import org.gephi.preview.spi.Renderer;
-import org.openide.explorer.propertysheet.PropertySheet;
-import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -180,7 +171,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             legendModel.setPickedLegend(previousActiveLegend);
             refreshLayers();
         }
-        
+
         previewUIController.refreshPreview();
     }//GEN-LAST:event_moveDownActionPerformed
 
@@ -271,7 +262,7 @@ public class LegendManagerUI extends javax.swing.JPanel implements PreviewUI, Pr
             legendManager.setPickedLegend(nextActiveLegend);
             refreshLayers();
         }
-        
+
         previewUIController.refreshPreview();
     }//GEN-LAST:event_moveUpActionPerformed
 

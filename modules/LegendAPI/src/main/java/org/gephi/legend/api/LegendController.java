@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.api;
 
-import com.sun.corba.se.impl.interceptors.PICurrent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -28,7 +23,7 @@ import org.openide.util.Lookup;
 
 /**
  *
- * @author edubecks
+ * @author mvvijesh, edubecks
  */
 public class LegendController {
 
@@ -36,8 +31,8 @@ public class LegendController {
     private Map<String, LegendItemRenderer> renderers;
     private Map<String, LegendItemBuilder> builders;
     private Collection<? extends LegendItemBuilder> availableBuilders;
-    private Item selectedItem = null;
-    private static LegendController instance = new LegendController();
+    private Item selectedItem;
+    private static LegendController instance;
     private static final String XML_LEGEND_ITEM = "legenditem";
     public static final String XML_LEGENDS = "legends";
     public static final String LEGEND_ITEM_SELECTED = "legend.item.selected";
@@ -47,20 +42,23 @@ public class LegendController {
         builders = new HashMap<String, LegendItemBuilder>();
         renderers = new HashMap<String, LegendItemRenderer>();
         listeners = new ArrayList<PropertyChangeListener>();
+        selectedItem = null;
 
         // populate available builders
         availableBuilders = Lookup.getDefault().lookupAll(LegendItemBuilder.class);
-        
+
         // populate 'builders' and 'renderers' with all the builders and renderers
         registerLegendBuilders();
         registerLegendRenderers();
     }
-    
-    
+
     /*
      * Returns an Instance of LegendController
-     */    
+     */
     public static LegendController getInstance() {
+        if (instance == null) {
+            instance = new LegendController();
+        }
         return instance;
     }
 
@@ -90,13 +88,18 @@ public class LegendController {
         return getLegendModel(Lookup.getDefault().lookup(ProjectController.class).getCurrentWorkspace());
     }
 
+    /**
+     * registering builders for legend items
+     */
     private void registerLegendBuilders() {
-        // registering builders
         for (LegendItemBuilder legendItemBuilder : availableBuilders) {
             builders.put(legendItemBuilder.getType(), legendItemBuilder);
         }
     }
 
+    /**
+     * registering renderers for legend items
+     */
     private void registerLegendRenderers() {
         // retrieving available renderers
         Collection<? extends LegendItemRenderer> legendItemRenderers = Lookup.getDefault().lookupAll(LegendItemRenderer.class);
@@ -107,23 +110,27 @@ public class LegendController {
         }
     }
 
+    /**
+     * @param item - item to be added
+     */
     public void addItemToLegendModel(Item item) {
         addItemToLegendModel(Lookup.getDefault().lookup(ProjectController.class).getCurrentWorkspace(), item);
     }
 
     /**
-     * Add an item
+     * add an item
      *
      * @param workspace
-     * @param item
+     * @param item - item to be added
      */
     public void addItemToLegendModel(Workspace workspace, Item item) {
+        // get the preview properties from preview model
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel(workspace);
         PreviewProperties previewProperties = previewModel.getProperties();
 
+        // add the item to the legend model
         LegendModel legendModel = getLegendModel(workspace);
-
         legendModel.addItem(item);
 
         // LEGEND PROPERTIES
@@ -139,14 +146,14 @@ public class LegendController {
         for (PreviewProperty property : legendProperties) {
             previewProperties.putValue(property.getName(), property.getValue());
         }
-        
-        // LEGEND OWN PROPERTIES
+
+        // legend own properties
         PreviewProperty[] ownProperties = item.getData(LegendItem.OWN_PROPERTIES);
         for (PreviewProperty property : ownProperties) {
             previewProperties.putValue(property.getName(), property.getValue());
         }
-        
-        // DYNAMIC PROPERTIES
+
+        // dynamic properties
         PreviewProperty[] dynamicProperties = item.getData(LegendItem.DYNAMIC_PROPERTIES);
         for (PreviewProperty property : dynamicProperties) {
             previewProperties.putValue(property.getName(), property.getValue());
@@ -185,7 +192,7 @@ public class LegendController {
             int newItemIndex = 0;
             boolean end = false;
             while (reader.hasNext() && !end) {
-                
+
                 // legend item
                 int type = reader.next();
                 String legendItem = reader.getLocalName();
@@ -222,35 +229,46 @@ public class LegendController {
         }
     }
 
-    /*
-     * returns a Collection of the available Legend Item Builders in the system
-     * Default list:
-     * TableItem Builder
-     * ImageItem Builder
-     * GroupsItem Builder
-     * Descriptiontem Builder
+    /**
+     * @return a Collection of the available legend item builders
      */
     public Collection<? extends LegendItemBuilder> getAvailableBuilders() {
         return availableBuilders;
     }
 
+    /**
+     *
+     * @return the collection of legend item renderers
+     */
     public Map<String, LegendItemRenderer> getRenderers() {
         return renderers;
     }
 
+    /**
+     * this method gets executed when a new item is selected. It will notify all
+     * the registered listeners that the property "legend.item.selected" has
+     * been changed from "selectedItem" to "item"
+     *
+     * @param item
+     */
     public void selectItem(Item item) {
-        // this method gets executed when a new item is selected. 
-        // It will notify(?) all the registered listeners that the property "legend.item.selected" has been changed from "selectedItem" to "item"
         selectedItem = item;
         for (PropertyChangeListener listener : listeners) {
             listener.propertyChange(new PropertyChangeEvent(this, LEGEND_ITEM_SELECTED, selectedItem, item));
         }
     }
 
+    /**
+     * @param listener - listener to be added
+     */
     public void addListener(PropertyChangeListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * @param listener - listener to be removed
+     * @return
+     */
     public boolean removeListener(PropertyChangeListener listener) {
         return listeners.remove(listener);
     }
@@ -259,13 +277,13 @@ public class LegendController {
         if (!(item instanceof LegendItem.DynamicItem)) {
             return false;
         }
-        
+
         LegendItem.DynamicItem dynamicItem = (LegendItem.DynamicItem) item;
         int currentNumOfProperties = ((Integer) (item.getData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES))).intValue();
         if (numOfProperties == currentNumOfProperties) {
             return false;
         }
-        
+
         dynamicItem.updateDynamicProperties(numOfProperties);
         item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, numOfProperties);
         return true;

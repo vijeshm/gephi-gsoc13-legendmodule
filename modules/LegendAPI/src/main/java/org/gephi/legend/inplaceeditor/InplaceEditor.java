@@ -1,25 +1,29 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.inplaceeditor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
+ * model to hold data about inplace editor items.
+ *
+ * These items are built using InplaceItemBuilder and rendered using
+ * InplaceItemRenderer. An inplace editor is made up of rows. Each row is made
+ * up of columns. Each row might contain a different number of columns, unlike a
+ * conventional table. Each of these columns contain inplace editor elements
+ * within them. A column is said to be grouped if it contains more than one
+ * elements in it. All the grouped elements represent the same preview property.
+ * Ex: Alignment - a set of four image elements can be combined into a single
+ * column group.
  *
  * @author mvvijesh
  */
 public class InplaceEditor implements Item {
 
     public static final String RENDERER = "inplaceRenderer";
-    // public static final String ROWS = "rows";
     public static final String TYPE = "inplace editor";
     public static final String BORDER_THICK = "border thick";
     public static final String BACKGROUND_COLOR = "background color";
@@ -40,40 +44,108 @@ public class InplaceEditor implements Item {
         this.data = new HashMap<String, Object>();
     }
 
+    /**
+     * appends a new row to the inplace editor.
+     *
+     * @return returns the added row
+     */
     public Row addRow() {
         Row r = new Row(this);
         rows.add(r);
         return r;
     }
 
+    /**
+     * removes the specified row.
+     *
+     * @param r - row to be removed
+     */
     public void deleteRow(Row r) {
         rows.remove(r);
     }
 
+    /**
+     * appends a column to the given row.
+     *
+     * @param r - the row to which the column must be added
+     * @param isGrouped - True if the column is intended to contain a set of
+     * elements representing the same preview property, False otherwise.
+     * @return the newly created column
+     */
     public Column addColumn(Row r, Boolean isGrouped) {
         Column col = r.addColumn(isGrouped);
         return col;
     }
 
+    /**
+     * deletes a specified column from the specified row
+     *
+     * @param r - row from which the column must be removed
+     * @param col - the column to be removed
+     */
     public void deleteColumn(Row r, Column col) {
         r.deleteColumn(col);
     }
 
+    /**
+     * adds an element to the column
+     *
+     * @param r - the row to which the element is to be added
+     * @param col - the column to which the element is to be added
+     * @param type - the type of element being added - CHECKBOX, COLOR, FILE,
+     * FONT, FUNCTION, IMAGE, LABEL, NUMBER, TEXT
+     * @param itemIndex - index of the item to which the inplace editor belongs
+     * to
+     * @param property - the preview property that the element will modify
+     * @param data - the extra data required by the element of corresponding
+     * type
+     * @param isDefault - if the element is grouped, this value represents
+     * whether it is the default
+     * @param propertyValue - if the element is grouped, the value that this
+     * element represents
+     * @return the newly created element
+     */
     public BaseElement addElement(Row r, Column col, BaseElement.ELEMENT_TYPE type, int itemIndex, PreviewProperty property, Map<String, Object> data, Boolean isDefault, Object propertyValue) {
         BaseElement elem = r.addElement(col, type, itemIndex, property, data, isDefault, propertyValue);
         return elem;
     }
 
-    // get methods
     public ArrayList<Row> getRows() {
         return rows;
     }
 
-    public void reflectAction(int x, int y) {
-        // get the item associated with the inplace editor
-        BlockNode node = getData(BLOCKNODE);
-        Item item = node.getItem();
+    @Override
+    public String getType() {
+        return type;
+    }
 
+    @Override
+    public Object getSource() {
+        return source;
+    }
+
+    @Override
+    public String[] getKeys() {
+        return data.keySet().toArray(new String[0]);
+    }
+
+    @Override
+    public <D> D getData(String key) {
+        return (D) data.get(key);
+    }
+
+    @Override
+    public void setData(String key, Object value) {
+        data.put(key, value);
+    }
+
+    /**
+     * this method will be called when a click occurs within the inplace editor.
+     *
+     * @param x - x-coordinate of the click
+     * @param y - y-coordinate of the click
+     */
+    public void reflectAction(int x, int y) {
         // find out which element has been clicked based on the click-coordinates and element coordinates
         BaseElement selectedElem = null;
         Column selectedColumn = null;
@@ -93,14 +165,6 @@ public class InplaceEditor implements Item {
             }
         }
 
-
-        // if the click is on a label, nothing should happen
-        // if the click is on a font, a font chooser should pop up. on choosing, the new font should be set in the item property, as well as preview property.
-        // if the click is on a text, a new text area should pop up. heading should be property that we're editing.
-        // if the click is on a checkbox, toggle the behavior - negate the property value and update the preview property.
-        // image always appears as a sequence of elements in a column. So, if a click happens on an image, then draw a rectangle around the image, indicating that its selected.
-        // if the click is on a color, display a color box popup. the new is set to the corresponding property
-        // if the click is on a number, then display a popup to change the number and display its name on the top.
         if (selectedColumn != null && selectedElem != null) {
             if (selectedColumn.isGrouped()) {
                 // if the column that you've selected has multiple elements, each should represent the same property
@@ -123,40 +187,18 @@ public class InplaceEditor implements Item {
                         e.setAssociatedData(BaseElement.SELECTED_WITHIN_GROUP, false);
                     }
 
+                    // only for the selected element, set the flag to be true
                     selectedElem.setAssociatedData(BaseElement.SELECTED_WITHIN_GROUP, true);
+                    // perform the required action on the selected element
                     selectedElem.onSelect();
                 } else {
                     prop.setValue(null);
                 }
 
             } else {
+                // perform the required action on the selected element
                 selectedElem.onSelect();
             }
         }
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public Object getSource() {
-        return source;
-    }
-
-    @Override
-    public <D> D getData(String key) {
-        return (D) data.get(key);
-    }
-
-    @Override
-    public void setData(String key, Object value) {
-        data.put(key, value);
-    }
-
-    @Override
-    public String[] getKeys() {
-        return data.keySet().toArray(new String[0]);
     }
 }

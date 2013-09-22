@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.api;
 
 import java.awt.Color;
@@ -25,6 +21,11 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
+ * A builder class for building legend items.
+ *
+ * This class is made abstract in order to share common code across all the
+ * legend item builders. The legend item builders are expected to extend this
+ * class and implement the abstract methods.
  *
  * @author mvvijesh, edubecks
  */
@@ -40,49 +41,49 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     protected static final String XML_NAME = "name";
     protected static final String XML_CLASS = "class";
     private static final String XML_DATA = "itemdata";
-    
-    // DEFAULT VALUES 
-    // BACKGROUND AND BORDER
+    // default values
+    // background and border
     protected Boolean defaultBackgroundIsDisplaying = Boolean.TRUE;
     protected Color defaultBackgroundColor = new Color(1f, 1f, 1f, 0.5f);
     protected Boolean defaultBorderIsDisplaying = Boolean.TRUE;
     protected Color defaultBorderColor = new Color(0f, 0f, 0f, 0.75f);
     protected Integer defaultBorderLineThick = 5;
-    // LABEL
+    // label
     protected String defaultLabel = "";
-    // IS_DISPLAYING
+    // is displaying
     protected Boolean defaultIsDisplaying = Boolean.TRUE;
-    // ORIGIN
+    // origin
     protected Float defaultOriginX = 0f;
     protected Float defaultOriginY = 0f;
-    // WIDTH AND HEIGHT
+    // width and height
     protected Float defaultWidth = 500f;
     protected Float defaultHeight = 300f;
-    // TITLE
+    // title
     protected Boolean defaultTitleIsDisplaying = Boolean.TRUE;
     protected String defaultTitle = "Click to change title properties.";
     protected Font defaultTitleFont = new Font("Arial", Font.BOLD, 30);
     protected Alignment defaultTitleAlignment = Alignment.CENTER;
     protected Color defaultTitleFontColor = Color.BLACK;
-    // DESCRIPTION
+    // description
     protected String defaultDescription = "Click to change description properties.";
     protected Boolean defaultDescriptionIsDisplaying = Boolean.TRUE;
     protected Color defaultDescriptionFontColor = Color.BLACK;
     protected Alignment defaultDescriptionAlignment = Alignment.LEFT;
     protected Font defaultDescriptionFont = new Font("Arial", Font.PLAIN, 10);
-    // PROPERTIES SET BY USER
+    // properties set by user
     protected String defaultUserLegendName = "legend name";
     // default values list
     private ArrayList<Object> defaultValuesArrayList;
 
     /**
-     * This function creates an Item using
+     * this function creates a custom item of a particular legend type, based on
+     * the custom legend item builder chosen.
      *
-     * @param newItemIndex
-     * @param graph
+     * @param newItemIndex - unique ID for the new item to be created
+     * @param graph - the graph object to be associated with the legend item
      * @param attributeModel
-     * @param builder
-     * @return
+     * @param builder - the custom builder chosen by the user
+     * @return newly created item
      */
     public Item createCustomItem(Integer newItemIndex, Graph graph, AttributeModel attributeModel, CustomLegendItemBuilder builder) {
         Item item = buildCustomItem(builder, graph, attributeModel, newItemIndex);
@@ -90,6 +91,13 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         return item;
     }
 
+    /**
+     * populates the item and preview properties from the preview model with
+     * various properties
+     *
+     * @param item - the newly built legend item whose properties need to be
+     * populated
+     */
     private void createDefaultProperties(Item item) {
         item.setData(LegendItem.PROPERTIES, createLegendProperties(item));
         item.setData(LegendItem.OWN_PROPERTIES, createLegendOwnProperties(item));
@@ -101,6 +109,12 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         item.setData(LegendItem.CURRENT_TRANSFORMATION, "");
     }
 
+    /**
+     *
+     * @param graph
+     * @param attributeModel
+     * @return the list of items which can be built using this builder
+     */
     @Override
     public Item[] getItems(Graph graph, AttributeModel attributeModel) {
         LegendModel legendManager = LegendController.getInstance().getLegendModel();
@@ -115,11 +129,20 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         return items.toArray(new Item[items.size()]);
     }
 
+    /**
+     *
+     * @param item - the item being built
+     * @param property - the property number
+     * @param value - value of the property
+     * @return the PreviewProperty constructed from the property number and
+     * value
+     */
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         String propertyString = LegendModel.getProperty(LegendProperty.LEGEND_PROPERTIES, itemIndex, property);
 
+        // based on the property number, create an appropriate PreviewProperty object
         switch (property) {
             case LegendProperty.LABEL: {
                 previewProperty = PreviewProperty.createProperty(
@@ -348,6 +371,14 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
 
     }
 
+    /**
+     * create the preview properties, populate the item and previewModel's
+     * PreviewProperties with it,
+     *
+     * @param item - the item being built
+     * @return list of new created item properties. These properties are common
+     * to all the legends.
+     */
     private PreviewProperty[] createLegendProperties(Item item) {
         if (setDefaultValues()) {
             updateDefaultValues();
@@ -356,7 +387,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
         PreviewModel previewModel = previewController.getModel();
         PreviewProperties previewProperties = previewModel.getProperties();
-        
+
         PreviewProperty property;
         int[] properties = LegendProperty.LIST_OF_PROPERTIES;
 
@@ -364,22 +395,22 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
 
         // creating label
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        
+
         // setting the label
         property = createLegendProperty(item, LegendProperty.LABEL, defaultLabel + itemIndex + " [" + item.getType() + "]");
         previewProperties.addProperty(property);
-        itemPreviewProperties[LegendProperty.LABEL] = property;
-        
+        itemPreviewProperties[LegendProperty.LABEL] = property; // the same reference is also maintained within the legend item
+
         // setting the legend name
         property = createLegendProperty(item, LegendProperty.USER_LEGEND_NAME, defaultLabel + itemIndex + " [" + item.getType() + "]");
         previewProperties.addProperty(property);
-        itemPreviewProperties[LegendProperty.USER_LEGEND_NAME] = property;
-        
+        itemPreviewProperties[LegendProperty.USER_LEGEND_NAME] = property; // the same reference is also maintained within the legend item
+
         for (int i = 0; i < itemPreviewProperties.length - 1; i++) {
             if (i != LegendProperty.LABEL && i != LegendProperty.USER_LEGEND_NAME) {
                 property = createLegendProperty(item, properties[i], defaultValuesArrayList.get(i));
                 previewProperties.addProperty(property);
-                itemPreviewProperties[i] = property;
+                itemPreviewProperties[i] = property; // the same reference is also maintained within the legend item
             }
         }
 
@@ -391,9 +422,11 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         return getTitle();
     }
 
+    @Override
     public void writeXMLFromData(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
+    @Override
     public void writeXMLFromDynamicProperties(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
     }
 
@@ -440,6 +473,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @param previewProperties Current workspace PreviewProperties
      * @throws XMLStreamException
      */
+    @Override
     public void writeXMLFromItem(XMLStreamWriter writer, Item item, PreviewProperties previewProperties) throws XMLStreamException {
 
         // legend type
@@ -486,6 +520,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @param item the item where the data would be stored
      * @throws XMLStreamException
      */
+    @Override
     public void readXMLToData(XMLStreamReader reader, Item item) throws XMLStreamException {
     }
 
@@ -559,6 +594,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @return
      * @throws XMLStreamException
      */
+    @Override
     public abstract ArrayList<PreviewProperty> readXMLToOwnProperties(XMLStreamReader reader, Item item) throws XMLStreamException;
 
     /**
@@ -571,11 +607,13 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @return
      * @throws XMLStreamException
      */
+    @Override
     public ArrayList<PreviewProperty> readXMLToDynamicProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
         reader.nextTag();
         return new ArrayList<PreviewProperty>();
     }
 
+    @Override
     public ArrayList<PreviewProperty> readXMLToLegendProperties(XMLStreamReader reader, Item item) throws XMLStreamException {
         ArrayList<PreviewProperty> properties = new ArrayList<PreviewProperty>();
 
@@ -606,6 +644,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         return properties;
     }
 
+    @Override
     public void readXMLToRenderer(XMLStreamReader reader, Item item) throws XMLStreamException {
         if (reader.getLocalName().equals(XML_RENDERER)) {
             String valueString = reader.getElementText();
@@ -628,6 +667,7 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      * @return
      * @throws XMLStreamException
      */
+    @Override
     public Item readXMLToItem(XMLStreamReader reader, Integer newItemIndex) throws XMLStreamException {
         Item item = createNewLegendItem(null);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
@@ -680,7 +720,8 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
     /**
      * Converts the propertyValue of a known type to an String object
      *
-     * @param propertyValue Known *      * types: <code> LegendItem.Alignment</code>, <code> LegendItem.Shape</code>
+     * @param propertyValue Known * * * * * * * * * * * * * * * * * * * * *
+     * types: <code> LegendItem.Alignment</code>, <code> LegendItem.Shape</code>
      * and <code> LegendItem.Direction</code>
      * @return
      */
@@ -709,32 +750,34 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
         updateDefaultValues();
     }
 
+    /**
+     * populate the list of default values
+     */
     public final void updateDefaultValues() {
         this.defaultValuesArrayList = new ArrayList<Object>();
-        defaultValuesArrayList.add(this.defaultLabel);
-        defaultValuesArrayList.add(this.defaultIsDisplaying);
-        defaultValuesArrayList.add(this.defaultOriginX);
-        defaultValuesArrayList.add(this.defaultOriginY);
-        defaultValuesArrayList.add(this.defaultWidth);
-        defaultValuesArrayList.add(this.defaultHeight);
-        defaultValuesArrayList.add(this.defaultBackgroundIsDisplaying);
-        defaultValuesArrayList.add(this.defaultBackgroundColor);
-        defaultValuesArrayList.add(this.defaultBorderIsDisplaying);
-        defaultValuesArrayList.add(this.defaultBorderColor);
-        defaultValuesArrayList.add(this.defaultBorderLineThick);
-        defaultValuesArrayList.add(this.defaultTitleIsDisplaying);
-        defaultValuesArrayList.add(this.defaultTitle);
-        defaultValuesArrayList.add(this.defaultTitleFont);
-        defaultValuesArrayList.add(this.defaultTitleFontColor);
-        defaultValuesArrayList.add(this.defaultTitleAlignment);
-        defaultValuesArrayList.add(this.defaultDescriptionIsDisplaying);
-        defaultValuesArrayList.add(this.defaultDescription);
-        defaultValuesArrayList.add(this.defaultDescriptionFont);
-        defaultValuesArrayList.add(this.defaultDescriptionFontColor);
-        defaultValuesArrayList.add(this.defaultDescriptionAlignment);
-        defaultValuesArrayList.add(this.defaultUserLegendName);
+        defaultValuesArrayList.add(defaultLabel);
+        defaultValuesArrayList.add(defaultIsDisplaying);
+        defaultValuesArrayList.add(defaultOriginX);
+        defaultValuesArrayList.add(defaultOriginY);
+        defaultValuesArrayList.add(defaultWidth);
+        defaultValuesArrayList.add(defaultHeight);
+        defaultValuesArrayList.add(defaultBackgroundIsDisplaying);
+        defaultValuesArrayList.add(defaultBackgroundColor);
+        defaultValuesArrayList.add(defaultBorderIsDisplaying);
+        defaultValuesArrayList.add(defaultBorderColor);
+        defaultValuesArrayList.add(defaultBorderLineThick);
+        defaultValuesArrayList.add(defaultTitleIsDisplaying);
+        defaultValuesArrayList.add(defaultTitle);
+        defaultValuesArrayList.add(defaultTitleFont);
+        defaultValuesArrayList.add(defaultTitleFontColor);
+        defaultValuesArrayList.add(defaultTitleAlignment);
+        defaultValuesArrayList.add(defaultDescriptionIsDisplaying);
+        defaultValuesArrayList.add(defaultDescription);
+        defaultValuesArrayList.add(defaultDescriptionFont);
+        defaultValuesArrayList.add(defaultDescriptionFontColor);
+        defaultValuesArrayList.add(defaultDescriptionAlignment);
+        defaultValuesArrayList.add(defaultUserLegendName);
     }
-    
     private final Object[] availableAlignments = {
         LegendItem.Alignment.LEFT,
         LegendItem.Alignment.RIGHT,
