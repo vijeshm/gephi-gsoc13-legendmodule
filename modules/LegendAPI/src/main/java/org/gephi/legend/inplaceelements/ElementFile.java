@@ -31,7 +31,7 @@ public class ElementFile extends BaseElement {
     public ElementFile(ELEMENT_TYPE type, int itemIndex, PreviewProperty property, InplaceEditor ipeditor, Row row, Column col, Map<String, Object> data, Boolean isGrouped, Boolean isDefault, Object propertyValue) {
         super(type, itemIndex, property, ipeditor, row, col, data, isGrouped, isDefault, propertyValue);
     }
-    
+
     @Override
     public void onSelect() {
         // show a file chooser. If the file is successfully chosen, set it as the property
@@ -44,11 +44,12 @@ public class ElementFile extends BaseElement {
     }
 
     /**
-     * 
+     *
      * @param graphics2d - the graphics object for the target
      * @param target - the target onto which the item should be rendered - SVG,
      * PDF or G2D
-     * @param blockUnitSize - unit size of a block, as defined in InplaceItemRenderer
+     * @param blockUnitSize - unit size of a block, as defined in
+     * InplaceItemRenderer
      */
     @Override
     public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
@@ -57,16 +58,18 @@ public class ElementFile extends BaseElement {
     }
 
     /**
-     * 
+     *
      * @param graphics2d - the graphics object for the target
      * @param target - the target onto which the item should be rendered - SVG,
      * PDF or G2D
-     * @param blockUnitSize - unit size of a block, as defined in InplaceItemRenderer
+     * @param blockUnitSize - unit size of a block, as defined in
+     * InplaceItemRenderer
      * @param editorOriginX - x-coordinate of the inplace editor
      * @param editorOriginY - y-coordinate of the inplace editor
      * @param borderSize - size of the border, as defined in InplaceItemRenderer
      * @param rowBlock - the row number
-     * @param currentElementsCount - the number of unit-blocks surpassed in the current row
+     * @param currentElementsCount - the number of unit-blocks surpassed in the
+     * current row
      */
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {

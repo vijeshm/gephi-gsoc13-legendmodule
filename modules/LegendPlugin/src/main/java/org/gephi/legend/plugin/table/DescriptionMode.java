@@ -1,52 +1,53 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
 import javax.swing.JOptionPane;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
-import org.gephi.graph.api.NodeIterable;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Shape;
 import org.gephi.preview.api.PreviewProperty;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * Description mode of a table contains two rows: first - property name, second
+ * - property value.
+ *
+ * This mode is used to customize the table to have only two columns and a
+ * user-specified number of rows. The first column contains a property name and
+ * the second column contains the corresponding value. The data for the
+ * property-value pairs can be fetched from an external data source if
+ * necessary.
  *
  * @author mvvijesh
  */
 @ServiceProvider(service = CustomTableItemBuilder.class, position = 2)
 public class DescriptionMode implements CustomTableItemBuilder {
 
-    protected Font cellFont = Cell.cellFont;
-    protected Color cellFontColor = Cell.cellFontColor;
-    protected LegendItem.Alignment cellFontAlignment = Cell.cellAlignment;
-    protected Color cellBackgroundColor = Cell.backgroundColor;
-    protected Color cellBorderColor = Cell.borderColor;
-    protected String cellTextContent = Cell.cellTextContent;
-    protected Shape cellShapeShape = Cell.cellShapeShape;
-    protected Color cellShapeColor = Cell.cellShapeColor;
-    protected Float cellShapeValue = Cell.cellShapeValue;
-    protected File cellImageFile = Cell.cellImageFile;
-    protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
-    protected int cellType = Cell.cellType;
-    
-    protected String propertyName = "Name";
-    protected String propertyValue = "Value";
-    protected String headerPropertyName = "Property";
-    protected String headerPropertValue = "Value";
+    protected Font cellFont = Cell.defaultCellFont;
+    protected Color cellFontColor = Cell.defaultCellFontColor;
+    protected LegendItem.Alignment cellFontAlignment = Cell.defaultCellAlignment;
+    protected Color cellBackgroundColor = Cell.defaultBackgroundColor;
+    protected Color cellBorderColor = Cell.defaultBorderColor;
+    protected String cellTextContent = Cell.defaultCellTextContent;
+    protected Shape cellShapeShape = Cell.defaultCellShapeShape;
+    protected Color cellShapeColor = Cell.defaultCellShapeColor;
+    protected Float cellShapeValue = Cell.defaultCellShapeValue;
+    protected File cellImageFile = Cell.defaultCellImageFile;
+    protected Boolean cellImageIsScaling = Cell.defaultCellImageIsScaling;
+    protected int cellType = Cell.defaultCellType;
+    protected String propertyName = "Name"; // dummy property name
+    protected String propertyValue = "Value"; // dummy value
+    protected String headerPropertyName = "Property"; // first column header
+    protected String headerPropertyValue = "Value"; // second column header
 
+    /**
+     * builds the table item with a user-specified number of rows, two columns
+     * and custom built style cells for headers.
+     *
+     * @param tableItem - the item being built
+     */
     @Override
     public void populateTable(TableItem tableItem) {
         String newValueString = (String) JOptionPane.showInputDialog(null, "Enter the number of properties:", "Number of Properties", JOptionPane.PLAIN_MESSAGE, null, null, "");
@@ -63,13 +64,14 @@ public class DescriptionMode implements CustomTableItemBuilder {
             numberOfProperties = 1;
         }
 
-        Integer tableNumberOfRows = numberOfProperties + 1;
+        Integer tableNumberOfRows = numberOfProperties + 1; // the extra row is for the header
         Integer tableNumberOfColumns = 2;
 
         String[] propertyNames = new String[numberOfProperties];
         String[] propertyValues = new String[numberOfProperties];
-        
-        for(int i = 0; i < numberOfProperties; i++) {
+
+        // populate propertyNames and propertyValues - this can be populated by the data from external sources as well
+        for (int i = 0; i < numberOfProperties; i++) {
             propertyNames[i] = propertyName + " " + i + ":";
             propertyValues[i] = propertyValue + " " + i;
         }
@@ -84,18 +86,21 @@ public class DescriptionMode implements CustomTableItemBuilder {
 
         ArrayList<ArrayList<Cell>> table = tableItem.getTable();
 
+        // custom built style for property name in header
         Cell headerPropertyNameCell = table.get(0).get(0);
         PreviewProperty[] headerPropertyNameCellPreviewProp = headerPropertyNameCell.getPreviewProperties();
         headerPropertyNameCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerPropertyName);
         headerPropertyNameCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerPropertyNameCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
+        // custom built style for value in header
         Cell headerPropertyValueCell = table.get(0).get(1);
         PreviewProperty[] headerPropertyValueCellPreviewProp = headerPropertyValueCell.getPreviewProperties();
-        headerPropertyValueCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerPropertValue);
+        headerPropertyValueCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerPropertyValue);
         headerPropertyValueCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerPropertyValueCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
+        // construct all the other rows
         Cell propertyNameCell;
         PreviewProperty[] propertyNameCellPreviewProp;
         Cell propertyValueCell;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.groups;
 
 import java.awt.Rectangle;
@@ -14,14 +10,24 @@ import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
+ * the item model for the groups legend.
+ *
+ * The group layout is organized into a number of columns called group elements.
+ * Each group element consists of a shape area and a label area. The label
+ * position can be adjusted to appear above or below the shape area. Each group
+ * item will be associated a value that determines the height of the shape.
+ * During rendering of the group item, these values are normalized. The custom
+ * group item builder has a method that gathers the required information and
+ * creates group elements out of it. This information is extracted by the group
+ * renderer for rendering the group elements as configured by the custom
+ * builder.
  *
  * @author mvvijesh, edubecks
  */
-public class GroupsItem extends AbstractItem implements LegendItem, Item.BoundingBoxProvidingItem{
+public class GroupsItem extends AbstractItem implements LegendItem, Item.BoundingBoxProvidingItem {
 
     public static final String LEGEND_TYPE = "Groups Item";
-    protected ArrayList<GroupElement> groups;
-    //BODY
+    protected ArrayList<GroupElement> groups; // the list of group elements
 
     public GroupsItem(Object source) {
         super(source, LEGEND_TYPE);
@@ -40,6 +46,10 @@ public class GroupsItem extends AbstractItem implements LegendItem, Item.Boundin
         this.groups = groups;
     }
 
+    /**
+     *
+     * @return a rectangle that acts as a bounding box for the groups legend.
+     */
     @Override
     public Rectangle getBoundingBox() {
         PreviewProperty[] ownProperties = this.getData(PROPERTIES);

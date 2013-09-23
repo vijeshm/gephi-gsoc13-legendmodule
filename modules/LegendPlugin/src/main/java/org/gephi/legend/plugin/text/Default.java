@@ -1,18 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.text;
 
 import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * This is the default custom item builder for the text legend.
  *
- * @author mvvijesh
+ * This class is exposed as a service. The UI uses these services and the Lookup
+ * API to show the list of available custom builders. This class defines the
+ * cells and its properties.
+ *
+ * @author mvvijesh, edubecks
  */
-@ServiceProvider(service=CustomTextItemBuilder.class, position=1)
+@ServiceProvider(service = CustomTextItemBuilder.class, position = 1)
 public class Default implements CustomTextItemBuilder {
-        @Override
+
+    @Override
     public String getDescription() {
         return DEFAULT_DESCRIPTION;
     }
@@ -21,7 +23,6 @@ public class Default implements CustomTextItemBuilder {
     public String getTitle() {
         return DEFAULT_TITLE;
     }
-
 
     @Override
     public boolean isAvailableToBuild() {

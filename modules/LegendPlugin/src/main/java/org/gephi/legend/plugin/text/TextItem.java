@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.text;
 
 import java.awt.Rectangle;
@@ -13,11 +9,11 @@ import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
+ * the item model for the text legend.
  *
- * @author mvvijesh
+ * @author mvvijesh, edubecks
  */
 public class TextItem extends AbstractItem implements LegendItem, Item.BoundingBoxProvidingItem {
-    //BODY
 
     public static final String BODY = "Body";
     public static final String LEGEND_TYPE = "Text Item";
@@ -31,6 +27,10 @@ public class TextItem extends AbstractItem implements LegendItem, Item.BoundingB
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
     }
 
+    /**
+     *
+     * @return a rectangle that acts as a bounding box for the text legend.
+     */
     @Override
     public Rectangle getBoundingBox() {
         PreviewProperty[] ownProperties = this.getData(PROPERTIES);

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.text;
 
 import java.awt.Color;
@@ -21,8 +17,6 @@ import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.legend.spi.LegendItemBuilder;
 import org.gephi.preview.api.Item;
-import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
@@ -32,8 +26,14 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 /**
+ * class to build the text items.
  *
- * @author mvvijesh
+ * This class is exposed as a service. The createCustomItem method (in the
+ * AbstractLegendItemRenderer) is used to create a text legend item, depending
+ * on the custom item builder chosen by the user from the UI. The custom
+ * builders are expected to implement the CustomTextItemBuilder interface.
+ *
+ * @author mvvijesh, edubecks
  */
 @ServiceProviders(value = {
     @ServiceProvider(service = ItemBuilder.class, position = 105),
@@ -41,7 +41,7 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class TextItemBuilder extends AbstractLegendItemBuilder {
 
-    // DEFAULT VALUES
+    // default values
     protected final String defaultBody = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam luctus ligula. Nunc mollis sagittis dui eget congue. Sed et turpis leo, vitae interdum magna. Pellentesque sollicitudin laoreet orci. Donec varius eleifend iaculis. Integer congue tempor nulla ac luctus. Nullam velit massa, convallis ut suscipit eget, auctor non velit. Etiam vitae velit sit amet justo luctus semper. Ut laoreet ullamcorper.";
     protected final Font defaultBodyFont = new Font("Arial", Font.PLAIN, 14);
     protected final Color defaultBodyFontColor = Color.BLACK;
@@ -58,6 +58,11 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         return false;
     }
 
+    /**
+     *
+     * @param item - item to be checked against
+     * @return True if GroupsItemBuilder can build the item. False, otherwise.
+     */
     @Override
     public boolean isBuilderForItem(Item item) {
         return item instanceof TextItem;
@@ -78,19 +83,28 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         return new TextItem(graph);
     }
 
+    /**
+     *
+     * @param builder - the custom text item builder chosen by the user from the
+     * UI
+     * @param graph - the current graph to which the text item belongs to
+     * @param attributeModel
+     * @param newItemIndex - index of the new text item being created
+     * @return the newly built text legend item
+     */
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        
+
         // add the renderer to the legend model if it has not been added
         TextItemRenderer textItemRenderer = TextItemRenderer.getInstance();
-        if(!legendModel.isRendererAdded(textItemRenderer)) {
+        if (!legendModel.isRendererAdded(textItemRenderer)) {
             legendModel.addRenderer(textItemRenderer);
         }
-        
+
         // setting default renderer and item index
         item.setData(LegendItem.RENDERER, textItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
@@ -98,6 +112,14 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         return item;
     }
 
+    /**
+     *
+     * @param item - the text item being built
+     * @param property - the index of the property
+     * @param value - the value of the property
+     * @return the PreviewProperty object populated with the property string and
+     * the value
+     */
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -151,22 +173,24 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         return previewProperty;
     }
 
+    /**
+     *
+     * @param item - the text item being built
+     * @return the list of PreviewProperty objects
+     */
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
-
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        PreviewModel previewModel = previewController.getModel();
-        PreviewProperties previewProperties = previewModel.getProperties();
-
-        PreviewProperty property;
         int[] properties = TextProperty.LIST_OF_PROPERTIES;
 
         PreviewProperty[] legendPreviewProperties = new PreviewProperty[defaultValues.length];
         for (int i = 0; i < defaultValues.length; i++) {
-            property = createLegendProperty(item, properties[i], defaultValues[i]);
-            previewProperties.addProperty(property);
-            legendPreviewProperties[i] = property;
+            legendPreviewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
+
+        // The text legend doesnt need any extra data from any other module in order to be rendered.
+        // If the renderer needs extra data, add a method in the CustomTextItemBuilder interface to retrieve the data.
+        // extract the CustomTextItemBuilder from the item and invoke the method to retrieve data.
+        // Once the required data is retrieved, add it to the text item in any appropriate form.
 
         return legendPreviewProperties;
     }
@@ -176,6 +200,10 @@ public class TextItemBuilder extends AbstractLegendItemBuilder {
         return Boolean.FALSE;
     }
 
+    /**
+     *
+     * @return the list of available custom builders for the text legend
+     */
     @Override
     public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
         Collection<? extends CustomTextItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTextItemBuilder.class);

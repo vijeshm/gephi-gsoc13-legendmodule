@@ -52,29 +52,32 @@ public class ElementColor extends BaseElement {
     }
 
     /**
-     * 
+     *
      * @param graphics2d - the graphics object for the target
      * @param target - the target onto which the item should be rendered - SVG,
      * PDF or G2D
-     * @param blockUnitSize - unit size of a block, as defined in InplaceItemRenderer
+     * @param blockUnitSize - unit size of a block, as defined in
+     * InplaceItemRenderer
      */
     @Override
     public void computeNumberOfBlocks(Graphics2D graphics2d, G2DTarget target, int blockUnitSize) {
-       // a color element always takes one unit-block 
+        // a color element always takes one unit-block 
         numberOfBlocks = 1;
     }
 
     /**
-     * 
+     *
      * @param graphics2d - the graphics object for the target
      * @param target - the target onto which the item should be rendered - SVG,
      * PDF or G2D
-     * @param blockUnitSize - unit size of a block, as defined in InplaceItemRenderer
+     * @param blockUnitSize - unit size of a block, as defined in
+     * InplaceItemRenderer
      * @param editorOriginX - x-coordinate of the inplace editor
      * @param editorOriginY - y-coordinate of the inplace editor
      * @param borderSize - size of the border, as defined in InplaceItemRenderer
      * @param rowBlock - the row number
-     * @param currentElementsCount - the number of unit-blocks surpassed in the current row
+     * @param currentElementsCount - the number of unit-blocks surpassed in the
+     * current row
      */
     @Override
     public void renderElement(Graphics2D graphics2d, G2DTarget target, int blockUnitSize, int editorOriginX, int editorOriginY, int borderSize, int rowBlock, int currentElementsCount) {
@@ -87,7 +90,7 @@ public class ElementColor extends BaseElement {
                 (int) ((editorOriginY + borderSize) + rowBlock * blockUnitSize + colorMargin * blockUnitSize),
                 (int) ((1 - 2 * colorMargin) * blockUnitSize),
                 (int) ((1 - 2 * colorMargin) * blockUnitSize));
-        
+
         // update the geometry of the inplace editor
         setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
                 (editorOriginY + borderSize) + rowBlock * blockUnitSize,

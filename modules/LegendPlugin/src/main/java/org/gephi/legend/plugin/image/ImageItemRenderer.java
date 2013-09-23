@@ -1,14 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.image;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,7 +17,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.legend.api.BlockNode;
-import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
 import org.gephi.legend.inplaceeditor.InplaceItemBuilder;
@@ -41,18 +34,21 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
+ * this is the renderer for image item.
+ *
+ * This renderer does not provide a service. Hence, it should be registered with
+ * the legend model when the corresponding items are built. Since, it doesnt
+ * provide a service, this class should be made singleton. Note that this
+ * approach is subjected to change.
  *
  * @author mvvijesh, edubecks
  */
-// @ServiceProvider(service = Renderer.class, position = 504)
 public class ImageItemRenderer extends AbstractLegendItemRenderer {
 
     public static final String IMAGENODE = "image node";
@@ -60,24 +56,24 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
     private int NO_IMAGE_FONT_STEP_SIZE = 2;
     private Font NO_IMAGE_FONT = new Font("Arial", Font.PLAIN, NO_IMAGE_FONT_INITIAL_SIZE);
     private Color NO_IMAGE_FONT_COLOR = Color.BLACK;
-    // OWN PROPERTIES
-    private File imageFile;
-    private Boolean useImageAspectRatio;
-    private int imageMargin;
-    // ENCODING
+    // own properties
+    private File imageFile; // the image file to be displayed
+    private Boolean useImageAspectRatio; // Boolean value that determines if the image should scale
+    private int imageMargin; // horizontal space between image border and legend border
+    // encoding
     public static final String DATA_PROTOCOL_PNG_PREFIX = "data:image/png;base64,";
     // instance
     private static ImageItemRenderer instance = null;
-    
+
     private ImageItemRenderer() {
         // private constructor is required to ensure singleton class
     }
-    
+
     public static ImageItemRenderer getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new ImageItemRenderer();
         }
-        
+
         return instance;
     }
 
@@ -86,6 +82,14 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         return item instanceof ImageItem;
     }
 
+    /**
+     *
+     * @param graphics2D - graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     * @param legendNode - BlockNode onto which the legend content will be
+     * rendered.
+     */
     @Override
     protected void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode) {
         try {
@@ -96,12 +100,17 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
             int blockHeight = (int) legendNode.getBlockHeight();
             Item item = legendNode.getItem();
 
+            // if an image node is already created within a legend node, we need not create it again and build the inplace editors for it.
             BlockNode imageNode = legendNode.getChild(IMAGENODE);
             if (imageNode == null) {
+                // the image node has not been added. Hence, add create and add it.
                 imageNode = legendNode.addChild(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin, IMAGENODE);
+
+                // build and associate an inplace editor with the image node
                 buildInplaceImage(imageNode, item, graphics2D, target);
             }
 
+            // irrespective of whether an image node is newly built, update the origin and dimensions of the image legend
             imageNode.updateGeometry(blockOriginX + imageMargin, blockOriginY + imageMargin, blockWidth - 2 * imageMargin, blockHeight - 2 * imageMargin);
 
             int canvasOriginX = (int) imageNode.getOriginX();
@@ -152,6 +161,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
                 int stepSize = NO_IMAGE_FONT_STEP_SIZE;
                 Font font = NO_IMAGE_FONT;
 
+                // dynamically adapting text, when the legend is being transformed
                 graphics2D.setFont(font);
                 while (graphics2D.getFontMetrics().stringWidth(noImageMessage) < canvasWidth) {
                     fontSize += stepSize;
@@ -159,7 +169,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
                     graphics2D.setFont(font);
                 }
 
-                fontSize -= stepSize;
+                fontSize -= stepSize; //font size wouldve gone one step ahead, decrease it.
                 font = font.deriveFont((float) fontSize);
                 graphics2D.setFont(font);
                 graphics2D.setColor(NO_IMAGE_FONT_COLOR);
@@ -173,6 +183,14 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
+    /**
+     *
+     * @param imageNode - BlockNode containing the image content
+     * @param item - the legend image item
+     * @param graphics2D - the graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     */
     private void buildInplaceImage(BlockNode imageNode, Item item, Graphics2D graphics2d, RenderTarget target) {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
@@ -184,8 +202,9 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
         Map<String, Object> data;
         BaseElement addedElement;
-        
+
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Source: ");
@@ -194,6 +213,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementFile.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFile.FILE_PATH, "/org/gephi/legend/graphics/file.png");
@@ -201,6 +221,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Margin: ");
@@ -209,6 +230,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementNumber.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
@@ -217,6 +239,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Scale: ");
@@ -226,6 +249,7 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
         col = r.addColumn(false);
+        // see ElementCheckbox.java to understand how this element is being structured within the inplace editor
         data = new HashMap<String, Object>();
         data.put(ElementCheckbox.IS_CHECKED, useImageAspectRatio);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.CHECKBOX, itemIndex, previewProperties[ImageProperty.LOCK_ASPECT_RATIO], data, false, null);
@@ -234,13 +258,18 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         imageNode.setInplaceEditor(ipeditor);
     }
 
+    /**
+     *
+     * @param item - image item being rendered
+     * @param properties - PreviewProperty for the PreviewModel
+     */
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        PreviewProperty[] ownPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
-        imageFile = (File) ownPreviewProperties[ImageProperty.IMAGE_URL].getValue(); // properties.getValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.IMAGE_URL));
-        useImageAspectRatio = (Boolean) ownPreviewProperties[ImageProperty.LOCK_ASPECT_RATIO].getValue(); // properties.getValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.LOCK_ASPECT_RATIO));
-        imageMargin = (Integer) ownPreviewProperties[ImageProperty.IMAGE_MARGIN].getValue(); // properties.getIntValue(LegendModel.getProperty(ImageProperty.OWN_PROPERTIES, itemIndex, ImageProperty.IMAGE_MARGIN));
+        PreviewProperty[] imageItemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+
+        imageFile = (File) imageItemPreviewProperties[ImageProperty.IMAGE_URL].getValue();
+        useImageAspectRatio = (Boolean) imageItemPreviewProperties[ImageProperty.LOCK_ASPECT_RATIO].getValue();
+        imageMargin = (Integer) imageItemPreviewProperties[ImageProperty.IMAGE_MARGIN].getValue();
     }
 
     @Override
@@ -248,6 +277,12 @@ public class ImageItemRenderer extends AbstractLegendItemRenderer {
         return NbBundle.getMessage(ImageItemRenderer.class, "ImageItemRenderer.name");
     }
 
+    /**
+     * @param itemBuilder - the custom item builder being checked against
+     * @param properties - preview properties of the preview model
+     * @return True if the custom item builder can be built with
+     * ImageItemBuilder
+     */
     @Override
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof ImageItemBuilder;

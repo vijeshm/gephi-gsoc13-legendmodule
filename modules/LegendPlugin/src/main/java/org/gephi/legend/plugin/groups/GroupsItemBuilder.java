@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.groups;
 
 import java.awt.Color;
@@ -31,6 +27,15 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 /**
+ * class to build the group items.
+ *
+ * This class is exposed as a service. The createCustomItem method (in the
+ * AbstractLegendItemRenderer) is used to create a group legend item, depending
+ * on the custom item builder chosen by the user from the UI. A group item
+ * layout is composed of a number of group elements. These group elements
+ * consists of two entities: a label and a shape. The data for these group
+ * elements is provided by a method in the custom group builder. Every custom
+ * group builder is expected to implement the CustomGroupsItemBuilder interface.
  *
  * @author mvvijesh, edubecks
  */
@@ -40,14 +45,15 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class GroupsItemBuilder extends AbstractLegendItemBuilder {
 
+    // define the default values preview properties
     private LegendItem.Shape defaultShape = LegendItem.Shape.RECTANGLE;
-    private Float defaultShapeWidthFraction = 0.8f;
-    private LegendItem.Direction defaultLabelPosition = Direction.DOWN;
+    private Float defaultShapeWidthFraction = 0.8f; // shape width fraction is the fraction of the element width that the shape occupies
+    private LegendItem.Direction defaultLabelPosition = Direction.DOWN; // this label can take two value: Direction.UP and Direction.DOWN
     private Font defaultLabelFont = new Font("Arial", Font.PLAIN, 15);
     private Color defaultLabelFontColor = Color.BLACK;
     private Alignment defaultLabelFontAlignment = Alignment.CENTER;
-    private Integer defaultPaddingBetweenTextAndShape = 5;
-    private Integer defaultPaddingBetweenElements = 20;
+    private Integer defaultPaddingBetweenTextAndShape = 5; // the veritcal space between the element and the shape
+    private Integer defaultPaddingBetweenElements = 20; // the horizontal space between consectutive elements
     private final Object[] defaultValues = {
         defaultShape,
         defaultShapeWidthFraction,
@@ -56,13 +62,18 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         defaultLabelFontColor,
         defaultLabelFontAlignment,
         defaultPaddingBetweenTextAndShape,
-        defaultPaddingBetweenElements,};
+        defaultPaddingBetweenElements};
 
     @Override
     public boolean setDefaultValues() {
         return false;
     }
 
+    /**
+     *
+     * @param item - item to be checked against
+     * @return True if GroupsItemBuilder can build the item. False, otherwise.
+     */
     @Override
     public boolean isBuilderForItem(Item item) {
         return item instanceof GroupsItem;
@@ -78,6 +89,14 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         return NbBundle.getMessage(GroupsItemBuilder.class, "GroupsItem.name");
     }
 
+    /**
+     *
+     * @param item - the group item being built
+     * @param property - the index of the property
+     * @param value - the value of the property
+     * @return the PreviewProperty object populated with the property string and
+     * the value
+     */
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -176,8 +195,14 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         return previewProperty;
     }
 
+    /**
+     *
+     * @param item - the groups item being built
+     * @return the list of PreviewProperty objects
+     */
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
+        GroupsItem groupsItem = (GroupsItem) item;
         int[] properties = GroupsProperty.LIST_OF_PROPERTIES;
 
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
@@ -185,12 +210,14 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
 
+        // the groups legend must be populated with the data that needs to rendered.
+        // the custmomGroupsBuilder associated with the item provides this data.
+        // see CustomGroupsItemBuilder interface and Default custom builder for more information
         CustomGroupsItemBuilder customGroupsBuilder = (CustomGroupsItemBuilder) item.getData(LegendItem.CUSTOM_BUILDER);
-        ArrayList<GroupElement> groups = new ArrayList<GroupElement>();
-        customGroupsBuilder.retrieveData(item, groups);
+        // fetch the data to be rendered from the customGroupsBuilder, by populating the groups list.
+        ArrayList<GroupElement> groups = customGroupsBuilder.retrieveData(groupsItem);
 
-        // setting the groups data
-        GroupsItem groupsItem = (GroupsItem) item;
+        // set the populated groups list in the groups item being built
         groupsItem.setGroups(groups);
 
         return previewProperties;
@@ -201,19 +228,28 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         return Boolean.FALSE;
     }
 
+    /**
+     *
+     * @param builder - the custom group item builder chosen by the user from
+     * the UI
+     * @param graph - the current graph to which the groups item belongs to
+     * @param attributeModel
+     * @param newItemIndex - index of the new groups item being created
+     * @return the newly built groups legend item
+     */
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        
+
         // add the renderer to the legend model if it has not been added
         GroupsItemRenderer groupsItemRenderer = GroupsItemRenderer.getInstance();
-        if(!legendModel.isRendererAdded(groupsItemRenderer)) {
+        if (!legendModel.isRendererAdded(groupsItemRenderer)) {
             legendModel.addRenderer(groupsItemRenderer);
         }
-        
+
         // setting default renderer, item index and custom builder
         item.setData(LegendItem.RENDERER, groupsItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
@@ -221,6 +257,10 @@ public class GroupsItemBuilder extends AbstractLegendItemBuilder {
         return item;
     }
 
+    /**
+     *
+     * @return the list of available custom builders for the groups legend
+     */
     @Override
     public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
         Collection<? extends CustomGroupsItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomGroupsItemBuilder.class);

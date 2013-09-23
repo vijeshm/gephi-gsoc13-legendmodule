@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
@@ -9,8 +5,6 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import javax.swing.JOptionPane;
 import org.gephi.legend.api.AbstractItem;
 import org.gephi.legend.api.LegendController;
@@ -20,9 +14,16 @@ import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.PROPERTIES;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
-import org.openide.util.NbBundle;
 
 /**
+ * the item model for the table legend.
+ *
+ * The table item contains a 2-d arraylist of cells (see Cell.java), which is
+ * logically equivalent to a table. It also has flags to indicate that the
+ * structure of the table has changed. This is required by the table item
+ * renderer to determine if the table must be re-built and re-drawn. The custom
+ * table item builder has a method that gathers the required information and
+ * populates the table item with the 2-d arraylist of cells.
  *
  * @author mvvijesh, edubecks
  */
@@ -30,9 +31,8 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
 
     public static final String LEGEND_TYPE = "Table Item";
     public static final String CELL_PROPERTIES = "Cell Properties";
-    // public static final String NUMBER_OF_ROWS = "Number of Rows";
-    // public static final String NUMBER_OF_COLUMNS = "Number of Columns";
     private ArrayList<ArrayList<Cell>> table;
+    // flags to indicate if the structure of a table has changed
     private Boolean rowChanged = true;
     private Boolean columnChanged = true;
     private Boolean ipeditorChanged = true;
@@ -54,9 +54,28 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
         if (table.size() > 0) {
             return table.get(0).size();
         }
+
         return 0;
     }
 
+    /**
+     * add a new row to the table
+     *
+     * @param pos - index at which the row must be added
+     * @param backgroundColor - background color of each cells in the row
+     * @param borderColor - border color of each cells in the row
+     * @param cellFont
+     * @param cellAlignment
+     * @param cellFontColor
+     * @param cellTextContent
+     * @param cellShapeShape
+     * @param cellShapeColor
+     * @param cellShapeValue
+     * @param cellImageFile
+     * @param cellImageIsScaling
+     * @param cellType - cell type can be TYPE_TEXT, TYPE_IMAGE or a TYPE_SHAPE
+     * (see Cell.java)
+     */
     public void addRow(int pos, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellTextContent, Shape cellShapeShape, Color cellShapeColor, Float cellShapeValue, File cellImageFile, Boolean cellImageIsScaling, int cellType) {
         int numberOfRows = table.size();
         int numberOfColumns = 0;
@@ -78,6 +97,11 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
         rowChanged = true;
     }
 
+    /**
+     * delete a row from the table
+     *
+     * @param pos - position of the row to be deleted
+     */
     public void deleteRow(int pos) {
         int numberOfRows = table.size();
         if (numberOfRows == 1) {
@@ -95,6 +119,24 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
         rowChanged = true;
     }
 
+    /**
+     * add a new column to the table.
+     *
+     * @param columnNumber - index at which the column should be added
+     * @param backgroundColor - background color of all the newly added cells
+     * @param borderColor - border color of all the newly added cells
+     * @param cellFont
+     * @param cellAlignment
+     * @param cellFontColor
+     * @param cellContent
+     * @param cellShapeShape
+     * @param cellShapeColor
+     * @param cellShapeValue
+     * @param cellImageFile
+     * @param cellImageIsScaling
+     * @param cellType - cell type can be TYPE_TEXT, TYPE_IMAGE or a TYPE_SHAPE
+     * (see Cell.java)
+     */
     public void addColumn(int columnNumber, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellContent, Shape cellShapeShape, Color cellShapeColor, Float cellShapeValue, File cellImageFile, Boolean cellImageIsScaling, int cellType) {
         int numberOfRows = table.size();
         for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
@@ -107,8 +149,13 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
         columnChanged = true;
     }
 
+    /**
+     * delete a column from the table
+     *
+     * @param pos - position of the column to be deleted
+     */
     public void deleteColumn(int pos) {
-        int numberOfColums = table.get(0).size(); //there will be atleast one row, always
+        int numberOfColums = table.get(0).size(); // there will be atleast one row, always
 
         if (numberOfColums == 1) {
             JOptionPane.showConfirmDialog(null, "The table must contain atleast one column.", "Unable to delete column", JOptionPane.PLAIN_MESSAGE);
@@ -129,6 +176,12 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
         columnChanged = true;
     }
 
+    /**
+     * checks if the structure of the table has changed
+     *
+     * @return True if a row, column or inplace Editor is modified. False,
+     * otherwise.
+     */
     public Boolean getStructureChanged() {
         return rowChanged || columnChanged || ipeditorChanged;
     }
@@ -154,6 +207,10 @@ public class TableItem extends AbstractItem implements LegendItem, Item.Bounding
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
     }
 
+    /**
+     *
+     * @return a rectangle that acts as a bounding box for the table legend.
+     */
     @Override
     public Rectangle getBoundingBox() {
         PreviewProperty[] ownProperties = this.getData(PROPERTIES);

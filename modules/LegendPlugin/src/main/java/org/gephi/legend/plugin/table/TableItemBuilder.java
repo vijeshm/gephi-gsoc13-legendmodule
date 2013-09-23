@@ -1,13 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -25,13 +20,18 @@ import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.spi.ItemBuilder;
-import org.openide.text.PrintPreferences;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 /**
+ * class to build the table items.
+ *
+ * This class is exposed as a service. The createCustomItem method (in the
+ * AbstractLegendItemRenderer) is used to create a table legend item, depending
+ * on the custom item builder chosen by the user from the UI. The custom
+ * builders are expected to implement the CustomTableItemBuilder interface.
  *
  * @author mvvijesh, edubecks
  */
@@ -41,15 +41,15 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class TableItemBuilder extends AbstractLegendItemBuilder {
 
-    protected final String content = Cell.cellTextContent;
+    protected final String content = Cell.defaultCellTextContent;
     // default Values
-    protected final Font defaultFont = Cell.cellFont;
-    protected final Color defaultFontColor = Cell.cellFontColor;
-    protected final Alignment defaultFontAlignment = Cell.cellAlignment;
-    protected final int defaultTableCellSpacing = 10;
-    protected final int defaultTableCellPadding = 5;
-    protected final int defaultTableBorderSize = 5;
-    protected final Color defaultTableBorderColor = Cell.borderColor;
+    protected final Font defaultFont = Cell.defaultCellFont;
+    protected final Color defaultFontColor = Cell.defaultCellFontColor;
+    protected final Alignment defaultFontAlignment = Cell.defaultCellAlignment;
+    protected final int defaultTableCellSpacing = 10; // the horizontal and vertical spacing between cells
+    protected final int defaultTableCellPadding = 5; // the horizontal and vertical spacing between cell content and cell border
+    protected final int defaultTableBorderSize = 5; // the size of the cell border. this is consistent across all the cells. i.e, border size for all the cells are equal
+    protected final Color defaultTableBorderColor = Cell.defaultBorderColor;
     protected final Color defaultTableBackgroundColor = new Color(0f, 0.35f, 1f, 0.5f);
     protected final Boolean defaultTableWidthFull = false;
     protected final Object[] defaultValues = {
@@ -61,15 +61,22 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         defaultTableBorderSize,
         defaultTableBorderColor,
         defaultTableBackgroundColor,
-        defaultTableWidthFull,
-    };
+        defaultTableWidthFull,};
 
     @Override
     public boolean setDefaultValues() {
-        // overwrite the generic properties here
         return false;
     }
 
+    /**
+     *
+     * @param builder - the custom table item builder chosen by the user from
+     * the UI
+     * @param graph - the current graph to which the table item belongs to
+     * @param attributeModel
+     * @param newItemIndex - index of the new text item being created
+     * @return the newly built table legend item
+     */
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         TableItem item = (TableItem) createNewLegendItem(graph);
@@ -77,23 +84,29 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
 
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        
+
         // add the renderer to the legend model if it has not been added
         TableItemRenderer tableItemRenderer = TableItemRenderer.getInstance();
-        if(!legendModel.isRendererAdded(tableItemRenderer)) {
+        if (!legendModel.isRendererAdded(tableItemRenderer)) {
             legendModel.addRenderer(tableItemRenderer);
         }
-        
+
         // setting default renderer and item index
         item.setData(LegendItem.RENDERER, tableItemRenderer);
         item.setData(LegendItem.ITEM_INDEX, newItemIndex);
         item.setData(LegendItem.CUSTOM_BUILDER, (CustomTableItemBuilder) builder);
 
-        tableItemBuilder.populateTable(item);
-
         return item;
     }
 
+    /**
+     *
+     * @param item - the table item being built
+     * @param property - the index of the property
+     * @param value - the value of the property
+     * @return the PreviewProperty object populated with the property string and
+     * the value
+     */
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -203,18 +216,28 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         return previewProperty;
     }
 
+    /**
+     *
+     * @param item - the table item being built
+     * @return the list of PreviewProperty objects
+     */
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
-        // Apart from creating Own Properties, this method will also populate the "table" with the default number of rows and columns
-        // It will also create the properties of each cell, while the creation of the cell itself.
-        TableItem tableItem = (TableItem) item;
         int[] properties = TableProperty.LIST_OF_PROPERTIES;
-        ArrayList<PreviewProperty> previewProperties = new ArrayList<PreviewProperty>();
+
+        PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
         for (int i = 0; i < defaultValues.length; i++) {
-            previewProperties.add(createLegendProperty(tableItem, properties[i], defaultValues[i]));
+            previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
 
-        return previewProperties.toArray(new PreviewProperty[0]);
+        // the table legend must be populated with the data that needs to rendered.
+        // the custmomTableBuilder associated with the item provides this data.
+        // see CustomTableItemBuilder interface and Default custom builder for more information
+        CustomTableItemBuilder customTableBuilder = (CustomTableItemBuilder) item.getData(LegendItem.CUSTOM_BUILDER);
+        // fetch the data to be rendered from the customGroupsBuilder, by populating the groups list.
+        customTableBuilder.populateTable((TableItem) item);
+
+        return previewProperties;
     }
 
     @Override
@@ -222,6 +245,11 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         return new TableItem(graph);
     }
 
+    /**
+     *
+     * @param item - item to be checked against
+     * @return True if TableItemBuilder can build the item. False, otherwise.
+     */
     @Override
     public boolean isBuilderForItem(Item item) {
         return item instanceof TableItem;
@@ -237,6 +265,10 @@ public class TableItemBuilder extends AbstractLegendItemBuilder {
         return NbBundle.getMessage(TableItemBuilder.class, "TableItem.name");
     }
 
+    /**
+     *
+     * @return the list of available custom builders for the table legend
+     */
     @Override
     public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
         Collection<? extends CustomTableItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomTableItemBuilder.class);

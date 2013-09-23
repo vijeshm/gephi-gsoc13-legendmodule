@@ -916,7 +916,8 @@ public abstract class AbstractLegendItemRenderer implements Renderer {
      * @param alignment - the alignment of the text within the bounding box
      * @param isComputingSpace - a boolean value to indicate if the interest is
      * just towards computing the space
-     * @return the width of the string in floating point (with or without drawing, depending on isComputingSpace)
+     * @return the width of the string in floating point (with or without
+     * drawing, depending on isComputingSpace)
      */
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment, boolean isComputingSpace) {
         if (text.isEmpty()) {
@@ -1000,7 +1001,8 @@ public abstract class AbstractLegendItemRenderer implements Renderer {
      * @param width - the width of the bounding box
      * @param height - the height of the bounding box
      * @param alignment - the alignment of the text within the bounding box
-     * @return the width of the string in floating point, without drawing the text
+     * @return the width of the string in floating point, without drawing the
+     * text
      */
     protected float legendDrawText(Graphics2D graphics2D, String text, Font font, Color color, double x, double y, Integer width, Integer height, Alignment alignment) {
         // (x, y, width, height) represents the box in which the given text must be rendered. The text is drawn in the vertical center by default. The horizontal alignment depends on the parameters.

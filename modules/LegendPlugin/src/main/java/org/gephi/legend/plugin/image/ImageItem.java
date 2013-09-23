@@ -1,18 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.image;
 
 import java.awt.Rectangle;
-import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.api.AbstractItem;
+import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.spi.LegendItem;
 import static org.gephi.legend.spi.LegendItem.PROPERTIES;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
+ * the item model for the image legend.
  *
  * @author mvvijesh, edubecks
  */
@@ -30,6 +27,10 @@ public class ImageItem extends AbstractItem implements LegendItem, Item.Bounding
         return (((PreviewProperty[]) this.getData(LegendItem.PROPERTIES))[LegendProperty.LABEL].getValue());
     }
 
+    /**
+     *
+     * @return a rectangle that acts as a bounding box for the image legend.
+     */
     @Override
     public Rectangle getBoundingBox() {
         PreviewProperty[] ownProperties = this.getData(PROPERTIES);

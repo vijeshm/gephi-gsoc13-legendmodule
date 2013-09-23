@@ -6,7 +6,8 @@ import org.gephi.legend.inplaceelements.BaseElement;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
- *  represents a row in the inplace editor layout
+ * represents a row in the inplace editor layout
+ *
  * @author mvvijesh
  */
 public class Row {
@@ -20,8 +21,9 @@ public class Row {
     }
 
     /**
-     * 
-     * @param isGrouped - indicates whether the column to be added contains grouped elements
+     *
+     * @param isGrouped - indicates whether the column to be added contains
+     * grouped elements
      * @return newly created column
      */
     public Column addColumn(Boolean isGrouped) {
@@ -32,6 +34,7 @@ public class Row {
 
     /**
      * remove the column
+     *
      * @param col - column to be removed
      */
     public void deleteColumn(Column col) {
@@ -39,7 +42,7 @@ public class Row {
     }
 
     /**
-     * 
+     *
      * @param col - the column to which the element must be added
      * @param type - the type of element being added - CHECKBOX, COLOR, FILE,
      * FONT, FUNCTION, IMAGE, LABEL, NUMBER, TEXT
@@ -60,7 +63,7 @@ public class Row {
     }
 
     /**
-     * 
+     *
      * @param col - the column in which the element to be removed is contained
      * @param e - the element to be removed
      */

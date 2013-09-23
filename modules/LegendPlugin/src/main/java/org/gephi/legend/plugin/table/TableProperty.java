@@ -1,19 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.gephi.legend.api.LegendModel;
 
 /**
+ * this class holds the properties associated with table legend.
  *
  * @author mvvijesh, edubecks
  */
 public class TableProperty {
+
     public static final int TABLE_FONT = 0;
     public static final int TABLE_FONT_COLOR = 1;
     public static final int TABLE_FONT_ALIGNMENT = 2;
@@ -23,7 +19,6 @@ public class TableProperty {
     public static final int TABLE_BORDER_COLOR = 6;
     public static final int TABLE_BACKGROUND_COLOR = 7;
     public static final int TABLE_WIDTH_FULL = 8;
-    
     public static String[] OWN_PROPERTIES = {
         ".table.font",
         ".table.font.color",
@@ -33,9 +28,7 @@ public class TableProperty {
         ".table.border.size",
         ".table.border.color",
         ".table.background.color",
-        ".table.width.full",
-    };
-    
+        ".table.width.full",};
     public static final int[] LIST_OF_PROPERTIES = {
         TABLE_FONT,
         TABLE_FONT_COLOR,
@@ -45,20 +38,21 @@ public class TableProperty {
         TABLE_BORDER_SIZE,
         TABLE_BORDER_COLOR,
         TABLE_BACKGROUND_COLOR,
-        TABLE_WIDTH_FULL,
-    };
-    
-    private static TableProperty instance = new TableProperty();
+        TABLE_WIDTH_FULL,};
+    private static TableProperty instance;
     private Map<String, Integer> propertyIndex;
-    
+
     private TableProperty() {
         propertyIndex = new HashMap<String, Integer>();
         for (int i = 0; i < OWN_PROPERTIES.length; i++) {
             propertyIndex.put(OWN_PROPERTIES[i], i);
         }
     }
-    
+
     public static TableProperty getInstance() {
+        if (instance == null) {
+            instance = new TableProperty();
+        }
         return instance;
     }
 }

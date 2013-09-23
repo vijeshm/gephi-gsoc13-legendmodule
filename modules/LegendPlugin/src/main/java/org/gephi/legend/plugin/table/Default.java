@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
@@ -12,30 +8,39 @@ import org.gephi.legend.spi.LegendItem.Shape;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * This is the default custom item builder for the table legend.
  *
- * @author mvvijesh
+ * This class is exposed as a service. The UI uses these services and the Lookup
+ * API to show the list of available custom builders. This class defines the
+ * cells and its properties. If you want to change the way the cells look,
+ * modify the populateTable method according to your custom needs.
+ *
+ * @author mvvijesh, edubecks
  */
 @ServiceProvider(service = CustomTableItemBuilder.class, position = 1)
 public class Default implements CustomTableItemBuilder {
-    // this class defines the cells and its properties.
-    // If you want to change the way the cells look, modify the populateTable method according to your custom needs.
-    
+
     protected int tableNumberOfRows = 2;
     protected int tableNumberOfColumns = 3;
-    
-    protected Font cellFont = Cell.cellFont;
-    protected Color cellFontColor = Cell.cellFontColor;
-    protected LegendItem.Alignment cellFontAlignment = Cell.cellAlignment;
-    protected Color cellBackgroundColor = Cell.backgroundColor;
-    protected Color cellBorderColor = Cell.borderColor;
-    protected String cellTextContent = Cell.cellTextContent;
-    protected Shape cellShapeShape = Cell.cellShapeShape;
-    protected Color cellShapeColor = Cell.cellShapeColor;
-    protected Float cellShapeValue = Cell.cellShapeValue;
-    protected File cellImageFile = Cell.cellImageFile;
-    protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
-    protected int cellType = Cell.cellType;
+    protected Font cellFont = Cell.defaultCellFont;
+    protected Color cellFontColor = Cell.defaultCellFontColor;
+    protected LegendItem.Alignment cellFontAlignment = Cell.defaultCellAlignment;
+    protected Color cellBackgroundColor = Cell.defaultBackgroundColor;
+    protected Color cellBorderColor = Cell.defaultBorderColor;
+    protected String cellTextContent = Cell.defaultCellTextContent;
+    protected Shape cellShapeShape = Cell.defaultCellShapeShape;
+    protected Color cellShapeColor = Cell.defaultCellShapeColor;
+    protected Float cellShapeValue = Cell.defaultCellShapeValue;
+    protected File cellImageFile = Cell.defaultCellImageFile;
+    protected Boolean cellImageIsScaling = Cell.defaultCellImageIsScaling;
+    protected int cellType = Cell.defaultCellType;
 
+    /**
+     * based on the values defined above, this method will populate the table
+     * item with rows and columns of cells.
+     *
+     * @param tableItem - the item being built
+     */
     @Override
     public void populateTable(TableItem tableItem) {
         //build the basic default table
@@ -43,6 +48,7 @@ public class Default implements CustomTableItemBuilder {
             tableItem.addRow(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageFile, cellImageIsScaling, cellType);
         }
 
+        // at this point, only rows have been added. The number of columns is still zero.
         for (int i = 0; i < tableNumberOfColumns; i++) {
             tableItem.addColumn(i, cellBackgroundColor, cellBorderColor, cellFont, cellFontAlignment, cellFontColor, cellTextContent, cellShapeShape, cellShapeColor, cellShapeValue, cellImageFile, cellImageIsScaling, cellType);
         }
@@ -67,7 +73,7 @@ public class Default implements CustomTableItemBuilder {
     public String stepsNeededToBuild() {
         return NONE_NEEDED;
     }
-    
+
     @Override
     public String toString() {
         return DEFAULT_TITLE;

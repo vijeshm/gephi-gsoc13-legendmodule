@@ -1,18 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.groups;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
-import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.inplaceeditor.Column;
@@ -29,7 +22,6 @@ import org.gephi.legend.inplaceelements.ElementImage;
 import org.gephi.legend.inplaceelements.ElementLabel;
 import org.gephi.legend.inplaceelements.ElementNumber;
 import org.gephi.legend.inplaceelements.ElementText;
-import org.gephi.legend.plugin.table.Cell;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
 import org.gephi.legend.spi.LegendItem.Direction;
@@ -40,85 +32,102 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.preview.spi.Renderer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * this is the renderer for groups item.
+ *
+ * This renderer does not provide a service. Hence, it should be registered with
+ * the legend model when the corresponding items are built. Since, it doesnt
+ * provide a service, this class should be made singleton. Note that this
+ * approach is subjected to change.
+ *
+ * A 2-d grid of groups is not supported. Groups can only be one dimensional.
  *
  * @author mvvijesh, edubecks
  */
-// @ServiceProvider(service = Renderer.class, position = 503)
 public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
     public static String GROUP_NODE = "group node";
     public static String GROUP_ELEMENT_SHAPE_NODE = "group element shape node";
     public static String GROUP_ELEMENT_LABEL_NODE = "group element label node";
-    //PROPERTIES
-    protected Shape shape;
-    protected Float shapeWidthFraction;
-    protected Direction labelPosition;
+    // properties
+    protected Shape shape; // RECTANGLE, CIRCLE, TRIANGLE
+    protected Float shapeWidthFraction; // the fraction of the total width a shape should occupy
+    protected Direction labelPosition; // UP, DOWN - this defined the relative position of label with shape. (RIGHT and LEFT have been omitted)
     protected Font labelFont;
     protected Color labelFontColor;
     protected Alignment labelFontAlignment;
-    protected Integer paddingBetweenTextAndShape;
-    protected Integer paddingBetweenElements;
+    protected Integer paddingBetweenTextAndShape; // this defines the vertical space between text and shape
+    protected Integer paddingBetweenElements; // this defines the horizontal space between consecutive elements
     // min shape size
     protected Float MINIMUM_SHAPE_SIZE = 10f;
-    // Instance
+    // instance
     private static GroupsItemRenderer instance = null;
 
     private GroupsItemRenderer() {
         // private constructor is required to ensure singleton class
     }
-    
+
     public static GroupsItemRenderer getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new GroupsItemRenderer();
         }
         return instance;
     }
-    
+
     @Override
     public boolean isAnAvailableRenderer(Item item) {
         return item instanceof GroupsItem;
     }
 
+    /**
+     *
+     * @param graphics2D - graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     * @param legendNode - BlockNode onto which the legend content will be
+     * rendered.
+     */
     @Override
     protected void renderToGraphics(Graphics2D graphics2d, RenderTarget target, BlockNode legendNode) {
-        // doesnt support multiple rows yet
-
+        // get the dimensions of the legend node
         int blockOriginX = (int) (legendNode.getOriginX());
         int blockOriginY = (int) (legendNode.getOriginY());
         int blockWidth = (int) legendNode.getBlockWidth();
         int blockHeight = (int) legendNode.getBlockHeight();
 
         GroupsItem item = (GroupsItem) legendNode.getItem();
-        PreviewProperty[] itemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
         ArrayList<GroupElement> groups = item.getGroups();
         int numberOfGroups = groups.size();
         int itemIndex = item.getData(LegendItem.ITEM_INDEX);
 
-        // currently the group legend occupies the entire block.
+        // the group legend occupies the entire block.
         int groupOriginX = blockOriginX;
         int groupOriginY = blockOriginY;
         int groupWidth = blockWidth;
         int groupHeight = blockHeight;
 
+        // if a group node is already created within a legend node, we need not create it again and build the inplace editors for it.
         BlockNode groupNode = legendNode.getChild(GROUP_NODE);
         if (groupNode == null) {
+            // the group node has not been added. Hence, add create and add it.
             groupNode = legendNode.addChild(groupOriginX, groupOriginY, groupWidth, groupHeight, GROUP_NODE);
+
+            // build and associate an inplace editor with the group node
             buildInplaceGroup(groupNode, item, graphics2d, target);
         }
 
+        // irrespective of whether a group node is newly built, update the origin and dimensions of the groups legend
         groupNode.updateGeometry(groupOriginX, groupOriginY, groupWidth, groupHeight);
 
-        // check if the group elements have already been built
-        BlockNode groupElement = groupNode.getChild(GROUP_ELEMENT_SHAPE_NODE); // gets the first instance of group element node
+        // if a group element is already created within a group node, we need not create it again and build the inplace editors for it.
+        BlockNode groupElement = groupNode.getChild(GROUP_ELEMENT_SHAPE_NODE);
         if (groupElement == null) {
-            // build group elements only for the first time
+            // the group elements have not been added
 
+            // compute the width and height of each element
             int elementWidth = (groupWidth - (numberOfGroups + 1) * paddingBetweenElements) / numberOfGroups;
             int elementHeight = groupHeight;
 
@@ -183,6 +192,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 InplaceEditor labelIpeditor = ipbuilder.createInplaceEditor(graph, labelNode);
 
                 r = labelIpeditor.addRow();
+                // see ElementLabel.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementLabel.LABEL_TEXT, "Label:");
@@ -192,18 +202,21 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = labelIpeditor.addRow();
+                // see ElementImage.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, elementPreviewProperties[GroupElement.LABEL_TEXT], data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementColor.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, elementPreviewProperties[GroupElement.LABEL_COLOR], data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementFont.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
@@ -212,6 +225,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = labelIpeditor.addRow();
+                // see ElementImage.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(true);
                 // left-alignment
                 data = new HashMap<String, Object>();
@@ -246,6 +260,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = labelIpeditor.addRow();
+                // see ElementImage.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(true);
                 // position up
                 data = new HashMap<String, Object>();
@@ -263,11 +278,11 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, elementPreviewProperties[GroupElement.LABEL_POSITION], data, elementPreviewProperties[GroupElement.LABEL_POSITION].getValue() == Direction.DOWN, Direction.DOWN);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
-
                 // building inplace editor for shape
                 InplaceEditor shapeIpeditor = ipbuilder.createInplaceEditor(graph, shapeNode);
 
                 r = shapeIpeditor.addRow();
+                // see ElementLabel.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementLabel.LABEL_TEXT, "Shape:");
@@ -277,6 +292,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = shapeIpeditor.addRow();
+                // see ElementImage.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(true);
                 // rectangle
                 data = new HashMap<String, Object>();
@@ -302,6 +318,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, elementPreviewProperties[GroupElement.SHAPE], data, elementPreviewProperties[GroupElement.SHAPE].getValue() == Shape.TRIANGLE, Shape.TRIANGLE);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementColor.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
@@ -309,6 +326,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 r = shapeIpeditor.addRow();
+                // see ElementLabel.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementLabel.LABEL_TEXT, "Value:");
@@ -317,6 +335,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementNumber.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
@@ -334,6 +353,14 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         renderGroupElements(graphics2d, groups, groupNode);
     }
 
+    /**
+     *
+     * @param groupNode - BlockNode containing the groups content
+     * @param item - the legend groups item
+     * @param graphics2D - the graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     */
     private void buildInplaceGroup(BlockNode groupNode, Item item, Graphics2D graphics2d, RenderTarget target) {
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
@@ -348,6 +375,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // controls for border
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Border: ");
@@ -356,6 +384,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementImage.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, borderIsDisplaying);
@@ -364,12 +393,14 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, legendItemPreviewProperties[LegendProperty.BORDER_IS_DISPLAYING], data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementColor.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, legendItemPreviewProperties[LegendProperty.BORDER_COLOR], data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementNumber.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
@@ -379,15 +410,16 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // controls for background
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Background: ");
         data.put(ElementLabel.LABEL_COLOR, InplaceItemRenderer.LABEL_COLOR);
         data.put(ElementLabel.LABEL_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
-        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null); // the last two arguments are related to grouped items. 
-        //For an element not belonging to any group, its values do not matter.
+        addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementImage.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, backgroundIsDisplaying);
@@ -396,6 +428,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, legendItemPreviewProperties[LegendProperty.BACKGROUND_IS_DISPLAYING], data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementColor.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
@@ -404,6 +437,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // controls for title
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Title:");
@@ -412,6 +446,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementImage.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, isDisplayingTitle);
@@ -422,6 +457,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // controls for description
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Description:");
@@ -430,6 +466,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementImage.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementImage.IMAGE_BOOL, isDisplayingDescription);
@@ -440,6 +477,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // controls for shape
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Label:");
@@ -448,6 +486,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementFunction.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/groups_label_position_up_unselected.png");
@@ -469,6 +508,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementFunction.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/groups_label_position_down_unselected.png");
@@ -492,6 +532,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
         // controls for shape
         r = ipeditor.addRow();
+        // see ElementLabel.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementLabel.LABEL_TEXT, "Shape:");
@@ -500,6 +541,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+        // see ElementFunction.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/group_rectangle_unselected.png");
@@ -520,7 +562,8 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
+        // see ElementFunction.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/group_circle_unselected.png");
@@ -541,7 +584,8 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
+        // see ElementFunction.java to understand how this element is being structured within the inplace editor
         col = r.addColumn(false);
         data = new HashMap<String, Object>();
         data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/group_triangle_unselected.png");
@@ -562,16 +606,25 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         });
         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-        
+
         groupNode.setInplaceEditor(ipeditor);
     }
 
+    /**
+     *
+     * @param graphics2d - the graphics object for the target
+     * @param groups - list of group elements
+     * @param groupNode - BlockNode containing the group contents
+     * @param numberOfGroups
+     */
     private void updateGroupGeometry(Graphics2D graphics2d, ArrayList<GroupElement> groups, BlockNode groupNode, int numberOfGroups) {
+        // get group node origin and dimensions
         int groupOriginX = (int) groupNode.getOriginX();
         int groupOriginY = (int) groupNode.getOriginY();
         int groupWidth = (int) groupNode.getBlockWidth();
         int groupHeight = (int) groupNode.getBlockHeight();
 
+        // compute group element width and height (same for all group elements). origin changes for each element.
         int elementWidth = (groupWidth - (numberOfGroups + 1) * paddingBetweenElements) / numberOfGroups;
         int elementHeight = groupHeight;
         int elementOriginX;
@@ -606,6 +659,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         }
 
         for (int i = 0; i < numberOfGroups; i++) {
+            // for each group element, compute the width and height
             elementOriginX = groupOriginX + i * elementWidth + (i + 1) * paddingBetweenElements;
             elementOriginY = groupOriginY;
 
@@ -618,6 +672,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
 
             // element is not actually a node. logically, an element is a combination of a shape and a label
             switch (elementLabelPosition) {
+                // LEFT and RIGHT are not supported
                 case UP:
                     labelNodes.get(i).updateGeometry(
                             elementOriginX,
@@ -651,9 +706,15 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
+    /**
+     * according to the data from the groups and geometry information from the
+     * labelNodes and shapeNodes, render the groups.
+     *
+     * @param graphics2D - the graphics object for the target
+     * @param groups - list of group elements
+     * @param groupNode - BlockNode containing the group contents
+     */
     private void renderGroupElements(Graphics2D graphics2D, ArrayList<GroupElement> groups, BlockNode groupNode) {
-        // according to the data from the groups and geometry information from the labelNodes and shapeNodes, render the groups
-
         ArrayList<BlockNode> shapeNodes = new ArrayList<BlockNode>();
         ArrayList<BlockNode> labelNodes = new ArrayList<BlockNode>();
         ArrayList<BlockNode> childNodes = groupNode.getChildren();
@@ -665,6 +726,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
             }
         }
 
+        // utility variables
         GroupElement groupElement;
         PreviewProperty[] elementPreviewProperties;
         String elementLabelText;
@@ -675,11 +737,11 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         Float elementValue;
         Shape elementShape;
         Color elementShapeColor;
-        FontMetrics fontMetrics;
 
         int shapeOriginX, shapeOriginY, shapeWidth, shapeHeight;
         int labelOriginX, labelOriginY, labelWidth, labelHeight;
 
+        // compute normalized values
         ArrayList<Float> normalizedValues = new ArrayList<Float>(); //do not change the original data. instead, compute a new array
         float maxValue = Float.MIN_VALUE;
         for (GroupElement group : groups) {
@@ -690,6 +752,7 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
             normalizedValues.add((Float) group.getPreviewProperty(GroupElement.VALUE).getValue() / maxValue);
         }
 
+        // render the elements
         for (int i = 0; i < groups.size(); i++) {
             groupElement = groups.get(i);
             elementPreviewProperties = groupElement.getPreviewProperties();
@@ -769,17 +832,23 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         }
     }
 
+    /**
+     *
+     * @param item - group item being rendered
+     * @param properties - PreviewProperty for the PreviewModel
+     */
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
-        shape = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE));
-        shapeWidthFraction = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_SHAPE_WIDTH_FRACTION));
-        labelPosition = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_POSITION));
-        labelFont = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT));
-        labelFontColor = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_COLOR));
-        labelFontAlignment = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_LABEL_FONT_ALIGNMENT));
-        paddingBetweenTextAndShape = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE));
-        paddingBetweenElements = properties.getValue(LegendModel.getProperty(GroupsProperty.OWN_PROPERTIES, itemIndex, GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS));
+        PreviewProperty[] groupsItemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
+
+        shape = groupsItemPreviewProperties[GroupsProperty.GROUPS_SHAPE].getValue();
+        shapeWidthFraction = groupsItemPreviewProperties[GroupsProperty.GROUPS_SHAPE_WIDTH_FRACTION].getValue();
+        labelPosition = groupsItemPreviewProperties[GroupsProperty.GROUPS_LABEL_POSITION].getValue();
+        labelFont = groupsItemPreviewProperties[GroupsProperty.GROUPS_LABEL_FONT].getValue();
+        labelFontColor = groupsItemPreviewProperties[GroupsProperty.GROUPS_LABEL_FONT_COLOR].getValue();
+        labelFontAlignment = groupsItemPreviewProperties[GroupsProperty.GROUPS_LABEL_FONT_ALIGNMENT].getValue();
+        paddingBetweenTextAndShape = groupsItemPreviewProperties[GroupsProperty.GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE].getValue();
+        paddingBetweenElements = groupsItemPreviewProperties[GroupsProperty.GROUPS_PADDING_BETWEEN_ELEMENTS].getValue();
     }
 
     @Override
@@ -787,6 +856,13 @@ public class GroupsItemRenderer extends AbstractLegendItemRenderer {
         return NbBundle.getMessage(GroupsItemRenderer.class, "GroupsItemRenderer.name");
     }
 
+    /**
+     *
+     * @param itemBuilder - the custom item builder being checked against
+     * @param properties - preview properties of the preview model
+     * @return True if the custom item builder can be built with
+     * GroupsItemBuilder
+     */
     @Override
     public boolean needsItemBuilder(ItemBuilder itemBuilder, PreviewProperties properties) {
         return itemBuilder instanceof GroupsItemBuilder;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
@@ -9,9 +5,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.gephi.legend.api.AbstractItem;
 import org.gephi.legend.api.LegendModel;
 import org.gephi.legend.spi.LegendItem;
 import org.gephi.legend.spi.LegendItem.Alignment;
@@ -20,9 +13,11 @@ import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperty;
 
 /**
- * This class represents a table cell. This is NOT a main legend class. This is
- * a supporting class that just holds individual properties. Hence, the builders
- * and renderers are not necessary.
+ * This class represents a table cell.
+ *
+ * This is not a main legend class. This is a supporting class that just holds
+ * individual properties. Hence, the builders and renderers for this class are
+ * not necessary.
  *
  * @author mvvijesh
  */
@@ -67,37 +62,37 @@ public class Cell {
     private Item item = null;
     private Integer row = null;
     private Integer column = null;
-    public static final Color backgroundColor = new Color(1f, 1f, 1f, 0.5f);
-    public static final Color borderColor = Color.BLACK;
-    public static final Font cellFont = new Font("Arial", Font.PLAIN, 25);
-    public static final Alignment cellAlignment = Alignment.CENTER;
-    public static final Color cellFontColor = Color.BLACK;
-    public static final String cellTextContent = "click to modify properties";
-    public static final Shape cellShapeShape = Shape.RECTANGLE;
-    public static final Color cellShapeColor = new Color(0f, 0f, 0f, 0.75f);
-    public static final Float cellShapeValue = 1f;
-    public static final Integer cellShapeWidth = 100;
-    public static final File cellImageFile = new File("/");
-    public static final Boolean cellImageIsScaling = true;
-    public static final Integer cellImageWidth = 50;
-    public static final Integer cellImageHeight = 50;
-    public static final int cellType = TYPE_TEXT;
+    public static final Color defaultBackgroundColor = new Color(1f, 1f, 1f, 0.5f);
+    public static final Color defaultBorderColor = Color.BLACK;
+    public static final Font defaultCellFont = new Font("Arial", Font.PLAIN, 25);
+    public static final Alignment defaultCellAlignment = Alignment.CENTER;
+    public static final Color defaultCellFontColor = Color.BLACK;
+    public static final String defaultCellTextContent = "click to modify properties";
+    public static final Shape defaultCellShapeShape = Shape.RECTANGLE;
+    public static final Color defaultCellShapeColor = new Color(0f, 0f, 0f, 0.75f);
+    public static final Float defaultCellShapeValue = 1f;
+    public static final Integer defaultCellShapeWidth = 100;
+    public static final File defaultCellImageFile = new File("/");
+    public static final Boolean defaultCellImageIsScaling = true;
+    public static final Integer defaultCellImageWidth = 50;
+    public static final Integer defaultCellImageHeight = 50;
+    public static final int defaultCellType = TYPE_TEXT;
     public static final Object[] defaultValues = {
-        backgroundColor,
-        borderColor,
-        cellFont,
-        cellAlignment,
-        cellFontColor,
-        cellTextContent,
-        cellShapeShape,
-        cellShapeColor,
-        cellShapeValue,
-        cellShapeWidth,
-        cellImageFile,
-        cellImageIsScaling,
-        cellImageWidth,
-        cellImageHeight,
-        cellType
+        defaultBackgroundColor,
+        defaultBorderColor,
+        defaultCellFont,
+        defaultCellAlignment,
+        defaultCellFontColor,
+        defaultCellTextContent,
+        defaultCellShapeShape,
+        defaultCellShapeColor,
+        defaultCellShapeValue,
+        defaultCellShapeWidth,
+        defaultCellImageFile,
+        defaultCellImageIsScaling,
+        defaultCellImageWidth,
+        defaultCellImageHeight,
+        defaultCellType
     };
     private PreviewProperty[] previewProperties = new PreviewProperty[OWN_PROPERTIES.length];
 
@@ -112,6 +107,24 @@ public class Cell {
         }
     }
 
+    /**
+     *
+     * @param item - item to which the cell belongs to
+     * @param row - row number of the cell
+     * @param column - column number of the cell
+     * @param backgroundColor
+     * @param borderColor
+     * @param cellFont
+     * @param cellAlignment
+     * @param cellFontColor
+     * @param cellTextContent
+     * @param cellShapeShape
+     * @param cellShapeColor
+     * @param cellShapeValue
+     * @param cellImageFile
+     * @param cellImageIsScaling
+     * @param cellType - cell type can be TYPE_TEXT, TYPE_IMAGE, TYPE_SHAPE
+     */
     Cell(Item item, int row, int column, Color backgroundColor, Color borderColor, Font cellFont, Alignment cellAlignment, Color cellFontColor, String cellTextContent, Shape cellShapeShape, Color cellShapeColor, float cellShapeValue, File cellImageFile, Boolean cellImageIsScaling, int cellType) {
         this.item = item;
         this.row = row;
@@ -134,6 +147,13 @@ public class Cell {
         }
     }
 
+    /**
+     *
+     * @param row - row number of the cell
+     * @param column - column number of the cell
+     * @param propertyIndex - index of the property listed in OWN_PROPERTIES
+     * @param value - value that the property takes
+     */
     private void addCellProperty(int row, int column, int propertyIndex, Object value) {
         PreviewProperty previewProperty = null;
         String propertyString = LegendModel.getProperty(OWN_PROPERTIES, (Integer) item.getData(LegendItem.ITEM_INDEX), propertyIndex);
@@ -296,6 +316,17 @@ public class Cell {
         return previewProperties;
     }
 
+    /**
+     * get the required width of the cell, in accordance with the cell type.
+     *
+     * At any given point in time, a cell can be of a particular type. This
+     * method will return the width that would be required to completely display
+     * the cell. It is used to determine the width of the column and auto adjust
+     * the column if the flag is set. (see TableItemRenderer for more details).
+     *
+     * @param graphics2d - graphics object for the target
+     * @return the width required to render the cell, ideally.
+     */
     public Integer getActiveWidth(Graphics2D graphics2d) {
         switch ((Integer) previewProperties[CELL_TYPE].getValue()) {
             case TYPE_TEXT:
@@ -305,16 +336,22 @@ public class Cell {
                 return fontMetrics.stringWidth((String) previewProperties[CELL_TEXT_CONTENT].getValue());
 
             case TYPE_IMAGE:
-                return (int) ((Integer) previewProperties[CELL_IMAGE_WIDTH].getValue()); // / (Float) previewProperties[CELL_IMAGE_WIDTH_FRACTION].getValue());
+                return (int) ((Integer) previewProperties[CELL_IMAGE_WIDTH].getValue());
 
             case TYPE_SHAPE:
-                return (int) ((Integer) previewProperties[CELL_SHAPE_WIDTH].getValue()); // / (Float) previewProperties[CELL_SHAPE_WIDTH_FRACTION].getValue());
+                return (int) ((Integer) previewProperties[CELL_SHAPE_WIDTH].getValue());
 
             default:
                 return -1;
         }
     }
 
+    /**
+     * this method update the width of the shape, width and height of the image
+     *
+     * @param columnWidth - the width of the column
+     * @param columnHeight - the height of the column
+     */
     public void updateWidthsHeights(int columnWidth, int columnHeight) {
         PreviewProperty cellShapeWidth = previewProperties[CELL_SHAPE_WIDTH];
         PreviewProperty cellImageWidth = previewProperties[CELL_IMAGE_WIDTH];

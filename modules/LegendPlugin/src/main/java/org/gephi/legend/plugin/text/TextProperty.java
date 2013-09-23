@@ -1,18 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.text;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * this class holds the properties associated with text legend.
  *
- * @author mvvijesh
+ * This is a singleton class.
+ *
+ * @author mvvijesh, edubecks
  */
 public class TextProperty {
-        //TEXT 
+
     public static final int TEXT_BODY = 0;
     public static final int TEXT_BODY_FONT = 1;
     public static final int TEXT_BODY_FONT_COLOR = 2;
@@ -29,7 +28,7 @@ public class TextProperty {
         TEXT_BODY_FONT_COLOR,
         TEXT_BODY_FONT_ALIGNMENT
     };
-    private static TextProperty instance = new TextProperty();
+    private static TextProperty instance;
     private Map<String, Integer> propertyIndex;
 
     public int getProperty(String propertyName) {
@@ -44,6 +43,9 @@ public class TextProperty {
     }
 
     public static TextProperty getInstance() {
+        if (instance == null) {
+            instance = new TextProperty();
+        }
         return instance;
-    }    
+    }
 }

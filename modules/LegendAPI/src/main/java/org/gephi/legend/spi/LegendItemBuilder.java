@@ -6,7 +6,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.gephi.attribute.api.AttributeModel;
 import org.gephi.graph.api.Graph;
-import org.gephi.legend.api.AbstractLegendItemRenderer;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.ItemBuilder;
 

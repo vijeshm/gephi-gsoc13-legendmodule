@@ -1,15 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.groups;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.gephi.legend.api.LegendModel;
 
 /**
+ * this class holds the properties associated with group legend.
+ *
+ * This is a singleton class.
  *
  * @author mvvijesh, edubecks
  */
@@ -23,7 +20,6 @@ public class GroupsProperty {
     public static final int GROUPS_LABEL_FONT_ALIGNMENT = 5;
     public static final int GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE = 6;
     public static final int GROUPS_PADDING_BETWEEN_ELEMENTS = 7;
-    
     public static final String[] OWN_PROPERTIES = {
         ".shape",
         ".shape.width.fraction",
@@ -32,9 +28,7 @@ public class GroupsProperty {
         ".label.font.color",
         ".label.font.alignment",
         ".paddingBetweenTextAndShape",
-        ".paddingBetweenElements",
-    };
-    
+        ".paddingBetweenElements",};
     public static final int[] LIST_OF_PROPERTIES = {
         GROUPS_SHAPE,
         GROUPS_SHAPE_WIDTH_FRACTION,
@@ -43,17 +37,8 @@ public class GroupsProperty {
         GROUPS_LABEL_FONT_COLOR,
         GROUPS_LABEL_FONT_ALIGNMENT,
         GROUPS_PADDING_BETWEEN_TEXT_AND_SHAPE,
-        GROUPS_PADDING_BETWEEN_ELEMENTS,
-    };
-
-    /*
-    public static String getLabelProperty(Integer itemIndex, int i) {
-        ArrayList<String> properties = LegendModel.getProperties(OWN_PROPERTIES, itemIndex);
-        return properties.get(GROUPS_LABEL) + i;
-    }
-    */
-    
-    private static GroupsProperty instance = new GroupsProperty();
+        GROUPS_PADDING_BETWEEN_ELEMENTS,};
+    private static GroupsProperty instance;
     private Map<String, Integer> propertyIndex;
 
     public int getProperty(String propertyName) {
@@ -61,13 +46,16 @@ public class GroupsProperty {
     }
 
     private GroupsProperty() {
-        propertyIndex = new HashMap <String, Integer>();
+        propertyIndex = new HashMap<String, Integer>();
         for (int i = 0; i < OWN_PROPERTIES.length; i++) {
             propertyIndex.put(OWN_PROPERTIES[i], i);
         }
     }
 
     public static GroupsProperty getInstance() {
+        if (instance == null) {
+            instance = new GroupsProperty();
+        }
         return instance;
     }
 }

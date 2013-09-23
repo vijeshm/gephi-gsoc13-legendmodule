@@ -100,7 +100,11 @@ public abstract class AbstractLegendItemBuilder implements LegendItemBuilder {
      */
     private void createDefaultProperties(Item item) {
         item.setData(LegendItem.PROPERTIES, createLegendProperties(item));
-        item.setData(LegendItem.OWN_PROPERTIES, createLegendOwnProperties(item));
+        item.setData(LegendItem.OWN_PROPERTIES, createLegendOwnProperties(item)); // we can inject code that fetches whatever data that is required and populate it into the object being built. 
+        // To enable this, a custom item builder must be associated with the item. 
+        // This builder will implement an interface which has a method to retrieve data
+        // (more methods can be added or modified to make it more powerful)
+
         item.setData(LegendItem.NUMBER_OF_DYNAMIC_PROPERTIES, 0);
         item.setData(LegendItem.HAS_DYNAMIC_PROPERTIES, hasDynamicProperties());
         item.setData(LegendItem.DYNAMIC_PROPERTIES, new PreviewProperty[0]);

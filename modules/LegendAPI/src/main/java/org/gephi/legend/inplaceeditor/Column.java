@@ -7,6 +7,7 @@ import org.gephi.preview.api.PreviewProperty;
 
 /**
  * represents a logical equivalent of a cell in the inplace editor layout.
+ *
  * @author mvvijesh
  */
 public class Column {
@@ -26,7 +27,7 @@ public class Column {
     }
 
     /**
-     * 
+     *
      * @param type - the type of element being added - CHECKBOX, COLOR, FILE,
      * FONT, FUNCTION, IMAGE, LABEL, NUMBER, TEXT
      * @param itemIndex - index of the item to which the inplace editor belongs

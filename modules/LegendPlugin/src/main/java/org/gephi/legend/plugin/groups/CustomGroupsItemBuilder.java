@@ -1,27 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.groups;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import org.gephi.legend.spi.CustomLegendItemBuilder;
-import org.gephi.preview.api.Item;
 
 /**
+ * interface that the custom group item builders must implement.
  *
- * @author edubecks
+ * This is required by the legend item builders when they need extraneous data
+ * to be included in the items. This extraneous data will be used by the
+ * renderers to render them appropriately. Every legend plugin must have atleast
+ * one (Default.java) custom legend item builder.
+ *
+ * @author mvvijesh, edubecks
  */
 public interface CustomGroupsItemBuilder extends CustomLegendItemBuilder {
 
     /**
-     * This function receives the objects that need to be filled in order to
-     * build the item
-     * @param labels
-     * @param colors
-     * @param values 
+     *
+     * @param item - the item being built
+     * @return array list of group elements. These group elements contain the
+     * extraneous data fetch from other modules.
      */
-    public void retrieveData(Item item, ArrayList<GroupElement> groups);
-
+    public ArrayList<GroupElement> retrieveData(GroupsItem item);
 }

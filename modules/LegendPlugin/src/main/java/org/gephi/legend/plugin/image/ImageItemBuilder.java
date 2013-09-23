@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.image;
 
 import java.io.File;
@@ -28,6 +24,12 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
 /**
+ * class to build the image items.
+ *
+ * This class is exposed as a service. The createCustomItem method (in the
+ * AbstractLegendItemRenderer) is used to create a image legend item, depending
+ * on the custom item builder chosen by the user from the UI. The custom
+ * builders are expected to implement the CustomImageItemBuilder interface.
  *
  * @author mvvijesh, edubecks
  */
@@ -37,9 +39,10 @@ import org.openide.util.lookup.ServiceProviders;
 })
 public class ImageItemBuilder extends AbstractLegendItemBuilder {
 
-    private File defaultImageFile = new File("/");
-    private Boolean defaultLockAspectRatio = Boolean.TRUE;
-    private int defaultMargin = 10;
+    // default values
+    private File defaultImageFile = new File("/"); // a dummy non-existant file
+    private Boolean defaultLockAspectRatio = Boolean.TRUE; // by default, the loaded images will be scaled
+    private int defaultMargin = 10; // this is space between the image element borders of the legend nodes
     private final Object[] defaultValues = {
         defaultImageFile,
         defaultLockAspectRatio,
@@ -83,6 +86,14 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
         return property;
     }
 
+    /**
+     *
+     * @param item - the group item being built
+     * @param property - the index of the property
+     * @param value - the value of the property
+     * @return the PreviewProperty object populated with the property string and
+     * the value
+     */
     private PreviewProperty createLegendProperty(Item item, int property, Object value) {
         PreviewProperty previewProperty = null;
         Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
@@ -145,6 +156,10 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
         return new ImageItem(graph);
     }
 
+    /**
+     *
+     * @return the list of available custom builders for the image legend
+     */
     @Override
     public ArrayList<CustomLegendItemBuilder> getAvailableBuilders() {
         Collection<? extends CustomImageItemBuilder> customBuilders = Lookup.getDefault().lookupAll(CustomImageItemBuilder.class);
@@ -155,13 +170,25 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
         return availableBuilders;
     }
 
+    /**
+     *
+     * @param item - the groups item being built
+     * @return the list of PreviewProperty objects
+     */
     @Override
     public PreviewProperty[] createLegendOwnProperties(Item item) {
         int[] properties = ImageProperty.LIST_OF_PROPERTIES;
+
         PreviewProperty[] previewProperties = new PreviewProperty[defaultValues.length];
         for (int i = 0; i < defaultValues.length; i++) {
             previewProperties[i] = createLegendProperty(item, properties[i], defaultValues[i]);
         }
+
+        // The image legend doesnt need any extra data from any other module in order to be rendered.
+        // If the renderer needs extra data, add a method in the CustomImageItemBuilder interface to retrieve the data.
+        // extract the CustomImageItemBuilder from the item and invoke the method to retrieve data.
+        // Once the required data is retrieved, add it to the image item in any appropriate form.
+
         return previewProperties;
     }
 
@@ -170,16 +197,25 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
         return Boolean.FALSE;
     }
 
+    /**
+     *
+     * @param builder - the custom image item builder chosen by the user from
+     * the UI
+     * @param graph - the current graph to which the groups item belongs to
+     * @param attributeModel
+     * @param newItemIndex - index of the new image item being created
+     * @return the newly built image legend item
+     */
     @Override
     public Item buildCustomItem(CustomLegendItemBuilder builder, Graph graph, AttributeModel attributeModel, Integer newItemIndex) {
         Item item = createNewLegendItem(graph);
-        
+
         LegendController legendController = LegendController.getInstance();
         LegendModel legendModel = legendController.getLegendModel();
-        
+
         // add the renderer to the legend model if it has not been added
         ImageItemRenderer imageItemRenderer = ImageItemRenderer.getInstance();
-        if(!legendModel.isRendererAdded(imageItemRenderer)) {
+        if (!legendModel.isRendererAdded(imageItemRenderer)) {
             legendModel.addRenderer(imageItemRenderer);
         }
 
@@ -190,6 +226,11 @@ public class ImageItemBuilder extends AbstractLegendItemBuilder {
         return item;
     }
 
+    /**
+     *
+     * @param item - item to be checked against
+     * @return True if GroupsItemBuilder can build the item. False, otherwise.
+     */
     @Override
     public boolean isBuilderForItem(Item item) {
         return item instanceof ImageItem;

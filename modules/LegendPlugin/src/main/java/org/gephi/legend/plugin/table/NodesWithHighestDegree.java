@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import java.awt.Color;
@@ -9,7 +5,6 @@ import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
 import javax.swing.JOptionPane;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
@@ -23,28 +18,40 @@ import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * Nodes with Highest Degree mode of the table legend lists the top N
+ * (user-specified) number of nodes with the highest degree, along with the
+ * degrees.
+ *
+ * This mode customizes the table to have only two columns and a user-specified
+ * number of rows. The first column contains the node names and the second
+ * column contains their degrees, in the descending order.
  *
  * @author mvvijesh
  */
 @ServiceProvider(service = CustomTableItemBuilder.class, position = 3)
 public class NodesWithHighestDegree implements CustomTableItemBuilder {
 
-    protected Font cellFont = Cell.cellFont;
-    protected Color cellFontColor = Cell.cellFontColor;
-    protected LegendItem.Alignment cellFontAlignment = Cell.cellAlignment;
-    protected Color cellBackgroundColor = Cell.backgroundColor;
-    protected Color cellBorderColor = Cell.borderColor;
-    protected String cellTextContent = Cell.cellTextContent;
-    protected Shape cellShapeShape = Cell.cellShapeShape;
-    protected Color cellShapeColor = Cell.cellShapeColor;
-    protected Float cellShapeValue = Cell.cellShapeValue;
-    protected File cellImageFile = Cell.cellImageFile;
-    protected Boolean cellImageIsScaling = Cell.cellImageIsScaling;
-    protected int cellType = Cell.cellType;
-    
+    protected Font cellFont = Cell.defaultCellFont;
+    protected Color cellFontColor = Cell.defaultCellFontColor;
+    protected LegendItem.Alignment cellFontAlignment = Cell.defaultCellAlignment;
+    protected Color cellBackgroundColor = Cell.defaultBackgroundColor;
+    protected Color cellBorderColor = Cell.defaultBorderColor;
+    protected String cellTextContent = Cell.defaultCellTextContent;
+    protected Shape cellShapeShape = Cell.defaultCellShapeShape;
+    protected Color cellShapeColor = Cell.defaultCellShapeColor;
+    protected Float cellShapeValue = Cell.defaultCellShapeValue;
+    protected File cellImageFile = Cell.defaultCellImageFile;
+    protected Boolean cellImageIsScaling = Cell.defaultCellImageIsScaling;
+    protected int cellType = Cell.defaultCellType;
     protected String headerNodeName = "Node";
     protected String headerNodeDegree = "Degree";
 
+    /**
+     * builds the table item with a user-specified number of rows, two columns
+     * and fills it up with the top N nodes with the highest degree.
+     *
+     * @param tableItem - the item being built
+     */
     @Override
     public void populateTable(TableItem tableItem) {
         String newValueString = (String) JOptionPane.showInputDialog(null, "Enter the top number of nodes:", "Number of Nodes", JOptionPane.PLAIN_MESSAGE, null, null, "");
@@ -126,18 +133,21 @@ public class NodesWithHighestDegree implements CustomTableItemBuilder {
 
         ArrayList<ArrayList<Cell>> table = tableItem.getTable();
 
+        // custom built style for node name in header
         Cell headerNodeNameCell = table.get(0).get(0);
         PreviewProperty[] headerNodeNameCellPreviewProp = headerNodeNameCell.getPreviewProperties();
         headerNodeNameCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerNodeName);
         headerNodeNameCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerNodeNameCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
+        // custom built style for degree in header
         Cell headerNodeDegreeCell = table.get(0).get(1);
         PreviewProperty[] headerNodeDegreeCellPreviewProp = headerNodeDegreeCell.getPreviewProperties();
         headerNodeDegreeCellPreviewProp[Cell.CELL_TEXT_CONTENT].setValue(headerNodeDegree);
         headerNodeDegreeCellPreviewProp[Cell.BACKGROUND_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
         headerNodeDegreeCellPreviewProp[Cell.BORDER_COLOR].setValue(new Color(0f, 0f, 0f, 0f));
 
+        // construct all the other rows
         Cell nodeNameCell;
         PreviewProperty[] nodeNameCellPreviewProp;
         Cell nodeDegreeCell;

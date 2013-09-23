@@ -101,7 +101,7 @@ public class ElementFont extends BaseElement {
         graphics2d.drawString(displayString,
                 (editorOriginX + borderSize) + currentElementsCount * blockUnitSize + numberOfBlocks * blockUnitSize / 2 - fontWidth / 2,
                 (editorOriginY + borderSize) + rowBlock * blockUnitSize + blockUnitSize / 2 + fontHeight / 2);
-        
+
         // update the geometry of the inplace editor
         setGeometry((editorOriginX + borderSize) + currentElementsCount * blockUnitSize,
                 (editorOriginY + borderSize) + rowBlock * blockUnitSize,

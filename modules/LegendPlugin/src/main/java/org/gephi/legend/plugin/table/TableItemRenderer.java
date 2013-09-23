@@ -1,22 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gephi.legend.plugin.table;
 
 import com.bric.swing.ColorPicker;
 import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
@@ -24,10 +17,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.gephi.graph.api.Graph;
 import org.gephi.legend.api.AbstractLegendItemRenderer;
+import org.gephi.legend.api.BlockNode;
 import org.gephi.legend.api.LegendController;
 import org.gephi.legend.api.LegendModel;
-import org.gephi.legend.api.BlockNode;
-import org.gephi.legend.api.LegendProperty;
 import org.gephi.legend.inplaceeditor.Column;
 import org.gephi.legend.inplaceeditor.InplaceClickResponse;
 import org.gephi.legend.inplaceeditor.InplaceEditor;
@@ -53,18 +45,28 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.ItemBuilder;
-import org.gephi.preview.spi.Renderer;
-import org.netbeans.swing.tabcontrol.event.TabActionEvent;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * this is the renderer for table item.
+ *
+ * This renderer does not provide a service. Hence, it should be registered with
+ * the legend model when the corresponding items are built. Since, it doesnt
+ * provide a service, this class should be made singleton. Note that this
+ * approach is subjected to change.
+ *
+ * The table item consists of a two dimensional array of cells. A 'cell' is an
+ * object which has a collection of preview properties for that cell. The table
+ * legend three modes of rendering: text, shape and image. Each cell can be
+ * configured to one mode at a time. The inplace editors associated with the
+ * cell nodes change according to the type of cell. When the type of a cell is
+ * shape, its value is normalized across the cells in the shape mode and then
+ * rendered.
  *
  * @author mvvijesh, edubecks
  */
-// @ServiceProvider(service = Renderer.class, position = 502)
 public class TableItemRenderer extends AbstractLegendItemRenderer {
 
     public static String TABLENODE = "table node";
@@ -72,7 +74,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     public static String CELLNODE_ROW_NUMBER = "cell node row number";
     public static String CELLNODE_COL_NUMBER = "cell node column number";
     public static String TABLE_PROPERTIES_ADDED = "table properties added";
-    // OWN PROPERTIES - refine the variable name to have semantic
+    // own properties
     private Font tableFont;
     private Color tableFontColor;
     private Alignment tableFontAlignment;
@@ -91,18 +93,18 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
     private int cellPaddingLowerLimit = 5;
     private int cellBorderLowerLimit = 5;
     private Boolean insufficientEmptySpace;
-    // Instance
+    // instance
     private static TableItemRenderer instance = null;
-    
+
     private TableItemRenderer() {
         // private constructor is required to ensure singleton class
     }
-    
+
     public static TableItemRenderer getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new TableItemRenderer();
         }
-        
+
         return instance;
     }
 
@@ -111,11 +113,15 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         return item instanceof TableItem;
     }
 
+    /**
+     *
+     * @param item - table item being rendered
+     * @param properties - PreviewProperty for the PreviewModel
+     */
     @Override
     protected void readOwnPropertiesAndValues(Item item, PreviewProperties properties) {
-        Integer itemIndex = item.getData(LegendItem.ITEM_INDEX);
         PreviewProperty[] tableItemPreviewProperties = item.getData(LegendItem.OWN_PROPERTIES);
-        
+
         tableFont = tableItemPreviewProperties[TableProperty.TABLE_FONT].getValue();
         tableFontColor = tableItemPreviewProperties[TableProperty.TABLE_FONT_COLOR].getValue();
         tableFontAlignment = tableItemPreviewProperties[TableProperty.TABLE_FONT_ALIGNMENT].getValue();
@@ -125,25 +131,37 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableCellBorderColor = tableItemPreviewProperties[TableProperty.TABLE_BORDER_COLOR].getValue();
         tableBackgroundColor = tableItemPreviewProperties[TableProperty.TABLE_BACKGROUND_COLOR].getValue();
         tableIsOccupyingFullWidth = tableItemPreviewProperties[TableProperty.TABLE_WIDTH_FULL].getValue();
-        
+
         tableNumberOfRows = ((TableItem) item).getNumberOfRows();
         tableNumberOfColumns = ((TableItem) item).getNumberOfColumns();
 
         table = ((TableItem) item).getTable();
         structureChanged = ((TableItem) item).getStructureChanged();
         insufficientEmptySpace = tableCellSpacing < cellSpacingLowerLimit && tableCellPadding < cellPaddingLowerLimit && tableCellBorderSize < cellBorderLowerLimit;
+        // this condition is used to transfer the table node's inplace editors onto cell node's inplace editors when the intercellular space becomes too small to click on.
     }
 
+    /**
+     *
+     * @param graphics2D - graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     * @param legendNode - BlockNode onto which the legend content will be
+     * rendered.
+     */
     @Override
     protected void renderToGraphics(Graphics2D graphics2D, RenderTarget target, BlockNode legendNode) {
+        // get the legendNode Geometry
         int blockOriginX = (int) (legendNode.getOriginX());
         int blockOriginY = (int) (legendNode.getOriginY());
         int blockWidth = (int) legendNode.getBlockWidth();
         int blockHeight = (int) legendNode.getBlockHeight();
 
+        // compute the mean column width and the row height
         int meanColWidth = (blockWidth - (tableNumberOfColumns + 1) * tableCellSpacing - 2 * tableNumberOfColumns * tableCellPadding - 2 * tableNumberOfColumns * tableCellBorderSize) / tableNumberOfColumns;
         int rowHeight = (blockHeight - (tableNumberOfRows + 1) * tableCellSpacing - 2 * tableNumberOfRows * tableCellPadding - 2 * tableNumberOfRows * tableCellBorderSize) / tableNumberOfRows;
 
+        // determine the width to the columns
         TableItem item = (TableItem) legendNode.getItem();
         Integer[] tableColumnWidths = new Integer[tableNumberOfColumns];
 
@@ -189,18 +207,23 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             sumOfWidths += tableColumnWidths[col];
         }
 
-        // create a table node, create a corresponding inplace editor and attach it as the legendNode's child
+        // compute table node dimensions
         int tableWidth = sumOfWidths + (tableNumberOfColumns + 1) * tableCellSpacing + 2 * tableNumberOfColumns * tableCellPadding + 2 * tableNumberOfColumns * tableCellBorderSize;
         int tableHeight = blockHeight;
         int tableOriginX = blockOriginX + blockWidth / 2 - tableWidth / 2;
-        int tableOriginY = blockOriginY + blockHeight / 2 - tableHeight / 2; //as of now, tableOriginY is same as blockOriginY
+        int tableOriginY = blockOriginY + blockHeight / 2 - tableHeight / 2;
+
+        // if an table node is already created within a legend node, we need not create it again and build the inplace editors for it.
         BlockNode tableNode = legendNode.getChild(TABLENODE);
         if (tableNode == null) {
+            // the table node has not been added. Hence, add create and add it.
             tableNode = legendNode.addChild(tableOriginX, tableOriginY, tableWidth, tableHeight, TABLENODE);
+
+            // build and associate an inplace editor with the table node
             buildInplaceTable(tableNode, item, graphics2D, target);
         }
 
-        // update the geometry of the table node - this is redundant only when the first time the legend is created.
+        // irrespective of whether a table node is newly built, update the origin and dimensions of the table legend
         tableNode.updateGeometry(tableOriginX, tableOriginY, tableWidth, tableHeight);
 
         // render background
@@ -233,8 +256,16 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         renderCells(graphics2D, tableNode, (TableItem) item);
     }
 
+    /**
+     * associate an inplace renderer with the table node.
+     *
+     * @param tableNode - BlockNode containing the table content
+     * @param item - the legend table item
+     * @param graphics2D - the graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     */
     private void buildInplaceTable(BlockNode tableNode, Item item, Graphics2D graphics2d, RenderTarget target) {
-        // associate an inplace renderer with the table node
         Graph graph = null;
         InplaceItemBuilder ipbuilder = Lookup.getDefault().lookup(InplaceItemBuilder.class);
         InplaceEditor ipeditor = ipbuilder.createInplaceEditor(graph, tableNode);
@@ -246,6 +277,16 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
         tableNode.setInplaceEditor(ipeditor);
     }
 
+    /**
+     *
+     * @param tableNode - BlockNode containing the table content
+     * @param item - the legend table item
+     * @param rowHeight
+     * @param colWidths - precomputed array of column widths
+     * @param graphics2D - the graphics object for the target
+     * @param target - the target onto which the item should be rendered - SVG,
+     * PDF or G2D
+     */
     private void buildCellNodes(BlockNode tableNode, Item item, int rowHeight, Integer[] colWidths, Graphics2D graphics2d, RenderTarget target) {
         // the legend model will still contain the reference to the old inplace editor, not the updated one. Hence, update it.
         LegendController legendController = LegendController.getInstance();
@@ -287,7 +328,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
             sum += colWidths[i];
         }
 
-        //create blocknodes for cells and associate inplace editors with them.
+        // create blocknodes for cells and associate inplace editors with them.
         for (int rowNumber = 0; rowNumber < tableNumberOfRows; rowNumber++) {
             for (int colNumber = 0; colNumber < tableNumberOfColumns; colNumber++) {
                 int tableCellOriginX = tableOriginX + columnOrigins[colNumber] + (colNumber + 1) * tableCellSpacing + (2 * colNumber + 1) * tableCellPadding + (2 * colNumber + 1) * tableCellBorderSize;
@@ -311,6 +352,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                 // Cell Properties
                 r = ipeditor.addRow();
+                // see ElementLabel.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementLabel.LABEL_TEXT, "Cell: ");
@@ -319,12 +361,14 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementColor.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.BACKGROUND_COLOR], data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementColor.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
@@ -334,18 +378,21 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 switch ((Integer) cellPreviewProperties[Cell.CELL_TYPE].getValue()) {
                     case Cell.TYPE_TEXT:
                         r = ipeditor.addRow();
+                        // see ElementImage.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementText.EDIT_IMAGE, "/org/gephi/legend/graphics/edit.png");
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.TEXT, itemIndex, cellPreviewProperties[Cell.CELL_TEXT_CONTENT], data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementColor.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.COLOR, itemIndex, cellPreviewProperties[Cell.CELL_FONT_COLOR], data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementFont.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementFont.DISPLAY_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
@@ -354,6 +401,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                         r = ipeditor.addRow();
+                        // see ElementImage.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(true);
                         // left-alignment
                         data = new HashMap<String, Object>();
@@ -390,6 +438,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                     case Cell.TYPE_SHAPE:
                         r = ipeditor.addRow();
+                        // see ElementImage.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(true);
                         // rectangle
                         data = new HashMap<String, Object>();
@@ -415,6 +464,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.IMAGE, itemIndex, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE], data, cellPreviewProperties[Cell.CELL_SHAPE_SHAPE].getValue() == LegendItem.Shape.TRIANGLE, LegendItem.Shape.TRIANGLE);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementColor.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementColor.COLOR_MARGIN, InplaceItemRenderer.COLOR_MARGIN);
@@ -422,6 +472,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                         r = ipeditor.addRow();
+                        // see ElementLabel.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementLabel.LABEL_TEXT, "Value:");
@@ -430,6 +481,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementNumber.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
@@ -438,6 +490,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                         r = ipeditor.addRow();
+                        // see ElementLabel.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementLabel.LABEL_TEXT, "Shape Width:");
@@ -446,6 +499,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementNumber.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
@@ -456,6 +510,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                     case Cell.TYPE_IMAGE:
                         r = ipeditor.addRow();
+                        // see ElementLabel.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementLabel.LABEL_TEXT, "Source: ");
@@ -464,6 +519,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementFile.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementFile.FILE_PATH, "/org/gephi/legend/graphics/file.png");
@@ -471,6 +527,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                         r = ipeditor.addRow();
+                        // see ElementLabel.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementLabel.LABEL_TEXT, "Scale: ");
@@ -479,6 +536,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementCheckbox.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementCheckbox.IS_CHECKED, (Boolean) cellPreviewProperties[Cell.CELL_IMAGE_IS_SCALING].getValue());
@@ -486,6 +544,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                         r = ipeditor.addRow();
+                        // see ElementLabel.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementLabel.LABEL_TEXT, "Image Dimensions:");
@@ -494,13 +553,15 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                        // see ElementNumber.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
                         data.put(ElementNumber.NUMBER_FONT, InplaceItemRenderer.INPLACE_DEFAULT_DISPLAY_FONT);
                         addedElement = col.addElement(BaseElement.ELEMENT_TYPE.NUMBER, itemIndex, cellPreviewProperties[Cell.CELL_IMAGE_WIDTH], data, false, null);
                         addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
-                        
+
+                        // see ElementNumber.java to understand how this element is being structured within the inplace editor
                         col = r.addColumn(false);
                         data = new HashMap<String, Object>();
                         data.put(ElementNumber.NUMBER_COLOR, InplaceItemRenderer.NUMBER_COLOR);
@@ -512,6 +573,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                 // switching between cell types
                 r = ipeditor.addRow();
+                // see ElementLabel.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementLabel.LABEL_TEXT, "Cell Type:");
@@ -520,6 +582,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.LABEL, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 // text type
                 data = new HashMap<String, Object>();
@@ -541,6 +604,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 // shape type
                 data = new HashMap<String, Object>();
@@ -562,6 +626,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement = col.addElement(BaseElement.ELEMENT_TYPE.FUNCTION, itemIndex, null, data, false, null);
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
+                // see ElementFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 // image type
                 data = new HashMap<String, Object>();
@@ -585,6 +650,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                 r = ipeditor.addRow();
                 // insert_row button
+                // see ElemenFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/insert_row.png");
@@ -596,7 +662,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellRowNumber = cellNode.getData(CELLNODE_ROW_NUMBER);
-                            tableItem.addRow(cellRowNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageFile, Cell.cellImageIsScaling, Cell.cellType);
+                            tableItem.addRow(cellRowNumber, Cell.defaultBackgroundColor, Cell.defaultBorderColor, Cell.defaultCellFont, Cell.defaultCellAlignment, Cell.defaultCellFontColor, Cell.defaultCellTextContent, Cell.defaultCellShapeShape, Cell.defaultCellShapeColor, Cell.defaultCellShapeValue, Cell.defaultCellImageFile, Cell.defaultCellImageIsScaling, Cell.defaultCellType);
                         }
                     }
                 });
@@ -604,6 +670,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // insert_column button
+                // see ElementFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/insert_column.png");
@@ -615,7 +682,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                             BlockNode cellNode = ipeditor.getData(InplaceEditor.BLOCKNODE);
                             TableItem tableItem = (TableItem) cellNode.getItem();
                             int cellColNumber = cellNode.getData(CELLNODE_COL_NUMBER);
-                            tableItem.addColumn(cellColNumber, Cell.backgroundColor, Cell.borderColor, Cell.cellFont, Cell.cellAlignment, Cell.cellFontColor, Cell.cellTextContent, Cell.cellShapeShape, Cell.cellShapeColor, Cell.cellShapeValue, Cell.cellImageFile, Cell.cellImageIsScaling, Cell.cellType);
+                            tableItem.addColumn(cellColNumber, Cell.defaultBackgroundColor, Cell.defaultBorderColor, Cell.defaultCellFont, Cell.defaultCellAlignment, Cell.defaultCellFontColor, Cell.defaultCellTextContent, Cell.defaultCellShapeShape, Cell.defaultCellShapeColor, Cell.defaultCellShapeValue, Cell.defaultCellImageFile, Cell.defaultCellImageIsScaling, Cell.defaultCellType);
                         }
                     }
                 });
@@ -623,6 +690,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // delete_row button
+                // see ElementFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/delete_row.png");
@@ -642,6 +710,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
                 addedElement.computeNumberOfBlocks(graphics2d, (G2DTarget) target, InplaceItemRenderer.DEFAULT_INPLACE_BLOCK_UNIT_SIZE);
 
                 // delete_column button
+                // see ElementFunction.java to understand how this element is being structured within the inplace editor
                 col = r.addColumn(false);
                 data = new HashMap<String, Object>();
                 data.put(ElementFunction.FUNCTION_IMAGE, "/org/gephi/legend/graphics/delete_column.png");
@@ -1243,7 +1312,7 @@ public class TableItemRenderer extends AbstractLegendItemRenderer {
 
                                 scaledOriginX = cellOriginX + cellWidth / 2 - scaledWidth / 2;
                                 scaledOriginY = cellOriginY + cellHeight / 2 - scaledHeight / 2;
-                                
+
                                 graphics2D.drawImage(image,
                                         scaledOriginX,
                                         scaledOriginY,
